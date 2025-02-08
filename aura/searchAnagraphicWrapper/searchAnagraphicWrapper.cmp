@@ -1,0 +1,36 @@
+<!--
+ - Created by FMARCHEGIA00 on 04/02/2021.
+ -->
+
+<aura:component description="searchAnagraphicWrapper" implements="force:hasRecordId,force:lightningQuickAction,force:appHostable,lightning:availableForFlowScreens,flexipage:availableForAllPageTypes" access="global">
+<!--    <lightning:workspaceAPI aura:id="workspaceAnagrafica" /> -->
+    <aura:attribute name="action" type="String" />
+    <aura:attribute name="responseText" type="String" />
+
+<!--    <aura:handler name="init" value="{! this }" action="{! c.onInit }"/> -->
+
+    <aura:attribute name="recordId" type="String" access="global" />
+
+    <c:searchAnagraphic caseid="{!v.recordId}" onclose="{!c.closeQA}"/>
+
+    <!--    <aura:attribute name="showSpinner" type="boolean" default="false"/>-->
+<!--    <aura:handler event="aura:doneRendering" action="{!c.doneRendering}"/>-->
+
+<!--    &lt;!&ndash; Spinner&ndash;&gt;-->
+<!--    <aura:if isTrue="{!v.showSpinner}">-->
+<!--        <div aura:id="spinner">-->
+<!--            <div class="slds-spinner_container">-->
+<!--                <div aura:id="spinnerL" class="slds-spinner slds-spinner&#45;&#45;large" role="alert">-->
+<!--                    <span class="slds-assistive-text">Loading</span>-->
+<!--                    <div class="slds-spinner_dot-a"></div>-->
+<!--                    <div class="slds-spinner_dot-b"></div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </aura:if>-->
+
+<!--    <lightning:tabset variant="scoped">-->
+<!--        <lightning:tab onactive="{! c.handleActive }" label="Ricerca Anagrafica" id="ricercaAnagrafica" />-->
+<!--    </lightning:tabset>-->
+
+</aura:component>

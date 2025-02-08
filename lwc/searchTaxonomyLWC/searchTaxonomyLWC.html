@@ -1,0 +1,14 @@
+<template>
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_4-of-4">
+            <form>
+                <!-- Create an Input Field where user can enter text to find the
+                Records-->
+                <lightning-input
+                    label={clabel} value={searchKey} type="search"
+                    onchange={handleChange} disabled={disable} required>
+                </lightning-input>
+            </form>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,18 @@
+<template>
+        <div class="slds-align_absolute-center slds-m-around_medium">
+            <p>{messageToDisplay}</p>
+        </div>
+        
+        <template if:false={hideButtons}>
+            <div class="slds-align_absolute-center">
+                <div class="slds-grid slds-gutters">
+                    <div class ="slds-col">
+                        <lightning-button data-name={label.next} label={label.next} variant="brand" onclick={handleNavigation}></lightning-button>
+                    </div>
+                    <div class ="slds-col" >
+                        <lightning-button data-name={label.close} label={label.close} variant="brand" onclick={handleNavigation}></lightning-button>
+                    </div>
+                </div>
+            </div>
+        </template>
+</template>

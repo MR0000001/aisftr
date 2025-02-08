@@ -1,0 +1,7 @@
+<!--
+ - Created by RGAROFALO00 on 28/05/2020.
+ -->
+
+<aura:component description="OpenEditForm" implements="lightning:availableForFlowActions" access="global"> 
+    <aura:attribute name="recordId" type="String" access="global" />
+</aura:component>

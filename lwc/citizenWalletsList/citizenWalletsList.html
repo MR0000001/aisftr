@@ -1,0 +1,37 @@
+<template>
+    <lightning-card>
+        <div class="slds-box slds-theme_shade">
+            <h3 slot="title">
+                <lightning-icon icon-name="action:record" size="small" alternative-text={label.walletsTtitle}></lightning-icon>
+                <span class="slds-p-left_x-small slds-text-title_caps">{label.walletsTtitle}</span>
+            </h3>
+            <template if:true={showListWallets}>
+                <div class="slds-p-left_large">
+                    <div class="slds-p-around_medium">
+                        <lightning-datatable 
+                            key-field="id"
+                            data={walletsToDisplay}
+                            columns={columns}
+                            wrap-text-max-lines="3"
+                            hide-checkbox-column 
+                            show-row-number-column>
+                        </lightning-datatable>
+                    </div>
+                    <div class="slds-p-around_medium">
+                        <div class="slds-m-bottom_medium">
+                            <p>{label.page} <b>{page}</b> {label.of} <b>{totalPages}</b></p>
+                        </div>
+                        <c-paginator-bottom variant="brand" onprevious={handlePrevious} onnext={handleNext} onfirst={handleFirst} onlast={handleLast} currentpage={page} totalrecords={totalRecordsCount} pagesize={pageSize}></c-paginator-bottom>
+                    </div>
+                </div>
+            </template>
+            <template if:false={showListWallets}>
+                <lightning-layout>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <div class="slds-align_absolute-center custom-box slds-box slds-p-around_medium slds-text-align_center">{errorToDisplay}</div>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>
+          </div>
+    </lightning-card>
+</template>

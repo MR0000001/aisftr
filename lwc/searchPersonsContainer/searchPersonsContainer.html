@@ -1,0 +1,30 @@
+<template>
+    <lightning-tabset variant="scoped">
+        <lightning-tab label={label.accountTitle} value={label.accountTitle}>
+            <c-search-anagraphic 
+                title={label.accountTitle} 
+                accordion-title={label.accountAccordionTitle} 
+                hide-general-search="false" 
+                caseid={caseId}
+                onredirecttolegalsearch={handleNavigatePage}
+                onclose={closeQuickAction}
+                is-from-case={isFromCase}
+                ondisablelegalregistry={handleNavigatePage}
+                onenablelegalregistry={handleNavigatePage}>
+            </c-search-anagraphic>
+        </lightning-tab>
+        
+        <lightning-tab label={label.legalEntitiesTitle} value={label.legalEntitiesTitle}>
+            <c-search-legal-entities 
+                title={label.legalEntitiesTitle} 
+                caseid={caseId}
+                onredirecttoregistry={handleNavigatePage}
+                ondisableregistry={handleNavigatePage}
+                onenableregistry={handleNavigatePage}
+                onclose={closeQuickAction}
+                is-from-case={isFromCase}
+                block-before-insertion={blockLegalBeforeInsertion}>
+            </c-search-legal-entities>
+        </lightning-tab>
+    </lightning-tabset>
+</template>

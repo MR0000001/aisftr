@@ -1,0 +1,21 @@
+<template>  
+    <lightning-layout>  
+      <lightning-layout-item>  
+        <lightning-button label={label.firstPage} icon-name="utility:chevronleft" onclick={handleFirst}  
+          disabled={showFirstButton}></lightning-button>  
+      </lightning-layout-item>  
+      <lightning-layout-item>  
+        <lightning-button label={label.previousPage} icon-name="utility:chevronleft" onclick={handlePrevious}  
+          disabled={showFirstButton}></lightning-button>  
+      </lightning-layout-item>  
+      <lightning-layout-item flexibility="grow"></lightning-layout-item>  
+      <lightning-layout-item>  
+        <lightning-button label={label.nextPage} icon-name="utility:chevronright" icon-position="right" onclick={handleNext}  
+          disabled={showLastButton}></lightning-button>  
+      </lightning-layout-item>  
+      <lightning-layout-item>  
+        <lightning-button label={label.lastPage} icon-name="utility:chevronright" icon-position="right" onclick={handleLast}  
+          disabled={showLastButton}></lightning-button>  
+      </lightning-layout-item>  
+    </lightning-layout>  
+  </template>

@@ -1,0 +1,12 @@
+<template>
+    <lightning-card title={label.actions}>
+        <template if:true={showRolesDropdown}>
+            <lightning-combobox name={label.role} label={label.role} value={selectedRole}
+            options={roles} onchange={handleRoleSelection} required class="slds-m-bottom_x-small"></lightning-combobox> 
+        </template>
+        <lightning-combobox name={label.action} label={label.action} value={selectedAction}
+            options={actions} onchange={handleActionSelection} required class="slds-m-bottom_x-small"></lightning-combobox>
+            <lightning-button variant="brand" label={label.next} title={label.next} onclick={handleNext} class="slds-m-left_x-small"></lightning-button>
+    </lightning-card>
+    
+</template>

@@ -1,0 +1,104 @@
+<template>  
+  <lightning-card>  
+    <div class="slds-m-around_medium">  
+        <table  
+          class="slds-table slds-table_bordered slds-table_striped slds-table_cell-buffer slds-table_fixed-layout slds-scrollable--x">  
+          <thead>  
+            <tr class="slds-text-heading_label">  
+              <th scope="col">  
+                <div  style = "white-space: pre-wrap" title={label.year}>{label.year}</div>  
+              </th>  
+              <th scope="col">  
+                <div  style = "white-space: pre-wrap" title={label.tribute}>{label.tribute}</div>  
+              </th>
+              <th scope="col">  
+                <div  style = "white-space: pre-wrap" title={label.description}>{label.description}</div>  
+              </th>  
+              <th scope="col">  
+                <div  style = "white-space: pre-wrap" title={label.issueDate}>{label.issueDate}</div>  
+              </th>
+              <th scope="col">  
+                <div  style = "white-space: pre-wrap" title={label.expirationDate}>{label.expirationDate}</div>  
+              </th>  
+              <th scope="col">  
+                <div  style = "white-space: pre-wrap" title={label.amountDate}>{label.amountDate}</div>  
+              </th>
+              <th scope="col">  
+                <div  style = "white-space: pre-wrap" title={label.amountReduced}>{label.amountReduced}</div>  
+              </th>  
+              <th scope="col" >  
+                <div  style = "white-space: pre-wrap" title={label.amountDueIncreased}>{label.amountDueIncreased}</div>  
+              </th>
+              <template if:true = {showadditionalparameters}>
+              <th scope="col">  
+                <div  style = "white-space: pre-wrap" title={label.amountPaid}>{label.amountPaid}</div>  
+              </th>  
+              <th scope="col">  
+                <div  style = "white-space: pre-wrap" title={label.amountPaidInstallment}>{label.amountPaidInstallment}</div>  
+              </th>
+              <th scope="col">  
+                <div  style = "white-space: pre-wrap" title={label.paymentId}>{label.paymentId}</div>  
+              </th>  
+              <th scope="col">  
+                <div  style = "white-space: pre-wrap" title={label.paymentDate}>{label.paymentDate}</div>  
+              </th>
+              <th scope="col">  
+                <div  style = "white-space: pre-wrap" title={label.paymentIntermediary}>{label.paymentIntermediary}</div>  
+              </th>
+            </template>
+            </tr>  
+          </thead>  
+          <tbody>  
+            <!-- Use the Apex model and controller to fetch server side data -->  
+            <template for:each={tributes} for:item="tribute">  
+              <tr key={tribute.Id}>  
+                <th scope="row">  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap"  title={tributesYear}>{tributesYear}</div>  
+                </th>  
+                <td>  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap"  title={tributesTypology}>{tributesTypology}</div>  
+                </td>
+                <td>  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap; word-wrap: break-word"  title={tribute.descPosizione}>{tribute.descPosizione}</div>  
+                </td> 
+                <td>  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap"  title={tribute.dataEmissione}><lightning-formatted-date-time value={tribute.dataEmissione}></lightning-formatted-date-time></div>  
+                </td> 
+                <td>  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap"  title={tribute.dataScadenza}><lightning-formatted-date-time value={tribute.dataScadenza}></lightning-formatted-date-time></div> 
+                </td> 
+                <td>  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap"  title={tribute.importoDovIntero}>{tribute.importoDovIntero}</div>  
+                </td> 
+                <td>  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap"  title={tribute.importoDovRidotto}>{tribute.importoDovRidotto}</div>  
+                </td> 
+                <td>  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap"  title={tribute.importoDovMaggiorato}>{tribute.importoDovMaggiorato}</div>  
+                </td> 
+                <template if:true = {showadditionalparameters}>
+                <td>  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap"  title={tribute.importoPagato}>{tribute.importoPagato}</div>  
+                </td> 
+                <td>  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap"  title={tribute.importoPag}>{tribute.importoPag}</div>  
+                </td> 
+                <td>  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap"  title={tribute.idPagamento}>{tribute.idPagamento}</div>  
+                </td> 
+                <td>  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap"  title={tribute.dataPagamento}><lightning-formatted-date-time value={tribute.dataPagamento}></lightning-formatted-date-time></div>  
+                </td> 
+                <td>  
+                  <div style = "overflow-wrap: anywhere; white-space: pre-wrap"  title={tribute.intermediarioPag}>{tribute.intermediarioPag}</div>  
+                </td>  
+              </template> 
+              </tr>  
+            </template>  
+          </tbody>  
+        </table>  
+    </div>  
+    <p class="slds-m-vertical_medium content">{label.page} <b>{currentpage}</b> {label.of} 
+      <b> {totalpages}</b></p>  
+  </lightning-card>  
+</template>

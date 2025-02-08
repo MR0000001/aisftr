@@ -1,0 +1,74 @@
+<template>
+    <div class="slds-m-around_large">
+        <div if:true={isLoading} class="slds-is-relative">
+            <lightning-spinner alternative-text="Loading..." variant="brand">
+            </lightning-spinner>
+        </div>
+    </div>
+
+    <div class="slds-p-bottom_medium">
+        <lightning-card padding = "around-medium">
+            <h3 slot="title" class="slds-p-around_xx-small">
+                <lightning-icon icon-name="utility:user" alternative-text={label.legalEntitiesTitle} class="slds-p-around_xx-small" size="small"></lightning-icon>{label.legalEntitiesTitle}
+            </h3>
+            
+            <div class="slds-card__body" style= "width: 99%; padding-left: 1%;">
+                <template if:true={showSearch}>
+                    <div>
+                        <lightning-input 
+                            name="fiscalCode" 
+                            type="text" 
+                            label={label.fiscalCode} 
+                            onchange = {handleFiscalCode} 
+                            onpaste = {handleFiscalCode} 
+                            maxlength="16" 
+                            value={fiscalCodeIndicated} 
+                            disabled={disableInput}>
+                        </lightning-input>
+                    </div>
+    
+                    <div class="slds-align_absolute-center slds-m-around_medium">
+                        <div class="slds-grid slds-gutters">
+                            <div class ="slds-col">
+                                <lightning-button label={label.search} variant="brand" onclick={handleSearch} disabled={disableSearchButton}></lightning-button>
+                            </div>
+                            <div class ="slds-col" >
+                                <lightning-button label={label.reset} variant="brand" onclick={handleClear} disabled={disableCancelButton}></lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template if:true={showLegalEntities}>
+                    <c-legal-entities-list records={legalEntities} caseid={caseid}
+                        fiscal-code-indicated={fiscalCodeIndicated}
+                        oncallsigeud={sigeudCallout} 
+                        ondisablelegalregistry={handleToggleInteractivity}
+                        onenablelegalregistry={handleToggleInteractivity}
+                        is-from-case={isFromCase}
+                        onclose={handleClose}>
+                    </c-legal-entities-list>
+                </template>
+
+                <template if:true={showSigeudLegalEntities}>
+                    <c-legal-entities-sigeud-list records={sigeudLegalEntities} 
+                        ondisablelegalregistry={handleToggleInteractivity}
+                        onenablelegalregistry={handleToggleInteractivity}
+                        onbackfromsigeudlist={handleBackFromSigeud}
+                        onsavefromsigeudlist={handleSaveFromSigeud}
+                        is-from-case={isFromCase}
+                        onclose={handleClose}
+                        legal-entities={legalEntities}
+                        delete-failed-ids={deleteFailedIds}>
+                    </c-legal-entities-sigeud-list>
+                </template>
+
+                <template if:true={showInfoModal}>
+                    <lightning-card>
+                        <c-search-legal-entities-info-modal message-to-display={messageToDisplay} onclosemodal={handleCloseModal} onredirecttoregistry={handleRedirectToRegistry} fiscal-code-indicated={fiscalCodeIndicated} hide-buttons={hideInfoModalButtons}></c-search-legal-entities-info-modal>
+                    </lightning-card>
+                </template>
+            </div>
+        </lightning-card>
+    </div>
+</template>

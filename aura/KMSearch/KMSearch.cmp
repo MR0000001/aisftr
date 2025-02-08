@@ -1,0 +1,433 @@
+<!--
+ - Created by LCONATO00 on 15/05/2020.
+ -->
+
+<aura:component description="KMSearch" implements="lightning:availableForFlowScreens,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                access="global"
+                controller="KMSearchController">
+    <lightning:workspaceAPI aura:id="workspaceKMSearch" />
+    <!-- call doInit method on component load -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="c:ResultEvent" action="{!c.handleEvent}"/>
+    <aura:handler event="c:DeleteStructureEvent" action="{!c.handleEventDeletedIdStructure}"/>
+    <!-- aura attributes to store search criteria -->
+    <aura:attribute name="articleTipology" type = "String"/>
+    <aura:attribute name="creationDateTo" type = "Date"/>
+    <aura:attribute name="creationDateFrom" type = "Date"/>
+    <aura:attribute name="articleTipologyNames" type="Map" />
+    <aura:attribute name="status" type = "String"/>
+    <aura:attribute name="statusName" type="Map" />
+    <aura:attribute name="listOfAllKnowledge" type="list"/>
+    <aura:attribute name="sortAsc" type="boolean"  />
+    <aura:attribute name="PaginationList" type="list"/>
+    <aura:attribute name="selectedCount" type="integer" default="0"
+                    description="selected Records Count"/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalRecordsCount" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="100"
+                    description="number of records to be display on per page"/>
+    <aura:attribute name="currentPage" type="integer" default="1"/>
+    <aura:attribute name="totalPagesCount" type="integer"/>
+    <aura:attribute name="bNoRecordsFound" type="boolean"/>
+    <aura:attribute name="searchCompleted" type="boolean"/>
+    <aura:attribute type="String" name="sortField" />
+    <aura:attribute type="Boolean" name="Faqchosen" />
+    <aura:attribute type="String" name="idstruttura" />
+    <aura:attribute name="textToSearch" type="String"/>
+    <aura:attribute name="messageFromEvent" type="String" />
+
+
+    <!-- internal attributes-->
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:attribute name="showSpinner" type="boolean" default="false"/>
+    <lightning:navigation aura:id="navService"/>
+    <lightning:card  title="{!$Label.c.KMSearch_Title}">
+
+        <!-- Search section-->
+        <div class="slds-grid slds-gutters">
+
+        <div class ="slds-col c-container">
+
+            <lightning:layout >
+
+                <lightning:layoutItem padding="around-small">
+                    <lightning:select aura:id="tipologySearchCriteria"  name="tipologyPicklist" label="{!$Label.c.KMSearch_ArticleTipology}" value ="{!v.articleTipology}">
+                        <option value="">{!$Label.c.KMSearch_BlankOption}</option>
+                        <aura:iteration items="{!v.articleTipologyNames}" var="articleTipology" indexVar="key">
+                            <option text="{!articleTipology.value}" value="{!articleTipology.key}"  />
+                        </aura:iteration>
+                    </lightning:select>
+
+
+                    <lightning:input aura:id="creationDateSearchCriteriaFrom" type="date" name="creationDateFrom" label="{!$Label.c.KMSearch_CreationDateFrom}"  value="{!v.creationDateFrom}"/>
+
+
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small">
+                    <lightning:select aura:id="statusSearchCriteria"  name="statusPicklist" label="{!$Label.c.KMSearch_Status}" value ="{!v.status}">
+                        <option value="">{!$Label.c.KMSearch_BlankOption}</option>
+                        <aura:iteration items="{!v.statusName}" var="status" indexVar="key">
+                            <option text="{!status.value}" value="{!status.key}"  />
+                        </aura:iteration>
+                    </lightning:select>
+                    <lightning:input aura:id="creationDateSearchCriteriaTo" type="date" name="creationDateTo" label="{!$Label.c.KMSearch_CreationDateTo}" value="{!v.creationDateTo}"/>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem>
+                    <div class="slds-clearfix slds-m-around_small">
+                        <div class="slds-clearfix">
+                               
+                            <lightning:layoutItem>
+                                <div class="slds-float_left">
+                                    <c:AutoComplete aura:id="structure-record" label="{!$Label.c.KMSearch_Structure}" objectApiName="Structure__c" idFieldApiName="Id" valueFieldApiName="StructureName__c" 
+                                    extendedWhereClause="Name_Org_Type__c" maxRecords="10" />
+                                </div>
+                            </lightning:layoutItem>
+                        </div>
+                        <div   onkeyup="{!c.handleKeyPress }" class="slds-clearfix">
+                            <lightning:input name="Text"  label="{!$Label.c.KMSearch_SearchKey}" fieldLevelHelp="{!$Label.c.KMSearch_HelpText}"  value="{!v.textToSearch}" />
+                        </div>
+                    </div>
+                </lightning:layoutItem>
+
+            
+            </lightning:layout>
+
+            <lightning:layout >
+                <lightning:layoutItem>
+             <div class="slds-clearfix slds-m-around_small">
+                 <div class="slds-clearfix">
+                         <lightning:button
+                                 label="{!$Label.c.KMSearch_Reset}"
+                                 onclick="{! c.resetFilters}"
+                         />
+                 </div>
+             </div>
+                </lightning:layoutItem>
+                <lightning:layoutItem>
+             <div class="slds-clearfix slds-m-around_small">
+                 <div class="slds-clearfix">
+                     <lightning:button
+                             label="{!$Label.c.KMSearch_Search}"
+                             onclick="{! c.searchKnowledgeArticles}"
+                     />
+                 </div>
+             </div>
+                </lightning:layoutItem>
+            </lightning:layout >
+        </div>
+            <div class="slds-col">
+                <div class="slds-clearfix slds-m-around_small">
+                    <div class="slds-clearfix">
+                        <div class="slds-float_right">
+                            <lightning:button
+                                    label="{!$Label.c.KMSearch_New}"
+                                    onclick="{! c.navigateToNewKnowledge}"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Spinner-->
+        <aura:if isTrue="{!v.showSpinner}">
+            <div aura:id="spinner">
+                <div class="slds-spinner_container">
+                    <div aura:id="spinnerL" class="slds-spinner slds-spinner--large" role="alert">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner_dot-a"></div>
+                        <div class="slds-spinner_dot-b"></div>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.bNoRecordsFound}">
+            <!--display error message if there is no records available -->
+            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info" role="alert">
+                <span class="slds-assistive-text">error</span>
+                <h2>{!$Label.c.KMSearch_NoRecordFound}</h2>
+            </div>
+            <aura:set attribute="else">
+                <aura:if isTrue="{!v.searchCompleted}">
+                <!--  Pagination Buttons Start -->
+                <div class="slds-align_absolute-center">
+                    <lightning:button label="{!$Label.c.KMSearch_First}"
+                                      disabled="{!v.startPage == 0}"
+                                      onclick="{!c.navigation}"
+                                      variant="brand"
+                                      iconName="utility:back"
+                                      name="first"/>
+                    <lightning:button label="{!$Label.c.KMSearch_Previous}"
+                                      disabled="{!v.startPage == 0}"
+                                      onclick="{!c.navigation}"
+                                      variant="brand"
+                                      iconName="utility:back"
+                                      name="previous"/>
+                    <span class="slds-badge slds-badge_lightest"
+                          style="margin-right: 10px;margin-left: 10px;">
+                        <label style="padding-right:3px">{!$Label.c.KMSearch_Page}</label>   <label style="padding-right:3px">{!v.currentPage}</label>  <label style="padding-right:3px">{!$Label.c.KMSearch_outOf}</label>  <label>{!v.totalPagesCount}</label>
+                    </span>
+                    <lightning:button label="{!$Label.c.KMSearch_Next}"
+                                      disabled="{!(v.endPage + 1) >= v.totalRecordsCount}"
+                                      onclick="{!c.navigation}"
+                                      variant="brand"
+                                      iconName="utility:forward"
+                                      iconPosition="right"
+                                      name="next"/>
+                    <lightning:button label="{!$Label.c.KMSearch_Last}"
+                                      disabled="{!(v.endPage + 1) >= v.totalRecordsCount}"
+                                      onclick="{!c.navigation}"
+                                      variant="brand"
+                                      iconName="utility:forward"
+                                      iconPosition="right"
+                                      name="last"/>
+                </div>
+                <!--  Pagination Buttons End -->
+                <br/>
+                <!-- data table start-->
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                    <thead>
+                    <tr class="slds-text-title_caps">
+
+                        <th onclick="{!c.sortByTitle}" aria-label="{!$Label.c.KMSearch_TitleKnowledge}" aria-sort="none" class="slds-is-resizable slds-is-sortable pointer" scope="col">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" tabindex="0">
+                                <span class="slds-assistive-text">Sort by: </span>
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <span class="slds-truncate" title="{!$Label.c.KMSearch_TitleKnowledge}">{!$Label.c.KMSearch_TitleKnowledge}</span>
+                                    <aura:if isTrue="{!v.sortField=='objKnowledge.Title'}">
+                                    <aura:if isTrue="{!v.sortAsc}">
+                                    <span class="slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                    </span>
+                                    <aura:set attribute="else">
+                                        <span class="slds-icon-utility-arrowup">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                    </span>
+                                    </aura:set>
+                                    </aura:if>
+                                    </aura:if>
+                                </div>
+                            </a>
+
+                        </th>
+                        <aura:if isTrue="{!v.Faqchosen}">
+                            <th onclick="{!c.sortByCategory}" aria-label="{!$Label.c.KMSearch_KnowledgeCategory}" aria-sort="none" class="slds-is-resizable slds-is-sortable pointer" scope="col">
+                                <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" tabindex="0">
+                                    <span class="slds-assistive-text">Sort by: </span>
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                        <span class="slds-truncate" title="{!$Label.c.KMSearch_KnowledgeCategory}">{!$Label.c.KMSearch_KnowledgeCategory}</span>
+                                        <aura:if isTrue="{!v.sortField=='objKnowledge.Category__c'}">
+                                            <aura:if isTrue="{!v.sortAsc}">
+                                    <span class="slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                    </span>
+                                                <aura:set attribute="else">
+                                        <span class="slds-icon-utility-arrowup">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                    </span>
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:if>
+                                    </div>
+                                </a>
+
+                            </th>
+                        </aura:if>
+                        <th onclick="{!c.sortByTipology}" aria-label="{!$Label.c.KMSearch_KnowledgeTipology}" aria-sort="none" class="slds-is-resizable slds-is-sortable pointer" scope="col">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" tabindex="0">
+                                <span class="slds-assistive-text">Sort by: </span>
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <span class="slds-truncate" title="{!$Label.c.KMSearch_KnowledgeTipology}">{!$Label.c.KMSearch_KnowledgeTipology}</span>
+                                    <aura:if isTrue="{!v.sortField=='objKnowledge.ArticleType__c'}">
+                                        <aura:if isTrue="{!v.sortAsc}">
+                                    <span class="slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                    </span>
+                                            <aura:set attribute="else">
+                                        <span class="slds-icon-utility-arrowup">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                    </span>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:if>
+                                </div>
+                            </a>
+
+                        </th>
+                        <th onclick="{!c.sortByStatus}" aria-label="{!$Label.c.KMSearch_Status}" aria-sort="none" class="slds-is-resizable slds-is-sortable pointer" scope="col">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" tabindex="0">
+                                <span class="slds-assistive-text">Sort by: </span>
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <span class="slds-truncate" title="{!$Label.c.KMSearch_Status}">{!$Label.c.KMSearch_Status}</span>
+                                    <aura:if isTrue="{!v.sortField=='objKnowledge.PublishStatus'}">
+                                        <aura:if isTrue="{!v.sortAsc}">
+                                    <span class="slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                    </span>
+                                            <aura:set attribute="else">
+                                        <span class="slds-icon-utility-arrowup">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                    </span>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:if>
+                                </div>
+                            </a>
+
+                        </th>
+                        <th onclick="{!c.sortByMacrostructure}" aria-label="{!$Label.c.KMSearch_Macrostructure}" aria-sort="none" class="slds-is-resizable slds-is-sortable pointer" scope="col">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" tabindex="0">
+                                <span class="slds-assistive-text">Sort by: </span>
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <span class="slds-truncate" title="{!$Label.c.KMSearch_Macrostructure}">{!$Label.c.KMSearch_Macrostructure}</span>
+                                    <aura:if isTrue="{!v.sortField=='objKnowledge.MacrostructureReference__r.ExtendedName__c'}">
+                                        <aura:if isTrue="{!v.sortAsc}">
+                                    <span class="slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                    </span>
+                                            <aura:set attribute="else">
+                                        <span class="slds-icon-utility-arrowup">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                    </span>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:if>
+                                </div>
+                            </a>
+
+                        </th>
+                        <th aria-label="{!$Label.c.KMSearch_Abstract}" aria-sort="none" class="slds-is-sortable pointer" scope="col">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" tabindex="0">
+                                <span class="slds-assistive-text">Sort by: </span>
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <span class="slds-truncate" title="{!$Label.c.KMSearch_Abstract}">{!$Label.c.KMSearch_Abstract}</span>
+                                    <aura:if isTrue="{!v.sortField=='objKnowledge.Abstract__c'}">
+                                        <aura:if isTrue="{!v.sortAsc}">
+                                    <span class="slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                    </span>
+                                            <aura:set attribute="else">
+                                    <span class="slds-icon-utility-arrowup">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                    </span>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:if>
+                                </div>
+                            </a>
+
+                        </th>
+
+                        <th onclick="{!c.sortByCreatedDate}" aria-label="{!$Label.c.KMSearch_CreationDate}" aria-sort="none" class="slds-is-resizable slds-is-sortable pointer" scope="col">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" tabindex="0">
+                                <span class="slds-assistive-text">Sort by: </span>
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <span class="slds-truncate" title="{!$Label.c.KMSearch_CreationDate}">{!$Label.c.KMSearch_CreationDate}</span>
+                                    <aura:if isTrue="{!v.sortField=='objKnowledge.CreatedDate'}">
+                                        <aura:if isTrue="{!v.sortAsc}">
+                                    <span class="slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                    </span>
+                                            <aura:set attribute="else">
+                                        <span class="slds-icon-utility-arrowup">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                    </span>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:if>
+                                </div>
+                            </a>
+
+                        </th>
+
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <aura:iteration items="{!v.PaginationList}" var="obj">
+                        <tr>
+
+                            <th scope="row" style="width: 45%; min-width: 250px;">
+                                <div class="slds-truncate pointer colTitle" title="{!obj.objKnowledge.Title}">
+                                    <a onclick="{!c.navigateToRecord}" id= "{!obj.objKnowledge.Id}">{!obj.objKnowledge.Title}</a>
+                                    </div>
+                            </th>
+                            <aura:if isTrue="{!v.Faqchosen}">
+                                <th scope="row">
+                                    <div class="slds-truncate" title="{!obj.objKnowledge.Category__c}">
+                                        {!obj.objKnowledge.Category__c}
+                                    </div>
+                                </th>
+                            </aura:if>
+                            <th scope="row">
+                                <div class="slds-truncate" title="{!obj.objKnowledge.ArticleType__c}">
+                                        {!obj.objKnowledge.ArticleType__c}
+                                    </div>
+                            </th>
+                            <th scope="row">
+                                <div class="slds-truncate" title="{!obj.objKnowledge.PublishStatus}">
+                                    {!obj.objKnowledge.PublishStatus}
+                                    </div>
+                            </th>
+                            <th scope="row" style="width: 25%">
+                                <div class="slds-truncate pointer colMacrostructure" title="{!obj.objKnowledge.MacrostructureReference__r.ExtendedName__c}">
+                                    <a onclick="{!c.navigateToRecord}" id= "{!obj.objKnowledge.MacrostructureReference__c}">{!obj.objKnowledge.MacrostructureReference__r.ExtendedName__c}</a>
+                                </div>
+                            </th>
+                            <th scope="row" style="width: 10%;">
+                                <div class="slds-truncate colAbstract" title="{!obj.objKnowledge.Abstract__c}" >
+                                    {!obj.objKnowledge.Abstract__c}
+                                </div>
+                            </th>
+                            <th scope="row">
+                                <div class="slds-truncate" title="{!obj.objKnowledge.CreatedDate }">
+                                    <lightning:formattedDateTime value="{!obj.objKnowledge.CreatedDate }"/>
+                                    </div>
+                            </th>
+
+                        </tr>
+                    </aura:iteration>
+                    </tbody>
+                </table>
+                <!-- DataTable End -->
+                <br/>
+                <!--  Pagination Buttons Start -->
+                <div class="slds-align_absolute-center">
+                    <lightning:button label="{!$Label.c.KMSearch_First}"
+                                      disabled="{!v.startPage == 0}"
+                                      onclick="{!c.navigation}"
+                                      variant="brand"
+                                      iconName="utility:back"
+                                      name="first"/>
+                    <lightning:button label="{!$Label.c.KMSearch_Previous}"
+                                      disabled="{!v.startPage == 0}"
+                                      onclick="{!c.navigation}"
+                                      variant="brand"
+                                      iconName="utility:back"
+                                      name="previous"/>
+                    <span class="slds-badge slds-badge_lightest"
+                          style="margin-right: 10px;margin-left: 10px;">
+                        <label style="padding-right:3px">{!$Label.c.KMSearch_Page}</label>   <label style="padding-right:3px">{!v.currentPage}</label>  <label style="padding-right:3px">{!$Label.c.KMSearch_outOf}</label>  <label>{!v.totalPagesCount}</label>
+                    </span>
+                    <lightning:button label="{!$Label.c.KMSearch_Next}"
+                                      disabled="{!(v.endPage + 1) >= v.totalRecordsCount}"
+                                      onclick="{!c.navigation}"
+                                      variant="brand"
+                                      iconName="utility:forward"
+                                      iconPosition="right"
+                                      name="next"/>
+                    <lightning:button label="{!$Label.c.KMSearch_Last}"
+                                      disabled="{!(v.endPage + 1) >= v.totalRecordsCount}"
+                                      onclick="{!c.navigation}"
+                                      variant="brand"
+                                      iconName="utility:forward"
+                                      iconPosition="right"
+                                      name="last"/>
+                </div>
+                <!--  Pagination Buttons End -->
+                </aura:if>
+            </aura:set>
+        </aura:if>
+    </lightning:card>
+</aura:component>

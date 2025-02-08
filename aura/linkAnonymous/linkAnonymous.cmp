@@ -1,0 +1,9 @@
+<!--
+ - Created by FMARCHEGIA00 on 19/04/2021.
+ -->
+
+<aura:component description="linkAnonymous" implements="lightning:availableForFlowScreens" controller="linkAnonymousController">
+    <aura:attribute name="anonymousId" type="String" access="global" default=""/>
+    <lightning:navigation aura:id="navService" />
+    <lightning:button label="Anonimo" onclick="{!c.navigate}"/>
+</aura:component>

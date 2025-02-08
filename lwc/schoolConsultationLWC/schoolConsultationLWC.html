@@ -1,0 +1,25 @@
+<template>
+    <div class="slds-m-around_large">
+        <div if:true={isLoading} class="slds-is-relative">
+            <lightning-spinner alternative-text="Loading..." variant="brand">
+            </lightning-spinner>
+        </div>
+    </div>
+<lightning-card  title={label.practicesTitle} >
+  <div class="slds-card__body slds-card__body_inner">    
+    <div style="
+padding-top: 1%;padding-left: 1%
+">
+<lightning-input name="fiscalCode" type="text" label={label.fiscalCode} onchange = {handleFiscalCodeChange} maxlength="16" value={fiscalCodeIndicated} required></lightning-input>
+    </div>
+    <div style="padding-left: 1%">
+        <lightning-input name="caseNmuber" type="text" label={label.caseNmuber} onchange = {handlePracticeCodeChange} required></lightning-input>
+        
+    </div>
+  </div>
+    <div class="slds-card__footer">
+      <lightning-button label={label.search} variant="brand" onclick={searchpractices} ></lightning-button>
+  </div>  
+
+</lightning-card>
+</template>

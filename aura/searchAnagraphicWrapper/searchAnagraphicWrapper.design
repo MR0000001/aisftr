@@ -1,0 +1,12 @@
+<!--
+ - Created by FMARCHEGIA00 on 05/02/2021.
+ -->
+
+<design:component>
+
+    <design:attribute name="recordId" label="Record ID" />
+
+    <design:attribute name="action" label="Navigation Action"  description="" />
+    <design:attribute name="responseText" label="response"  description="Eventuale risposta dal componente aura" />
+
+</design:component>

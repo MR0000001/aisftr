@@ -1,0 +1,49 @@
+<template>
+    <div class="slds-box slds-theme_shade">
+        <div class="slds-m-around_small slds-align_absolute-center slds-text-heading_small">
+            <p>{label.sigeudTableTitle}</p>
+        </div>
+
+        <div class='slds-m-around_medium'>
+            <lightning-input type="search" disabled={disableSearch} label='{label.searchByCompanyName}' onchange={handleSearch}>
+            </lightning-input>
+        </div>
+
+        <div class="slds-m-around_small slds-align_absolute-center">
+            <p>{label.sigeudTableInfo}</p>
+        </div>
+
+        <div class="slds-m-top_large slds-m-bottom_large slds-m-left_medium slds-m-right_medium">    
+            <lightning-datatable
+                aria-label={label.sigeudTableName}
+                data-id="sigeudlist"
+                data={recordsToDisplay}
+                columns={columns}
+                key-field="contactKey"
+                wrap-text-max-lines="3"
+                selected-rows={selectedRows}
+                onrowselection={handleSelectedRows}>
+            </lightning-datatable>
+        </div>
+
+        <div class="slds-align_absolute-center slds-m-around_medium">
+            <div class="slds-grid slds-gutters">
+                <div class ="slds-col">
+                    <lightning-button label={label.save} variant="brand" onclick={handleSave} disabled={disableSave}></lightning-button>
+                </div>
+
+                <div class ="slds-col" >
+                    <lightning-button label={label.back} variant="brand" onclick={handleBack} disabled={disableBack}></lightning-button>
+                </div>
+            </div>
+        </div>
+    
+        <div class="slds-m-around_medium">
+            <div class="slds-m-bottom_medium">
+                <p>{label.genericPage} <b>{page}</b> {label.of} <b>{totalPages}</b></p>
+            </div>
+            
+            <c-paginator-bottom variant="brand" onprevious={handlePrevious} onnext={handleNext} onfirst={handleFirst} onlast={handleLast} currentpage={page} totalrecords={totalRecordsCount} pagesize={pageSize}></c-paginator-bottom>
+        </div>
+    </div>
+</template>

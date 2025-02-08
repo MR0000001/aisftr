@@ -1,0 +1,21 @@
+<template>
+    <lightning-card>
+        <template if:true={loading}>
+            <lightning-spinner alternative-text="Loading"></lightning-spinner>
+        </template>
+        <div class="slds-card__body slds-card__body_inner">    
+            <div class="slds-grid">
+                <div class="slds-col slds-size_1-of-2">
+                        <p><b>{label.sendrequest}</b></p>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-button variant="brand" label={label.send} title={label.send} onclick={handleSend} class="slds-m-left_x-small" disabled={sentToExternal}>
+                    </lightning-button>
+                </div>
+                <template if:true={openPopup}>
+                    <c-callout-popup onresetpopup={resetPopup} oncallout={handleCallout} open-popup={openPopup} popup-title={label.attention} popup-msgs={popupMsgs}></c-callout-popup>
+                </template>
+            </div>
+        </div>
+    </lightning-card>
+</template>

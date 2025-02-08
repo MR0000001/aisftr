@@ -1,0 +1,7 @@
+<design:component >
+    <design:attribute name="recordId" label="Record ID" />
+    <design:attribute name="contactId" label="Contact ID" />
+    <design:attribute name="accountId" label="Account ID" />
+    <design:attribute name="personaFisica" label="Persona Fisica" />
+    <design:attribute name="caseBusinessAccount" label="Is Case Business Account" />
+</design:component>

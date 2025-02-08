@@ -1,0 +1,20 @@
+<aura:component description="manageFavoritesToCitizensButton" 
+implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global">
+
+    <aura:html tag="style">
+        .slds-modal__content{
+            overflow: auto;
+            height:650px !important;
+            max-height:650px !important;
+        }
+        .slds-modal__container{
+            width:50% !important;
+            max-width:50% !important;
+        }
+    </aura:html>
+
+    <aura:attribute name="recordId" type="String" access="global" />
+
+    <c:manageFavoritesToCitizensWrapper recordId="{!v.recordId}" onclose="{!c.closeQA}"/>
+
+</aura:component>

@@ -1,0 +1,403 @@
+<template>
+  <template if:true={loading}>
+    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+  </template>
+  <div class="slds-box slds-theme_shade">
+    <template if:false={queryResult}>
+      <div class="slds-grid slds-gutters slds-var-p-bottom_xx-large">
+        <div class="slds-col">
+          <lightning-input
+            type="text"
+            label={inputTextLabel}
+            value={textToSearch}
+            onchange={handleInputChange}
+          ></lightning-input>
+        </div>
+        <div class="slds-col slds-var-p-top_xx-large">
+          <lightning-button label={label.cerca} onclick={find}></lightning-button>
+        </div>
+      </div>
+    </template>
+    <template if:true={queryResult}>
+      <template for:each={queryResult.BP} for:item="BP">
+        <lightning-card key={BP.CodiceBP} title={label.info} icon-name="standard:contract">
+          <div class="slds-var-p-around_medium lgc-bg">
+            <lightning-tile class="slds-box slds-theme_shade">
+              <dl class="slds-dl_horizontal">
+                <dt class="slds-dl_horizontal__label">
+                  <p class="slds-truncate" title={label.cod_utente}>{label.cod_utente}</p>
+                </dt>
+                <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                  <p class="slds-truncate" title={label.cod_utente}>{BP.CodiceBP}</p>
+                </dd>
+                <dt class="slds-dl_horizontal__label">
+                  <p class="slds-truncate" title={label.nome_cognome}>{label.nome_cognome}</p>
+                </dt>
+                <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                  <p class="slds-truncate" title={label.nome_cognome}>{BP.Nome} {BP.Cognome}</p>
+                </dd>
+                <dt class="slds-dl_horizontal__label">
+                  <p class="slds-truncate" title={label.cod_fis_or_p_iva}>{label.cod_fis_or_p_iva}</p>
+                </dt>
+                <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                  <p class="slds-truncate" title={label.cod_fis_or_p_iva}>{BP.CodiceFiscale} / {BP.PartitaIVA}</p>
+                </dd>
+                <dt class="slds-dl_horizontal__label">
+                  <p class="slds-truncate" title={label.ind_res}>{label.ind_res}</p>
+                </dt>
+                <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                  <p class="slds-truncate" title={label.ind_res}>
+                    {BP.IndirizzoLegale}, {BP.NumeroCivico}, {BP.Frazione}, {BP.Localita}, {BP.CAP}
+                  </p>
+                </dd>
+              </dl>
+            </lightning-tile>
+          </div>
+          <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
+            <lightning-accordion-section name="A" label={label.lista_conti_cliente} class="accordionClass">
+              <template if:true={BP.CA}>
+                <template for:each={BP.CA} for:item="CA">
+                  <div key={CA.CodiceCA} class="slds-box slds-theme_shade">
+                    <lightning-tile>
+                      <dl class="slds-dl_horizontal">
+                        <dt class="slds-dl_horizontal__label">
+                          <p class="slds-truncate" title={label.conto_cliente}>{label.conto_cliente}</p>
+                        </dt>
+                        <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                          <p class="slds-truncate" title={label.conto_cliente}>{CA.CodiceCA}</p>
+                        </dd>
+                        <dt class="slds-dl_horizontal__label">
+                          <p class="slds-truncate" title={label.ind_recapito}>{label.ind_recapito}</p>
+                        </dt>
+                        <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                          <p class="slds-truncate" title={label.ind_recapito}>
+                            {CA.Indirizzo}, {CA.NumeroCivico} {CA.PreCivico}, {CA.Frazione}, {CA.Localita}, {CA.CAP}
+                          </p>
+                        </dd>
+                      </dl>
+                    </lightning-tile>
+                    <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
+                      <lightning-accordion-section name="B" label={label.lista_contratti}>
+                        <template if:true={CA.CONTRATTI}>
+                          <template for:each={CA.CONTRATTI} for:item="CONTRATTO">
+                            <div key={CONTRATTO.CodiceContratto} class="slds-box slds-theme_default">
+                              <lightning-tile>
+                                <dl class="slds-dl_horizontal">
+                                  <dt class="slds-dl_horizontal__label">
+                                    <p class="slds-truncate" title={label.cod_contratto}>{label.cod_contratto}</p>
+                                  </dt>
+                                  <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                    <p class="slds-truncate" title={label.cod_contratto}>{CONTRATTO.CodiceContratto}</p>
+                                  </dd>
+                                  <dt class="slds-dl_horizontal__label">
+                                    <p class="slds-truncate" title={label.ind_contratto}>{label.ind_contratto}</p>
+                                  </dt>
+                                  <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                    <p class="slds-truncate" title={label.ind_contratto}>
+                                      {CONTRATTO.Indirizzo}, {CONTRATTO.NumeroCivico} {CONTRATTO.PreCivico}, {CONTRATTO.Frazione}, {CONTRATTO.Localita}, {CONTRATTO.CAP}
+                                    </p>
+                                  </dd>
+                                  <dt class="slds-dl_horizontal__label">
+                                    <p class="slds-truncate" title={label.data_attivazione}>{label.data_attivazione}</p>
+                                  </dt>
+                                  <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                    <p class="slds-truncate" title={label.data_attivazione}>
+                                      {CONTRATTO.DataAttivazione}
+                                    </p>
+                                  </dd>
+                                  <dt class="slds-dl_horizontal__label">
+                                    <p class="slds-truncate" title={label.data_cessazione}>{label.data_cessazione}</p>
+                                  </dt>
+                                  <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                    <p class="slds-truncate" title={label.data_cessazione}>
+                                      {CONTRATTO.DataCessazione}
+                                    </p>
+                                  </dd>
+                                  <dt class="slds-dl_horizontal__label">
+                                    <p class="slds-truncate" title={label.cod_impianto}>{label.cod_impianto}</p>
+                                  </dt>
+                                  <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                    <p class="slds-truncate" title={label.cod_impianto}>{CONTRATTO.CodiceImpianto}</p>
+                                  </dd>
+                                  <dt class="slds-dl_horizontal__label">
+                                    <p class="slds-truncate" title={label.categoria}>{label.categoria}</p>
+                                  </dt>
+                                  <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                    <p class="slds-truncate" title={label.categoria}>{CONTRATTO.Categoria}</p>
+                                  </dd>
+                                  <dt class="slds-dl_horizontal__label">
+                                    <p class="slds-truncate" title={label.tipo_utenza}>{label.tipo_utenza}</p>
+                                  </dt>
+                                  <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                    <p class="slds-truncate" title={label.tipo_utenza}>{CONTRATTO.TipologiaUtenza}</p>
+                                  </dd>
+                                </dl>
+                              </lightning-tile>
+                              <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
+                                <lightning-accordion-section name="C" label={label.info}>
+                                  <template if:true={CONTRATTO.INFO_IMPIANTO}>
+                                    <template for:each={CONTRATTO.INFO_IMPIANTO} for:item="INFO_IMPIANTO">
+                                      <lightning-tile
+                                        class="slds-box slds-theme_shade"
+                                        key={INFO_IMPIANTO.CodiceOperando}
+                                      >
+                                        <dl class="slds-dl_horizontal">
+                                          <dt class="slds-dl_horizontal__label">
+                                            <p class="slds-truncate" title={label.cod_operando}>{label.cod_operando}</p>
+                                          </dt>
+                                          <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                            <p class="slds-truncate" title={label.cod_operando}>
+                                              {INFO_IMPIANTO.CodiceOperando}
+                                            </p>
+                                          </dd>
+                                          <dt class="slds-dl_horizontal__label">
+                                            <p class="slds-truncate" title={label.data_inizio_validita}>
+                                              {label.data_inizio_validita}
+                                            </p>
+                                          </dt>
+                                          <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                            <p class="slds-truncate" title={label.data_inizio_validita}>
+                                              {INFO_IMPIANTO.DataInizioValidita}
+                                            </p>
+                                          </dd>
+                                          <!--
+                                          <dt class="slds-dl_horizontal__label">
+                                            <p class="slds-truncate" title={label.data_fine_validita}>
+                                              {label.data_fine_validita}
+                                            </p>
+                                          </dt>
+                                          <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                            <p class="slds-truncate" title={label.data_fine_validita}>
+                                              {INFO_IMPIANTO.DataFineValidita}
+                                            </p>
+                                          </dd>
+                                          -->
+                                          <dt class="slds-dl_horizontal__label">
+                                            <p class="slds-truncate" title={label.valore}>{label.valore}</p>
+                                          </dt>
+                                          <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                            <p class="slds-truncate" title={label.valore}>{INFO_IMPIANTO.Valore}</p>
+                                          </dd>
+                                          
+                                        </dl>
+                                      </lightning-tile>
+                                    </template>
+                                  </template>
+                                </lightning-accordion-section>
+                              </lightning-accordion>
+                            </div>
+                          </template>
+                          <div data-bp={BP.CodiceBP} data-ca={CA.CodiceCA} onclick={getPosizioneEconomica}>
+                            <lightning-accordion-section
+                              name="D"
+                              data-bp={BP.CodiceBP}
+                              data-ca={CA.CodiceCA}
+                              label={label.conto_economico}
+                            >
+                              <template if:true={CA.DOCUMENTI}>
+                                <template for:each={CA.DOCUMENTI} for:item="DOCUMENTO">
+                                  <div class="slds-box slds-theme_default" key={DOCUMENTO.NDOCUMENTO}>
+                                    <lightning-tile>
+                                      <dl class="slds-dl_horizontal">
+                                        <dt class="slds-dl_horizontal__label">
+                                          <p class="slds-truncate" title={label.num_doc}>{label.num_doc}</p>
+                                        </dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                          <p class="slds-truncate" title={label.num_doc}>{DOCUMENTO.NDOCUMENTO}</p>
+                                        </dd>
+                                        <dt class="slds-dl_horizontal__label">
+                                          <p class="slds-truncate" title={label.data_documento}>
+                                            {label.data_documento}
+                                          </p>
+                                        </dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                          <p class="slds-truncate" title={label.data_documento}>{DOCUMENTO.DATA_DOC}</p>
+                                        </dd>
+                                        <dt class="slds-dl_horizontal__label">
+                                          <p class="slds-truncate" title={label.data_scadenza_documento}>
+                                            {label.data_scadenza_documento}
+                                          </p>
+                                        </dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                          <p class="slds-truncate" title={label.data_scadenza_documento}>
+                                            {DOCUMENTO.FAEDN}
+                                          </p>
+                                        </dd>
+                                        <dt class="slds-dl_horizontal__label">
+                                          <p class="slds-truncate" title={label.tipo_documento}>
+                                            {label.tipo_documento}
+                                          </p>
+                                        </dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                          <p class="slds-truncate" title={label.tipo_documento}>{DOCUMENTO.TIPO}</p>
+                                        </dd>
+                                        <dt class="slds-dl_horizontal__label">
+                                          <p class="slds-truncate" title={label.importo_totale}>
+                                            {label.importo_totale}
+                                          </p>
+                                        </dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                          <p class="slds-truncate" title={label.importo_totale}>
+                                            {DOCUMENTO.IMPORTO_TOTALE}
+                                          </p>
+                                        </dd>
+                                        <dt class="slds-dl_horizontal__label">
+                                          <p class="slds-truncate" title={label.importo_pagato}>
+                                            {label.importo_pagato}
+                                          </p>
+                                        </dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                          <p class="slds-truncate" title={label.importo_pagato}>
+                                            {DOCUMENTO.IMPORTO_PAGAT}
+                                          </p>
+                                        </dd>
+                                        <dt class="slds-dl_horizontal__label">
+                                          <p class="slds-truncate" title={label.importo_da_pagare}>
+                                            {label.importo_da_pagare}
+                                          </p>
+                                        </dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                          <p class="slds-truncate" title={label.importo_da_pagare}>
+                                            {DOCUMENTO.IMPORTO_APERTO}
+                                          </p>
+                                        </dd>
+                                        <dt class="slds-dl_horizontal__label">
+                                          <p class="slds-truncate" title={label.tipo_contratto}>
+                                            {label.tipo_contratto}
+                                          </p>
+                                        </dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                          <p class="slds-truncate" title={label.tipo_contratto}>
+                                            {DOCUMENTO.TIPO_CONTRATTO}
+                                          </p>
+                                        </dd>
+                                      </dl>
+                                    </lightning-tile>
+                                    <template if:true={DOCUMENTO.PIANO_RATA}>
+                                      <lightning-accordion-section
+                                        name="E"
+                                        label={label.piani_rate}
+                                        key={DOCUMENTO.NDOCUMENTO}
+                                      >
+                                        <template for:each={DOCUMENTO.PIANO_RATA} for:item="PIANO_RATA">
+                                          <lightning-tile class="slds-box slds-theme_shade" key={PIANO_RATA.RPNUM}>
+                                            <dl class="slds-dl_horizontal">
+                                              <dt class="slds-dl_horizontal__label">
+                                                <p class="slds-truncate" title={label.num_piano_rientro}>
+                                                  {label.num_piano_rientro}
+                                                </p>
+                                              </dt>
+                                              <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                <p class="slds-truncate" title={label.num_piano_rientro}>
+                                                  {PIANO_RATA.RPNUM}
+                                                </p>
+                                              </dd>
+                                              <dt class="slds-dl_horizontal__label">
+                                                <p class="slds-truncate" title={label.data_inizio_rientro}>
+                                                  {label.data_inizio_rientro}
+                                                </p>
+                                              </dt>
+                                              <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                <p class="slds-truncate" title={label.data_inizio_rientro}>
+                                                  {PIANO_RATA.STTDT}
+                                                </p>
+                                              </dd>
+                                              <dt class="slds-dl_horizontal__label">
+                                                <p class="slds-truncate" title={label.data_fine_rientro}>
+                                                  {label.data_fine_rientro}
+                                                </p>
+                                              </dt>
+                                              <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                <p class="slds-truncate" title={label.data_fine_rientro}>
+                                                  {PIANO_RATA.ENDDT}
+                                                </p>
+                                              </dd>
+                                            </dl>
+                                          </lightning-tile>
+                                        </template>
+                                      </lightning-accordion-section>
+                                    </template>
+                                    <template if:true={DOCUMENTO.SOLLECITO}>
+                                      <lightning-accordion-section
+                                        name="F"
+                                        label={label.solleciti}
+                                        key={DOCUMENTO.NDOCUMENTO}
+                                      >
+                                        <template for:each={DOCUMENTO.SOLLECITO} for:item="SOLLECITO">
+                                          <lightning-tile class="slds-box slds-theme_shade" key={SOLLECITO.NUMSOLL}>
+                                            <dl class="slds-dl_horizontal">
+                                              <dt class="slds-dl_horizontal__label">
+                                                <p class="slds-truncate" title={label.num_sollecito}>
+                                                  {label.num_sollecito}
+                                                </p>
+                                              </dt>
+                                              <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                <p class="slds-truncate" title={label.num_sollecito}>
+                                                  {SOLLECITO.NUMSOLL}
+                                                </p>
+                                              </dd>
+                                              <dt class="slds-dl_horizontal__label">
+                                                <p class="slds-truncate" title={label.data_emissione_sollecito}>
+                                                  {label.data_emissione_sollecito}
+                                                </p>
+                                              </dt>
+                                              <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                <p class="slds-truncate" title={label.data_emissione_sollecito}>
+                                                  {SOLLECITO.DATA_SOLL}
+                                                </p>
+                                              </dd>
+                                            </dl>
+                                          </lightning-tile>
+                                        </template>
+                                      </lightning-accordion-section>
+                                    </template>
+                                    <template if:true={DOCUMENTO.RUOLO}>
+                                      <lightning-accordion-section
+                                        name="G"
+                                        label={label.ruoli}
+                                        key={DOCUMENTO.NDOCUMENTO}
+                                      >
+                                        <template for:each={DOCUMENTO.RUOLO} for:item="RUOLO">
+                                          <lightning-tile class="slds-box slds-theme_shade" key={RUOLO.NRUOLO}>
+                                            <dl class="slds-dl_horizontal">
+                                              <dt class="slds-dl_horizontal__label">
+                                                <p class="slds-truncate" title={label.numero_ruolo}>
+                                                  {label.numero_ruolo}
+                                                </p>
+                                              </dt>
+                                              <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                <p class="slds-truncate" title={label.numero_ruolo}>{RUOLO.NRUOLO}</p>
+                                              </dd>
+                                              <dt class="slds-dl_horizontal__label">
+                                                <p class="slds-truncate" title={label.data_emissione_ruolo}>
+                                                  {label.data_emissione_ruolo}
+                                                </p>
+                                              </dt>
+                                              <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                <p class="slds-truncate" title={label.data_emissione_ruolo}>
+                                                  {RUOLO.DATA_RUOLO}
+                                                </p>
+                                              </dd>
+                                            </dl>
+                                          </lightning-tile>
+                                        </template>
+                                      </lightning-accordion-section>
+                                    </template>
+                                  </div>
+                                </template>
+                              </template>
+                            </lightning-accordion-section>
+                          </div>
+                        </template>
+                      </lightning-accordion-section>
+                    </lightning-accordion>
+                  </div>
+                </template>
+              </template>
+            </lightning-accordion-section>
+          </lightning-accordion>
+        </lightning-card>
+      </template>
+    </template>
+  </div>
+</template>

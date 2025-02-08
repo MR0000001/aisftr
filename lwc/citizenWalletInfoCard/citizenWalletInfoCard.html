@@ -1,0 +1,90 @@
+<template>
+    <lightning-card>
+        <div class="slds-box slds-theme_shade">
+            <h3 slot="title">
+                <lightning-icon icon-name="action:info" size="small" alternative-text={label.infoCardTitle}></lightning-icon>
+                <span class="slds-p-left_x-small slds-text-title_caps">{label.infoCardTitle}</span>
+            </h3>
+            <template if:true={showInfoCard}>
+                <div class="slds-p-left_large">
+                    <lightning-layout multiple-rows>
+                        <lightning-layout-item size="4" padding="around-small">
+                            <div class="slds-box slds-box_small slds-theme_default">
+                                <div class="slds-p-around_x-small">
+                                    <lightning-icon icon-name="action:share_poll" size="x-small" alternative-text={label.serialNumber}></lightning-icon><span class="slds-p-left_x-small">{label.serialNumber}</span>
+                                </div>
+                                <div class="slds-p-bottom_x-small slds-p-top_x-small slds-p-right_x-small slds-p-left_xx-large">
+                                    <p><strong>{serialNumber}</strong></p>
+                                </div>
+                            </div>
+                        </lightning-layout-item>
+    
+                        <lightning-layout-item size="4" padding="around-small">
+                            <div class="slds-box slds-box_small slds-theme_default">
+                                <div class="slds-p-around_x-small">
+                                    <lightning-icon icon-name="action:more" size="x-small" alternative-text={label.totalPoints}></lightning-icon><span class="slds-p-left_x-small">{label.totalPoints}</span>
+                                </div>
+                                <div class="slds-p-bottom_x-small slds-p-top_x-small slds-p-right_x-small slds-p-left_xx-large">
+                                    <p><strong>{totalPoints}</strong></p>
+                                </div>
+                            </div>
+                        </lightning-layout-item>
+    
+                        <lightning-layout-item size="4" padding="around-small">
+                            <div class="slds-box slds-box_small slds-theme_default">
+                                <div class="slds-p-around_x-small">
+                                    <lightning-icon icon-name="action:update_status" size="x-small" alternative-text={label.cardStatus}></lightning-icon><span class="slds-p-left_x-small">{label.cardStatus}</span>
+                                </div>
+                                <div class="slds-p-bottom_x-small slds-p-top_x-small slds-p-right_x-small slds-p-left_xx-large">
+                                    <p><strong>{cardStatus}</strong></p>
+                                </div>
+                            </div>
+                        </lightning-layout-item>
+    
+                        <lightning-layout-item size="4" padding="around-small">
+                            <div class="slds-box slds-box_small slds-theme_default">
+                                <div class="slds-p-around_x-small">
+                                    <lightning-icon icon-name="action:new_event" size="x-small" alternative-text={label.activationDate}></lightning-icon><span class="slds-p-left_x-small">{label.activationDate}</span>
+                                </div>
+                                <div class="slds-p-bottom_x-small slds-p-top_x-small slds-p-right_x-small slds-p-left_xx-large">
+                                    <p><strong>{activationDate}</strong></p>
+                                </div>
+                            </div>
+                        </lightning-layout-item>
+                        
+                        <lightning-layout-item size="4" padding="around-small">
+                            <div class="slds-box slds-box_small slds-theme_default">
+                                <div class="slds-p-around_x-small">
+                                    <lightning-icon icon-name="action:new_event" size="x-small" alternative-text={label.issueDate}></lightning-icon><span class="slds-p-left_x-small">{label.issueDate}</span>
+                                </div>
+                                <div class="slds-p-bottom_x-small slds-p-top_x-small slds-p-right_x-small slds-p-left_xx-large">
+                                    <p><strong>{issueDate}</strong></p>
+                                </div>
+                            </div>
+                        </lightning-layout-item>
+                        
+                        <lightning-layout-item size="4" padding="around-small">
+                            <div class="slds-box slds-box_small slds-theme_default">
+                                <div class="slds-p-around_x-small">
+                                    <lightning-icon icon-name="action:new_event" size="x-small" alternative-text={label.expiryDate}></lightning-icon><span class="slds-p-left_x-small">{label.expiryDate}</span>
+                                </div>
+                                <div class="slds-p-bottom_x-small slds-p-top_x-small slds-p-right_x-small slds-p-left_xx-large">
+                                    <p><strong>{expiryDate}</strong></p>
+                                </div>
+                            </div>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>
+            </template>
+            <template if:false={showInfoCard}>
+                <div class="slds-p-left_xx-large">
+                    <lightning-layout>
+                        <lightning-layout-item size="12" padding="around-small">
+                            <div class="slds-align_absolute-center action-box slds-box slds-p-around_medium slds-text-align_center">{errorToDisplay}</div>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

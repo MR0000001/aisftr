@@ -1,0 +1,19 @@
+<template>
+    <lightning-card title={label.rejection}>  
+        <lightning-combobox name={label.reason} label={label.reason} value={selectedReason}
+            options={reasons} onchange={handleReasonSelection} required class="slds-m-bottom_x-small"></lightning-combobox>
+        <lightning-textarea name={label.comment} label={label.comment} value={rejectionComment} onchange={handleCommentModification} max-length={maxLength} required> </lightning-textarea>
+            <div class="slds-m-around_xx-small">
+                <div class="slds-grid slds-gutters">
+                    <div class ="slds-col">
+                        <lightning-button variant="brand" label={label.back} title={label.back} onclick={handleBack} class="slds-m-left_x-small"></lightning-button>
+                    </div>
+                    <div class ="slds-col" >
+                        <lightning-button variant="brand" label={label.save} title={label.save} onclick={handleSave} class="slds-m-left_x-small" disabled={disableSave}></lightning-button>
+                    </div>
+                </div>
+            </div>
+            
+    </lightning-card>
+    
+</template>

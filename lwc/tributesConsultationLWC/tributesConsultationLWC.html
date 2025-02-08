@@ -1,0 +1,89 @@
+<template>
+    <div class="slds-m-around_large">
+        <div if:true={isLoading} class="slds-is-relative">
+            <lightning-spinner alternative-text="Loading..." variant="brand">
+            </lightning-spinner>
+        </div>
+    </div>
+ <div class="slds-p-bottom_medium">  
+<lightning-card  title={label.tributesTitle} padding = "around-medium">
+    <div style="
+padding-top: 1%;padding-left: 1%
+">
+<lightning-input name="fiscalCode" type="text" label={label.fiscalCode} onchange = {handleFiscalCodeChange} maxlength="16" value={fiscalCodeIndicated} required></lightning-input>
+    </div>
+    <div style="padding-left: 1%"> 
+        <lightning-combobox name="positions" label={label.positions} value={value}
+            placeholder={label.choosePosition} onchange={handlePositionSelection} options={positions} required>
+        </lightning-combobox>
+    </div>
+    <div style="padding-left: 1%">
+        <lightning-combobox name="year" label={label.year} value={value}
+            placeholder={label.chooseYear} onchange={handleYearSelection} options={years} required>
+        </lightning-combobox>
+    </div>
+    <div style="padding-left: 1%">
+        <lightning-combobox name="tributeTypology" label={label.tributeTypology} value={value}
+            placeholder={label.chooseTributeTypology} onchange={handleTypologySelection} options={tributesTypologies} required>
+        </lightning-combobox>
+        
+    </div>
+    
+    <div class="slds-card__footer">
+        <lightning-button label={label.search} variant="brand" onclick={searchTributes} ></lightning-button>
+    </div>
+        
+</lightning-card>
+</div>
+<!--
+<template if:true = {searchCompleted}>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+           <header class="slds-modal__header">
+              <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                 <lightning-icon icon-name="utility:close"
+                    alternative-text="close"
+                    variant="inverse"
+                    size="small" ></lightning-icon>
+                 <span class="slds-assistive-text">Close</span>
+              </button>
+              <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{label.tributesHeader}</h2>
+           </header>
+           <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+            <div class="slds-m-around_medium">  
+                <c-paginator-bottom onprevious={handlePrevious} onnext={handleNext} onfirst={handleFirst}  
+                    onlast={handleLast} currentpage={page} totalrecords={totalrecords} pagesize={pagesize}>  
+                  </c-paginator-bottom> 
+                  </div>
+                <c-tributes-list currentpage={page} totalpages={totalPages} pagesize={pagesize} tributes ={PaginationList} tributes-year ={tributesYear} tributes-typology={tributeTypology} showadditionalparameters= {showadditionalparameters}></c-tributes-list>  
+                <div class="slds-m-around_medium">  
+                  <c-paginator-bottom onprevious={handlePrevious} onnext={handleNext} onfirst={handleFirst}  
+                    onlast={handleLast} currentpage={page} totalrecords={totalrecords} pagesize={pagesize}>  
+                  </c-paginator-bottom>  
+                </div>   
+           </div>
+           <footer class="slds-modal__footer">
+              <button class="slds-button slds-button_neutral" onclick={closeModal}>Cancel</button>
+           </footer>
+        </div>
+     </section>
+     <div class="slds-backdrop slds-backdrop_open"></div>
+
+<div class="slds-p-top_x-large"> 
+<lightning-card >  
+    <div class="slds-m-around_medium">  
+    <c-paginator-bottom onprevious={handlePrevious} onnext={handleNext} onfirst={handleFirst}  
+        onlast={handleLast} currentpage={page} totalrecords={totalrecords} pagesize={pagesize}>  
+      </c-paginator-bottom> 
+      </div>
+    <c-tributes-list currentpage={page} totalpages={totalPages} pagesize={pagesize} tributes ={PaginationList} showadditionalparameters= {showadditionalparameters}></c-tributes-list>  
+    <div class="slds-m-around_medium">  
+      <c-paginator-bottom onprevious={handlePrevious} onnext={handleNext} onfirst={handleFirst}  
+        onlast={handleLast} currentpage={page} totalrecords={totalrecords} pagesize={pagesize}>  
+      </c-paginator-bottom>  
+    </div>  
+  </lightning-card>  
+</div>
+-->
+</template>
+</template>

@@ -1,0 +1,10 @@
+.THIS {
+}
+
+.THIS .slds-listbox {
+    max-height: 240px;
+}
+
+.THIS .accordionMinHeight {
+    min-height: 350px;
+}

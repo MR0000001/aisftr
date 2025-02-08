@@ -1,0 +1,76 @@
+<template>  
+    <lightning-card>  
+      <div class="slds-m-around_medium">  
+          <table  
+            class="slds-table slds-table_bordered slds-table_striped slds-table_cell-buffer slds-table_fixed-layout">  
+            <thead>  
+              <tr class="slds-text-heading_label">  
+                <th scope="col">  
+                  <div  style = "white-space: pre-wrap" title={label.serviceType}>{label.serviceType}</div>  
+                </th>  
+                <th scope="col">  
+                  <div  style = "white-space: pre-wrap" title={label.year}>{label.year}</div>  
+                </th>
+                <th scope="col">  
+                  <div  style = "white-space: pre-wrap" title={label.name}>{label.name}</div>  
+                </th>  
+                <th scope="col">  
+                  <div  style = "white-space: pre-wrap" title={label.surname}>{label.surname}</div>  
+                </th>
+                <th scope="col">  
+                  <div  style = "white-space: pre-wrap" title={label.birthday}>{label.birthday}</div>  
+                </th>  
+                <th scope="col">  
+                  <div  style = "white-space: pre-wrap" title={label.phone}>{label.phone}</div>  
+                </th>
+                <th scope="col">  
+                  <div  style = "white-space: pre-wrap" title={label.status}>{label.status}</div>  
+                </th>  
+                <th scope="col" >  
+                  <div  style = "white-space: pre-wrap" title={label.note}>{label.note}</div>  
+                </th>
+                <th scope="col">  
+                  <div  style = "white-space: pre-wrap" title={label.msguid}>{label.msguid}</div>  
+                </th>
+              </tr>  
+            </thead>  
+            <tbody>  
+              <!-- Use the Apex model and controller to fetch server side data -->  
+              <template for:each={practices} for:item="practice">  
+                <tr key={practice.caseId}>  
+                  <th scope="row">  
+                    <div style = "overflow-wrap: anywhere; white-space: pre-wrap" title={practice.tipoServizio}>{practice.tipoServizio}</div>  
+                  </th>  
+                  <td>  
+                    <div style = "overflow-wrap: anywhere; white-space: pre-wrap" title={practice.annoScolastico}>{practice.annoScolastico}</div>  
+                  </td>
+                  <td>  
+                    <div style = "overflow-wrap: anywhere; white-space: pre-wrap" title={practice.nome}>{practice.nome}</div>  
+                  </td> 
+                  <td>  
+                    <div style = "overflow-wrap: anywhere; white-space: pre-wrap" title={practice.cognome}>{practice.cognome}</div>  
+                  </td> 
+                  <td>  
+                    <div style = "overflow-wrap: anywhere; white-space: pre-wrap" title={practice.dataNascita}>{practice.dataNascita}</div>  
+                  </td> 
+                  <td>  
+                    <div style = "overflow-wrap: anywhere; white-space: pre-wrap" title={practice.telefonoRichiedente}>{practice.telefonoRichiedente}</div>  
+                  </td> 
+                  <td>  
+                    <div style = "overflow-wrap: anywhere; white-space: pre-wrap" title={practice.statoDomanda}>{practice.statoDomanda}</div>  
+                  </td> 
+                  <td>  
+                    <div style = "overflow-wrap: anywhere; white-space: pre-wrap" title={practice.nota}>{practice.nota}</div>  
+                  </td> 
+                  <td>  
+                    <div style = "overflow-wrap: anywhere; white-space: pre-wrap" title={practice.msgUid}>{practice.msgUid}</div>  
+                  </td>
+                </tr>  
+              </template>  
+            </tbody>  
+          </table>  
+      </div>  
+      <p class="slds-m-vertical_medium content">{label.page} <b>{currentpage}</b> {label.of} 
+        <b> {totalpages}</b></p>  
+    </lightning-card>  
+  </template>

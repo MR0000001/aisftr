@@ -1,0 +1,85 @@
+<template>
+    <lightning-card>
+        <div class="slds-box slds-theme_shade">
+            <h3 slot="title">
+                <lightning-icon icon-name="action:record" size="small" alternative-text={label.infoTransactionsTitle}></lightning-icon>
+                <span class="slds-p-left_x-small slds-text-title_caps">{label.infoTransactionsTitle}</span>
+            </h3>
+            <template if:true={showInfoTranscation}>
+                <div class="slds-p-left_large">
+                    <div class="slds-p-around_medium">
+                        <lightning-icon icon-name="action:filter" size="x-small" alternative-text={label.filters}></lightning-icon>
+                        <span class="slds-p-left_x-small slds-text-title_caps">{label.filters}:</span>
+                        <lightning-layout multiple-rows>
+                            <lightning-layout-item size="3" padding="around-small">
+                                <lightning-input class="DateFilters fromDateCmp" type="date" name="from" label={label.dateFrom} min={minDate} max={maxDate} onchange={handleFromDateChange}></lightning-input>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="3" padding="around-small">
+                                <lightning-input class="DateFilters toDateCmp" type="date" name="to" label={label.dateTo} min={minDate} max={maxDate} onchange={handleToDateChange} ></lightning-input>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="3" padding="around-small">
+                                <div>
+                                    <div class="slds-border_left slds-p-left_medium">
+                                        <lightning-combobox
+                                            name="presetDateFilters"
+                                            label={label.daysFilters}
+                                            value={selectedDaysBefore}
+                                            options={lessThanDays}
+                                            onchange={handleDaysChange}>
+                                        </lightning-combobox>
+                                    </div>
+                                </div>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="3" padding="around-small">
+                                <div>
+                                    <div class="slds-border_left slds-p-left_medium">
+                                        <lightning-combobox
+                                            name="partnersList"
+                                            label={label.partners}
+                                            value={selectedPartner}
+                                            options={partners}
+                                            onchange={handlePartnersChange}>
+                                        </lightning-combobox>
+                                    </div>
+                                </div>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                        <div class="slds-clearfix slds-p-right_small">
+                            <div class="slds-float_right">
+                                <lightning-button variant="brand" label={label.search} onclick={handleSearch} disabled={isDisabledSearch} class="slds-m-left_x-small"></lightning-button>
+                                <lightning-button variant="brand" label={label.reset} onclick={handleReset} class="slds-m-left_x-small"></lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="slds-p-around_medium">
+                        <lightning-datatable 
+                            key-field="id"
+                            data={transactionsToDisplay}
+                            columns={columns}
+                            wrap-text-max-lines="3"
+                            sorted-direction={sortedDirection}
+                            sorted-by={sortedBy}
+                            hide-checkbox-column 
+                            show-row-number-column
+                            onsort={updateColumnSorting}>
+                        </lightning-datatable>
+                    </div>
+                    <div class="slds-p-around_medium">
+                        <div class="slds-m-bottom_medium">
+                            <p>{label.page} <b>{page}</b> {label.of} <b>{totalPages}</b></p>
+                        </div>
+                        <c-paginator-bottom variant="brand" onprevious={handlePrevious} onnext={handleNext} onfirst={handleFirst} onlast={handleLast} currentpage={page} totalrecords={totalRecordsCount} pagesize={pageSize}></c-paginator-bottom>
+                    </div>
+                </div>
+            </template>
+            <template if:false={showInfoTranscation}>
+                <lightning-layout>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <div class="slds-align_absolute-center custom-box slds-box slds-p-around_medium slds-text-align_center">{errorToDisplay}</div>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>
+        </div>
+    </lightning-card>
+</template>

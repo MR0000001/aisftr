@@ -1,0 +1,25 @@
+<template>
+    <div class="slds-align--absolute-center">
+        <div if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading..." variant="brand" style="height: 650px;margin: auto 0;">
+            </lightning-spinner>
+        </div>
+    </div>
+    <span class="slds-page-header__title slds-truncate slds-m-bottom_x-small slds-p-bottom_x-small" title={label.title}>{label.title}</span>
+    <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+      <lightning-progress-step label={label.step0} value="0"></lightning-progress-step>
+      <lightning-progress-step label={label.step1} value="1"></lightning-progress-step>
+  </lightning-progress-indicator>    
+    <div class="slds-m-around"  style="width: 100%; height: 520px;">
+        <template if:true={stepNumber0}>
+            <c-manage-favorites-to-citizens-municipio 
+            onhandleescorback={handleEscOrBack} onhandlesaveornext={handleSaveOrNext}
+            table1data={table1data} preselectedrowstable1={preselectedrowstable1}></c-manage-favorites-to-citizens-municipio>
+        </template>
+        <template if:true={stepNumber1}>
+            <c-manage-favorites-to-citizens-aree-tematiche 
+            onhandleescorback={handleEscOrBack} onhandlesaveornext={handleSaveOrNext}
+            table2data={table2data} preselectedrowstable2={preselectedrowstable2}></c-manage-favorites-to-citizens-aree-tematiche>
+        </template>
+    </div>
+</template>

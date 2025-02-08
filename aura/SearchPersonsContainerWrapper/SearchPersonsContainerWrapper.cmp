@@ -1,0 +1,21 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader,lightning:availableForFlowScreens" access="global" >
+    <aura:html tag="style">
+        .slds-modal__container {
+            max-width: 100rem !important;
+            width: 100% !important;
+            padding: 0;
+        }
+
+        .slds-modal__content {
+            height:unset !important;
+            max-height:53rem !important;
+            overflow: visible !important;
+        }
+    </aura:html>
+    
+    <aura:attribute name="recordId" type="String" access="global" />
+    
+    <div class="slds-modal__container">
+        <c:searchPersonsContainer caseId = "{!v.recordId}" />
+    </div>
+</aura:component>

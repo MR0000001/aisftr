@@ -1,0 +1,74 @@
+<template>
+  <lightning-card>  
+    <div class="slds-m-around_medium">  
+        <table  
+          class="slds-table slds-table_bordered slds-table_striped slds-table_cell-buffer slds-table_fixed-layout">  
+          <thead>  
+            <tr class="slds-text-heading_label">  
+              <th scope="col">  
+                <div class="slds-truncate" style = "white-space: pre-wrap" title={label.name}>{label.name}</div>  
+              </th>  
+              <th scope="col">  
+                <div class="slds-truncate" style = "white-space: pre-wrap" title={label.surname}>{label.surname}</div>  
+              </th>
+              <th scope="col">  
+                <div class="slds-truncate" style = "white-space: pre-wrap" title={label.birthday}>{label.birthday}</div>  
+              </th>
+              <th scope="col">  
+                  <div class="slds-truncate" style = "white-space: pre-wrap" title={label.fiscalCode}>{label.fiscalCode}</div>  
+                </th>  
+              <th scope="col">  
+                <div class="slds-truncate" style = "white-space: pre-wrap" title={label.home}>{label.home}</div> 
+              </th>
+              <th scope="col">  
+                <div class="slds-truncate" style = "white-space: pre-wrap" title={label.address}>{label.address}</div> 
+              </th>
+            </tr>  
+          </thead>  
+          <tbody>  
+            <!-- Use the Apex model and controller to fetch server side data -->  
+            <template for:each={accounts} for:item="account">  
+              <tr key={account.accountId}> 
+                <th scope="row">  
+                  <div class="slds-truncate" title={account.firstName}>{account.firstName}</div>  
+                </th>  
+                <td>  
+                  <div class="slds-truncate" title={account.lastName}>{account.lastName}</div>  
+                </td>
+                <td>  
+                  <div class="slds-truncate" title={account.birthday}>{account.birthday}</div>  
+                </td> 
+                <td>  
+                  <div class="slds-truncate" title={account.fiscalCode}>{account.fiscalCode}</div>  
+                </td> 
+                <td>  
+                  <div class="slds-truncate" title={account.home}>{account.home}</div> 
+                </td> 
+                <td>  
+                  <div class="slds-truncate" title={account.address}>{account.address}</div> 
+                </td>
+                <template if:true = {account.fromSF}>
+                  <td>  
+                    <lightning-button class="slds-p-right_medium" label={label.open} variant="brand" onclick={openAccount} data-id={account.accountId} disabled={disableButtons}></lightning-button>
+                    <template if:true = {canAssociateCase}>
+                      <lightning-button label={label.associa} variant="brand" onclick={associateAccountToCase} data-id={account.accountId} disabled={disableButtons}></lightning-button>
+                    </template>
+                    <template if:true = {isFromLegal}>
+                      <lightning-button label={label.research} variant="brand" onclick={handleSearchSigeud} data-id={account.accountId} disabled={disableButtons}></lightning-button>
+                    </template>
+                  </td>                  
+                </template>
+                <template if:true = {account.notFromSF}>
+                  <td>  
+                    <lightning-button label={label.add} variant="brand" onclick={newAccount} data-fiscalcode={account.fiscalCode} disabled={disableButtons}></lightning-button>
+                  </td>
+                </template>           
+              </tr>  
+            </template>  
+          </tbody>  
+        </table>  
+    </div>  
+    <p class="slds-m-vertical_medium content">{label.page} <b>{currentpage}</b> {label.of} 
+      <b> {totalpages}</b></p>  
+  </lightning-card>  
+</template>

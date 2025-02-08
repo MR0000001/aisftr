@@ -1,0 +1,12 @@
+<!--
+ - Created by FMARCHEGIA00 on 03/03/2021.
+ -->
+
+<aura:component description="caseManagementOrchestratorWrapper" implements="force:hasRecordId,force:lightningQuickAction,lightning:availableForFlowScreens,flexipage:availableForAllPageTypes" access="global">
+
+    <aura:attribute name="recordId" type="String" access="global" />
+    <lightning:workspaceAPI aura:id="workspaceToClose"/>
+
+    <c:caseManagementOrchestrator onclosetab="{!c.closetab}" recordId="{!v.recordId}" />
+
+</aura:component>

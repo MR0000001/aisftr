@@ -1,0 +1,22 @@
+<template>
+    <lightning-card  title={label.tributesTitle} >
+        <p class="slds-m-vertical_medium content slds-m-around_medium">{label.fiscalCode}: <b> {fiscalCode}</b> </p>
+        <p class="slds-m-vertical_medium content slds-m-around_medium">{label.positions}: <b> {positions}</b> </p>
+        <p class="slds-m-vertical_medium content slds-m-around_medium">{label.year}: <b> {year}</b> </p>
+        <p class="slds-m-vertical_medium content slds-m-around_medium">{label.tributeTypology}: <b> {tributesTypology}</b> </p>
+    <div class="slds-m-around_medium">
+        
+                <c-paginator-bottom onprevious={handlePrevious} onnext={handleNext} onfirst={handleFirst}  
+                    onlast={handleLast} currentpage={page} totalrecords={totalrecords} pagesize={pagesize}>  
+                  </c-paginator-bottom> 
+                  </div>
+                <c-tributes-list currentpage={page} totalpages={totalpages} pagesize={pagesize} tributes ={PaginationList} tributes-year ={tributesYear} tributes-typology={tributesTypology} showadditionalparameters={showadditionalparameters}></c-tributes-list>  
+                <div class="slds-m-around_medium">  
+                  <c-paginator-bottom onprevious={handlePrevious} onnext={handleNext} onfirst={handleFirst}  
+                    onlast={handleLast} currentpage={page} totalrecords={totalrecords} pagesize={pagesize}>  
+                  </c-paginator-bottom>  
+        
+    </div>
+</lightning-card>  
+
+</template>

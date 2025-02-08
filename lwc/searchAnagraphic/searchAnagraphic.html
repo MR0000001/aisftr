@@ -1,0 +1,120 @@
+<template>
+    <div class="slds-m-around_large">
+        <div if:true={isLoading} class="slds-is-relative">
+            <lightning-spinner alternative-text="Loading..." variant="brand">
+            </lightning-spinner>
+        </div>
+    </div>
+    <div class="slds-p-bottom_medium">
+        <lightning-card padding = "around-medium">
+            <h3 slot="title" class="slds-p-around_xx-small">
+                <lightning-icon icon-name="utility:user" class="slds-p-around_xx-small" size="small"></lightning-icon>
+                {label.searchAccountTitle}
+            </h3>
+            <template if:true={isFromLegal}>
+                <div class="slds-m-around_medium slds-text-align_left slds-text-heading_small">
+                    <p>{label.legalEntityPhase}</p>
+                </div>
+            </template>
+            <template if:false={showCardNewAccount}>
+                <div class="slds-card__body" style= "width: 99%; padding-left: 1%;">
+                    <lightning-accordion allow-multiple-sections-open
+                                            active-section-name={activeSections}>
+                        <form>
+                            <lightning-accordion>
+                                <lightning-accordion-section name="searchByFC" label={label.searchByFC} class="title">
+                                    <lightning-input name="fiscalCode" type="text" label={label.fiscalCode} onchange = {handleFiscalCodeChange} onpaste = {handleFiscalCodeChange} maxlength="16" value={fiscalCodeIndicated} disabled={disableInput}></lightning-input>
+                                </lightning-accordion-section>
+
+                                <lightning-accordion-section name="generalSearch" label={label.generalSearch} class="title">
+                                    <div class="slds-grid slds-gutters" style = "position: relative;">
+                                        <div class ="slds-col" >
+                                            <lightning-input name="name" type="text" label={label.name} value={firstname} onchange = {handleNameChange} onpaste = {handleNameChange} disabled={disableInput}></lightning-input>
+                                        </div>
+                                        <div class ="slds-col">
+                                            <lightning-input name="surname" type="text" label={label.surname} value={lastname} onchange = {handleSurnameChange} onpaste = {handleSurnameChange} disabled={disableInput}></lightning-input>
+                                        </div>
+                                        <div class ="slds-col">
+                                            <lightning-input name="birthday" type="date" label={label.dateofbirth} value={birthday} onchange = {handleDateChange} onpaste = {handleDateChange} max={today} disabled={disableInput}></lightning-input>
+                                        </div>
+                                        <div class ="slds-col">
+                                            <lightning-combobox name="sex" label={label.gender} value={sex} options={genderPicklistValues} onchange={handleSexChange} onpaste = {handleSexChange} disabled={disableInput}></lightning-combobox>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+                            </lightning-accordion>
+                        </form>
+
+                    </lightning-accordion>
+
+                    <div class="slds-align_absolute-center slds-m-around_medium">
+                        <div class="slds-grid slds-gutters">
+                            <div class ="slds-col">
+                                <lightning-button label={label.search} variant="brand" onclick={searchAccounts} disabled={disableButtons}></lightning-button>
+                            </div>
+                            <div class ="slds-col" >
+                                <lightning-button label={label.reset} variant="brand" onclick={resetFilters} disabled={disableButtons}></lightning-button>
+                            </div>
+                            <div class ="slds-col">
+                                <lightning-button label={label.newAccount} variant="brand" onclick={newAccount} disabled={disableNewButton}></lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <template if:true = {searchCompleted}>
+                    <div class="slds-p-top_x-large">
+                    <lightning-card >
+                        <div class="slds-m-around_medium">
+                            <c-paginator-bottom variant="brand" onprevious={handlePrevious} onnext={handleNext} onfirst={handleFirst} onlast={handleLast} currentpage={page} totalrecords={totalrecords} pagesize={pagesize}></c-paginator-bottom>
+                        </div>
+                        <template if:true={isFromLegal}>
+                            <lightning-formatted-rich-text value={label.legalEntitesRegistryButtonsDesc}></lightning-formatted-rich-text>
+                        </template>
+                        <c-accounts-list onassociateaccounttocase={associateaccounttocase}  
+                        onsearchsigeud={handleSearchSigeud}
+                        onshowcardaccount={showCardAccount} is-from-legal={isFromLegal}
+                        can-associate-case={canAssociateCase} currentpage={page} totalpages={totalPages} pagesize={pagesize}
+                        accounts ={PaginationList} onnavigation={resetFilters} onstartloading={startLoading} onstoploading={stopLoading}
+                        onhandlespinner={handlespinner} ></c-accounts-list>
+                        <div class="slds-m-around_medium">
+                            <c-paginator-bottom variant="brand" onprevious={handlePrevious} onnext={handleNext} onfirst={handleFirst} onlast={handleLast} currentpage={page} totalrecords={totalrecords} pagesize={pagesize}></c-paginator-bottom>
+                        </div>
+                    </lightning-card>
+                    </div>
+                </template>
+            </template>
+
+            <template if:true={showCardAccountToggle}>
+                <hr/>
+                <lightning-card>
+                    <div class="slds-card__body slds-card__body_innerdy slds-p-bottom_large" style= "width: 90%; padding-left: 5%;">
+                        <lightning-button-icon  variant="brand" class="slds-float_right slds-p-right_medium" icon-name="utility:close"  alternative-text="Chiudi" title="Chiudi" onclick={closeCardAccount}></lightning-button-icon>
+                        <br/>
+                        <lightning-record-form
+                            class="slds-p-around_large slds-p-bottom_large"
+                            record-id={accountRecordIdToShow}
+                            object-api-name="Account"
+                            record-type-id={recordTypeIdToUse}
+                            layout-type="Full"
+                            columns="2"
+                            mode="readonly">
+                        </lightning-record-form>
+                        <br/>
+                        <lightning-button-icon  variant="brand" class="slds-float_right slds-p-bottom_large slds-p-right_medium" icon-name="utility:close"  alternative-text="Chiudi" title="Chiudi" onclick={closeCardAccount}></lightning-button-icon>
+                        <br/>
+                    </div>
+                </lightning-card>
+            </template>
+
+            <template if:true={showCardNewAccount}>
+                <div class="slds-card__body" style= "width: 99%; padding-left: 1%;">
+                    <c-search-anagraphic_create-account onclosecreateaccountform={closecreateaccountform}
+                    onclosecardnewaccount={closecardnewaccount} account-record-id={accountRecordId} record-type-id-to-use={recordTypeIdToUse}>
+                    </c-search-anagraphic_create-account>
+                </div>
+            </template>
+
+        </lightning-card>
+    </div>
+</template>

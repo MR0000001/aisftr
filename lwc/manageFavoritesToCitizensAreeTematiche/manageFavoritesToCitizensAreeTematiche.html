@@ -1,0 +1,25 @@
+<template>
+
+    <div class="slds-m-around_xx-small" style="width: 100%; height: 470px; overflow-y: auto">
+        <lightning-datatable
+            key-field="Id"
+            data={dataTable2}
+            columns={columnsTable2}
+            selected-rows={preselectedrowstable2}
+            onrowselection={selectedRowsEvent}>            
+        </lightning-datatable>
+    </div>
+
+    <div class="slds-m-around_xx-small slds-p-top_medium">
+        <div class="slds-grid">
+            <div class ="slds-col_bump-right">
+                <lightning-button class="" variant="destructive-text" label={label.esc} title={label.esc} onclick={handleEsc}></lightning-button>
+            </div>
+            <div class ="slds-col_bump-left">
+                <lightning-button class="slds-p-right_x-small" variant="brand" label={label.back} title={label.back} onclick={handleBack}></lightning-button>
+                <lightning-button class="" variant="brand" label={label.save} title={label.save} onclick={handleSaveOrNext}></lightning-button>
+            </div>
+        </div>
+    </div>   
+
+</template>

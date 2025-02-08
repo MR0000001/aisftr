@@ -1,0 +1,67 @@
+<template>
+    <lightning-card title={label.title}>
+        <template if:false={showDipReass}>
+            <template if:true={showSection1}>
+                <lightning-combobox
+                    name={label.reason}
+                    label={label.reason}
+                    value={selectedReasonReassign}
+                    options={reasonsReassignment}
+                    onchange={handleSelecteReason}
+                    required="required"
+                    class="slds-m-bottom_x-small"></lightning-combobox>
+                <lightning-textarea
+                    max-length={maxLength}
+                    name={label.comment}
+                    label={label.comment}
+                    value={commentReassign}
+                    onchange={handleComment}
+                    required="required"
+                    class="slds-m-bottom_x-small"></lightning-textarea>
+            </template>
+            <template if:true={showCC}>
+                <lightning-combobox
+                    name={label.queues}
+                    label={label.queues}
+                    value={selectedQueueReassign}
+                    options={reassignQueues}
+                    onchange={handleSelectQueue}
+                    required="required"
+                    class="slds-m-bottom_x-small"></lightning-combobox>
+            </template>
+        </template>
+        <template if:true={showDipReass}>
+            <div class="slds-m-left_x-small">
+                {label.warning}
+            </div>
+            <lightning-textarea
+                max-length={maxLength}
+                name={label.comment}
+                label={label.comment}
+                value={commentReassign}
+                onchange={handleComment}
+                class="slds-m-bottom_x-small"></lightning-textarea>
+        </template>
+        <div class="slds-m-around_xx-small">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning-button
+                        variant="brand"
+                        label={label.back}
+                        title={label.back}
+                        onclick={handleBack}
+                        class="slds-m-left_x-small"></lightning-button>
+                </div>
+                <div class="slds-col">
+                    <lightning-button
+                        variant="brand"
+                        label={label.save}
+                        title={label.save}
+                        onclick={handleSave}
+                        class="slds-m-left_x-small"
+                        disabled={disableSave}></lightning-button>
+                </div>
+            </div>
+        </div>
+    </lightning-card>
+</template>

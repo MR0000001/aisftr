@@ -1,0 +1,20 @@
+<template>
+    <lightning-card title={label.title}>  
+        <lightning-combobox name={label.modality} label={label.modality} value={selectedModalityPass}
+            options={modalities} onchange={handleModalitySelection} required class="slds-m-bottom_x-small"></lightning-combobox>
+        <template if:true ={showQueue}>
+            <lightning-combobox name={label.queues} label={label.queues} value={selectedQueue}
+            options={queues} onchange={handleQueueSelection} required class="slds-m-bottom_x-small"></lightning-combobox>
+        </template>
+            <div class="slds-m-around_xx-small">
+                <div class="slds-grid slds-gutters">
+                    <div class ="slds-col">
+                        <lightning-button variant="brand" label={label.back} title={label.back} onclick={handleBack} class="slds-m-left_x-small"></lightning-button>
+                    </div>
+                    <div class ="slds-col" >
+                        <lightning-button variant="brand" label={label.save} title={label.save} onclick={handleSave} class="slds-m-left_x-small"></lightning-button>
+                    </div>
+                </div>
+            </div>
+    </lightning-card>
+</template>

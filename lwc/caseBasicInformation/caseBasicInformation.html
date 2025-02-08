@@ -1,0 +1,31 @@
+<template>
+    <lightning-accordion allow-multiple-sections-open
+                         active-section-name={activeSections}>
+        <lightning-accordion-section name="basicInformation" label={label.basicInformation} class="title">
+            <lightning-combobox name={label.interactionTypology} label={label.interactionTypology} value={typologyselected}
+            options={recordTypes} onchange={handleTypologySelection} required disabled={InstructorUser}></lightning-combobox>
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-combobox name={label.interactionDetail} label={label.interactionDetail} value={interactionselected}
+            options={interactionDetails} onchange={handleInteractionSelection} required disabled={InstructorUser}></lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-combobox name={label.currentQueue} class="value" label={label.currentQueue} value={selectedqueue} onchange ={handleQueueSelection}
+            options={queues} disabled ={onlyOneQueue} required ></lightning-combobox>
+            
+            </div>
+            </div>
+        </lightning-accordion-section>
+</lightning-accordion>
+<div style="height:250px"></div>
+<div class="slds-grid slds-gutters slds-m-around_xx-small">
+    <div class ="slds-col_bump-right">
+        <template if:false = {isCreation} >
+            <lightning-button variant="destructive-text" label={label.cancel} title={label.cancel} onclick={handleCancel} class=""></lightning-button>
+        </template>
+    </div>
+        <div class ="slds-col_bump-left">
+            <lightning-button variant="destructive" label={label.next} title={label.next} onclick={handleNext} class=""></lightning-button>
+        </div>
+    </div>
+</template>

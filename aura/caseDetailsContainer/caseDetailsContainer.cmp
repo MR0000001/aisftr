@@ -1,0 +1,176 @@
+<aura:component implements="lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:availableForFlowScreens" access="global">
+    <aura:html tag="style">
+        .slds-modal__content{
+        height:unset !important;
+        max-height:unset !important;
+        }
+        .slds-modal__container{
+        width:80% !important;
+        max-width:80% !important;
+        }
+    </aura:html>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="isCase" type="boolean"/>
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="showGeoCoding" type="boolean"/>
+    <aura:attribute name="bottomUp" type="boolean"/>
+    <aura:attribute name="municipality" type="String"/>
+    <aura:attribute name="recordId" type="String" access="global" />
+    <aura:attribute name="typologySelected" type="String"/>
+    <aura:attribute name="interactionSelected" type="String"/>
+    <aura:attribute name="selectedQueue" type="String"/>
+    <aura:attribute name="selectedThemarea" type="String"/>
+    <aura:attribute name="selectedArgument" type="String"/>
+    <aura:attribute name="selectedSpecification" type="String"/>
+    <aura:attribute name="selectedThemareaR" type="String"/>
+    <aura:attribute name="selectedArgumentR" type="String"/>
+    <aura:attribute name="selectedSpecificationR" type="String"/>
+    <aura:attribute name="estimatedQueue" type="String"/>
+    <aura:attribute name="fullAddress" type="String"/>
+    <aura:attribute name="address" type="String"/>
+    <aura:attribute name="letterAddress" type="String"/>
+    <aura:attribute name="numberAddress" type="String"/>
+    <!--<aura:attribute name="googleKey" type="String"/>
+    <aura:attribute name="vfOrigin" type="String"/>
+    <aura:attribute name="domain" type="String"/>
+    <aura:attribute name="urlGoogleMaps" type="String"/>-->
+    <aura:attribute name="lat" type="String"/>
+    <aura:attribute name="lng" type="String"/>
+    <!--<aura:attribute name="callNic" type="Boolean"/>-->
+    <aura:attribute name="isonchangeselected" type="Boolean"/>
+    <aura:attribute name="showCaseDetails" type="Boolean"/>
+    <aura:attribute name="showCaseBasicInformation" type="Boolean"/>
+    <aura:attribute name="contactId" type="String" access="global"/>
+    <aura:attribute name="accountId" type="String" access="global"/>
+    <aura:attribute name="serviceRequestId" type="String"/>
+    <aura:attribute name="origin" type="String"/>
+    <aura:attribute name="personaFisica" type="String" access="global"/>
+    <aura:attribute name="caseBusinessAccount" type="String" access="global"/>
+    <aura:attribute name="subject" type="String"/>
+    <aura:attribute name="nameinteraction" type="String"/>
+    <aura:attribute name="isCreation" type="Boolean"/>
+    <!--<aura:attribute name="isNicError" type="Boolean"/>-->
+    <aura:attribute name="oldInteraction" type="String"/>
+    <aura:attribute name="protocolNumber" type="String"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:if isTrue="{!and(v.isCase, !v.showGeoCoding)}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.handleFilterChange }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:wizardCaseOrchestrator 
+                                              recordId = "{!v.recordId}" 
+                                              caseId = "{!v.caseId}" 
+                                              onfilterchange="{! c.handleFilterChange }" 
+                                              onshowgeocoding="{!c.showGeoCoding}"
+                                              typologySelected="{!v.typologySelected}" 
+                                              interactionSelected="{!v.interactionSelected}" 
+                                              selectedQueue="{!v.selectedQueue}" 
+                                              selectedThemarea="{!v.selectedThemarea}" 
+                                              selectedArgument="{!v.selectedArgument}" 
+                                              selectedSpecification="{!v.selectedSpecification}"
+                                              selectedThemarears="{!v.selectedThemareaR}" 
+                                              selectedArgumentrs="{!v.selectedArgumentR}" 
+                                              selectedSpecificationrs="{!v.selectedSpecificationR}" 
+                                              estimatedQueue="{!v.estimatedQueue}" 
+                                              address="{!v.address}" 
+                                              letterAddress="{!v.letterAddress}" 
+                                              numberAddress="{!v.numberAddress}"
+                                              bottomUp="{!v.bottomUp}" 
+                                              lat="{!v.lat}" 
+                                              lng="{!v.lng}" 
+                                              subject="{!v.subject}" 
+                                              isCreation="{!v.isCreation}"
+                                              fullAddress="{!v.fullAddress}"
+                                              showCaseBasicInformation="{!v.showCaseBasicInformation}"
+                                              showCaseDetails="{!v.showCaseDetails}"
+                                              municipality="{!v.municipality}"
+                                              contactId="{!v.contactId}"
+                                              accountId="{!v.accountId}"
+                                              serviceRequestId="{!v.serviceRequestId}"
+                                              origin="{!v.origin}"
+                                              isonchangeselected = "{!v.isonchangeselected}"
+                                              nameinteraction="{!v.nameinteraction}"
+                                              protocolNumber="{!v.protocolNumber}"
+                                              oldInteraction="{!v.oldInteraction}"
+                                              personaFisica="{!v.personaFisica}"
+                                              caseBusinessAccount="{!v.caseBusinessAccount}"
+                                              />
+                </div>
+                <!--Modal/Popup Box Footer Starts here-->
+                <!--
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="brand"
+                                          label="{!$Label.c.Cancel}"
+                                          title="{!$Label.c.Cancel}"
+                                          onclick="{! c.handleFilterChange }"/>
+                    </footer>
+                    -->
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+        <aura:set attribute="else">
+            <aura:if  isTrue="{!!v.showGeoCoding}" >
+                <c:wizardCaseOrchestrator
+                                          recordId = "{!v.recordId}" 
+                                          caseId = "{!v.caseId}" 
+                                          onfilterchange="{! c.handleCloseQuickAction }" 
+                                          onshowgeocoding="{!c.showGeoCoding}" 
+                                          address="{!v.address}" 
+                                          letterAddress="{!v.letterAddress}" 
+                                          numberAddress="{!v.numberAddress}"
+                                          fullAddress="{!v.fullAddress}"
+                                          typologySelected="{!v.typologySelected}" 
+                                          interactionSelected="{!v.interactionSelected}" 
+                                          selectedQueue="{!v.selectedQueue}" 
+                                          selectedThemarea="{!v.selectedThemarea}" 
+                                          selectedArgument="{!v.selectedArgument}" 
+                                          selectedSpecification="{!v.selectedSpecification}"
+                                          selectedThemarears="{!v.selectedThemareaR}" 
+                                          selectedArgumentrs="{!v.selectedArgumentR}" 
+                                          selectedSpecificationrs="{!v.selectedSpecificationR}" 
+                                          estimatedQueue="{!v.estimatedQueue}" 
+                                          subject="{!v.subject}" 
+                                          isCreation="{!v.isCreation}"
+                                          lat="{!v.lat}" 
+                                          lng="{!v.lng}"
+                                          showCaseBasicInformation="{!v.showCaseBasicInformation}"
+                                          showCaseDetails="{!v.showCaseDetails}"
+                                          municipality="{!v.municipality}"
+                                          contactId="{!v.contactId}"
+                                          accountId="{!v.accountId}"
+                                          serviceRequestId="{!v.serviceRequestId}"
+                                          origin="{!v.origin}"
+                                          isonchangeselected = "{!v.isonchangeselected}"
+                                          bottomUp="{!v.bottomUp}"
+                                          nameinteraction="{!v.nameinteraction}"
+                                          protocolNumber="{!v.protocolNumber}"
+                                          oldInteraction="{!v.oldInteraction}"
+                                          personaFisica="{!v.personaFisica}"
+                                          caseBusinessAccount="{!v.caseBusinessAccount}"
+                                          />
+            </aura:if>
+        </aura:set>
+    </aura:if>
+    <aura:if isTrue="{!v.showGeoCoding}">
+        <div style="width: 100%; height: 650px;">
+            <c:leafletMap
+                    lng="{!v.lng}"
+                    lat="{!v.lat}"
+                    municipality="{!v.municipality}"
+                    fullAddress="{!v.fullAddress}"
+                    address="{!v.address}"
+                    numberAddress="{!v.numberAddress}"
+                    letterAddress="{!v.letterAddress}"
+                    ongoback="{!c.handleBack}" />
+        </div>
+    </aura:if>
+</aura:component>

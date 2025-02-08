@@ -1,0 +1,11 @@
+<aura:component implements="lightning:isUrlAddressable" description="SoftphoneMultipleContacts">
+    <aura:attribute name="PhoneCTI" type="String" />
+    <aura:attribute name="finalComponent" type="String" />
+    <aura:attribute name="tabToClose" type="String" />
+    <aura:attribute name="mystery" type="String" />
+    <lightning:navigation aura:id="navService" />
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onPageReferenceChange}"/>
+    <aura:handler name="change" value="{!v.pageReference}" action="{!c.onPageReferenceChange}"/>
+    <lightning:flow aura:id="flowData" />
+</aura:component>

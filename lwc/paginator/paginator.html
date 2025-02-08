@@ -1,0 +1,22 @@
+<template>  
+    <lightning-layout horizontal-align="spread">
+      <lightning-layout-item>
+        <span class="slds-m-right_x-small">
+          <lightning-button label="<<" title={label.first} onclick={handleFirst} disabled={showFirstButton}></lightning-button>
+        </span>
+        <lightning-button label="<" title={label.previous} onclick={handlePrevious} disabled={showFirstButton}></lightning-button>
+      </lightning-layout-item>
+
+      <lightning-layout-item>
+        <p>{label.page} {page} {label.of} {totalPages}</p>
+      </lightning-layout-item>
+
+      <lightning-layout-item>
+        <lightning-button label=">" title={label.next} onclick={handleNext} disabled={showLastButton}></lightning-button>
+        <span class="slds-m-left_x-small">
+          <lightning-button label=">>" title={label.last} onclick={handleLast} disabled={showLastButton}></lightning-button>
+        </span>
+      </lightning-layout-item>
+      
+    </lightning-layout>
+</template>

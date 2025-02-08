@@ -1,0 +1,24 @@
+/**
+ * Created by LCONATO00 on 19/05/2020.
+ */
+.THIS .pointer{
+    cursor: pointer;
+}
+
+.THIS .colTitle {
+    white-space:pre-wrap;
+    word-wrap:break-word;
+}
+
+.THIS .colMacrostructure {
+    white-space:pre-wrap;
+    word-wrap:break-word;
+}
+
+.THIS .colAbstract {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 75px;
+  display: inline-block;
+}

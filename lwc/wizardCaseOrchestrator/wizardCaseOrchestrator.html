@@ -1,0 +1,42 @@
+<template>
+  <span class="slds-page-header__title slds-truncate slds-m-bottom_x-small" title={label.caseCompilation}>{label.caseCompilation}</span>
+  <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+    <lightning-progress-step label={label.step0} value="0"></lightning-progress-step>
+    <lightning-progress-step label={label.step1} value="1"></lightning-progress-step>
+    <lightning-progress-step label={label.step2} value="2"></lightning-progress-step>
+</lightning-progress-indicator>
+<template if:true = {showCaseBasicInformation}>
+  <lightning-card >  
+      <c-case-basic-information oncompleterecordfields={handleCompleteRecord} 
+      recordid={recordId} caseid={caseId} selectedqueue={selectedQueue} interactionselected={interactionSelected}
+      typologyselected={typologySelected} nameinteraction={nameinteraction} selected-argument={selectedArgumentR} selected-thematic-area={selectedThemareaR} selected-specific={selectedSpecificationR}
+      estimated-queue={estimatedQueue} thematic-area={selectedThemarea} specific={selectedSpecification} argument={selectedArgument} onfilterchange ={filterchange}
+      dont-query={dontQuery} onnextfrombi={handleNavigatePage}  onpreviousfromdetails={handleNavigatePage} address={address} full-address={fullAddress} letter-address={letterAddress} number-address={numberAddress} municipality={municipality} account-id={accountId} contact-id={contactId} lat={lat} lng={lng} protocol-number={protocolNumber} old-interaction={oldInteraction}
+      casealertpolicewarning={casealertpolicewarning} isonchangeselected={isonchangeselected} is-creation={isCreation}  subject={subject} originalid={originalid} persona-fisica={personaFisica} case-business-account={caseBusinessAccount}>
+        </c-case-basic-information>
+    </lightning-card>
+  </template>
+  <template if:true = {showCaseDetails}>
+        <lightning-card >  
+            <c-case-details onnextfromdetails={handleNavigatePage} onpreviousfromdetails={handleNavigatePage}
+            recordid={recordId} caseid={caseId} selectedqueue={selectedQueue} interactionselected={interactionSelected}
+            typologyselected={typologySelected} nameinteraction={nameinteraction} selected-argument={selectedArgumentR} selected-thematic-area={selectedThemareaR} selected-specific={selectedSpecificationR}
+            estimated-queue={estimatedQueue} thematic-area={selectedThemarea} specific={selectedSpecification} argument={selectedArgument} onfilterchange ={filterchange} protocol-number={protocolNumber} old-interaction={oldInteraction}
+            dont-query={dontQuery} onshowgeocoding={showGeoCoding} address={address} full-address={fullAddress} letter-address={letterAddress} number-address={numberAddress} lat={lat} lng={lng} bottom-up={bottomUp} origin={origin} service-request-id={serviceRequestId} municipality={municipality}
+            account-id={accountId} contact-id={contactId} is-creation={isCreation}  subject={subject}
+            casealertpolicewarning={casealertpolicewarning} isonchangeselected={isonchangeselected} originalid={originalid} persona-fisica={personaFisica} case-business-account={caseBusinessAccount}>
+              </c-case-details> 
+          </lightning-card>  
+        </template>
+    <template if:true = {showCaseCreation}>
+        <lightning-card >  
+            <div class="slds-m-around_medium">  
+            <c-case-creation onpreviousfromcreation={handleNavigatePage}  caseid={caseId} fields={fields} selectedqueue={selectedQueue} interactionselected={interactionSelected}
+            typologyselected={typologySelected} nameinteraction={nameinteraction}  selectedargument={selectedArgument} selectedspecification={selectedSpecification} selectedthemarea={selectedThemarea} onfilterchange ={filterchange}
+            estimated-queue={estimatedQueue} selected-argument={selectedArgumentR} selected-thematic-area={selectedThemareaR} selected-specific={selectedSpecificationR} address={address} full-address={fullAddress} letter-address={letterAddress} number-address={numberAddress} municipality={municipality} protocol-number={protocolNumber} old-interaction={oldInteraction}
+            service-request-id={serviceRequestId} account-id={accountId} contact-id={contactId} origin={origin} lat={lat} lng={lng} casealertpolicewarning={casealertpolicewarning} no-reassign={noReassign} subject={subject} is-creation={isCreation} maintain-triplets={maintainTriplets} originalid={originalid} persona-fisica={personaFisica} case-business-account={caseBusinessAccount} isonchangeselected={isonchangeselected}>
+              </c-case-creation> 
+              </div>  
+          </lightning-card>  
+        </template>
+</template>

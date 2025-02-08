@@ -1,0 +1,8 @@
+<aura:component implements="lightning:isUrlAddressable" description="SoftphoneNoContact component">
+    <lightning:navigation aura:id="navService" />
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:attribute name="tabToClose" type="String" />
+    <aura:attribute name="mystery" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.onPageReferenceChange}"/>
+    <lightning:flow aura:id="flowData" />
+</aura:component>

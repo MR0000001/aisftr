@@ -1,0 +1,9 @@
+<aura:component controller="CTIUtility" implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:backgroundUtilityItem" access="global">
+    <lightning:workspaceAPI aura:id="workspace" />
+    <lightning:navigation aura:id="navService"/>
+    <aura:attribute name="pageReference" type="Object"/>
+    <aura:attribute name="pageReference_mystery" type="Object"/>
+    <aura:attribute name="url" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="mysteryActive" type="Boolean" default="false"/>
+</aura:component>

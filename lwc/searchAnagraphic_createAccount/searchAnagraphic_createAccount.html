@@ -1,0 +1,23 @@
+<template>
+    <div class="slds-m-around_large">
+        <div if:true={isLoading} class="slds-is-relative">
+            <lightning-spinner alternative-text="Loading..." variant="brand">
+            </lightning-spinner>
+        </div>
+    </div>
+    
+    <lightning-card class="slds-p-around_large">
+        <lightning-record-form
+            object-api-name="Account"
+            record-type-id={recordTypeIdToUse}
+            record-id={accountRecordId}
+            layout-type="Full"
+            mode="edit"
+            columns="2"
+            onsuccess={handleSuccessCreateAccount}
+            oncancel={handleCancelCreateAccount}
+            onsubmit={handleSubmitCreateAccount}
+            >
+        </lightning-record-form>    
+    </lightning-card>
+</template>

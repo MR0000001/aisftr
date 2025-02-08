@@ -1,0 +1,19 @@
+<template>
+    <template if:true={loading}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+    <template if:false={loading}>
+        <template if:true={showAll}>
+            <c-citizen-wallet-info-card card-information={cardInformation}></c-citizen-wallet-info-card>
+            <c-citizen-wallets-list page-size={walletsPerPage} wallets={wallets}></c-citizen-wallets-list>
+            <c-citizen-wallet-info-transactions page-size={transactionsPerPage} transaction-informations={transactionInformations} partners-list={partnersList} min-date={minDate} max-date={maxDate}></c-citizen-wallet-info-transactions>
+        </template>
+        <template if:false={showAll}>
+            <lightning-layout>
+                <lightning-layout-item size="12" padding="around-small">
+                    <div class="slds-align_absolute-center slds-p-around_xx-large slds-text-align_center">{errorToDisplay}</div>
+                </lightning-layout-item>
+            </lightning-layout>
+        </template>
+    </template>
+</template>

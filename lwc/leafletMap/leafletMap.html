@@ -1,0 +1,65 @@
+<!--
+  @author            : Daniel Perrella
+  @created date      : 
+  @description       : 
+  @testClasses       : 
+  @last modified by  : Daniel Perrella
+  @last modified on  : 11-08-2022
+-->
+<template>
+    <div class="main">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading"></lightning-spinner>
+        </template>
+
+        <div class="slds-grid">
+            <div class="slds-p-top_x-small slds-p-bottom_x-small slds-p-right_x-small">
+                <input class="search-bar" type="search" placeholder={label.via} aria-label={label.via}
+                       size={label.streetInputSize} oninput={handleCallout} onkeypress={handleCallout} />
+                <datalist id="streets">
+                    <template for:each={streetNames} for:item="street">
+                        <option key={street.label} value={street.value}>{street.label}</option>
+                    </template>
+                </datalist>
+            </div>
+            
+            <div class="slds-p-top_x-small slds-p-bottom_x-small slds-p-right_x-small">
+                <lightning-combobox
+                    name={label.civico}
+                    value={selectedNumberStreet}
+                    placeholder={label.civico}
+                    class="search-bar"
+                    options={numberAddressesOptions}
+                    onchange={handleNumberChange}>
+                </lightning-combobox>
+                <!-- <input class="search-bar" type="search" placeholder={label.civico} aria-label={label.civico} size={label.numberInputSize} oninput={handleGetStreetDetails}></input> -->
+            </div>
+        </div>
+    
+        <div class="slds-map map-root" lwc:dom="manual"></div>
+    
+        <div class="slds-grid slds-p-vertical_x-small buttons-wrapper">
+            <div class="slds-grid slds-col_bump-left">
+                <div class="slds-col slds-p-left_large">
+                    <lightning-button
+                            variant="destructive"
+                            label={label.back}
+                            aria-label={label.back}
+                            data-label={label.back}
+                            onclick={handleReturn}>
+                    </lightning-button>
+                </div>
+                <div class="slds-col slds-p-left_large">
+                    <lightning-button
+                            variant="destructive"
+                            disabled={isConfirmDisabled}
+                            label={label.confirmAddress}
+                            aria-label={label.confirmAddress}
+                            data-label={label.confirmAddress}
+                            onclick={handleReturn}>
+                    </lightning-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

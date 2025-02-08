@@ -1,0 +1,56 @@
+.map-root {
+    z-index: 1;
+    min-width: 1rem;
+    height:550px!important;
+}
+
+.map-rootDisplayMode {
+    z-index: 1;
+    min-width: 1rem;
+    height:450px!important;
+}
+
+.main {
+    position: relative;
+}
+
+.search-bar {
+    border-color: #8E001C;
+    border-width: 10px;
+    border-radius: 5px;
+    height: 60px!important;
+    width: 90%;
+    --sds-c-input-color-border: #8E001C;
+    --sds-c-input-width-border: 10px;
+    --sds-c-input-radius-border: 5px;
+    --sds-c-input-height: 60px!important;
+}
+
+.search-barNumber{
+    width: 20%;
+}
+
+.divButtons{
+    margin-top: 30px;
+    margin-left: 30px;
+}
+
+.divButtonsSpace{
+    margin-left: 5%;
+}
+
+.search-bar:focus {
+    border-color: #4d90fe;
+}
+
+.buttons-wrapper {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 400;
+}
+
+.buttons-wrappert {
+    position: absolute;
+    padding-bottom: 30%;
+}

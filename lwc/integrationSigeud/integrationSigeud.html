@@ -1,0 +1,11 @@
+<template>   
+    <template if:true={showComponent}>
+        <c-search-legal-entities 
+            title={label.legalEntitiesTitle} 
+            person-account-id={recordId}
+            fiscal-code-indicated={fiscalCodeIndicated}
+            onclose={closeQuickAction}
+            is-from-case={isFromCase}>
+        </c-search-legal-entities>
+    </template>
+</template>

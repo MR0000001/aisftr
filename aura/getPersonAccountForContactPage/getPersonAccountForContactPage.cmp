@@ -1,0 +1,10 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens" access="global" >
+	<aura:attribute name="personAccountId" type="String"/>
+    <aura:attribute name="fields" type="String[]" default="['NameContactHyper__pc', 'Fiscal_Code__pc', 'Account_Type__c', 'PersonHomePhone' , 'PersonMobilePhone', 'PersonOtherPhone', 'PersonEmail', 'Pec_Contact__pc']" />
+    <lightning:recordForm
+        recordId="{!v.personAccountId}"
+        objectApiName="Account"
+        fields="{!v.fields}"
+        columns="2"
+        mode="readonly" />
+</aura:component>

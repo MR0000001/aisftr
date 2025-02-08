@@ -1,0 +1,31 @@
+<template>
+        <template if:true ={showHomeScreen}>
+            <c-home-screen-case-management onnext={handleNextHomeScreen} 
+            actions={actionsHomeScreen} selected-action={selectedHomeScreenAction} original-user-role={originalUserRole} selected-role={userRole}
+            >  
+              </c-home-screen-case-management> 
+        </template>
+        <template if:true ={showRejection}>
+            <c-rejection-case-management onback={handleBackRejection} 
+            case={caseRecord} reasons={reasons} selected-reason={selectedRejectionReason} rejection-comment={rejectionComment}
+            action={selectedHomeScreenAction} prior-queue={priorQueue} dip-reassign-queue={dipReassignQueue} user-role={userRole} actions={actionsHomeScreen}
+            onclosetab={handleCloseTab} original-user-role={originalUserRole}
+            >  
+              </c-rejection-case-management> 
+        </template>
+        <template if:true ={showChangeLevel}>
+            <c-level-pass-case-management onback={handleBackPassLevel} 
+            case={caseRecord} modalities={modalities} selected-modality-pass={selectedModalityPass} selected-queue={selectedQueuePass} 
+            action={selectedHomeScreenAction} user-role={userRole} actions={actionsHomeScreen} original-user-role={originalUserRole}
+            >  
+              </c-level-pass-case-management> 
+        </template>
+        <template if:true ={showReassignment}>
+            <c-reassign-case-management onback={handleBackReassignment} 
+            case={caseRecord} comment-reassign={commentReassign} selected-queue-reassign={selectedQueueReassign} selected-reason-reassign={selectedReasonReassign} 
+            reasons-reassignment={reasonsReassignment} user-role={userRole} reassign-queues={reassignQueues} action={selectedHomeScreenAction} show-dip-reass={reassign} actions={actionsHomeScreen}
+            onclosetab={handleCloseTab} record-id={recordId} original-user-role={originalUserRole}>  
+              </c-reassign-case-management> 
+        </template>
+    
+</template>

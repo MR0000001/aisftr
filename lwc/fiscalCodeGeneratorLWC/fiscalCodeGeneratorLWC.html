@@ -1,0 +1,58 @@
+<template>
+    <header class="slds-modal__header">
+        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{label.headerTitle}</h2>
+    </header>
+    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+        <template if:true = {isSame}>
+                <lightning-card>
+                    <div class="slds-align_absolute-center" style="height:3rem">{label.cfSame}</div>
+                </lightning-card>
+        </template>
+        <template if:true = {isDifferent}>
+            <lightning-card>
+                <div class="slds-align_absolute-center" style="height:3rem">{label.cfDifferent}</div>
+                <div class="slds-m-around_medium"> 
+                    <table  class="slds-table slds-table_bordered slds-table_striped slds-table_cell-buffer slds-table_fixed-layout" style="height:3rem">  
+                        <thead>  
+                            <tr class="slds-text-heading_label">  
+                                <th scope="col">  
+                                    <div class="slds-truncate slds-border_right" style = "white-space: pre-wrap" title={label.cfInserted}>{label.cfInserted}</div>  
+                                </th>
+                                <th scope="col">  
+                                    <div class="slds-truncate" style = "white-space: pre-wrap" >{fiscalCodeExisting}</div>  
+                                </th>
+                            </tr>
+                            <tr class="slds-text-heading_label">
+                                <th scope="col">  
+                                    <div class="slds-truncate slds-border_right" style = "white-space: pre-wrap" title={label.cfCalculated}>{label.cfCalculated}</div>  
+                                </th>
+                                <th scope="col">  
+                                    <div class="slds-truncate" style = "white-space: pre-wrap" >{fiscalCodeGenerated}</div>  
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </lightning-card>
+        </template>
+        <template if:true = {isError}>
+            <lightning-card>
+                <div class="slds-align_absolute-center" style="height:3rem">{errorMsg}</div>
+            </lightning-card>
+        </template>
+        <template if:true = {isErrorExisting}>
+            <lightning-card>
+                <div class="slds-align_absolute-center" style="height:3rem">
+                    {errorMsg} 
+                    <lightning-formatted-url label={existingAccountName} value={recordPageUrl} target="_parent"></lightning-formatted-url>
+                </div>
+            </lightning-card>
+        </template>
+        <div class="slds-align_absolute-center" style="height:5rem">
+            <lightning-button variant="brand" label={label.cancel} title={label.cancel} onclick={handleCancel} class="slds-m-left_x-small"></lightning-button>
+            <template if:false = {isDisabled} >
+                <lightning-button variant="brand" label={label.save} title={label.save} onclick={handleSave} class="slds-m-left_x-small"></lightning-button> 
+            </template>
+        </div>
+    </div>
+</template>
