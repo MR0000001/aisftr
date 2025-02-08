@@ -1,0 +1,7 @@
+<aura:event type="APPLICATION" description="Event template" >
+     <aura:attribute name="pqidId" type="String" />
+     <aura:attribute name="pqidOnHand" type="Integer" />
+     <aura:attribute name="locationFrom" type="String" />
+    
+    
+</aura:event>

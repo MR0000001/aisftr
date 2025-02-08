@@ -1,0 +1,130 @@
+<aura:component controller="TA_LCC204_ComponentTakePhoto"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                access="global" >
+
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="workOrder" type="Object" />
+    <aura:attribute access="public" name="isInitialized" type="Boolean" default="false" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="general" type="Object" />
+    <aura:attribute access="private" name="custom" type="Object" />
+    <aura:attribute access="private" name="title" type="String" />
+    <aura:attribute access="private" name="description" type="String" />
+    <aura:attribute access="private" name="customerCardBg" type="String" />
+    <aura:attribute access="private" name="listPhotosUrl" type="List" />
+    <aura:attribute access="private" name="indexImages" type="Integer" default="1"/>
+    <aura:attribute access="private" name="numberOfImgs" type="Integer" default="0"/>
+    <aura:attribute access="private" name="minQtyImagesLabel" type="String"/>
+    <aura:attribute access="private" name="extraCostInvoiceToSend" type="Boolean" default="false" />
+    <aura:attribute access="private" name="permittingFormRequired" type="Boolean" default="false" /> <!-- [20220517AL] - NR2551 -->
+    <!-- JS - ENXCRM-214 - 28/04/2022 - START -->
+    <aura:attribute access="private" name="caseId" type="String" />
+    <aura:attribute access="private" name="saveOnCase" type="Boolean" default="false" />
+    <!-- JS - ENXCRM-214 - 28/04/2022 - END -->
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:handler name="change" value="{!v.listPhotosUrl}" action="{!c.handleManageListPhoto}"/>
+    <aura:handler event="c:TA_LCE248_GenericEvent" action="{!c.handleHideComponent}"/>
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt" />
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <lightning:layout multipleRows="true" class="slds-m-top_large slds-m-left_small slds-m-right_small">
+            <div class="ta-accordion-header" 
+                style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover; border-radius: 2.5vw;
+                        background-position: ' + v.general.bgPosition + '; background-color:' + v.general.bgColor + '; box-shadow: 0vw 1vw 2vw -0.8vw black;
+                        background-blend-mode: lighten;'}">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" class="ta-title-white">
+                        {!v.title}
+                    </lightning:layoutItem>
+
+                    <lightning:layoutItem size="12" class="ta-description-grey slds-m-top_small">
+                        {!v.description}
+                    </lightning:layoutItem>
+
+                    <!-- JS - ENXCRM-214 - 28/04/2022 - START -->
+                    <!--<lightning:layoutItem size="12" class="slds-m-top_small slds-text-align_right">
+                        <lightning:input type="file"
+                            multiple="false"
+                            id="{!v.workOrder.Id}"
+                            onchange="{!c.handleUploadFile}" />
+                    </lightning:layoutItem>-->
+
+                    <aura:if isTrue="{!v.saveOnCase}">
+                        <lightning:layoutItem size="12" class="slds-m-top_small slds-text-align_right">
+                            <lightning:input type="file"
+                                multiple="false"
+                                id="{!v.caseId}"
+                                onchange="{!c.handleUploadFile}" />
+                        </lightning:layoutItem>
+                        <aura:set attribute="else">
+                            <lightning:layoutItem size="12" class="slds-m-top_small slds-text-align_right">
+                                <lightning:input type="file"
+                                    multiple="false"
+                                    id="{!v.workOrder.Id}"
+                                    onchange="{!c.handleUploadFile}" />
+                            </lightning:layoutItem>
+                        </aura:set>
+                    </aura:if>
+                    <!-- JS - ENXCRM-214 - 28/04/2022 - END -->
+
+                    <aura:iteration items="{!v.listPhotosUrl}" var="photoUrl">
+                        <lightning:layoutItem size="6" class="slds-m-top_medium slds-is-relative slds-text-align_center">
+                            <aura:if isTrue="{!photoUrl.TA_DoxeeURL__c != null}">
+                                <!-- START FIX [ADC27/05/2021] ENXCRM-118 aggiunta estensione per i pdf -->
+                                <!--<img src="{!photoUrl.TA_DoxeeURL__c}" class="ta-photo"/>
+                                <div id="{!photoUrl.Id}" onclick="{!c.handleDeleteFile}" class="ta-photo-button-close">
+                                    <img src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" class="ta-photo-icon-close" />
+                                </div>-->
+                                <aura:if isTrue="{!photoUrl.TA_isDoc__c}">
+                                    <div class="ta-box-photo-blank">                                        
+                                        <img src="{!$Resource.TA_Icons + '/xc-icons/word-icon.svg'}" class="ta-word-icon"/>                                          
+                                        <div class="ta-pdf-name">
+                                            {!photoUrl.TA_FileName__c}
+                                        </div>
+                                    </div>
+                                    <div id="{!photoUrl.Id}" onclick="{!c.handleDeleteFile}" class="ta-photo-button-close-pdf">
+                                        <img src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" class="ta-photo-icon-close" />
+                                    </div>                                  
+                                </aura:if>  
+                                <aura:if isTrue="{!photoUrl.TA_isPdf__c}">
+                                    <div class="ta-box-photo-blank">
+                                        <a href="{!photoUrl.TA_DoxeeURL__c}" target="_blank">
+                                            <img src="{!$Resource.TA_Icons + '/xc-icons/pdf-icon.svg'}" class="ta-pdf-icon"/>                                           
+                                        </a>
+                                        <div class="ta-pdf-name">
+                                            {!photoUrl.TA_FileName__c}
+                                        </div>
+                                    </div>
+                                    <div id="{!photoUrl.Id}" onclick="{!c.handleDeleteFile}" class="ta-photo-button-close-pdf">
+                                        <img src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" class="ta-photo-icon-close" />
+                                    </div>
+                                </aura:if>  
+                                <aura:if isTrue="{!and(not(photoUrl.TA_isPdf__c),not(photoUrl.TA_isDoc__c))}">
+                                    <img src="{!photoUrl.TA_DoxeeURL__c}" class="ta-photo"/>
+                                    <div id="{!photoUrl.Id}" onclick="{!c.handleDeleteFile}" class="ta-photo-button-close">
+                                        <img src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" class="ta-photo-icon-close" />
+                                    </div>
+                                </aura:if>
+                                
+                                <!-- END FIX [ADC27/05/2021] ENXCRM-118 aggiunta estensione per i pdf -->                                
+                            </aura:if>
+                        </lightning:layoutItem>
+                    </aura:iteration>
+                </lightning:layout>
+            </div>
+        </lightning:layout>
+    </aura:if>
+</aura:component>

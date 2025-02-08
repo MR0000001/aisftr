@@ -1,0 +1,38 @@
+<aura:component implements="force:hasSObjectName,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+
+    <aura:attribute access="public" name="recordId" type="string" />
+    <aura:attribute access="public" name="listArrived" type="String" default="" />
+    <aura:attribute access="public" name="Longitude" type="Object" />
+    <aura:attribute access="public" name="Latitude" type="Object" />
+    <aura:attribute access="public" name="City" type="Object" />
+    <aura:attribute access="public" name="Street" type="Object" />
+    <aura:attribute access="public" name="PostalCode" type="Object" />
+    <aura:attribute access="public" name="Country" type="Object" />
+    <aura:attribute access="public" name="contactName" type="Object" />
+    <aura:attribute access="private" name="redirectUrl" type="String" />
+    <aura:attribute access="private" name="totalAddress" type="String" />
+    <aura:attribute access="private" name="mapMarkers" type="Object" />
+    <aura:attribute access="private" name="zoomLevel" type="Integer" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleDoInit}" value="{!this}" />
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt" />
+
+    <lightning:layout multipleRows="true" class="slds-m-top_large slds-m-left_small slds-m-right_small">
+        <lightning:layoutItem size="12" class="flexipageComponent">
+            <lightning:map  mapMarkers="{!v.mapMarkers}"
+                            zoomLevel="{!v.zoomLevel}"
+                            onmarkerselect="{!c.handleRedirectToMaps}"
+                            showFooter="false"/>
+
+            <h2 class="slds-hide">
+                <span class="slds-truncate slds-p-horizontal_small" title="Section Title">{!$Label.c.TA_MapLabel}</span>
+            </h2>
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

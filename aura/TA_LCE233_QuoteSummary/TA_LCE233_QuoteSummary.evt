@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="handlerCmpName" type="String" />
+    <aura:attribute name="action" type="String" />
+    <aura:attribute name="params" type="Object" />
+</aura:event>

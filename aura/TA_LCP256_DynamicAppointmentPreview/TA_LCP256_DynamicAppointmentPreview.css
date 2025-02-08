@@ -1,0 +1,8 @@
+/* CUSTOM-TAG */
+.THIS .ta-appointment-preview {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    padding: 10vw 5vw 5vw 5vw;
+    z-index: 2;
+}

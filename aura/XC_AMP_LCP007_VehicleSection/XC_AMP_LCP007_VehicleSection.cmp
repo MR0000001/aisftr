@@ -1,0 +1,68 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 12-18-2020
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   12-07-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component extends="c:XC_AMP_LCP001_AbstractAMPComponent"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId">
+
+    <aura:attribute name="objectType" type="String" />
+    <aura:attribute name="recordTypeId" type="String" />
+    <aura:attribute name="fieldsList" type="List" />
+    <aura:attribute name="readOnly" type="Boolean" default="false" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <lightning:navigation aura:id="navService" />
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    <div class="slds-p-around_x-small">
+        <c:XC_AMP_LCP005_SectionHeaderIcon text="{!$Label.c.XC_CL_AMP_VehicleHeader}" iconName="custom:custom31" />
+
+        <lightning:card variant="narrow" class="slds-card_boundary">
+
+
+            <lightning:recordEditForm recordId="{!v.recordId}" objectApiName="{!v.objectType}"
+                recordTypeId="{!v.recordTypeId}" density="compact" onload="{!c.loadREForm}">
+                <!--onsuccess="{!c.onSuccessSave}"-->
+                <lightning:messages aura:id="errorMessages" />
+                <lightning:layout multipleRows="true">
+
+                    <aura:if isTrue="{!v.spinnerControl}">
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="12"
+                            padding="around-small">
+                            <div class="slds-is-relative">
+                                <lightning:spinner aura:id="mySpinner" variant="brand" />
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:if>
+
+                    <aura:iteration items="{!v.fieldsList}" var="field">
+                        <lightning:layoutItem size="6" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="6">
+                            <div class="slds-p-around_xx-small">
+                                <aura:if isTrue="{!field.isReadonly}">
+                                    <lightning:inputField aura:id="field" readonly="{!field.isReadonly}" disabled="{!field.isReadonly}"
+                                        required="{!field.isRequired}" fieldName="{!field.fieldName}"
+                                        onchange="{!c.validateData}" />
+
+                                    <aura:set attribute="else">
+                                        <lightning:inputField aura:id="field" readonly="{!v.readOnly}" disabled="{!v.readOnly}"
+                                        required="{!field.isRequired}" fieldName="{!field.fieldName}"
+                                        onchange="{!c.validateData}" />
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:iteration>
+                </lightning:layout>
+            </lightning:recordEditForm>
+        </lightning:card>
+    </div>
+
+</aura:component>

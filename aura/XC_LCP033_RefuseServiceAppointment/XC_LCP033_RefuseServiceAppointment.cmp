@@ -1,0 +1,67 @@
+<!--
+* @author Nicola Mariniello nmariniello@deloitte.it - Luisana Rocco lrocco@deloitte.it
+* @date Creation 05/11/2018
+* @date Modification dd/mm/yyyy
+* @description Component to refuse Service Appointment
+-->
+
+<aura:component controller="XC_LCC033_RefuseServiceAppointment" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global">
+    
+    <aura:attribute name="recordId" type="String"/>  
+    <aura:attribute name="record" type="Object" />
+    <aura:attribute name="componentRecord" type="Object" />
+    <aura:attribute name="recordError" type="String" />
+    <aura:attribute name="insertRefusingReason" type="Boolean" default="false"/>
+    <aura:attribute name="pickOk" type="Boolean" default="true"/>
+    <aura:attribute name="newReason" type="String" default=""/>
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    
+    
+    <force:recordData 
+                      aura:id="recordLoader" 
+                      recordId="{!v.recordId}"  
+                      layoutType="FULL" 
+                      mode="EDIT"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.componentRecord}"
+                      targetError="{!v.recordError}"/>
+    
+    
+    <lightning:card footer="Card Footer" title="{!$Label.c.XC_CL_ServiceAppointment_RefuseTitle}">
+        
+        <aura:set attribute="footer">
+            <br/><br></br>
+            {!$Label.c.XC_CL_ServiceAppointment_RefuseBody} <br/><br></br>
+            
+            <aura:if isTrue="{!not(v.insertRefusingReason)}">
+                <br/>
+                <lightning:button variant="brand" label="{!$Label.c.XC_CL_YesButton}" onclick="{!c.updateServiceAppointment}"/>
+                &nbsp; &nbsp; 
+                <lightning:button variant="brand" label="No" onclick="{!c.noButton}"/>
+                
+                <aura:set attribute='else'>
+                    <div style="text-align:left">
+                        <lightning:recordEditForm
+                                                  objectApiName="ServiceAppointment">
+                            <!-- the messages component is for error messages -->
+                            <lightning:messages />
+                            <lightning:inputField aura:id="reason" fieldName="XC_Reason_of_Rejection__c" onchange="{!c.sblock}" value="{!v.newReason}" />
+                        </lightning:recordEditForm>
+                    </div>
+                    <br/>
+                    <lightning:button variant="brand" disabled="{!v.pickOk}" label="{!$Label.c.XC_CL_SaveButton}" onclick="{!c.doChanges}"/>
+                </aura:set>
+                
+            </aura:if>
+            
+        </aura:set>
+        
+    </lightning:card>
+    
+    <aura:if isTrue="{!v.spinnerControl}" >
+        <div aura:id="masterSpinner" style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner"/>
+        </div>
+    </aura:if>
+    
+</aura:component>

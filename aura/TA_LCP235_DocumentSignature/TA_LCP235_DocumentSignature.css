@@ -1,0 +1,172 @@
+/* .THIS .ta-title {
+    font-size: 4vw;
+    color: white;
+    font-weight: 800;
+}
+
+.THIS .ta-title-purple {
+    font-size: 4vw;
+    color: rgb(70, 30, 125);
+    font-weight: 800;
+}
+
+.THIS .ta-box-title {
+    font-size: 3.3vw;
+    color: white;
+    font-weight: 800;
+}
+
+.THIS .ta-accordion-header-icon {
+    width: 9vw;
+    margin-top: 2vw;
+}
+
+.THIS .ta-accordion-header-button {
+    font-size: 3.5vw;
+    font-weight: 100;
+    border: 1px solid white;
+    padding: 1vw 2vw 1vw 2vw;
+    border-radius: 2.5vw;
+    color: white;
+    background: transparent;
+    text-transform: capitalize;
+}
+
+.THIS .ta-box {
+    border-top: .3vw solid white;
+    padding-top: 6vw;
+    margin-top: 6vw;
+}
+
+.THIS .ta-box-icon {
+    width: 5vw;
+}
+
+.THIS .ta-doc-modal-bg {
+    position: fixed;
+    z-index: 5;
+    left: 0;
+    top: 0;
+    background: rgba(70, 30, 125, 0.8);
+    height: 100vh;
+    width: 100vw;
+} */
+
+/* .THIS .slds-fade-in-open {
+    background: rgba(70, 30, 125, 0.8);
+}
+
+.THIS .slds-modal__container {
+    margin: 5vw !important;
+}
+
+.THIS .slds-modal__header {
+    border-top-left-radius: 5vw;
+    border-top-right-radius: 5vw;
+}
+
+.THIS .slds-modal__footer {
+    border-bottom-left-radius: 5vw;
+    border-bottom-right-radius: 5vw;
+} */
+
+/* .THIS .ta-doc-modal-container {
+    position: absolute;
+    margin: 15vw 5vw;
+    z-index: -1;
+    background: white;
+    top: 0;
+    border-radius: 5vw;
+    box-shadow: 0 0vw 1vw 0vw black;
+}
+
+.THIS .ta-container-padding {
+    padding: 5vw;
+}
+
+.THIS .ta-animation-pop-in {
+    animation: pop-in 0.5s;
+    -webkit-animation-name: pop-in 0.5s;
+    animation-name: pop-in 0.5s;
+}
+
+.THIS .ta-button-closing {
+    color: #ff006e;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background-color: #ffffff;
+    border-color: #ff006e;
+    min-width: 35vw;
+    text-transform: uppercase;
+    border-radius: 10vw;
+    font-weight: 800;
+    font-size: 4vw;
+    padding: 2vw;
+}
+  
+@keyframes pop-in {
+    0% {
+    -webkit-transform: scale3d(0,0,0);
+    transform: scale3d(0,0,0);
+    opacity: 0;
+    }
+
+    20% {
+    opacity: 1;
+    }
+
+    40% {
+    -webkit-animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);
+    animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);  
+    }
+
+    60% {
+    -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+    animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+    -webkit-transform: scale3d(1.08,1.08,1.08);
+    transform: scale3d(1.08,1.08,1.08);
+    }
+
+    80% {
+    -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+    animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+    }
+
+    100% {
+    -webkit-animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+    animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+    -webkit-transform: scale3d(1,1,1);
+    transform: scale3d(1,1,1);
+    }
+}
+
+.THIS iframe html body .contaier {
+    letter-spacing: 0.3vw;
+    font-size: 4.5vw;
+}
+
+.THIS .button {
+    font-size: 10px;
+    width: auto;
+    font-size: 4vw;
+    font-weight: 100;
+    border: 1px solid black;
+    padding: 1vw 2vw 1vw 2vw;
+    border-radius: 2.5vw;
+    color: black;
+    background: transparent;
+    text-transform: capitalize;
+    letter-spacing: 0.3vw;
+    width: 40vw;
+}
+
+.THIS .button.refresh, .THIS .button.clear, .THIS .button.send {
+    margin: 0 3vw 4vw 0;
+}
+
+.THIS .button.new {
+    margin: 0 0 4vw 0;
+}
+
+.THIS table#documents {
+    margin: 5vw 0;
+} */

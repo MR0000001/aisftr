@@ -1,0 +1,71 @@
+<!--
+* @author  Roberta Cossiga r.cossiga@deloitte.it && Roberta Porrega roberta.porrega@nttdata.com && Simone Trenta strenta@deloitte.it
+* @date Creation 05/03/2019
+* @date Modification dd/mm/yyyy
+* @description component for create a new Document Skill Association
+-->
+<aura:component controller = "XC_LCC090_NewSkillDocumentAssociation" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference" access="global"> 
+    
+    <aura:attribute name="recordTypeId" type="String"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="skillId" type="String" /> 
+    <aura:attribute name="skillName" type="String" /> 
+    <aura:attribute name="listOfDocumentAND" type="String" /> 
+    <aura:attribute name="listOfDocumentOR" type="String" /> 
+    <aura:attribute name="mapSkillDocument" type="Map" default=" {          
+                                                        skillId: '',             
+                                                        skillName : '',           
+                                                        listOfDocumentAND : '',          
+                                                        listOfDocumentOR : ''
+                                                        
+                                                        }"/> 
+    <aura:attribute name="isVisibleRecordEditForm" type="Boolean" default="false" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <lightning:workspaceAPI aura:id="workspace" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <lightning:navigation aura:id="navService"/>
+    
+    <div class="container" >
+        <div class="slds-text-align_left">
+            <lightning:layoutItem>
+                <div>
+                    <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="12" padding="horizontal-small">
+                      <aura:if isTrue="{!v.isVisibleRecordEditForm}">
+                        <lightning:recordEditForm aura:id="editForm" recordId="{!v.recordId}" recordTypeId="{!v.recordTypeId}"  objectApiName="XC_SkillDocumentAssociation__c"   >
+                            
+                            <c:strike_lookup
+                                             label="{!$Label.c.XC_CL_Skill}"
+                                             object="Skill"
+                                             searchField="MasterLabel"
+                                             placeholder="Search a Skill"
+                                             iconName="custom:custom9"
+                                             order="MasterLabel" 
+                                             loadingMessage="Loading..."
+                                             errorMessage="Invalid input"
+                                             showRecentRecords="true"
+                                             required="true"
+                                             value="{!v.mapSkillDocument.skillId}"
+                                             valueLabel="{!v.mapSkillDocument.skillName}"
+                                             />   
+                            
+                             <lightning:inputField aura:id="listOfDocumentAND" fieldName="XC_ListOfDocumentAND__c" value="{!v.mapSkillDocument.listOfDocumentAND}" />
+                             <lightning:inputField aura:id="listOfDocumentOR" fieldName="XC_ListOfDocumentOR__c" value="{!v.mapSkillDocument.listOfDocumentOR}" />
+                            
+                        </lightning:recordEditForm>
+                      </aura:if>
+                    </lightning:layoutItem>
+                </div>
+            </lightning:layoutItem>
+        </div>
+    </div>
+    <div class="space">
+        <div class="modal-footer slds-modal__footer slds-size_1-of-1">
+            <div class="forceChangeRecordTypeFooter">
+                <lightning:button  label="{!$Label.c.XC_CL_CancelButton}" title="Cancel" onclick="{! c.cancel}"/>
+                <lightning:button variant="brand" label="{!$Label.c.XC_CL_ConfirmButton}" title="Submit" onclick="{! c.confirm}" />
+            </div>
+        </div>
+    </div> 
+    
+</aura:component>

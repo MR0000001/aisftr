@@ -1,0 +1,9 @@
+<apex:page standardController="gii__Warehouse__c" extensions="Giic_WarehouseUtility" action="{!calculateValueForWHPage}">
+<apex:form >
+      <apex:pageMessages id="errorMessage" />  
+      <br/>
+     <div align="center" draggable="false">
+      
+    </div>
+  </apex:form>
+</apex:page>

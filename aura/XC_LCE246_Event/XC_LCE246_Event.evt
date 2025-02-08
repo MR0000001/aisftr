@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="Event to fire operations on a document" >
+    <aura:attribute name="documentInserted" type="String"/>
+</aura:event>

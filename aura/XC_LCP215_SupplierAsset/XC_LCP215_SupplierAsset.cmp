@@ -1,0 +1,28 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" 
+access="global" controller="XC_LCC215_SupplierAsset">
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="supplierRepair" type="String" />
+    <aura:attribute name="supplierInsurance" type="String" />
+    <aura:attribute name="errorMessage" type="String" />
+    <aura:attribute name="isError" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+
+    <lightning:card>
+        <aura:set attribute="title">
+            <lightning:icon iconName="standard:asset_object" size="small"/>
+            <strong style="margin-left: 4px;">{!$Label.c.XC_CL_SupplierHeader}</strong>   
+        </aura:set>
+        <div style="margin-left: 11px;">
+        <aura:if isTrue="{!v.isError}">
+            <b>{!v.errorMessage}&nbsp;</b> 
+            <aura:set attribute="else"> 
+                <b>{!$Label.c.XC_CL_SupplierRepair}&nbsp;</b> {!v.supplierRepair}
+                <br></br>
+                <b>{!$Label.c.XC_CL_SupplierInsurance}&nbsp;</b> {!v.supplierInsurance}
+            </aura:set>      
+        </aura:if>
+    </div>
+    </lightning:card>
+        
+</aura:component>

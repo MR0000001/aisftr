@@ -1,0 +1,9 @@
+<!--
+* @author Simone Trenta - strenta@deloitte.it
+* @date Creation 16/07/2019
+* @date Modification dd/mm/yyyy
+* @description XC_LCE017_CloseNewAddress - Event fired clicking on 'Cancel' new address in the opportunity creation
+-->
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="closed" type="Boolean" default='false'/>
+</aura:event>

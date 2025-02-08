@@ -1,0 +1,89 @@
+.THIS .slds-form-element__static{
+    color: white !important;
+}
+
+.THIS .slds-form-element_stacked:not(.slds-is-editing), 
+.THIS .slds-form_stacked .slds-form-element:not(.slds-is-editing), 
+.THIS .slds-form_horizontal .slds-form-element_stacked:not(.slds-is-editing) {
+    padding: 0 !important;
+}
+
+.THIS .slds-form-element__control .slds-checkbox {
+    margin-left: 1vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-modal-body {
+    height: 50vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 3vw 0 0 0 !important;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-field-input .slds-select:active {
+    border: inherit;
+    box-shadow: none;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-field-input .slds-select:focus {
+    border: inherit;
+    box-shadow: none;
+}
+
+/* CUSTOM-TAG */
+.THIS .slds-button.slds-button_brand, .THIS .slds-button[name="insert"] {
+    color: #ffffff;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background: linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+    border: 1px solid black;
+    padding: 1vw 5vw 1vw 5vw;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size:3.5vw;
+    text-transform: uppercase;
+    height: 9vw;
+    width: 35vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .slds-m-top_small.slds-size_12-of-12 .slds-form-element .slds-form-element__label {
+    display: none;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-modal-container {
+    background: white;
+    border-radius: 5vw;
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    top: 30vw;
+    padding: 6vw 6vw 0vw 6vw;
+    margin: 5vw;
+    width: 90vw;
+}
+
+/* CUSTOM-TAG */
+.THIS form div div .slds-input, .THIS form div div .slds-select, .THIS form div div  .slds-input:focus, .THIS form div div .slds-input:active, .THIS form div div .slds-faux-input {
+    background-color: #ece8f2 !important;
+    border: 1px solid #ece8f2 !important;
+    border-radius: 5vw !important;
+    color: #461e7d !important;
+    height: 8vw;
+}
+
+/* CUSTOM-TAG */
+.THIS form div div .slds-input[readonly], .THIS form div div .slds-faux-input[readonly] {
+    background-color: transparent !important;
+    border: none !important;
+    color: #461e7d !important;
+    height: 8vw;
+}
+
+/* CUSTOM-TAG */
+.THIS form div div .slds-form-element__label {
+    padding-top: 4vw !important;
+    color: #00000C !important;
+}

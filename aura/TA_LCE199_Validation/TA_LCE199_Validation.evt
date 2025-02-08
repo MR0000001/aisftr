@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="cmpName" type="String"/>
+    <aura:attribute name="validate" type="Boolean"/>
+    <aura:attribute name="updateFields" type="Boolean" default="false"/>
+    <aura:attribute name="errors" type="List"/>
+</aura:event>

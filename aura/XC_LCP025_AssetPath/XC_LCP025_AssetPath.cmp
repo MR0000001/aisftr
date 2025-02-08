@@ -1,0 +1,10 @@
+<aura:component controller="XC_LCC025_AssetPath" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasRecordId" >
+	
+	<aura:attribute name="variant" type="String" default="linear"/>
+	<lightning:picklistPath aura:id="picklistPath" recordId="{!v.recordId}"
+        variant="{!v.variant}"
+        picklistFieldApiName="Status"
+        onselect="{!c.handleSelect}">
+    </lightning:picklistPath>
+
+</aura:component>

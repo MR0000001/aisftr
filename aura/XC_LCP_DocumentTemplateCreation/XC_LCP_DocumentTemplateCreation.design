@@ -1,0 +1,4 @@
+<design:component>
+     <design:attribute name="recordId" label="record Id" required="true"/>
+     <design:attribute name="Templatechoice" label="Template Choice" required="true"/>
+</design:component>

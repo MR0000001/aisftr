@@ -1,0 +1,11 @@
+.THIS .c-container {
+    background-color:white
+}
+
+.THIS .slds-dropdown_length-10 {
+    padding-left: 33%;
+    margin-top: -1.5%;
+    position: absolute;
+    z-index: 7010;
+    width: -webkit-fill-available;
+}

@@ -1,0 +1,167 @@
+<aura:component controller= "Giic_LCC020_ResendSAP" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:hasSObjectName,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute type="Boolean" name="sapSelected" default="false"/>
+    <aura:attribute type="Boolean" name="logisticSelected" default="false"/>
+    <aura:attribute type="Boolean" name="showSpinner" default="false"/>
+    <aura:attribute type="String" name="operationType" default="Creation" />
+    <aura:attribute name="sobjecttype" type="String" default="{!v.sObjectName}"/>
+    <aura:attribute name="purchaseOrderFields" type="String[]" default="giic_Status__c"/>
+    <aura:attribute name="purchaseOrder" type="Object"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+     <force:recordData  aura:id="purchaseOrderRecord"
+                        recordId="{!v.recordId}"
+                        targetFields="{!v.purchaseOrder}"
+                        layoutType="FULL"/>
+    <aura:if isTrue = "{!v.showSpinner}" >
+    <lightning:spinner aura:id="mySpinner" />
+    </aura:if>
+   
+    <lightning:card>
+        <aura:set attribute="title">
+            <div class="slds-text-heading_medium">
+                <b > Resend {!v.operationType} to systems: </b>
+            </div>
+        </aura:set>
+        <aura:set attribute="footer">
+           &nbsp;
+        </aura:set>
+      
+    </lightning:card>
+    
+    
+    <div class="slds-text-align_center">    
+    <fieldset class="slds-form-element">
+        
+        <legend class="slds-form-element__legend slds-form-element__label"></legend>
+        <div class="slds-form-element__control">
+            <lightning:layout multipleRows="true">
+        <aura:if isTrue="{!v.sobjecttype == 'gii__PurchaseOrder__c'}">
+              <lightning:layoutItem size = "6" >
+          <div class="slds-visual-picker slds-visual-picker_medium">
+                <input type="checkbox" id="visual-picker-76" value="visual-picker-76" name="options" checked="{!v.sapSelected}" onchange="{!c.setCheckboxVal}"/>
+                <label for="visual-picker-76">
+                    <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                        <span class="slds-is-selected">
+                             <div class="slds-text-heading_large"> 
+                               <lightning:icon iconName="action:check" alternativeText="Approved" />
+                            </div>
+                        </span>
+                        <span class="slds-is-not-selected">
+                            <div class="slds-text-heading_large"> 
+                                     <lightning:icon iconName="standard:account" alternativeText="Approved" /><br></br>
+                                       SAP 
+                            </div>
+                           
+                        </span>
+                    </span>
+                    <span class="slds-visual-picker__body">
+                        
+                    </span>
+                </label>
+            </div>
+            </lightning:layoutItem>
+          
+               <lightning:layoutItem size = "6" >
+            <div class="slds-visual-picker slds-visual-picker_medium">
+                <input type="checkbox" id="visual-picker-77" value="visual-picker-77" name="options" checked="{!v.logisticSelected}" onchange="{!c.setCheckboxVal}"/>
+                <label for="visual-picker-77">
+                    <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                        <span class="slds-is-selected">
+                             <div class="slds-text-heading_large"> 
+                           <lightning:icon iconName="action:check" alternativeText="Approved" />
+                            </div>
+                        </span>
+                        <span class="slds-is-not-selected">
+                                
+                            <div class="slds-text-heading_large"> 
+                                     <lightning:icon iconName="custom:custom98" alternativeText="Approved" /><br></br>
+                                       3PL
+                            		 </div>
+                                
+                               
+                            </span>
+                        </span>
+                    
+                    <span class="slds-visual-picker__body">
+                        
+                    </span>
+                </label>
+            </div>
+                
+            </lightning:layoutItem>
+          </aura:if>
+                <aura:if isTrue="{!or(v.sobjecttype == 'gii__PurchaseOrderReceipt__c' , v.sobjecttype == 'gii__PurchaseOrderReceiptStaging__c') }">
+            <lightning:layoutItem size = "12" >
+            <div class="slds-visual-picker slds-visual-picker_medium">
+                <input type="checkbox" id="visual-picker-76" value="visual-picker-76" name="options" checked="{!v.sapSelected}" onchange="{!c.setCheckboxVal}"/>
+                <label for="visual-picker-76">
+                    <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                        <span class="slds-is-selected">
+                             <div class="slds-text-heading_large"> 
+                               <lightning:icon iconName="action:check" alternativeText="Approved" />
+                            </div>
+                        </span>
+                        <span class="slds-is-not-selected">
+                            <div class="slds-text-heading_large"> 
+                                     <lightning:icon iconName="standard:account" alternativeText="Approved" /><br></br>
+                                       SAP 
+                            </div>
+                           
+                        </span>
+                    </span>
+                    <span class="slds-visual-picker__body">
+                        
+                    </span>
+                </label>
+            </div>
+            </lightning:layoutItem>
+                </aura:if>
+                <aura:if isTrue="{!v.sobjecttype == 'gii__TransferOrder__c'}">
+             <lightning:layoutItem size = "12" >
+            <div class="slds-visual-picker slds-visual-picker_medium">
+                <input type="checkbox" id="visual-picker-77" value="visual-picker-77" name="options" checked="{!v.logisticSelected}" onchange="{!c.setCheckboxVal}"/>
+                <label for="visual-picker-77">
+                    <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                        <span class="slds-is-selected">
+                             <div class="slds-text-heading_large"> 
+                           <lightning:icon iconName="action:check" alternativeText="Approved" />
+                            </div>
+                        </span>
+                        <span class="slds-is-not-selected">
+                                
+                            <div class="slds-text-heading_large"> 
+                                     <lightning:icon iconName="custom:custom98" alternativeText="Approved" /><br></br>
+                                       3PL
+                            		 </div>
+                                
+                               
+                            </span>
+                        </span>
+                    
+                    <span class="slds-visual-picker__body">
+                        
+                    </span>
+                </label>
+            </div>
+                
+            
+            </lightning:layoutItem>
+                </aura:if>
+            </lightning:layout>
+        </div>
+    </fieldset>
+           </div>
+        
+     <div class="slds-hidden">   
+    <lightning:recordForm aura:id="purchaseForm"
+                                recordId="{!v.recordId}"
+                                objectApiName="{!v.sobjecttype}"
+                                fields="{!v.purchaseOrderFields}"
+                                columns="1"
+                                mode="readonly"
+                                onload="{!c.manageData}" />
+    </div>
+    <div class="slds-modal__footer">
+              <lightning:button label="Cancel" variant="neutral" onclick="{!c.handleCancel}"/>
+              <lightning:button label="Confirm" variant="brand" onclick="{!c.doInit}"/> 
+         </div>
+</aura:component>

@@ -1,0 +1,39 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	
+	<aura:attribute name="showAccountKeySection" type="Boolean" default="true" />
+	<aura:attribute name="showEditAccount" type="Boolean" default="false" />
+	<aura:attribute name="recordTypeToReturn" type="String" />
+	<aura:attribute name="spinnerControlFather" type="Boolean" default="false" />
+	<aura:attribute name="accountRecord" type="Object"/>
+	<aura:attribute name="documentType" type="String" />
+	<aura:attribute name="documentId" type="String" />
+	<aura:attribute name="email" type="String" />
+    <aura:attribute name="recordId" type="String" />
+<!-- 	<aura:attribute name="" type="Boolean" default="false" />
+	<aura:attribute name="" type="Boolean" default="false" /> -->
+
+	<aura:if isTrue="{!v.showAccountKeySection}" >
+		<!-- <c:XC_LCP003_NewAccountKeyInput openAccountEdit="{!v.showEditAccount}" 
+										spinnerControlSon="{!v.spinnerControlFather}" 
+										accountRecord="{!v.accountRecord}" 
+										email="{!v.email}" 
+										documentId="{!v.documentId}" 
+										documentType="{!v.documentType}"/> -->
+	</aura:if>
+
+	<!-- <aura:if isTrue="{!v.showEditAccount}" > -->
+		<c:XC_LCP003_NewAccount recordTypeToReturn="{!v.recordTypeToReturn}" 
+								accountRecord="{!v.accountRecord}" 
+								email="{!v.email}" 
+								documentId="{!v.documentId}" 
+								documentType="{!v.documentType}"
+								recordId="{!v.recordId}"/>
+	<!-- </aura:if> -->
+
+	<aura:if isTrue="{!v.spinnerControlFather}" >
+		<div aura:id="masterSpinner">
+        	<lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+
+</aura:component>

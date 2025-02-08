@@ -1,0 +1,7 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="handlerCmpName" type="String" />
+    <aura:attribute name="actionName" type="String" />
+    <aura:attribute name="actionParams" type="Object" />
+    <aura:attribute name="showButton" type="Boolean" />
+    <aura:attribute name="isCartSummary" type="Boolean" />
+</aura:event>

@@ -1,0 +1,112 @@
+<!--
+    Interaction Workspace Connector implementation Visual Force page extension for X-Customer - Deloitte Digital - F.Imperioli
+-->
+
+<apex:page docType="html-5.0" controller="gl_WorkspaceConnectorController" showHeader="false"
+    title="WorkspaceConnector Page">
+    <apex:slds />
+    <apex:includeScript value="/support/console/40.0/integration.js" />
+    <apex:includeScript value="/support/api/40.0/interaction.js" />
+    <script type="text/javascript" src="{!URLFOR($Resource.gl_jquery, 'jquery-1.10.2.min.js')}"></script>
+    <script type="text/javascript" src="/support/api/40.0/lightning/opencti_min.js"></script>
+
+    <style>
+        td img {
+            vertical-align: top;
+        }
+    </style>
+
+    <!-- <link rel="stylesheet" href="{!URLFOR($Resource.gl_datapanel_css)}" /> -->
+
+    <script type="text/javascript">
+        var gl_resources = {
+            "logo": "{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_logo.png')}",
+            "minus_green": "{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_green_minus.png')}",
+            "minus_red": "{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_red_minus.png')}",
+            "minus_blue": "{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_blue_minus.png')}",
+            "plus_green": "{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_green_plus.png')}",
+            "plus_red": "{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_red_plus.png')}",
+            "plus_blue": "{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_blue_plus.png')}"
+        };
+        // Added FOR XCUSTOMER FI
+        var SFUserSessionId = '{!$Api.Session_ID}';
+        var SFCurrentUserId = '{!$User.Id}';
+    </script>
+
+    <script type="text/javascript" src="{!URLFOR($Resource.gl_jquery_subscribe_js)}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.gl_log_js)}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.gl_datapanel_js)}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.gl_version_js)}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.gl_misc_js)}"></script>
+
+    <script type="text/javascript" src="{!URLFOR($Resource.gl_globals_js)}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.gl_workspace_js)}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.gl_salesforce_js)}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.gl_connector_js)}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.gl_default_js)}"></script>
+    <!-- COMET D MODULE FOR XCUSTOMER -->
+    <script type="text/javascript" src="{!URLFOR($Resource.XC_STR_CometD,'cometd.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.XC_STR_CometD,'json2.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.XC_STR_CometD,'jquery_cometd.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.XC_STR_CometD,'cometdReplayExtension.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.XC_STR_CometD,'cometdCustom.js')}"></script>
+    <!-- MODULE ADDED FOR XCUSTOMER -->
+    <script type="text/javascript" src="{!URLFOR($Resource.XC_STR_CTI_Recording_Module)}"></script>
+
+
+    <div style="width:100%" class="slds-scope">
+
+        <!-- these divs will store paths to images that will be manipulated by jquery-->
+        <!--
+        <div id="logo" style="display:none;">{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_logo.png')}</div>
+        <div id="minus_green" style="display:none;">{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_green_minus.png')}</div>
+        <div id="minus_red" style="display:none;">{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_red_minus.png')}</div>
+        <div id="minus_blue" style="display:none;">{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_blue_minus.png')}</div>
+        <div id="plus_green" style="display:none;">{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_green_plus.png')}</div>
+        <div id="plus_red" style="display:none;">{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_red_plus.png')}</div> 
+        <div id="plus_blue" style="display:none;">{!URLFOR($Resource.gl_wsc_icons, 'wsc_icons/wsc_blue_plus.png')}</div> 
+-->
+        <!-- end of divs -->
+
+        <div id="uisection">
+            <div class="slds-grid">
+                <div class="slds-form-element__control slds-large-size_1-of-2 slds-size_1-of-2 slds-p-around_xx-small" id="logoTd">
+                    <!-- LOGO GOES HERE FOR GENESYS JQUERY -->
+                </div>
+                <div class="slds-form-element__control slds-large-size_1-of-2 slds-size_1-of-2 slds-p-around_xx-small" id="logoTd">
+                    <img src="{!URLFOR($Resource.XC_STR_Logo)}" style="height:45px;width:45px;float:right;"/>
+                </div>
+            </div>
+        </div>
+        <!-- RECORDING SECTION ITALY ONLY TODO: Add customLabels-->
+        <div id="recControls" class="slds-p-around_small slds-box" style="display:none">
+            <div class="slds-p-around_xx-small slds-text-title_caps slds-text-align_center">
+                {!$Label.XC_CL_CTIRecControlsHeader}
+            </div>
+            <div class="slds-p-around_xx-small slds-text-title_caps slds-text-color_destructive slds-text-align_center blinking">
+                {!$Label.XC_CL_CTIPanelRecordingRequiredMessage}
+            </div>
+            <div class="slds-grid">
+                <div class="slds-form-element__control slds-large-size_1-of-2 slds-size_1-of-2 slds-p-around_xx-small" id="form-div-startrec">
+                    <button id="startRecBtn" class="slds-button slds-button_destructive" onClick="RecModule.startRecording()">
+                        <svg class="slds-button__icon slds-button__icon_left" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                            xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#record"></use>
+                        </svg>
+                        {!$Label.XC_CL_CTIStartRecordBTN}
+                    </button>
+                </div>
+                <div class="slds-form-element__control slds-large-size_1-of-2 slds-size_1-of-2 slds-p-around_xx-small" id="form-div-stoprec">
+                    <button id="stopRecBtn" class="slds-button slds-button_neutral" onClick="RecModule.stopRecording()">
+                        <svg class="slds-button__icon slds-button__icon_left" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                            xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#stop"></use>
+                        </svg>
+                        {!$Label.XC_CL_CTIStopRecordBTN}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</apex:page>

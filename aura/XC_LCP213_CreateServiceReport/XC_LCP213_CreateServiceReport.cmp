@@ -1,0 +1,23 @@
+<!--
+    @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+    @date 15/10/2020
+    @description XC_LCP213_CreateServiceReport - Button to create Service Report on WorkOrder
+-->
+
+<aura:component controller= "XC_LCC213_CreateServiceReport" 
+                implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference" 
+                access="global">
+
+    <aura:Attribute name="recordId" type="String"/>
+    <aura:Attribute name="spinnerControl" type="Boolean" default="false"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div
+            style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+
+</aura:component>

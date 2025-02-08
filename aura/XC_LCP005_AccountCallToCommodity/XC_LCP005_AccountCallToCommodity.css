@@ -1,0 +1,13 @@
+.THIS .scrollerSize {
+    height: 400px;
+}
+
+.THIS .hide{
+    opacity:0.0;
+    cursor: default;
+  
+}
+.THIS .div {
+    resize: none;
+    overflow: none;
+  }

@@ -1,0 +1,59 @@
+<aura:component controller="TA_LCC221_QuestionAnswer"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global" >
+
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="workOrderId" type="String" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="general" type="Object" />
+    <aura:attribute access="private" name="custom" type="Object" />
+    <aura:attribute access="private" name="customerCardBg" type="String" />
+    <aura:attribute access="private" name="layoutItemSize" type="Integer" />
+    <aura:attribute access="private" name="infoBag" type="Object" />
+    <aura:attribute access="private" name="selectedAnswer" type="String" />
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false"/>
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}" />
+    <aura:handler event="c:TA_LCE224_Refresh" action="{!c.handleRefresh}" />
+
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt" />
+    <aura:registerEvent name="fireValidationEvent" type="c:TA_LCE199_Validation" />
+    <aura:registerEvent name="answerToButton" type="c:TA_LCE221_AnswerToButton" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <lightning:layout multipleRows="true" class="slds-m-bottom_large slds-m-top_large slds-m-left_small slds-m-right_small">
+            <lightning:layoutItem size="12">
+                <div onclick="{!c.handleOpenModal}" style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover;
+                background-position: ' + v.general.bgPosition + '; background-color: ' + v.general.bgColor + '; box-shadow: 0vw 1vw 2vw -0.8vw black; background-blend-mode: lighten; border-radius: 2vw;'}">
+                    <lightning:layout multipleRows="true" class="ta-question-box">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_small ta-color-white"><h3> {!v.infoBag.question.TA_Label__c} </h3></lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <lightning:layout multipleRows="true">
+                                <aura:iteration items="{!v.infoBag.answers}" var="answer">
+                                    <lightning:layoutItem size="{!v.layoutItemSize}" class="slds-m-bottom_x-small">
+                                        <div id="{!answer.name}" class="slds-is-relative" onclick="{!c.handleSelectAnswer}">
+                                            <div class="ta-answer-box">{!answer.label}</div>
+                                            <div class="ta-select-icon-container">
+                                                <img src="{!$Resource.TA_Icons + '/xc-icons/check.svg'}" class="slds-hidden" />
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+                                </aura:iteration>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </aura:if>
+</aura:component>

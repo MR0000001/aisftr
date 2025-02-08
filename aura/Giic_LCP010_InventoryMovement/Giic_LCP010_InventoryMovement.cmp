@@ -1,0 +1,170 @@
+<aura:component controller="giic_LCC010_InventoryMovement" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,force:hasSObjectName" access="global">
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="productInventory" type="gii__ProductInventory__c"/>
+	<aura:attribute name="lightValue" type="String" default=""/>
+    <aura:attribute name="sobjectType" type="String" default="{!v.sObjectName}"/>
+    <aura:attribute name="allPiqDetails" type="gii__ProductInventoryQuantityDetail__c[]" />
+    <aura:attribute name="columns" type="List"/>  
+    <aura:attribute name="mapPolToSerialList" type="Map" default="{}"/>
+    <aura:attribute name="productId" type="String" />
+    <aura:attribute name="productName" type="String" />   
+    <aura:attribute name="productCode" type="String" />   
+    <aura:attribute name="SKUCode" type="String" />   
+    <aura:attribute name="filter1" type="String" default='' />   
+    <aura:attribute name="filter2" type="String" default='' />  
+    <aura:attribute name="filter3" type="String" default='' />  
+    <aura:attribute name="warehouseId" type="String" />
+    <aura:attribute name="warehouseName" type="String" />
+    <aura:attribute name="locationToValue" type="String" />
+    <aura:attribute name="locationSearchSelectedValue" type="String" />
+    <aura:attribute name="productSerialSearchSelectedValue" type="String" />
+    <aura:attribute name="productLOTSearchSelectedValue" type="String" />
+    
+    <aura:attribute name="deliveryDate" type="Date" default="" />
+    <aura:attribute name="errors" type="Object" default="[]"/>
+    <aura:attribute name="mapPolIdToQuantity" type="Map" default="{}"/>
+    <aura:attribute name="error" type="String" default=""/>
+    <aura:attribute name="draftValues" type="gii__PurchaseOrderLine__c" default="[]"/>
+    <aura:attribute name="receiptDate" type="Date" default="" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" /> 
+    <aura:attribute name="lineSelected" type="Boolean" default="true" /> 
+    <aura:attribute  name="POrderLineList" type="List"/> 
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:attribute name="data" type="List"/>
+    <aura:attribute name="lookupSection1" type="List"></aura:attribute>
+    <aura:attribute name="lookupSection2" type="List"></aura:attribute>
+    <aura:attribute name="isReady1" type="Boolean" default="false"></aura:attribute>  
+    <aura:attribute name="isReady2" type="Boolean" default="false"></aura:attribute>
+    <aura:attribute name="showDataTable" type="Boolean" default="false"></aura:attribute> 
+    <aura:handler name="change" value="{!v.locationSearchSelectedValue}"       action="{!c.requeryData}"/>
+    <aura:handler name="change" value="{!v.productSerialSearchSelectedValue}"  action="{!c.requeryData}"/>
+    <aura:handler name="change" value="{!v.productLOTSearchSelectedValue}"  action="{!c.requeryData}"/>
+    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" /> 
+    <div class="c-container">
+	 
+        <div class="slds-box slds-theme_shade">
+    <div class="slds-text-heading_large">
+         <lightning:icon iconName="standard:location" alternativeText="Approved" />&nbsp;
+        
+        <b> Location to Location Inventory Movement </b>
+            </div>
+ </div> <br></br>
+        
+         <aura:if isTrue="{!v.showSpinner}">
+        	<lightning:spinner aura:id="mySpinner" />
+         </aura:if>
+    
+        
+            
+        <div class="slds-theme_shade"><b>&nbsp; Product Inventory</b></div>
+             <lightning:layout>
+            <lightning:layoutItem size="6" padding="around-small">
+                <div class="custom-box">Product: &nbsp;&nbsp;<a href="{!'/'+v.productId}">{!v.productName}</a> </div>
+            </lightning:layoutItem>
+                 
+            <lightning:layoutItem size="6" padding="around-small">
+                <div class="custom-box">Warehouse:&nbsp; &nbsp; <a href="{!'/'+v.warehouseId}">{!v.warehouseName}</a> </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+        <lightning:layout>
+                 <lightning:layoutItem size="6" padding="around-small">
+                     <div class="custom-box">Product Code:&nbsp; &nbsp; <b> {!v.productCode}</b> </div>
+            </lightning:layoutItem>
+                 <lightning:layoutItem size="6" padding="around-small">
+                     <div class="custom-box">SKU Code:&nbsp; &nbsp;&nbsp; <b> {!v.SKUCode}</b> </div>
+            </lightning:layoutItem>
+                 
+        </lightning:layout><br></br>
+          <div class="slds-theme_shade"><b>&nbsp; Transfer To Location</b></div>
+         <lightning:layout>
+          
+      
+               <lightning:layoutItem size="6" padding="around-small">
+                  <aura:if isTrue="{!v.isReady1}">
+                      	<c:strike_lookup
+    			label="Location"
+    			object="gii__Location__c"
+    			searchField="Name"
+    			placeholder="Select an option"
+    			iconName="standard:location"
+    			order="Name"
+    			filter="{!v.filter1}"
+    			limit="8"
+                required="true"
+    			value="{!v.locationToValue}"
+    			loadingMessage="Loading..."
+    			errorMessage="Invalid input"/>
+    </aura:if>
+             </lightning:layoutItem>
+        </lightning:layout>
+          <br></br><br></br>
+        <div class="slds-theme_shade"><b>&nbsp;&nbsp;Search by:</b></div>
+        <aura:if isTrue="{!v.isReady2}">
+         <lightning:layout>
+              &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;
+            <lightning:layoutItem size="4" padding="around-small">
+                 
+                     	<c:strike_lookup
+    			label="Location"
+    			object="gii__Location__c"
+    			searchField="Name"
+    			placeholder="Select an option"
+    			iconName="standard:location"
+    			order="Name"
+    			filter="{!v.filter1}"
+    			limit="8"
+                required="false"
+    			value="{!v.locationSearchSelectedValue}"
+    			loadingMessage="Loading..."
+    			errorMessage="Invalid input"/>
+               
+             </lightning:layoutItem>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;
+              <lightning:layoutItem size="4" padding="around-small">
+                   	<c:strike_lookup
+    			label="Product Serial"
+    			object="gii__ProductSerial__c"
+    			searchField="Name"
+    			placeholder="Select an option"
+    			iconName="standard:dataset"
+    			order="Name"
+    			filter="{!v.filter2}"
+    			limit="8"
+                required="false"
+    			value="{!v.productSerialSearchSelectedValue}"
+    			loadingMessage="Loading..."
+    			errorMessage="Invalid input"/>
+                  
+             </lightning:layoutItem>
+              <lightning:layoutItem size="4" padding="around-small">
+                   	<c:strike_lookup
+    			label="Product Lot"
+    			object="gii__ProductLot__c"
+    			searchField="Name"
+    			placeholder="Select an option"
+    			iconName="standard:dataset"
+    			order="Name"
+    			filter="{!v.filter3}"
+    			limit="8"
+                required="false"
+    			value="{!v.productLOTSearchSelectedValue}"  
+    			loadingMessage="Loading..."
+    			errorMessage="Invalid input"/>
+                  
+             </lightning:layoutItem>
+        </lightning:layout>
+              </aura:if>
+    		<br></br><br></br>
+        
+        
+         <aura:if isTrue="{!v.showDataTable}">
+             <c:Giic_LCP011_IMcustomDataTable allPiqDetails="{!v.allPiqDetails}"  locationToId="{!v.locationToValue}" productInventoryId="{!v.recordId}"  />
+        </aura:if>
+              
+            
+    </div>
+    
+</aura:component>

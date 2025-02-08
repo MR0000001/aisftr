@@ -1,0 +1,373 @@
+<aura:component controller="TA_LCC199_ButtonSection"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    extends="c:TA_LCP209_BaseWizard"
+    access="global">
+
+    <aura:attribute access="public" name="recordId" type="String" />
+    <aura:attribute access="public" name="showCalendarModal" type="Boolean" default="true"/>
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="public" name="schedTimesUpdated" type="Boolean" default="false" />
+
+    <aura:attribute access="private" name="infoBag" type="Object" />
+    <aura:attribute access="private" name="listVisibleButton" type="List" />
+    <aura:attribute access="private" name="listHiddenButton" type="List" />
+    <aura:attribute access="private" name="listMoreButton" type="List" />
+    <aura:attribute access="private" name="showMoreOptions" type="Boolean" default="false" />
+    <aura:attribute access="private" name="showDependencyButtons" type="Boolean" default="false" />
+    <aura:attribute access="private" name="showLCP208Modal" type="Boolean" default="false" />
+    <aura:attribute access="private" name="paramsLCP208Modal" type="Object" />
+    <aura:attribute access="private" name="validations" type="List" />
+    <aura:attribute access="private" name="invalidFields" type="List" />
+    <aura:attribute access="private" name="showErrorToast" type="Boolean" default="false" />
+    <aura:attribute access="private" name="updateObject" type="Object" />
+    <aura:attribute access="private" name="leadConversionParams" type="Object" />
+    <aura:attribute access="private" name="methodApexToRun" type="List" default="[]"/>
+    <aura:attribute access="private" name="showModalCloseService" type="Boolean" default="false" />
+    <aura:attribute access="private" name="generalInfoMap" type="Object" />
+    <aura:attribute access="private" name="closeServiceModalTitle" type="String" />
+    <!-- <aura:attribute access="private" name="listCloseServiceReason" type="List" /> -->
+    <aura:attribute access="private" name="showLCP224BookAppointmentModal" type="Boolean" default="false" />
+    <aura:attribute access="private" name="showInfoModal" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="modalInfo" type="Object"/>
+    <aura:attribute access="private" name="showNoMatchAssetModal" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="showManageAssetModal" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="assets" type="List"/>
+    <aura:attribute access="private" name="showSuspendVisitModal" type="Boolean" default="false" />
+    <aura:attribute access="private" name="suspendVisitParams" type="Object" default="" />
+    <aura:attribute access="private" name="keepSpinnerVisible" type="Boolean" default="false" />
+    <aura:attribute access="private" name="selectedValueCloseService" type="String" />
+    <aura:attribute access="private" name="runCallBack" type="Boolean" default="false" />
+
+    <!-- JS FIX GEOLOCALIZATION START -->
+    <aura:attribute name="currentLongitude" type="String" default=""/>
+    <aura:attribute name="currentLatitude" type="String" default=""/>
+    <aura:attribute name="currentAccuracy" type="String" default=""/>
+    <aura:attribute name="gpsDisabled" type="Boolean" default="false"/>
+    <!-- JS FIX GEOLOCALIZATION END -->
+
+    <!-- START - [20220621AL] - NR2330 -->
+    <aura:attribute access="private" name="showTechnicalAssetModal" type="Boolean" default="false" /> 
+    <aura:attribute access="private" name="technicalAssetWrapper" type="Object"/> 
+    <!-- END - [20220621AL] - NR2330 -->
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:handler name="modalEvt" event="c:TA_LCE208_Modal" action="{!c.handleEvents}" />
+    <aura:handler event="c:TA_LCE199_Validation" action="{!c.handleValidationEvt}" />
+    <aura:handler event="c:TA_LCE201_GeneralInfoToButtonSection" action="{!c.handleGeneralInfo}" />
+    <aura:handler event="c:TA_LCE214_UpdateFields" action="{!c.handleEvents}" />
+    <aura:handler event="c:TA_LCE221_AnswerToButton" action="{!c.handleAnswerToButton}" />
+    <aura:handler event="c:TA_LCE223_LeadConversion" action="{!c.handleReceiveLeadConversionParams}" />
+    <aura:handler event="c:TA_LCE216_ModalManagement" action="{!c.handleModalManagement}" />
+    <aura:handler event="c:TA_LCE226_CartStep" action="{!c.handlePrepareNextCartStep}" />
+    <aura:handler event="c:TA_LCE233_QuoteSummary" action="{!c.handleQuoteSummaryCallback}" />
+
+    <aura:registerEvent name="updateFieldsEvt" type="c:TA_LCE214_UpdateFields" />
+    <aura:registerEvent name="refreshEvt" type="c:TA_LCE224_Refresh"/>
+    <aura:registerEvent name="rescheduleVisit" type="c:TA_LCE215_BookAppointment" />
+    <aura:registerEvent name="TA_LCE226_CartStep" type="c:TA_LCE226_CartStep" />
+    <aura:registerEvent name="TA_LCE233_QuoteSummary" type="c:TA_LCE233_QuoteSummary" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <div class="slds-align_absolute-center button-section-container">
+        <div class="ta-buttons-shown-container">
+            <aura:iteration items="{!v.listVisibleButton}" var="buttonWrapper">
+                <button id="{!buttonWrapper.developerName}"
+                    class="{!if(buttonWrapper.type == 'Primary', 'ta-button-primary ta-right-button',
+                            if(buttonWrapper.type == 'Secondary', 'ta-button-secondary ta-left-button',
+                            if(buttonWrapper.type == 'Closing', 'ta-button-closing ta-left-button')))}"
+                    name="{!buttonWrapper.developerName}"
+                    onclick="{!c.handleActionButton}">
+                    {!buttonWrapper.name}
+                </button>
+            </aura:iteration>
+        </div>
+        <aura:if isTrue="{!not(empty(v.listHiddenButton))}">
+            <aura:if isTrue="{!v.showMoreOptions}">
+                <lightning:buttonIcon class="ta-custom-button ta-right-button ta-more-options" iconName="utility:close" onclick="{!c.handleMoreOptions}" />
+                <aura:set attribute="else">
+                    <lightning:buttonIcon class="ta-custom-button ta-right-button ta-more-options" iconName="utility:threedots_vertical" onclick="{!c.handleMoreOptions}" />
+                </aura:set>
+            </aura:if>
+        </aura:if>
+    </div>
+
+    <!-- <div class="{!if(v.showErrorToast, 'ta-error-toast','slds-hide')}">
+        <lightning:layout multipleRows="true" class="slds-p-top_small slds-p-left_medium slds-p-right_medium">
+            <lightning:layoutItem size="10">
+                <lightning:layout multipleRows="true">
+                    <aura:iteration items="{!v.invalidFields}" var="field">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_small ta-error-toast-text">
+                            {!field}
+                        </lightning:layoutItem>
+                    </aura:iteration>
+                </lightning:layout>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="2" class="slds-text-align_right">
+                <img class="ta-error-toast-icon" src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" onclick="{!c.handleCloseToast}" />
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div> -->
+
+    <aura:if isTrue="{!or(v.showMoreOptions, v.showDependencyButtons)}">
+        <div class="ta-modal-more-options">
+            <lightning:layout class="ta-modal-button-container" multipleRows="true">
+                <aura:iteration items="{!v.listMoreButton}" var="buttonWrapper">
+                    <lightning:layoutItem size="12">
+                        <button id="{!buttonWrapper.developerName}"
+                            class="{!if(buttonWrapper.type == 'Primary', 'ta-button-primary ta-modal-button',
+                                if(buttonWrapper.type == 'Secondary', 'ta-button-secondary ta-modal-button',
+                                if(buttonWrapper.type == 'Closing', 'ta-button-closing ta-modal-button')))}"
+                            name="{!buttonWrapper.developerName}"
+                            onclick="{!c.handleActionButton}">
+                            {!buttonWrapper.name}
+                        </button>
+                    </lightning:layoutItem>
+                </aura:iteration>
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showModalCloseService}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" />
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleCloseModalCloseService}" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-body">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_xx-small slds-text-title_bold">
+                            {!v.closeServiceModalTitle}
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="ta-field-input">
+                            <lightning:select value="{!v.selectedValueCloseService}">
+                                <aura:iteration items="{!v.infoBag.closeReasons}" var="closeServiceOption">
+                                    <option value="{!closeServiceOption.value}">{!closeServiceOption.label}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-footer-anc">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12">
+                            <lightning:button class="ta-button-primary-modal" label="{!$Label.c.TA_Confirm}" onclick="{!c.handleUpdateCloseServiceReason}" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showInfoModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-info-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-info-body slds-text-align_center">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="ta-modal-info-title">
+                            {!v.modalInfo.title}
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="ta-modal-info-description">
+                            {!v.modalInfo.description}
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-footer-anc">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12">
+                            <lightning:button class="ta-button-primary-modal" label="OK" onclick="{!c.handleManageInfoModalClose}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showNoMatchAssetModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-info-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" />
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" name="showNoMatchAssetModal" onclick="{!c.handleManageCloseModal}" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-info-body slds-text-align_center">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_xx-small ta-modal-info-title">
+                            {!$Label.c.TA_CategoryMatch}
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-footer-anc">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="6" class="slds-p-right_xx-small">
+                            <lightning:button name="button-no" class="ta-button-closing-modal" label="{!$Label.c.TA_No}" onclick="{!c.handleManageNoMatchAssetModal}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="6" class="slds-p-left_xx-small">
+                            <lightning:button name="button-yes" class="ta-button-primary-modal" label="{!$Label.c.TA_Yes}" onclick="{!c.handleManageNoMatchAssetModal}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showManageAssetModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-info-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" />
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" name="showManageAssetModal" onclick="{!c.handleManageCloseModal}" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-asset-body slds-text-align_center">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_small ta-modal-info-title">
+                            {!$Label.c.TA_SelectNewAsset}
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <!-- PICKLIST -->
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <lightning:button name="button-asset-selection" class="ta-button-primary-modal" label="{!$Label.c.TA_Save}" onclick=""/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-asset-footer">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_small ta-modal-info-title slds-text-align_center">
+                            {!$Label.c.TA_CreateNewAsset}
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                            <lightning:button name="button-edit-asset" class="ta-button-secondary-modal" label="{!$Label.c.TA_Edit}" onclick=""/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <lightning:button name="button-create-new-asset" class="ta-button-primary-modal" label="{!$Label.c.TA_CreateNewAsset}" onclick=""/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+    <!-- SUSPEND VISIT MODAL -->
+    <aura:if isTrue="{!v.showSuspendVisitModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-suspend-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-suspend-body slds-text-align_center">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="ta-modal-suspend-title">
+                            {!$Label.c.TA_SuspendVisit}
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="ta-modal-suspend-description">
+                            {!$Label.c.TA_SuspendVisitAlert}
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-footer-anc">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12">
+                            <button id="Suspend" class="ta-button-primary-modal slds-m-bottom_medium" onclick="{!c.handleSuspendVisit}">
+                                {!$Label.c.TA_SuspendVisitYes}
+                            </button>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <button class="ta-button-closing-modal" onclick="{!c.handleManageCloseSuspendVisitModal}">
+                                {!$Label.c.TA_SuspendVisitNo}
+                            </button>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+    
+    <!-- START - [20220621AL] - NR2330 -->
+    <aura:if isTrue="{!v.showTechnicalAssetModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container slds-p-around_large ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="slds-text-align_center ta-height-100">
+                    <lightning:layout multipleRows="true" class="ta-height-100 ta-container-padding">
+                        <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large">
+                            <h3 class="ta-color-black">{!$Label.c.TA_TechnicalAssetTitle}</h3>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large">
+                            <p class="ta-color-black ta-description-padding"> {!$Label.c.TA_TechnicalAssetDesc}</p>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                            <c:ta_lwc265_customlookup 
+                                objectName="Asset" 
+                                objectIdentifier= "Name" 
+                                fieldName="Name" 
+                                label="{!$Label.c.TA_TechnicalAsset}" 
+                                placeholder="{!$Label.c.TA_SearchTechnicalAsset}"
+                                condition="{!v.technicalAssetWrapper.condition}"
+                                required="false" 
+                                minDigits="5"
+                                recordLimit="15"
+                                defaultValue="{!v.technicalAssetWrapper.technicalAsset}"
+                                onselected="{!c.handleTechnicalAssetSelected}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-m-bottom_large">
+                            <lightning:input type="datetime"
+                                class="ta-input-date"
+                                name="declared-date" 
+                                value="{!v.technicalAssetWrapper.dateDeclared}"
+                                label="{!v.technicalAssetWrapper.type == 'suspend' ? $Label.c.TA_SuspensionDateDeclared : $Label.c.TA_ClosingDateDeclared}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <lightning:layout multipleRows="true">       
+                                <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                                    <button class="ta-button-closing-modal ta-button-height" onclick="{!c.handleHideTechnicalAssetModal}">
+                                        {!$Label.c.TA_Cancel}
+                                    </button>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <button class="ta-button-primary-modal ta-button-height" onclick="{!c.handleTechnicalAssetContinue}">
+                                        {!v.technicalAssetWrapper.type == 'suspend' ? $Label.c.TA_Suspend : $Label.c.TA_Complete}
+                                    </button>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+    <!-- END - [20220621AL] - NR2330 -->
+
+    <aura:if isTrue="{!v.showLCP208Modal}">
+        <c:TA_LCP208_Modal params="{!v.paramsLCP208Modal}" isSpinnerVisible="{!v.isSpinnerVisible}"/>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showLCP224BookAppointmentModal}">
+        <c:TA_LCP224_BookAppointmentModal workOrderId="{!v.recordId}" showCalendarModal="{!v.showCalendarModal}" calendarName="calendarButtonSection" reschedule="true" doRedirect="true"/>
+    </aura:if>
+
+</aura:component>

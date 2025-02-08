@@ -1,0 +1,408 @@
+/* .THIS .ta-card-title {
+    font-size: 4vw;
+    font-weight: 800;
+    color: white;
+    text-transform: capitalize;
+    padding: 2vw 0vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-service-container {
+    background: transparent;
+    border-top: 0.3vw solid white;
+    padding-top: 6vw;
+}
+
+/*.THIS .ta-service-icon {
+    width: 3.5vw;
+    height: 3.5vw;
+    margin-left: 1.5vw;
+}
+
+.THIS .ta-service-icon-atc {
+    width: 3.5vw;
+    height: 3.5vw;
+    margin-top: .5vw;
+    margin-left: 3vw;
+}
+
+.THIS .ta-service-icon-close {
+    width: 3vw;
+    height: 3vw;
+    margin-left: 2vw;
+    margin-top: .5vw;
+}
+
+ .THIS .ta-service-title {
+    font-size: 3.3vw;
+    font-weight: 800;
+    color: white;
+    text-transform: capitalize;
+}
+
+.THIS .ta-service-description {
+    font-size: 3.3vw;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.THIS .ta-service-icon-text {
+    font-size: 3.3vw;
+    font-weight: 300;
+    color: white;
+}
+
+.THIS .ta-service-box {
+    border: .2vw solid white;
+    border-radius: 2.5vw;
+    padding: 1.8vw;
+    width: 37vw;
+    background: #00c983
+}
+
+.THIS .ta-service-box-atc {
+    border: .2vw solid white;
+    border-radius: 2.5vw;
+    padding: 1.8vw;
+    width: 31vw;
+    background: #461e7d;
+}
+
+.THIS .ta-service-box-added {
+    border: .2vw solid white;
+    border-radius: 2.5vw;
+    padding: 1.8vw;
+    width: 37vw;
+    background: #ff006e;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-service-price {
+    font-size: 4vw;
+    font-weight: 800;
+    color: white;
+}
+
+/* .THIS .ta-button-primary-modal {
+    color: #ffffff;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background: linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+    border: 1px solid linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size: 3.5vw;
+    text-transform: uppercase;
+    min-width: 35vw;
+    width: 100%;
+}
+
+.THIS .ta-modal-info-title {
+    font-size: 4vw;
+    font-weight: 800;
+}
+
+.THIS .ta-modal-info-description {
+    font-size: 3.3vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-modal-info-body {
+    padding: 2vw 0vw 4vw 0vw;
+    height: 80vw;
+    overflow-y: auto;
+}
+
+/* .THIS .ta-modal-info-container {
+    position: absolute;
+    margin: 5vw 10vw 10vw 10vw;
+    z-index: -1;
+    background: white;
+    top: 80vw;
+    border-radius: 5vw;
+    box-shadow: 0 0vw 1vw 0vw black;
+}
+
+.THIS .ta-modal-header {
+    border-top-left-radius: 5vw;
+    border-top-right-radius: 5vw;
+    padding: 5vw;
+}
+
+.THIS .ta-modal-header-button {
+    height: inherit;
+    width: 5vw;
+}
+
+.THIS .ta-modal-footer {
+    background: white;
+    border-bottom-left-radius: 5vw;
+    border-bottom-right-radius: 5vw;
+    padding: 3vw;
+}
+
+.THIS .ta-modal-body {
+    padding: 3vh;
+    height: 30vh;
+    overflow-y: auto;
+}
+
+.THIS .ta-animation-pop-in {
+    animation: pop-in 0.5s;
+    -webkit-animation-name: pop-in 0.5s;
+    animation-name: pop-in 0.5s;
+}
+
+@keyframes pop-in {
+    0% {
+      -webkit-transform: scale3d(0,0,0);
+      transform: scale3d(0,0,0);
+      opacity: 0;
+    }
+  
+    20% {
+      opacity: 1;
+    }
+  
+    40% {
+      -webkit-animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);
+      animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);  
+    }
+  
+    60% {
+      -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+      animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+      -webkit-transform: scale3d(1.08,1.08,1.08);
+      transform: scale3d(1.08,1.08,1.08);
+    }
+  
+    80% {
+      -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+      animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+    }
+  
+    100% {
+      -webkit-animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+      animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+      -webkit-transform: scale3d(1,1,1);
+      transform: scale3d(1,1,1);
+    }
+} */
+
+/* CUSTOM-TAG */
+.THIS.ta-modal-bg {
+    z-index: 4;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(70, 30, 125, 0.8);
+    height: 100vh;
+    width: 100vw;
+}
+  
+/* .THIS .ta-modal-container {
+    position: absolute;
+    margin: 5vw 10vw 10vw 10vw;
+    z-index: -1;
+    background: white;
+    top: 25vh;
+    border-radius: 5vw;
+    box-shadow: 0 0vw 1vw 0vw black;
+} */
+
+/* .THIS .slds-select_container .slds-select {
+    padding-left: 4vw !important;
+    border-radius: 5vw !important;
+    background: #ece8f2 !important; 
+    color: rgb(70, 30, 125) !important;
+}
+
+.THIS .slds-select_container:before, .THIS .slds-select_container:after {
+    right: 3.5vw !important;
+} */
+
+/* CUSTOM-TAG */
+.THIS .slds-select_container {
+    margin: 0 15vw !important;
+}
+
+/* CUSTOM-TAG */
+.THIS .slds-form-element__label {
+    display: none !important;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-mp-selected {
+    position: absolute;
+    background: #ff006e;
+}
+
+/* .THIS .ta-cart-price-discount {
+    color: #ff006e;
+    text-decoration: line-through;
+    font-size: 4vw;
+}
+
+.THIS .ta-quantity-operator {
+    color: rgb(70, 30, 125);
+    font-size: 5vw;
+    background: rgba(255, 255, 255, 0.9);
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    border-radius: 2.5vw;
+    margin-top: 1vw;
+}
+
+.THIS .ta-quantity-operator-disabled {
+    color: rgb(70, 30, 125);
+    font-size: 5vw;
+    background: rgba(255, 255, 255, 0.9);
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    border-radius: 2.5vw;
+    opacity: 0.5;
+    margin-top: 1vw;
+}
+
+.THIS .ta-quantity-editable-2 {
+    font-size: 3.3vw;
+    color: white;
+    font-weight: 800;
+    padding: .8vw;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    float: right;
+    margin: .5vw 0vw;
+}
+
+.THIS .ta-service-box-atc-2 {
+    border: .2vw solid white;
+    border-radius: 2.5vw;
+    padding: 1.2vw;
+    text-align: center;
+    width: 23vw;
+    background: #461e7d;
+    color: white;
+} */
+
+.THIS .ta-service-box-atc-2-disabled {
+    border: .2vw solid white;
+    border-radius: 2.5vw;
+    padding: 1.8vw;
+    text-align: center;
+    width: auto;
+    background: #461e7d;
+    color: white;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* CUSTOM-TAG TABLET */
+@media only screen and (min-width: 601px) {
+    /*.THIS .ta-service-box-added {
+        border: .2vw solid white;
+        border-radius: 2.5vw;
+        padding: 1.5vw;
+        width: 28vw;
+        background: #ff006e;
+    }
+
+    .THIS .ta-service-icon-close {
+        width: 2.5vw;
+        height: 2.5vw;
+        margin-left: 2vw;
+        margin-top: .5vw;
+    }
+
+    .THIS .ta-service-box-atc {
+        border: .2vw solid white;
+        border-radius: 2.5vw;
+        padding: 1.5vw;
+        width: 23vw;
+        background: #461e7d;
+    }
+
+    .THIS .ta-modal-info-title {
+        font-size: 3vw;
+        font-weight: 800;
+    }
+
+    .THIS .ta-service-box {
+        border: .2vw solid white;
+        border-radius: 2.5vw;
+        padding: 1.5vw;
+        width: 30vw;
+        background: #00c983;
+    }
+
+    .THIS .ta-service-icon, .THIS .ta-service-icon-atc  {
+        width: 3vw;
+        height: 3vw;
+        margin-left: 2vw;
+    }
+
+    .THIS .ta-quantity-editable-2 {
+        font-size: 3.3vw;
+        color: white;
+        font-weight: 800;
+        padding: .6vw;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 5vw;
+        height: 5vw;
+        text-align: center;
+        margin: .5vw;
+    }
+    
+    .THIS .ta-quantity-operator-disabled {
+        color: rgb(70, 30, 125);
+        background: rgba(255, 255, 255, 0.9);
+        width: 4vw;
+        text-align: center;
+        border-radius: 2.5vw;
+        margin-top: 1.2vw;
+        opacity: .5;
+    }
+
+    .THIS .ta-quantity-operator {
+        color: rgb(70, 30, 125);
+        background: rgba(255, 255, 255, 0.9);
+        width: 4vw;
+        text-align: center;
+        border-radius: 2.5vw;
+        margin-top: 1.2vw;
+    }
+
+    .THIS .ta-quantity-operator-disabled {
+        color: rgb(70, 30, 125);
+        background: rgba(255, 255, 255, 0.9);
+        width: 4vw;
+        height: 100%;
+        text-align: center;
+        border-radius: 2.5vw;
+        margin-top: 1.2vw;
+        opacity: 0.5;
+    }*/
+
+    /* CUSTOM-TAG */
+    .THIS.ta-modal-bg {
+        z-index: 5;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: rgba(70, 30, 125, 0.8);
+        height: 100vh;
+        width: 100vw;
+    }
+
+    /* CUSTOM-TAG*/
+    .THIS .ta-margin-right {
+        margin-right: -4vw;
+    }
+}

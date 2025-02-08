@@ -1,0 +1,95 @@
+<aura:component controller="Giic_LCC025_UploadLotCSV" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+	<aura:attribute name="showModal" type="Boolean" default="true" /> 
+    <aura:attribute name="showSpinner" type="Boolean" default="false" /> 
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="progress" type="Integer" default="0" /> 
+    <aura:attribute name="csvString" type="String"/>
+    <aura:attribute name="csvObject" type="Giic_CSVObject"/>
+    <aura:attribute name="backgroundImageURL" type="String" default=""/>
+    <aura:attribute name="maxSerialNumbersAllowed" type="Integer" />
+    <aura:attribute name="purchaseOrderLineId" type="String"   />
+    <aura:attribute name="allSerials" type="List"   />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    <aura:registerEvent name="shootMapFromCsv" type="c:Giic_LCE018_ShootMapFromCsv"/>
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" /> 
+    <div class="c-container">
+        <aura:if isTrue="{!v.showSpinner}">
+        	<lightning:spinner aura:id="mySpinner" />
+        </aura:if>
+      <ul class="slds-welcome-mat slds-size_2-of-2">
+     
+            <li class="slds-welcome-mat__tile">
+              <a href="javascript:void(0);" class="slds-box slds-box_link slds-media">
+                   
+                <div class="slds-media__figure slds-media__figure_fixed-width slds-align_absolute-center">
+                  <div class="slds-welcome-mat__tile-figure">
+                      
+                    <div class="slds-welcome-mat__tile-icon-container">
+                       
+                      <span class="slds-icon_container slds-icon-utility-download">
+                        
+                           <lightning:icon iconName="utility:download"   alternativeText="download" title="download"  />
+                      </span>
+                      <span class="slds-icon_container slds-icon_container_circle slds-icon-action-check" title="Completed">
+                       
+                          <span class="slds-assistive-text">Completed</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="slds-media__body" onclick="{!c.gotoURL}">
+                  <div class="slds-welcome-mat__tile-body">
+                    <h3 class="slds-welcome-mat__tile-title">Download this file</h3>
+                    <p class="slds-welcome-mat__tile-description">If download not start please allow pop-ups on this site.</p>
+                  </div>
+                </div>
+              </a>
+            </li>
+            <li class="slds-welcome-mat__tile">
+              <a href="javascript:void(0);" class="slds-box slds-box_link slds-media">
+                <div class="slds-media__figure slds-media__figure_fixed-width slds-align_absolute-center">
+                  <div class="slds-welcome-mat__tile-figure">
+                    <div class="slds-welcome-mat__tile-icon-container">
+                      <span class="slds-icon_container slds-icon-utility-edit">
+                       
+                          <lightning:icon iconName="utility:edit"   alternativeText="edit" title="edit"  />
+                      </span>
+                      
+                    </div>
+                  </div>
+                </div>
+                <div class="slds-media__body" onclick="{!c.incrementProgress}">
+                  <div class="slds-welcome-mat__tile-body">
+                    <h3 class="slds-welcome-mat__tile-title">Fill it with your data, save as CSV and upload it!</h3>
+                    <p class="slds-welcome-mat__tile-description">Open the file and fill it with the information you want to upload, remember to save it as CSV.</p>
+                  </div>
+                </div>
+              </a>
+            </li>
+            
+           
+          </ul>
+        <div class="slds-align_absolute-center">
+         <lightning:input name="file" type="file" aura:id="file" label="" multiple="true" accept="csv" onchange="{! c.handleUploadFinished}"/>
+		
+             <aura:if isTrue="{!v.allOk}">
+        <br></br>
+                 <lightning:icon iconName="standard:task2"   alternativeText="allOk" title="allOk"  />
+        </aura:if>
+           </div>
+        
+        
+        </div>
+      
+    
+  
+    
+
+    <aura:set attribute="else">
+   <!--   <c:LightningUploaderSon csvString="{!v.csvString}" recordId="{!v.recordId}"></c:LightningUploaderSon>  -->
+    </aura:set>
+  
+    
+    
+
+</aura:component>

@@ -1,0 +1,18 @@
+<!--
+* @author Valeria Martino - valeria.martino@nttdata.com
+* @date Creation 08/10/2019
+* @date Modification dd/mm/yyyy
+* @description XC_LCP160_CancelContract – Component for XC_LCC160_CancelContract 
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                controller ="XC_LCC160_CancelContract" access="global" >
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.cancelContractInvoke}" />
+	<aura:if isTrue="{!v.spinnerControl}">
+        <div
+            style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+</aura:component>

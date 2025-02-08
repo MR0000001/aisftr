@@ -1,0 +1,96 @@
+<aura:component 
+    controller="XC_LCC058_NewContactsOnContract" 
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,lightning:actionOverride,forceCommunity:availableForAllPageTypes,force:hasSObjectName,lightning:availableForFlowScreens,lightning:isUrlAddressable,lightning:hasPageReference,force:lightningQuickActionWithoutHeader" access="global" >
+    
+<lightning:navigation aura:id="navService"/>
+<lightning:workspaceAPI aura:id="workspace" />
+<lightning:notificationsLibrary aura:id="notifLib"/>
+
+<aura:attribute name="recordId" type="String" />
+<aura:attribute name="valueMap" type="Map" />
+<aura:attribute name="contractRole" type="List" />
+<aura:attribute name="roleValue" type="String" />
+<aura:attribute name="contactList" type="List" />
+<aura:attribute name="contactValue" type="String" />
+<aura:attribute name="disabledSubmit" type="Boolean" default="true" />
+    
+<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+<div style="height:600px;" >    <!--class="slds-box" -->
+    <!--<article class="slds-card" style="height:500px">-->
+<lightning:card variant="Narrow">
+    <div class="modal-header slds-modal__header slds-size_1-of-1">
+        <h4 class="title slds-text-heading--medium" >{!$Label.c.XC_CL_Contract_NewContactsOnContract}</h4>
+    </div>
+    <lightning:layout>
+        <lightning:layoutItem size="6" padding="around-small">
+            
+            <c:strike_lookup
+                label="{!$Label.c.XC_CL_Contract}"
+                object="XC_ContractLineItem__c"
+                value="{!v.valueMap.contractId}"
+                searchField="Id"
+                placeholder="{!$Label.c.XC_CL_DigitAndSelectOptionMessage}"
+                iconName="custom:custom66"
+                order="Id"
+                limit="5"
+                searchingMessage="{!$Label.c.XC_CL_Searching}"
+                noResultsMessage="{!$Label.c.XC_CL_NoResultsFound}"
+                loadingMessage="{!$Label.c.XC_CL_Loading}"
+                errorMessage="{!$Label.c.XC_CL_InvalidInput}"
+                disabled="true"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="6" padding="around-small">
+            <c:strike_lookup
+                label="{!$Label.c.XC_CL_CPAB_Account}"
+                object="Account"
+                value="{!v.valueMap.accountId}"
+                searchField="Name"
+                placeholder="{!$Label.c.XC_CL_DigitAndSelectOptionMessage}"
+                iconName="standard:account"
+                subtitleField="Industry"
+                order="Name"
+                limit="5"
+                searchingMessage="{!$Label.c.XC_CL_Searching}"
+                noResultsMessage="{!$Label.c.XC_CL_NoResultsFound}"
+                loadingMessage="{!$Label.c.XC_CL_Loading}"
+                errorMessage="{!$Label.c.XC_CL_InvalidInput}"
+                disabled="true"/>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+     <lightning:layout>
+            <lightning:layoutItem flexibility="auto" padding="around-small">
+    <lightning:input type="date" name="startDate" label="{!$Label.c.XC_CL_StartDate}" disabled="true" value="{!v.valueMap.startDate}" />
+                 </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" padding="around-small">
+    <lightning:input type="date" name="endDate" label="{!$Label.c.XC_CL_EndDate}" value="{!v.valueMap.endDate}"/>
+     </lightning:layoutItem>
+    </lightning:layout>
+     <lightning:layout>
+            <lightning:layoutItem flexibility="auto" padding="around-small">
+    <lightning:combobox name="ChooseContract" label="{!$Label.c.XC_CL_Contract_ContactRole}" placeholder="{!$Label.c.XC_CL_DigitAndSelectOptionMessage}" value="{! v.roleValue }" required="true"
+						options="{!v.contractRole}" onchange="{!c.changeRole }"/> 
+                </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" padding="around-small">
+    <lightning:combobox name="ChooseContact" label="{!$Label.c.XC_CL_Contact}" placeholder="{!$Label.c.XC_CL_DigitAndSelectOptionMessage}" value="{! v.contactValue }" required="true"
+						options="{!v.contactList}" onchange="{!c.changeContact }"/>  
+                  </lightning:layoutItem>
+    </lightning:layout>
+    <div class="abbass">
+                  <footer class="slds-modal__footer slds-theme_default">   
+                         <lightning:button variant="neutral" 
+                                          label="{!$Label.c.XC_CL_CancelButton}"
+                                          title="Cancel"
+                                          onclick="{! c.closeModal }"/>
+                        
+                                <lightning:button variant="brand" 
+                                                  label="{!$Label.c.XC_CL_SaveButton}"
+                                                  title="Submit"
+                                                  disabled="{!v.disabledSubmit}"
+                                                  onclick="{! c.createContacts }"/>
+    </footer>
+        </div>
+    <!--</article>-->
+    </lightning:card>
+    </div>
+</aura:component>

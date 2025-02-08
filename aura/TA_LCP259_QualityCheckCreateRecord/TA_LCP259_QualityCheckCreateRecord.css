@@ -1,0 +1,185 @@
+/* .THIS .ta-title {
+    font-size: 4vw;
+    color: white;
+    font-weight: 800;
+}
+
+.THIS .ta-description {
+    color: rgb(255, 255, 255, 0.6) !important;
+    font-size: 3.3vw;
+}
+
+.THIS .ta-accordion-header-icon {
+    width: 9vw;
+    margin-top: 2vw;
+}
+
+.THIS .ta-accordion-header-button {
+    font-size: 3.5vw;
+    font-weight: 100;
+    border: 1px solid white;
+    padding: 1vw 2vw 1vw 2vw;
+    border-radius: 2.5vw;
+    color: white;
+    background: transparent;
+    text-transform: capitalize;
+    width: 25vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-modal-container {
+    background: white;
+    border-radius: 5vw;
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    top: 30vw;
+    padding: 6vw 6vw 0vw 6vw;
+    margin: 5vw;
+    width: 90vw;
+}
+
+.THIS .ta-hidden-field {
+    display: none;
+}
+
+.THIS .ta-subtitle {
+    font-size: 3vw !important;
+}
+
+.THIS .ta-button-primary-modal {
+    margin-bottom: 1em;
+}
+
+.THIS .ta-border-padding-top-white {
+    border-top: .5vw solid white;
+    padding-top: 2vw;
+}
+
+.THIS .ta-select-font-size .slds-select  {
+    font-size: 2.7vw !important;
+}
+
+.THIS .ta-select-question .slds-select  {
+    font-size: 3vw !important;
+    height: auto !important;
+    white-space: break-spaces;
+}
+
+
+
+/* .THIS.ta-modal-bg {
+    position: fixed;
+    z-index: 5;
+    left: 0;
+    top: 0;
+    background: rgba(70, 30, 125, 0.8);
+    height: 100vh;
+    width: 100vw;
+}
+
+.THIS .ta-icon-close {
+    width: 5vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-modal-body {
+    height: 50vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 3vw 0 0 0 !important;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-field-input .slds-select:active {
+    border: inherit;
+    box-shadow: none;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-field-input .slds-select:focus {
+    border: inherit;
+    box-shadow: none;
+}
+
+/* CUSTOM-TAG */
+.THIS .slds-input, .THIS .slds-select, .THIS .slds-input:focus, .THIS .slds-input:active, .THIS .slds-faux-input {
+    background-color: #ece8f2 !important;
+    border: 1px solid #ece8f2 !important;
+    border-radius: 5vw !important;
+    color: #461e7d !important;
+    height: 8vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .slds-input[readonly], .THIS .slds-faux-input[readonly] {
+    background-color: transparent !important;
+    border: none !important;
+    color: #461e7d !important;
+    height: 8vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .slds-button.slds-button_brand, .THIS .slds-button[name="insert"] {
+    color: #ffffff;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background: linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+    border: 1px solid black;
+    padding: 1vw 5vw 1vw 5vw;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size:3.5vw;
+    text-transform: uppercase;
+    height: 9vw;
+    width: 35vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .slds-form-element__label {
+    padding-top: 4vw !important;
+    color: #00000C !important;
+}
+
+/* CUSTOM-TAG */
+.THIS .slds-m-top_small.slds-size_12-of-12 .slds-form-element .slds-form-element__label {
+    display: none;
+}
+
+/* .THIS .ta-modal-section-title {
+    font-size: 4vw;
+    font-weight: 800;
+    margin-top: 8vw;
+} */
+
+/* .THIS .slds-pill_container {
+    border: none !important;
+} */
+
+/* .THIS .ta-record-box {
+    font-size: 4vw;
+    color: rgba(255, 255,255, 0.5);
+    font-weight: 800;
+}
+
+.THIS .ta-button-closing {
+    color: #ff006e;
+    background-color: #ffffff;
+    border-color: #ff006e;
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size: 3.5vw;
+    height: 9vw;
+    width: 35vw;
+}
+
+.THIS .ta-footer {
+    padding-bottom: 4vw;
+}
+
+.THIS .ta-modal-header-title-purple {
+    font-weight: 800;
+    font-size: 4.4vw;
+    color: #461e7d;
+} */

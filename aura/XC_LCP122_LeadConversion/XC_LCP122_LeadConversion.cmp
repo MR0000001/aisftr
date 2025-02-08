@@ -1,0 +1,328 @@
+<!--
+* @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @date Creation 27/06/2019
+* @description XC_LCP122_LeadConversion – Component for Lead conversion
+-->
+
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:hasSObjectName,lightning:availableForFlowScreens,force:lightningQuickActionWithoutHeader"
+    access="global" controller="XC_LCC122_LeadConversion">
+
+    <lightning:overlayLibrary aura:id="overlayLib" />
+
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="lead" type="Lead" />
+    <aura:attribute name="emailContact" type="String" default="" />
+    <aura:attribute name="createOpportunity" type="Boolean" default="true" />
+    <aura:attribute name="community" type="Boolean" default="false" />
+    <aura:attribute name="wrapperResult" type="Object" />
+    <aura:attribute name="contactExists" type="String" default="" />
+    <aura:attribute name="accountExists" type="String" default="" />
+    <aura:attribute name="contactExistsText" type="String" default="" />
+    <aura:attribute name="accountExistsText" type="String" default="" />
+    <aura:attribute name="contactFound" type="Boolean" default="false" />
+    <aura:attribute name="accountFound" type="Boolean" default="false" />
+    <aura:attribute name="type" type="String" default="" />
+    <aura:attribute name="isSFMLead" type="Boolean" default="false"/>
+    <aura:attribute name="account" type="Account" default="false" />
+    <aura:attribute name="contact" type="Contact" default="false" />
+    <aura:attribute name="opportunity" type="Opportunity" default="false" />
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <aura:html tag="style">
+        .slds-modal__container { max-width:80rem !important; width:60%!important; }
+        .cuf-content { padding: 0 0rem !important; }
+        .slds-p-around--medium { padding: 0rem !important; }
+    </aura:html>
+
+    <div class="modal-header slds-modal__header slds-size_1-of-1">
+        <h4 class="title slds-text-heading--medium">{!$Label.c.XC_CL_LeadConv_TitleWindow}</h4>
+        {!$Label.c.XC_CL_LeadConvert_Title}
+    </div>
+    <br></br>
+    <br></br>
+    <br></br>
+    <div>
+        <lightning:layout verticalAlign="center" horizontalAlign="center">
+
+            <lightning:layoutItem padding="around-small">
+                <!-- BOX ACCOUNT -->
+                <div class="custom-box">
+                    <lightning:card variant="Narrow" title="{!$Label.c.Account}" iconName="standard:account">
+                        <div>
+                            <div style="margin = 2px 2px 2px 2px">
+                                <p style="overflow-wrap: break-word;">
+                                    <aura:if isTrue="{!v.accountFound}">
+                                        <aura:if
+                                            isTrue="{!v.lead.XC_LeadRecordType__c  == $Label.c.XC_CL_Lead_Residential}">
+                                            <aura:if isTrue="{!not(empty(v.lead.Name))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Name}&nbsp;</b>
+                                                {!v.account.Name}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.account.XC_EmailCustom__c))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Email}&nbsp;</b>
+                                                {!v.account.XC_EmailCustom__c}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.account.Phone))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Phone}&nbsp;</b>
+                                                {!v.account.Phone}
+                                            </aura:if>
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{!not(empty(v.account.Company__c))}">
+                                                    <br></br>
+                                                    <aura:if
+                                                        isTrue="{!or(v.lead.XC_LeadRecordType__c  == $Label.c.XC_CL_Lead_Soho, v.isSFMLead)}">
+                                                        <b>{!$Label.c.XC_CL_LeadConvert_Company}&nbsp;</b>
+                                                        <aura:set attribute="else">
+                                                            <b>{!$Label.c.XC_CL_LeadConvert_Name}&nbsp;</b>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                    <aura:if
+                                                        isTrue="{!v.lead.XC_LeadRecordType__c  == $Label.c.XC_CL_Lead_GLOB2B}">
+                                                        <b>{!$Label.c.XC_CL_LeadConvert_Company}&nbsp;</b>
+                                                        
+                                                    </aura:if>
+                                                    <aura:if
+                                                        isTrue="{!v.lead.XC_LeadRecordType__c  == $Label.c.XC_CL_Lead_GLOB2G}">
+                                                        <b>{!$Label.c.XC_CL_LeadConvert_Company}&nbsp;</b>
+                                                        
+                                                    </aura:if>
+                                                    
+                                                    {!v.account.Company__c}
+                                                </aura:if>
+                                                <aura:if isTrue="{!not(empty(v.account.IdentityType__c))}">
+                                                    <br></br>
+                                                    <b>{!$Label.c.XC_CL_LeadConvert_Doc_Type}&nbsp;</b>
+                                                    {!v.account.IdentityType__c}
+                                                </aura:if>
+                                                <aura:if isTrue="{!not(empty(v.account.IdentityNumber__c))}">
+                                                    <br></br>
+                                                    <b>{!$Label.c.XC_CL_LeadConvert_Doc_Numb}&nbsp;</b>
+                                                    {!v.account.IdentityNumber__c}
+                                                </aura:if>
+                                            </aura:set>
+                                        </aura:if>
+                                        <aura:set attribute="else">
+                                            <aura:if
+                                                isTrue="{!v.lead.XC_LeadRecordType__c  == $Label.c.XC_CL_Lead_Residential}">
+                                                <aura:if isTrue="{!not(empty(v.lead.Name))}">
+                                                    <br></br>
+                                                    <b>{!$Label.c.XC_CL_LeadConvert_Name}&nbsp;</b>
+                                                    {!v.lead.Name}
+                                                </aura:if>
+                                                <aura:if isTrue="{!not(empty(v.lead.XC_EmailCustom__c))}">
+                                                    <br></br>
+                                                    <b>{!$Label.c.XC_CL_LeadConvert_Email}&nbsp;</b>
+                                                    {!v.lead.XC_EmailCustom__c}
+                                                </aura:if>
+                                                <aura:if isTrue="{!not(empty(v.lead.Phone))}">
+                                                    <br></br>
+                                                    <b>{!$Label.c.XC_CL_LeadConvert_Phone}&nbsp;</b>
+                                                    {!v.lead.Phone}
+                                                </aura:if>
+                                                <aura:set attribute="else">
+                                                    <aura:if isTrue="{!not(empty(v.lead.Company))}">
+                                                        <br></br>
+                                                        <aura:if
+                                                            isTrue="{! or(v.lead.XC_LeadRecordType__c  == $Label.c.XC_CL_Lead_Soho, v.lead.XC_LeadRecordType__c  == $Label.c.XC_CL_Lead_GLOB2B, v.lead.XC_LeadRecordType__c  == $Label.c.XC_CL_Lead_GLOB2G, v.isSFMLead )}">
+                                                            <b>{!$Label.c.XC_CL_LeadConvert_Company}&nbsp;</b>
+                                                            <aura:set attribute="else">
+                                                                <b>{!$Label.c.XC_CL_LeadConvert_Name}&nbsp; </b>
+                                                            </aura:set>
+                                                        </aura:if>
+                                                        {!v.lead.Company}
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!not(empty(v.lead.XC_DocumentType__c))}">
+                                                        <br></br>
+                                                        <b>{!$Label.c.XC_CL_LeadConvert_Doc_Type}&nbsp;</b>
+                                                        {!v.lead.XC_DocumentType__c}
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!not(empty(v.lead.XC_DocumentNumber__c))}">
+                                                        <br></br>
+                                                        <b>{!$Label.c.XC_CL_LeadConvert_Doc_Numb}&nbsp;</b>
+                                                        {!v.lead.XC_DocumentNumber__c}
+                                                    </aura:if>
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:set>
+                                    </aura:if>
+                                    <br></br>
+                                    <br></br>
+                                </p>
+                            </div>
+                        </div>
+                        <br></br>
+                        <div class="myPlusButtonClass">
+                            <lightning:icon iconName="{!v.accountExists}" size="x-small" style="margin-right: 10px;" />
+                            {!v.accountExistsText}
+                        </div>
+
+                    </lightning:card>
+
+                </div>
+            </lightning:layoutItem>
+
+            <lightning:layoutItem padding="around-small">
+                <!-- BOX CONTACT -->
+                <div class="custom-box">
+                    <lightning:card variant="Narrow" title="{!$Label.c.Contact}" iconName="standard:contact">
+                        <div>
+                            <div style="margin=2px 2px 2px 2px">
+                                <p style="overflow-wrap: break-word;">
+                                    <aura:if isTrue="{!v.contactFound}">
+                                        <aura:if
+                                            isTrue="{!v.lead.XC_LeadRecordType__c  == $Label.c.XC_CL_Lead_Residential}">
+                                            <aura:if isTrue="{!not(empty(v.contact.Name))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Name}&nbsp;</b>
+                                                {!v.contact.Name}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.contact.Email))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Email}&nbsp;</b>
+                                                {!v.contact.Email}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.contact.Phone))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Phone}&nbsp;</b>
+                                                {!v.contact.Phone}
+                                            </aura:if>
+                                        <aura:set attribute="else">
+                                            <aura:if isTrue="{!not(empty(v.contact.Name))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Name}&nbsp;</b>
+                                                {!v.contact.Name}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.contact.Phone))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Phone}&nbsp;</b>
+                                                {!v.contact.Phone}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.emailContact))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Email}&nbsp;</b>
+                                                {!v.emailContact}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.contact.XC_CDocType__c))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Doc_Type}&nbsp;</b>
+                                                {!v.contact.XC_CDocType__c}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.contact.XC_CDocNumber__c))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Doc_Numb}&nbsp;</b>
+                                                {!v.contact.XC_CDocNumber__c}
+                                            </aura:if>
+                                        </aura:set>
+                                    </aura:if>
+                                    <aura:set attribute="else">
+                                        <aura:if
+                                            isTrue="{!v.lead.XC_LeadRecordType__c  == $Label.c.XC_CL_Lead_Residential}">
+                                            <aura:if isTrue="{!not(empty(v.lead.Name))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Name}&nbsp;</b>
+                                                {!v.lead.Name}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.emailContact))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Email}&nbsp;</b>
+                                                {!v.emailContact}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.lead.Phone))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Phone}&nbsp;</b>
+                                                {!v.lead.Phone}
+                                            </aura:if>
+                                        <aura:set attribute="else">
+                                            <aura:if isTrue="{!not(empty(v.lead.Name))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Name}&nbsp;</b>
+                                                {!v.lead.Name}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.lead.Phone))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Phone}&nbsp;</b>
+                                                {!v.lead.Phone}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.emailContact))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Email}&nbsp;</b>
+                                                {!v.emailContact}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.lead.XC_CDocType__c))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Doc_Type}&nbsp;</b>
+                                                {!v.lead.XC_CDocType__c}
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(v.lead.XC_CDocNumber__c))}">
+                                                <br></br>
+                                                <b>{!$Label.c.XC_CL_LeadConvert_Doc_Numb}&nbsp;</b>
+                                                {!v.lead.XC_CDocNumber__c}
+                                            </aura:if>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:set>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.lead.XC_LeadRecordType__c == $Label.c.XC_CL_Lead_Residential}">
+                                        <br></br>
+                                    </aura:if>
+                                    <br></br>
+                                </p>
+                            </div>
+                        </div>
+                        <br></br>
+                        <div class="myPlusButtonClass">
+                            <lightning:icon iconName="{!v.contactExists}" size="x-small" style="margin-right: 10px;" />
+                            {!v.contactExistsText}
+                        </div>
+                    </lightning:card>
+                </div>
+            </lightning:layoutItem>
+
+            <lightning:layoutItem padding="around-small">
+                <!-- BOX OPPORTUNITY -->
+                <div class="custom-box">
+                    <lightning:card variant="Narrow" title="{!$Label.c.Opportunity}" iconName="standard:opportunity">
+                        <div style="margin=2px 2px 2px 2px">
+                            <br></br>
+                            <p style="overflow-wrap: break-word;"><b>{!$Label.c.XC_CL_LeadConvert_Category}&nbsp;</b>
+                                <aura:if isTrue="{!not(empty(v.lead.MyCategoryOfInterest))}">
+                                    {!v.lead.MyCategoryOfInterest}<aura:set attribute="else">
+                                        <i>{!$Label.c.XC_CL_LeadConvert_None}</i></aura:set>
+                                </aura:if>
+                                <br></br>
+                            </p>
+                            <br></br>
+                            <lightning:input type="toggle" label="{!$Label.c.XC_CL_LeadConvert_Toggle_Opp}"
+                                name="{!$Label.c.XC_CL_LeadConvert_Toggle_Opp}" checked="{!v.createOpportunity}"
+                                disabled="false" />
+                        </div>
+                    </lightning:card>
+                </div>
+            </lightning:layoutItem>
+
+        </lightning:layout>
+    </div>
+    <div class="forceChangeRecordTypeFooter slds-float--right slds-m-around--medium">
+        <lightning:layout verticalAlign="right" horizontalAlign="right">
+            <lightning:layoutItem padding="around-small" flexibility="auto">
+                <lightning:button variant="brand" label="{!$Label.c.XC_CL_LeadConvert_Convert}"
+                    title="{!$Label.c.XC_CL_LeadConvert_Convert}" onclick="{!c.convert}" />
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div
+            style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+
+</aura:component>

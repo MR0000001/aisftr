@@ -1,0 +1,78 @@
+<!--
+  @File Name          : XC_LCP137_CTIContactCases.cmp
+  @Description        : 
+  @Author             : Francesco Imperioli - fimperioli@deloitte.it
+  @Group              : 
+  @Last Modified By   : Francesco Imperioli - fimperioli@deloitte.it
+  @Last Modified On   : 28/5/2020, 14:42:04
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    28/5/2020   Francesco Imperioli - fimperioli@deloitte.it     Initial Version
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="XC_LCC136_CTIContactCases">
+
+        <!-- SERVICE CONSOLE INTEGRATION -->
+        <lightning:workspaceAPI aura:id="workspace"/>
+
+        <!--PAGINATION MANAGEMENT  -->
+        <aura:attribute name="data" type="Object"/>
+        <aura:attribute name="columns" type="List"/>
+        <aura:attribute name="pageNumber" type="Integer" default="1"/>
+        <aura:attribute name="pageSize" type="Integer" default="5"/>
+        <aura:attribute name="isLastPage" type="Boolean" default="false"/>
+        <aura:attribute name="dataSize" type="Integer" default="0"/>
+
+        <!-- SALESFORCE DATA MAPPING -->
+        <aura:attribute name="interactionRecord" type="Object"/>
+        <aura:attribute name="recordError" type="String"/>
+
+        <!-- DATATABLE MANAGEMENT -->
+        <aura:attribute name="caseColumns" type="List"/>
+        <aura:attribute name="caseSelectedRows" type="List"/>
+        <aura:attribute name="maxRowSelection" type="Integer" default="1" />
+        <aura:attribute name="caseMatches" type="Case[]"/>
+        <aura:attribute name="emptyList" type="Boolean"/>
+        <aura:attribute name="totalCases" type="Integer" default="0"/>
+
+
+
+        <force:recordData aura:id="recordLoader"
+        recordId="{!v.recordId}"
+        targetFields="{!v.interactionRecord}"
+        targetError="{!v.recordError}"
+        fields="Name,XC_Phone__c,XC_ContactId__c,XC_LeadId__c,XC_HasMultipleMatch__c,XC_CaseId__c,XC_InteractionStatus__c"
+        recordUpdated="{!c.init}"
+        layoutType="FULL"
+        mode="EDIT"
+        />
+
+
+        <lightning:card variant="Narrow" title="{! $Label.c.XC_CL_CTIContactCase_Header +' ' + '(' + v.totalCases + ')'}" iconName="standard:case">
+            <aura:set attribute="actions">
+                <lightning:button label="{!$Label.c.XC_CL_CTIContactCase_NewBtn}" iconName="standard:case" iconPosition="left" onclick="{!c.createCase}"/>
+                <aura:if isTrue="{! !v.emptyList }">
+                    <lightning:button label="{!$Label.c.XC_CL_CTIContactCase_PrevBtn}" iconName="utility:chevronleft" iconPosition="left"
+                    onclick="{!c.handlePrev}" disabled="{! v.pageNumber == 1}"/>
+                    <lightning:button label="{!$Label.c.XC_CL_CTIContactCase_NextBtn}" iconName="utility:chevronright" iconPosition="right"
+                                        disabled="{!v.isLastPage}" onclick="{!c.handleNext}"/>
+                </aura:if>
+            </aura:set>
+            <aura:set attribute="footer">
+                    <p class="slds-text-heading__medium">{!$Label.c.XC_CL_CTIContactCase_Footer1} {!v.pageNumber} | {!$Label.c.XC_CL_CTIContactCase_Footer2} {! ' ' + ((v.pageNumber-1)*v.pageSize)+' '+ $Label.c.XC_CL_CTIContactCase_Footer3 +' '+((v.pageNumber-1)*v.pageSize+v.dataSize)}</p>
+            </aura:set>
+            <p class="slds-p-horizontal_small">
+                <!-- PAGINATED DATATABLE -->
+            <aura:if isTrue="{! !v.emptyList }">
+                    <lightning:datatable columns="{!v.caseColumns}" data="{!v.caseMatches}"
+                    keyField="Id" maxRowSelection="{!v.maxRowSelection}"
+                    onrowselection="{!c.caseSelected}" selectedRows="{!v.caseSelectedRows}"/>
+                    <aura:set attribute="else">
+                        No Cases found
+                    </aura:set>
+            </aura:if>
+
+            </p>
+        </lightning:card>
+
+
+</aura:component>

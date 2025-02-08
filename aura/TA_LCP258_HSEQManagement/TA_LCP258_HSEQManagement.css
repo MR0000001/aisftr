@@ -1,0 +1,126 @@
+.THIS .ta-modal-container{
+    margin: 0;
+    top: 10vh;
+    bottom: 5vh;    /* 17062022 FD - ENXCRM-208 */
+    left: 10vw;
+    right: 10vw;
+}
+
+.THIS .ta-modal-body {
+    max-height: 20vh;   /* 20062022 FD - ENXCRM-208 */
+    padding: 0;
+    height: auto;
+    margin: 2vh 3vw;
+    width: 74vw;
+}
+
+.THIS .ta-modal-header {
+    min-height: 8vh;
+    padding-bottom: 1vh;
+}
+
+.THIS .slds-form-element__label{
+    color: black !important;
+}
+
+.THIS .ta-filter-label{
+    font-size: 3vw !important;
+}
+
+@media only screen and (max-width: 600px) {
+    .THIS .ta-workorder-card {  
+        animation: 1s fadeIn;
+        animation-fill-mode: forwards;
+        border-bottom-right-radius: 6vw;
+        border-top-right-radius: 6vw;
+        width: 100%;
+        height: 100%;
+    }
+
+    .THIS .ta-bg-color-darkorange {
+        background-color: darkorange;
+    }
+
+    .THIS .ta-bg-color-purple {
+        background-color:#461e7d;
+    }
+
+    .THIS .ta-bg-color-green {
+        background-color:#00c983;
+    }
+    
+    .THIS .ta-bg-color-blue {
+        background-color: #0070d2;
+    }
+}
+
+@media screen and (min-width: 601px) {
+    .THIS .ta-icon-size-small {
+        margin-top: 1vw;
+        margin-right: 1vw;
+    }
+
+    .THIS .ta-workorder-card {
+        margin-bottom: 6vw !important;
+    }
+}
+
+.THIS .ta-workorder-bg {
+    background-color: #EBF5FB;
+    border-radius: 2vw;
+    height: 100%;
+    padding: 1.5vh 3vw;
+    border-left: 2vw solid #0070d2;
+}
+
+.THIS .ta-workorder-bg-green {
+    background-color: #EAFAF1;
+    border-radius: 2vw;
+    height: 100%;
+    padding: 1.5vh 3vw;
+    border-left: 2vw solid green;
+}
+
+.THIS .ta-workorder-bg-orange {
+    background-color: #ffbf80;
+    border-radius: 2vw;
+    height: 100%;
+    padding: 1.5vh 3vw;
+    border-left: 2vw solid darkorange;
+}
+
+.THIS .ta-box-label {
+    border-radius: 1.5vw;
+    padding: .3vh 2vw;
+    width: fit-content;
+}
+
+.THIS .ta-icon-size-small {
+    width: 4vw;
+}
+
+.THIS .ta-input input {
+    padding-left: 4vw !important;
+    border-radius: 5vw !important;
+    background: #ece8f2 !important;
+    color: rgb(70, 30, 125) !important;
+}
+
+.THIS .ta-hide-label label {
+    display: none;
+}
+
+.THIS .ta-checkbox-blu span .slds-checkbox_faux{
+    border-color: #0070d2 !important;
+    background-color: #0070d2 !important;
+}
+
+.THIS .ta-checkbox-orange span .slds-checkbox_faux{
+    border-color: darkorange !important;
+    background-color: darkorange !important;
+}
+
+.THIS .ta-checkbox-green span .slds-checkbox_faux{
+    border-color: green !important;
+    background-color: green !important;
+}

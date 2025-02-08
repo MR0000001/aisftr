@@ -1,0 +1,236 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                controller="TA_LCC205_Homepage"
+                access="global"
+                extends="c:TA_LCP209_BaseWizard">
+
+    <ltng:require styles="{!join(',', 
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css', 
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css', 
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:attribute access="private" name="isCmpInitialized" type="Boolean" default="false" />
+    <aura:attribute access="private" name="showSelectAccountModal" type="Boolean" default="false" />
+    <aura:attribute access="private" name="redirectParamAccount" type="String" default="" />
+    <aura:attribute access="private" name="showAppointmentToBeConfirmed" type="Boolean" default="false" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}" />
+    <aura:handler name="closeModal" event="c:TA_LCE248_GenericEvent" action="{!c.handleCloseModal}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, height=device-height" /> 
+
+    <div>
+        <lightning:layout multipleRows="true">
+            <div class="ta-home-bg">
+                <lightning:layoutItem size="12" class="slds-text-align_center slds-m-top_large">
+                    <h3 class="ta-color-white"> {!$Label.c.TA_WelcomeBack} </h3>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large">
+                    <h3 class="ta-text-uppercase ta-color-white"> {!v.userName}! </h3>
+                </lightning:layoutItem>
+            </div>
+
+            <lightning:layoutItem size="12">
+                <lightning:layout multipleRows="true" class="ta-home-box-page">
+                    <lightning:layoutItem size="12" class="slds-p-top_large ta-border-top-grey">
+                        <!-- <h2 class="ta-color-black slds-m-bottom_large slds-text-align_center"> </h2> -->
+                    </lightning:layoutItem>
+
+                    <aura:if isTrue="{!v.processType=='B2C'}">
+                        <lightning:layoutItem size="12">
+                            <lightning:layout>
+                                <lightning:layoutItem size="6" class="ta-left-tabs">
+                                    <!-- START - Tab Agenda -->
+                                    <div id="tab-agenda" class="ta-tab-bg"
+                                    style="{!'background-image:' + ' url(' + v.customerCardBg +'), 
+                                            linear-gradient(317deg, #461e7d 104%, #7731d7 -10%);background-size: cover;
+                                            background-position: bottom;
+                                            background-blend-mode: soft-light;'}"
+                                    name="agenda"
+                                    onclick="{!c.handleManageRedirect}">
+        
+                                        <lightning:layout multipleRows="true">
+                                            <lightning:layoutItem size="12">
+                                                <h3 class="slds-text-align_left ta-color-white ta-tab-title"> {!$Label.c.TA_Agenda} </h3>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12">
+                                                <p class="slds-text-align_left ta-color-white-opacity-60 ta-tab-description"> {!$Label.c.TA_CheckSchedule} </p>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12">
+                                                <div class="slds-text-align_right"> 
+                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/calendar-white.svg'}" class="ta-icon-large"/>
+                                                </div>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                    </div>
+                                    <!-- END -Tab Agenda -->
+                                </lightning:layoutItem>
+        
+                                <lightning:layoutItem size="6" class="ta-right-tabs">
+                                    <lightning:layout multipleRows="true">
+                                        <!-- <lightning:layoutItem size="12">
+                                            <div class="ta-tab-bg-small"
+                                                    style="{!'background-image:' + ' url(' + v.customerCardBg +'),
+                                                            linear-gradient(317deg, #461e7d 104%, #7731d7 -10%);background-size: cover;
+                                                            background-position: bottom;
+                                                            background-blend-mode: soft-light;'}"
+                                                    name="{!if(v.processType == 'B2C', 'newaccount', 'asset')}"
+                                                    onclick="{!c.handleManageRedirect}">
+                                                <lightning:layout multipleRows="true">
+                                                    <lightning:layoutItem size="8" class="slds-m-top_xx-small">
+                                                        <lightning:layout multipleRows="true">
+                                                            <lightning:layoutItem size="12">
+                                                                <h3 class="slds-text-align_left ta-color-white ta-text-uppercase"> {!if(v.processType == 'B2C', $Label.c.TA_CreateAccountAndSell, $Label.c.TA_Asset)} </h3>
+                                                            </lightning:layoutItem>
+                                                            <lightning:layoutItem size="12">
+                                                                <p class="slds-text-align_left ta-color-white-opacity-60"> {!if(v.processType == 'B2C', '', $Label.c.TA_CheckAccount)} </p>
+                                                            </lightning:layoutItem>
+                                                        </lightning:layout>
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="4">
+                                                        <div class="slds-text-align_right slds-m-top_x-small"> 
+                                                            <img src="{!$Resource.TA_Icons + '/xc-icons/user-white.svg'}" class="ta-icon-large"/>
+                                                        </div>
+                                                    </lightning:layoutItem>
+                                                </lightning:layout>
+                                            </div>
+                                        </lightning:layoutItem> -->
+                                        <lightning:layoutItem size="12">
+                                            <div class="ta-tab-bg-small"
+                                                    style="{!'background-image:' + ' url(' + v.customerCardBg +'),
+                                                            linear-gradient(317deg, #461e7d 104%, #7731d7 -10%);background-size: cover;
+                                                            background-position: bottom;
+                                                            background-blend-mode: soft-light;'}"
+                                                    name="{!if(v.processType == 'B2C', 'account', 'case')}"
+                                                    onclick="{!c.handleManageRedirect}">
+                                                <lightning:layout multipleRows="true">
+                                                    <lightning:layoutItem size="8" class="slds-m-top_xx-small">
+                                                        <lightning:layout multipleRows="true">
+                                                            <lightning:layoutItem size="12">
+                                                                <h3 class="slds-text-align_left ta-color-white"> {!if(v.processType == 'B2C', $Label.c.TA_SelectCustomerSell, $Label.c.TA_Case)} </h3>
+                                                            </lightning:layoutItem>
+                                                        </lightning:layout>
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="4">
+                                                        <div class="slds-text-align_right slds-m-top_xx-small">
+                                                            <img src="{!$Resource.TA_Icons + '/xc-icons/asset-white.svg'}" class="ta-icon-large"/>
+                                                        </div>
+                                                    </lightning:layoutItem>
+                                                </lightning:layout>
+                                            </div>
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="12">
+                            <div class="ta-tab-bg-large"
+                                    style="{!'background-image:' + ' url(' + v.customerCardBg +'), linear-gradient(317deg, #461e7d 104%, #7731d7 -10%);
+                                        background-size: cover;
+                                        background-position: bottom;
+                                        background-blend-mode: soft-light;'}"
+                                    name="appointmentToBeConfirmed"
+                                    onclick="{!c.handleManageRedirect}">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="10">
+                                        <lightning:layout multipleRows="true">
+                                            <lightning:layoutItem size="12">
+                                                <h3 class="slds-text-align_left ta-color-white">{!$Label.c.TA_AppointmentsToBeConfirmed}</h3>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12">
+                                                <p class="slds-text-align_left slds-m-top_xx-small ta-color-white-opacity-60"> {!$Label.c.TA_CheckAppointment} </p>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="2">
+                                        <div class="slds-text-align_right">
+                                            <img src="{!$Resource.TA_Icons + '/xc-icons/user-white.svg'}" class="ta-icon-large"/>
+                                        </div>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:if>
+
+                    <aura:if isTrue="{!v.processType=='B2G'}">
+                        <lightning:layoutItem size="6">
+                            <!-- START - Tab Agenda -->
+                            <div id="tab-agenda" class="ta-tab-bg"
+                            style="{!'background-image:' + ' url(' + v.customerCardBg +'), 
+                                    linear-gradient(317deg, #461e7d 104%, #7731d7 -10%);background-size: cover;
+                                    background-position: bottom;
+                                    background-blend-mode: soft-light;'}"
+                            name="agenda"
+                            onclick="{!c.handleManageRedirect}">
+    
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="12">
+                                        <h3 class="slds-text-align_left ta-color-white ta-tab-title"> {!$Label.c.TA_Agenda} </h3>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="12">
+                                        <p class="slds-text-align_left ta-color-white-opacity-60 ta-tab-description"> {!$Label.c.TA_CheckSchedule} </p>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="12">
+                                        <div class="slds-text-align_right"> 
+                                            <img src="{!$Resource.TA_Icons + '/xc-icons/calendar-white.svg'}" class="ta-icon-large"/>
+                                        </div>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </div>
+                            <!-- END -Tab Agenda -->
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="6">
+                            <div id="tab-agenda" class="ta-tab-bg"
+                            style="{!'background-image:' + ' url(' + v.customerCardBg +'), 
+                                    linear-gradient(317deg, #461e7d 104%, #7731d7 -10%);background-size: cover;
+                                    background-position: bottom;
+                                    background-blend-mode: soft-light;'}"
+                            name="workorder"
+                            onclick="{!c.handleManageRedirect}">
+    
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="12">
+                                        <h3 class="slds-text-align_left ta-color-white ta-tab-title"> {!$Label.c.TA_WorkOrders} </h3>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="12">
+                                        <p class="slds-text-align_left ta-color-white-opacity-60 ta-tab-description"> {!$Label.c.TA_CheckWorkOrders} </p>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="12">
+                                        <div class="slds-text-align_right"> 
+                                            <img src="{!$Resource.TA_Icons + '/xc-icons/asset-white.svg'}" class="ta-icon-large"/>
+                                        </div>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:if>
+
+                    <!-- START - Appointments Preview -->
+                    <lightning:layoutItem size="12">
+                        <div class="ta-appointment-preview">
+                            <aura:if isTrue="{!v.processType == 'B2C'}">
+                                <h3 class="ta-color-purple ta-font-weight-800 slds-m-bottom_small">{!$Label.c.TA_Next3Appointments}</h3>
+                            </aura:if>
+                            <aura:if isTrue="{!v.processType == 'B2G'}">
+                                <h3 class="ta-color-purple ta-font-weight-800 slds-m-bottom_small">{!$Label.c.TA_NextAppointments}</h3>
+                            </aura:if>
+                            <c:TA_LCP206_AppointmentPreview processType="{!v.processType}"/>
+                        </div>
+                    </lightning:layoutItem>
+                    <!-- END - Appointments Preview -->
+
+                    <lightning:layoutItem size="12">
+                        <div class="ta-box-dummy"></div>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+
+    <aura:if isTrue="{!v.showSelectAccountModal}">
+        <c:TA_LCP250_SelectAccount communityBaseUrl="{!v.communityBaseUrl}"/>
+    </aura:if>
+
+    <c:TA_LCP252_AppointmentToBeConfirmed isOpen="{!v.showAppointmentToBeConfirmed}" />
+
+</aura:component>

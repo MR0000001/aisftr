@@ -1,0 +1,64 @@
+<aura:component controller="TA_LCC208_Modal"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global"
+    extends="c:TA_LCP209_BaseWizard" >
+
+    <aura:attribute access="public" name="params" type="Object" default="{}"/>
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="public" name="title" type="String" />
+    <aura:attribute access="public" name="description" type="String" />
+
+    <aura:attribute access="private" name="matrixWrappers" type="List"/>
+    <aura:attribute access="private" name="isInitialized" type="Boolean"/>
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}"/>
+    <aura:registerEvent name="modalEvt" type="c:TA_LCE208_Modal"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="slds-text-align_center ta-height-100">
+                    <lightning:layout multipleRows="true" class="ta-height-100 ta-container-padding">
+                        <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large">
+                            <aura:if isTrue="{!v.title != ''}">
+                                <h3 class="ta-color-black">{!v.title}</h3>
+                            </aura:if>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large">
+                            <aura:if isTrue="{!v.description != ''}">
+                                <p class="ta-color-black ta-description-padding">{!v.description}</p>
+                            </aura:if>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large slds-m-top_large">
+                            <aura:if isTrue="{!v.params.imgPath != ''}">
+                                <img src="{!$Resource.TA_Images + v.params.imgPath}" class="ta-img-size"/>
+                            </aura:if>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <lightning:layout multipleRows="true">
+                                <aura:iteration items="{!v.matrixWrappers}" var="btn">
+                                    <lightning:layoutItem size="12" class="slds-text-align_center slds-m-top_medium">
+                                        <lightning:button class="{!if(btn.actionWrp.type == 'Primary', 'ta-button-primary-modal',
+                                                                if(btn.actionWrp.type == 'Secondary', 'ta-button-secondary-modal', 'ta-button-closing-modal'))}"
+                                                        label="{!btn.actionWrp.label}"
+                                                        name="{!btn.actionWrp.developerName}"
+                                                        onclick="{!c.handleActionButton}"/>
+                                    </lightning:layoutItem>
+                                </aura:iteration>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+</aura:component>

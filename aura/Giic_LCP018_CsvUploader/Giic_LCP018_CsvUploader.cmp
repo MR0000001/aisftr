@@ -1,0 +1,47 @@
+<aura:component >
+    <aura:attribute name="TableContent" type="String"  description=" Show the Result class"/>
+    <aura:attribute name="TargetFileName" type="String"  description="Name of the file"/>
+    <aura:attribute name="tableheaders" type="Object[]" />
+    <aura:attribute name="fileContentData" type="String"/>
+    <aura:attribute name="filename" type="String"/>  
+    <aura:attribute name="allSerials" type="List"/> 
+    <aura:attribute name="maxSerialNumbersAllowed" type="Integer"/> 
+    <aura:attribute name="backgroundImageURL" type="String" default=""/>
+    <aura:attribute name="purchaseOrderLineId" type="String" />
+    <aura:attribute name="mapPolToSerialList" type="Map" default="{}"/>
+    <!-- It will display 100 records . Change for your requirement-->
+    <aura:attribute name="NumOfRecords" type="Integer" default="300"/> 
+    <aura:attribute name="showMain" type="Boolean" default="true"/>
+    <aura:attribute name="isReadyForShot" type="Boolean" default="false"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>  
+    <aura:handler name="change" value="{!v.isReadyForShot}" action="{!c.checkIfIsReady}" />
+    <aura:registerEvent name="shootMapFromCsv" type="c:Giic_LCE018_ShootMapFromCsv"/>
+ <aura:if isTrue="{!v.showMain}">
+      
+        <div  class="slds-m-around--large" ondragover="{!c.onDragOver}" ondrop="{!c.onDrop}" >
+            
+            <div aura:id="holder" class="slds-m-top--medium slds-align--absolute-center" style="{!'position: relative; height: 45vh; background:' + v.backgroundColor + ' url(' + v.backgroundImageURL +') no-repeat;background-position: center;background-size: cover;'}">
+                <h1></h1>
+            </div>
+            
+            
+        </div>
+            
+      <aura:set attribute="else">
+           
+            <ui:outputRichText class="uiOutputRichText slds-m-around--large" value="{!v.TargetFileName}"/> 
+            <ui:outputRichText class="uiOutputRichText slds-m--around-large" value="{!v.TableContent}"/>
+            <div class="slds-p-around--large slds-align--absolute-center">
+                <div class="slds-hidden"> 
+                <lightning:button label="Upload" variant="brand" onclick="{!c.processFileContent}" />
+                <lightning:button label="Cancel" variant="brand" 
+                                  onclick="{!c.cancel}" /> 
+                </div>
+            </div>
+          
+        </aura:set>
+          
+     </aura:if>
+   
+</aura:component>

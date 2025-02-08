@@ -1,0 +1,68 @@
+<!--
+* @author Lorenzo Orlanducci lorenzo.orlanducci@nttdata.com 
+* @date Creation 29/08/2019
+* @date Modification dd/mm/yyyy
+* @description component for select params for a change ownership 
+-->
+<aura:component controller="XC_LCC142_ChangeOfOwnershipParam"
+  implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable">
+
+
+  <aura:attribute name="filter3" type="String" />
+  <aura:attribute name="recordId" type="String" />
+  <aura:attribute name="accountId" type="String" />
+  <aura:attribute name="reasonValue" type="String" />
+  <aura:attribute name="typeValue" type="String" />
+  <aura:attribute name="showSpinner" type="Boolean" />
+  <aura:attribute name="disabledSubmit" type="Boolean" default="true" />
+  <aura:attribute name="reasonOptions" type="List" />
+  <aura:attribute name="contactValue" type="String" />
+  <aura:attribute name="contactSelectionDisabled" type="Boolean" default="true" />
+  <aura:attribute name="contactOptions" type="List" />
+  <aura:attribute name="typeOptions" type="List" /> 
+  <lightning:notificationsLibrary aura:id="notifLib" />
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+  <aura:if isTrue="{!v.showSpinner}">
+    <lightning:spinner alternativeText="Loading" size="large" />
+  </aura:if>
+  <lightning:card  iconName="action:change_owner">
+    <aura:set attribute="title">
+      <h3 class="slds-p-horizontal_small">{!$Label.c.XC_CL_ChangeOfOwnershipTitle}</h3>
+    </aura:set>
+    <lightning:layout multipleRows="true">
+      <lightning:layoutItem size="12" padding="around-small">
+        <lightning:recordEditForm objectApiName="NE__Order__c">
+          <lightning:inputField aura:id="relatedAccount" name ="relatedAccount" fieldName = "NE__AccountId__c" value="{!v.accountId}" onchange="{!c.getAccountRelatedContact}"/>
+        </lightning:recordEditForm>
+        <aura:if isTrue="{!!v.contactSelectionDisabled}">
+          <lightning:layoutItem size="12">
+            <br></br>
+            <lightning:combobox aura:id="relatedContact" name="Contact" label="Contact" value="{!v.contactValue}" options="{!v.contactOptions}" />
+          </lightning:layoutItem>                   
+      </aura:if>
+        <!-- <c:strike_lookup label="Choose Account" object="Account" value="{!v.accountId}" searchField="Name"
+          placeholder="Search an account" iconName="standard:account" order="Id" limit="100"
+          searchingMessage="Search..." noResultsMessage="No Result found" loadingMessage="" errorMessage="" /> -->
+      </lightning:layoutItem>
+      <lightning:layoutItem size="12" padding="around-small">
+        <br></br>
+        <lightning:combobox name="Reason" label="Reason" value="{! v.reasonValue }" options="{! v.reasonOptions }"
+          onchange="{!c.sblok}" />
+      </lightning:layoutItem>
+      <lightning:layoutItem size="12" padding="around-small">
+        <br></br>
+        <lightning:combobox name="Type" label="Type" value="{! v.typeValue }" options="{! v.typeOptions }" />
+      </lightning:layoutItem>
+    </lightning:layout>
+  </lightning:card><br></br><br></br>
+  <footer class="slds-modal__footer">
+    <lightning:button variant="neutral" label="{!$Label.c.XC_CL_Cancel}" title="Cancel" onclick="{! c.closeModal }" />
+
+
+    <lightning:button variant="brand" label="{!$Label.c.XC_CL_SaveButton}" disabled="{!v.disabledSubmit}"
+      onclick="{! c.changeOwnerOrder }" />
+
+  </footer>
+
+
+</aura:component>

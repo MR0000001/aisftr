@@ -1,0 +1,48 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,force:hasSObjectName"
+    access="global" controller="XC_LCC088_AssignToNationalPartner">
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="partnerList" type="List" />
+    <aura:attribute name="selectedValue" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+    <aura:attribute name="showError" type="Boolean" default="false" />
+    <aura:attribute name="showSuccess" type="Boolean" default="false" />
+    <aura:attribute name="errorMessage" type="String" />
+
+
+    <div class="modal-header slds-modal__header slds-size_1-of-1">
+        <h4 class="title slds-text-heading--medium">
+            {!$Label.c.XC_CL_AssignToNationalPartnerHeader}</h4>
+    </div>
+    <aura:if isTrue="{!v.showSuccess}">
+        <br></br>
+        <h1>
+            <b>{!$Label.c.XC_CL_Success}: </b>{!v.errorMessage}</h1>
+        <aura:set attribute="else">
+            <aura:if isTrue="{!v.showError}">
+                <br></br>
+                <h1>
+                    <b>{!$Label.c.XC_CL_Error} </b>{!v.errorMessage}</h1>
+                <aura:set attribute="else">
+
+                    <lightning:combobox name="NationalPartner"
+                        placeholder="{!$Label.c.XC_CL_AssignToNationalPartnerPlHolder}" options="{!v.partnerList}"
+                        value="None" onchange="{!c.saveSelectValue}" composed="true">
+                    </lightning:combobox>
+                    <div align='right'>
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_SaveButton}"
+                            title="{!$Label.c.XC_CL_SaveButton}" onclick="{!c.assign}" />
+                    </div>
+                </aura:set>
+            </aura:if>
+        </aura:set>
+    </aura:if>
+
+
+
+    <aura:if isTrue="{!v.spinnerControl}">
+        <lightning:spinner alternativeText="Loading" size="large" variant="brand" />
+    </aura:if>
+
+</aura:component>

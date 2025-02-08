@@ -1,0 +1,110 @@
+<aura:component controller='XC_LCC136_UpCompliantCaseIndemnif' implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable">
+
+	<aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="accountId" type="String"/>
+	<aura:attribute name="cardTitle" type="String" default="" />
+	<aura:attribute name="BillingProfileLI" type="Id" default="" />    
+	<aura:attribute name="lookupFilter" type="String" default=""/>	
+	<aura:attribute name="canshow" type="Boolean" default="false" />
+    <aura:attribute name="showNewZuoraBilling" type="Boolean" default="false" />
+    
+	<aura:attribute name="indemnifReasonMap" type="Object[]"/>
+	<aura:attribute name="indemnificationReason" type="String" />
+	<aura:attribute name="disabledSend" type="Boolean" default="true" />
+	<aura:attribute name="amount" type="Decimal" default="" />
+	<aura:attribute name="disableAmount" type="string" default="true"/>
+	<aura:attribute name="automatic_refund" type="Boolean" default="false" />
+	<aura:attribute name="case_comments" type="String" default="" />
+	<aura:attribute name="automaticApproval" type="string" default=""/>
+	<aura:attribute name="showAutomaticApproval" type="string" default="false"/>
+	<aura:attribute name="disableIndemnification" type="Boolean" default="false"/>
+
+	<aura:attribute name="sentToZuora" type="string" default=""/>
+	<aura:attribute name="sendStatus" type="string" default=""/>
+	<aura:attribute name="legalEntity" type="string" default=""/>
+	<aura:attribute name="approvalStatus" type="string" default=""/>
+	<aura:attribute name="showSpinner" type="Boolean" default="false" />
+
+	<aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner aura:id="mySpinner" />
+    </aura:if>
+
+	<lightning:workspaceAPI aura:id="workspace"/>
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+	<aura:handler name="change" value="{!v.BillingProfileLI}" action="{!c.checkNotBlank}"/>
+	<aura:handler name="change" value="{!v.amount}" action="{!c.checkNotBlank}"/>
+	<aura:handler event="c:XC_LCE015_ModalClosed" action="{!c.handleModalClosedEvent}" />
+
+	<lightning:notificationsLibrary aura:id="notifLib"/>
+	<div class="c-container">
+		<aura:if isTrue="{!v.canshow}">
+			<lightning:card>
+				
+				<!--aura:set attribute="title">
+					<lightning:icon iconName="standard:asset" size="large"/>
+					<b> {! v.cardTitle } </b>
+				</aura:set-->
+				<header class="slds-modal__header">
+					<h1 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.XC_CL_Indemnification} </h1>
+				</header>
+				<br></br>
+
+                <aura:if isTrue="{!v.showNewZuoraBilling}">
+            <c:strike_modal title="Create Case" primaryButtonLabel="{!$Label.c.XC_CL_OK}" secondaryButtonLabel="{!$Label.c.XC_CL_CancelButton}" showHeader="false"
+                showFooter="false" showClose="true" showModal="true">
+                <c:ZuoraBillingProfileCreation sobjecttype="Account" recordId="{!v.accountId}" />
+            </c:strike_modal>
+        </aura:if>
+						<c:strike_lookup 
+								label="{!$Label.c.XC_CL_BillingProfileLineItem}"
+								object="XC_BillingProfileLineItem__c"
+								value="{!v.BillingProfileLI}"
+                                subtitleField="XC_BillToAddressText__c"       
+								searchField="XC_BillingProfileName__c"
+								placeholder=""
+								order="Name"
+								limit="15"
+								searchingMessage="{!$Label.c.XC_CL_Loading}"
+								noResultsMessage=""
+								loadingMessage="{!$Label.c.XC_CL_Loading}"
+								errorMessage=""
+								filter="{!v.lookupFilter}"
+								required="true"
+								disabled = '{!v.disableIndemnification}'
+								/>
+								
+				<lightning:select aura:id="indemnificationReason" name="indemnificationReason" label="{!$Label.c.XC_CL_IndemnificationReason}" value="{!v.indemnificationReason}" onchange="{! c.checkNotBlank }" disabled="{!v.disableIndemnification}">
+					<aura:iteration var="idemnifReasonVar" items="{!v.indemnifReasonMap}">
+						<option value="{!idemnifReasonVar.value}" text="{!idemnifReasonVar.label}"></option>
+					</aura:iteration>
+				</lightning:select>
+				
+				<lightning:input type='number' name='amount' label='{!$Label.c.XC_CL_Amount}' value='{!v.amount}' disabled='{!v.disableAmount}'/>
+
+				<aura:if isTrue="{! v.showAutomaticApproval}">
+					<lightning:input  name='automaticApproval' label='{!$Label.c.XC_CL_AutomaticApproval}' value='{!v.automaticApproval}' disabled = "true"/>
+				</aura:if>
+			
+				<br></br>
+				<lightning:input type='toggle' name=' automatic_refund' label='{!$Label.c.XC_CL_AutomaticRefund}' checked='{!v.automatic_refund}' disabled = "{!v.disableIndemnification}" />
+
+				<lightning:input type='text' name='case_comments' label='{!$Label.c.XC_CL_CommentsForApprovals}' value='{!v.case_comments}' disabled = '{!v.disableIndemnification}' />
+
+			</lightning:card> 
+		
+			<div class="topborder" style="text-align:right">
+				<lightning:button variant="Neutral" label="{!$Label.c.XC_CL_Create_Billing_Profile}" onclick="{!c.showNewBilling}" />
+				<button type="button" class="slds-button slds-button_neutral" onclick="{!c.goback}">{!$Label.c.XC_CL_CancelButton}</button>
+				<lightning:button aura:id="sendbutton" name="btn1" disabled="{!v.disabledSend}" label="{!$Label.c.XC_CL_Send}" class="slds-button slds-button_brand" onclick="{!c.updateCase}" />
+				
+			</div>
+		</aura:if>
+
+		<aura:if isTrue="{!v.showSpinner}">
+    		<lightning:spinner alternativeText="{!$Label.c.XC_CL_Loading}" size="large" />
+		</aura:if>      
+
+	</div> 
+
+   
+</aura:component>

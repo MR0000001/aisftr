@@ -1,0 +1,47 @@
+<aura:component controller = "XC_LCC250_CreditCheckVerify"
+        implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasSObjectName,lightning:availableForFlowScreens,lightning:isUrlAddressable,force:hasRecordId,lightning:hasPageReference,force:lightningQuickActionWithoutHeader"
+                access="global" >
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:attribute name="showModal" type="boolean" default="false"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="spinnerControl" type="boolean" default="false"/>
+
+
+    <aura:if isTrue= "{!v.spinnerControl}">
+        <div aura:id="MainDiv" class="slds-modal__container">
+            <div class="slds-align_absolute-center slds-spinner--brand slds-spinner slds-spinner--medium slds-is-fixed" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+
+
+    <aura:if isTrue= "{!!v.spinnerControl}">
+    <div>
+        <header class="slds-modal__header">
+            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{!$Label.c.XC_CL_CreditCheckRequest}</h2>
+        </header>
+    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+        <p class="slds-m-top_x-small">{!$Label.c.XC_CL_CreditCheckConfirmation}</p>
+
+    </div>
+        <footer class="slds-modal__footer">
+            <lightning:button variant="neutral" label="{!$Label.c.XC_CL_Cancel}" title="Cancel"
+                              onclick="{! c.closeModal }" />
+
+
+            <lightning:button variant="brand" label="{!$Label.c.XC_CL_Submit}" title="Submit"
+                              disabled="{!v.disabledSubmit}" onclick="{! c.doInit }" />
+
+        </footer>
+    </div>
+    </aura:if>
+
+
+
+
+
+
+</aura:component>

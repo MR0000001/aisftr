@@ -1,0 +1,39 @@
+<!-- component -->
+<aura:component controller="XC_LCC045_WorkOrderEmailInTravel" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasSObjectName,lightning:availableForFlowScreens" access="global" >
+<!-- components attributes -->
+<aura:attribute name="recordId" type="String" required="true" default=''/>  
+<aura:attribute name="spinnerControl" type="Boolean" default="false"/> 
+<aura:attribute name="customerInteraction" type="Map" required="true" default = "  {    		
+                                              customerType : '',
+         									  workorderId : '',
+         									  skipComunication : false
+                                              }  " />
+<lightning:notificationsLibrary aura:id="notifLib"/>
+    
+
+     <aura:if isTrue="{!v.spinnerControl}" >
+     <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+        <lightning:spinner aura:id="mySpinner" />
+     </div>
+    </aura:if>
+    <aura:attribute name="delays" type="List" default="[
+    {'label': '15min', 'value': '15'},
+    {'label': '30min', 'value': '30'}
+    ]"/>
+    <aura:attribute name="delay" type="String" default="15"/>
+
+    <lightning:radioGroup aura:id="mydelay"
+                          name="mydelay"
+                          label="Radio Group"
+                          options="{! v.delays }"
+                          value="{! v.delay }"
+                          type="radio"/>
+    <br></br>
+    <lightning:buttonGroup>
+        <lightning:button label="Cancel" onclick="{! c.cancel}"/>
+        <lightning:button label="Ok" variant="brand"  onclick="{! c.init}"/>
+       
+    </lightning:buttonGroup>
+ 
+ 
+</aura:component>

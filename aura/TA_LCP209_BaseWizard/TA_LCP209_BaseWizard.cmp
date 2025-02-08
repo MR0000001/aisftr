@@ -1,0 +1,39 @@
+<aura:component extensible="true"
+    abstract="true"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global"
+    controller="TA_LCC209_BaseWizardCnt">
+
+    <aura:attribute access="public" name="communityBaseUrl" type="String" />
+    <aura:attribute access="public" name="userName" type="String" />
+    <aura:attribute access="public" name="userLanguage" type="String" />
+    <aura:attribute access="public" name="userPermissionSetName" type="String"/>
+    <aura:attribute access="public" name="processType" type="String"/>
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute name="isInitialized" type="Boolean" default="false"/>
+    <aura:attribute name="isSpinnerVisible" type="Boolean" default="false"/>
+    <aura:attribute name="customerCardBg" type="String" default=""/>
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}"
+                    scripts="{!$Resource.TA_SR_jQuery}"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}"/>
+    <aura:handler name="appointmentPreviewEvent" event="c:TA_LCE200_AppointmentPreviewEvt" action="{!c.handleCatchAppointmentPreviewEvt}"/>
+    <aura:handler name="toggleSpinnerEvent" event="c:TA_LCE213_StartSpinnerEvt" action="{!c.handleCatchToggleSpinnerEvt}"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isSpinnerVisible}">
+        <c:TA_LCP207_Spinner/>
+    </aura:if>
+
+    <aura:if isTrue="{!v.isInitialized}">
+        {!v.body}
+    </aura:if>
+</aura:component>

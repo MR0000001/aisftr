@@ -1,0 +1,7 @@
+<!--
+ - Created by dpalamides on 18/10/2019.
+ -->
+
+<aura:event type="COMPONENT" description="XC_LCE163_SaveConsents">
+    <aura:attribute name="consentsWrapper" type="Object"/>
+</aura:event>

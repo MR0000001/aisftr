@@ -1,0 +1,55 @@
+<aura:component 
+                controller="XC_UTIL_Environment"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable" access="global" >
+
+	<aura:attribute name="recordId" type="String" />
+	<aura:attribute name="parentRecordId" type="String" />
+	<aura:attribute name="recordTypeId" type="String"/>
+    <aura:attribute name="showComponent" type="Boolean" default="false"/>
+    <aura:attribute name="isCommunity" type="Boolean" default="false" />
+    <aura:attribute name="socialPersonaId" type="String" />
+	<!-- HANDLER -->
+	<aura:handler name="init" value="{!this}" action="{!c.init}" />
+	
+    
+    <aura:if isTrue="{!v.showComponent}">
+    	<c:XC_LCP000_RedirectLogicNewSobject 
+        	objectName="Lead" 
+			parentRecordId="{!v.parentRecordId}" 
+            recordId="{!v.recordId}" 
+            recordTypeId="{!v.recordTypeId}" 
+            isCommunity="{!v.isCommunity}"
+            socialPersonaId="{!v.socialPersonaId}" />
+    </aura:if>
+	<!--aura:attribute name="spinnerControl" type="Boolean" default="false" />
+	<aura:attribute name="userIdRetrieved" type="Boolean" default="false" />
+	<aura:attribute name="showCustomNewLead" type="Boolean" default="false" />
+	<aura:attribute name="isCustUser" type="Boolean" default="false" />
+	<aura:attribute name="name" type="String"/>
+    <aura:attribute name="surname" type="String"/>
+    <aura:attribute name="recordTypeId" type="String"/>
+    <aura:attribute name="currentUserId" type="String" />
+	<aura:attribute name="record" type="Object" description="The record object to be displayed"/>
+	<aura:attribute name="simpleRecord" type="Object" description="A simplified view record object to be displayed"/>
+	<aura:attribute name="recordError" type="String" description="An error message bound to force:recordData"/>
+
+	<aura:handler name="init" value="{!this}" action="{!c.init}" />
+	<aura:handler name="change" value="{!v.record}" action="{!c.verifyUser}" />
+	<aura:if isTrue="{!v.userIdRetrieved}" >
+		<force:recordData 	aura:id="record"
+    						layoutType="FULL"
+    						recordId="{!v.currentUserId}"
+    						targetError="{!v.recordError}"
+    						targetRecord="{!v.record}"
+    						targetFields ="{!v.simpleRecord}"
+    						mode="VIEW"/>
+    </aura:if>
+	<aura:if isTrue="{!v.spinnerControl}" >
+    	<lightning:spinner aura:id="mySpinner" />
+	</aura:if>
+
+	<aura:if isTrue="{!v.showCustomNewLead}" >
+			<c:XC_LCP002_NewLead recordTypeToReturn="{!v.recordTypeId}" />
+	</aura:if-->
+
+</aura:component>

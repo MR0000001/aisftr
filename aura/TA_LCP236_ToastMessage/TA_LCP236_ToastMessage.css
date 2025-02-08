@@ -1,0 +1,33 @@
+.THIS .ta-error-toast-text {
+    word-wrap: break-word;
+}
+/* .THIS.ta-error-toast {
+    width: 100vw;
+    background: rgb(255 0 110);
+    position: fixed;
+    left: 0;
+    top: 0px;
+    z-index: 9999;
+    box-shadow: 0 1vw 2vw rgba(0,0,0,0.5);
+}
+
+.THIS.ta-green-toast {
+    width: 100vw;
+    background: rgb(0, 201, 131);
+    position: fixed;
+    left: 0;
+    top: 0px;
+    z-index: 9999;
+    box-shadow: 0 1vw 2vw rgba(0,0,0,0.5);
+}
+
+.THIS .ta-error-toast-text {
+    color: white;
+    font-size: 3.3vw;
+    font-weight: 300;
+    text-align: left;
+}
+
+.THIS .ta-error-toast-icon {
+    width: 4vw;
+} */

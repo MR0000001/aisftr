@@ -1,0 +1,109 @@
+<aura:component controller="giic_LCC004_SendSap" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,force:hasSObjectName" access="global">
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="serialOk" type="Boolean" default="false"/>
+    <aura:attribute name="isForSpain" type="Boolean" default="false"/>
+    <aura:attribute name="permitSave" type="Boolean" default="true"/>
+    <aura:attribute name="showLineComponent005" type="Boolean" default="false"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="forSearch" type="Boolean" default="false"/>
+    <aura:attribute name="purchaseOrderLineId" type="String" />
+    
+    <aura:attribute name="organizationDataOK" type="Boolean" default="true"/>
+    <aura:attribute name="companyCode" type="String" />  
+    <aura:attribute name="purchasesGroup" type="String" />  
+    
+    <aura:attribute name="purchasingOrganization" type="String" />
+    
+    <aura:attribute name="purchasesOrganizationOptions" type="List" />
+    <aura:attribute name="definitionOfPurchasesGroup" type="String" />
+    <aura:attribute name="organizationOfPurchases" type="String" />
+    <aura:attribute name="division" type="String" /> 
+    <aura:attribute name="applicantUnit" type="String" /> 
+    <aura:attribute name="definitionOfPurchasesGroupOptions" type="List" />   
+    <aura:attribute name="definitionOfPurchasesOrganizationOptions" type="List" /> 
+    <aura:attribute name="purchaseGroupToDefinition" type="List" /> 
+    <aura:attribute name="purchaseOrgToOrgDefinition" type="List" />
+    <aura:attribute name="purchasesGroupOptions" type="List" />
+     
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" /> 
+    <div class="c-container">
+    <div class="slds-box slds-theme_shade">
+    <div class="slds-text-heading_large">
+         <lightning:icon iconName="standard:text_template" alternativeText="Approved" />&nbsp;
+        
+        <b> Manage fields to send to Sap</b>
+            </div>
+ </div> 
+    <lightning:layout multipleRows="true">
+             <aura:if isTrue="{!v.showSpinner}">
+       				 <lightning:spinner aura:id="mySpinner" />
+   				   </aura:if>
+            <lightning:layoutItem size="12" padding="around-small" >
+                       <lightning:input name="ser" disabled="true"  label="Company Code" value="{!v.companyCode}" />
+            </lightning:layoutItem>
+        <lightning:layoutItem size="6" padding="around-small">
+                 <lightning:combobox name="ser" disabled="{!v.serialOk}" value="{! v.purchasesGroup}" placeholder="Select a group"
+							options="{! v.purchasesGroupOptions }" onchange="{!c.changeGroup }"  label="Purchasing group" />
+            </lightning:layoutItem>
+          <lightning:layoutItem size="6" padding="around-small">
+                 <lightning:combobox name="ser" disabled="{!v.serialOk}" value="{! v.purchasingOrganization}" 
+							options="{! v.purchasesOrganizationOptions }" onchange="{!c.changeOrganization }"  label="Purchasing Organization" />
+            </lightning:layoutItem>
+          <!--
+        <lightning:layoutItem size="6" padding="around-small" >
+                 <lightning:combobox name="ser" disabled="true"  value="{! v.definitionOfPurchasesGroup }" 
+					options="{! v.definitionOfPurchasesGroupOptions }"  label="Definition of Purchases group" />
+            </lightning:layoutItem>
+      
+        <lightning:layoutItem size="6" padding="around-small">
+                 <lightning:input name="ser" disabled="{!v.serialOk}"  label="Organization of purchases" />
+            </lightning:layoutItem>
+        <lightning:layoutItem size="6" padding="around-small">
+                 <lightning:input name="ser" disabled="{!v.serialOk}"  label="Applicant Unit" />
+            </lightning:layoutItem>
+        <lightning:layoutItem size="6" padding="around-small">
+                 <lightning:input name="ser" disabled="{!v.serialOk}"  label="Division" />
+            </lightning:layoutItem>
+        -->
+        
+        
+        <lightning:layoutItem size="10" padding="around-small" ><br></br>
+               <lightning:button variant="brand" 
+                              label="Show Purchase Order Lines"
+                              title="save"
+                              iconName="utility:list"
+                              iconPosition="right"
+                              disabled="{!v.organizationDataOK}"
+                              onclick="{!c.openLines}"/> 
+            
+        </lightning:layoutItem>
+         <lightning:layoutItem size="2" padding="around-small">
+             <div class="strad">
+             
+              <lightning:button variant="neutral"   
+                              label="Close Modal"
+                              title="Close"
+                              onclick="{! c.closeModal }"/>
+            
+           
+     
+                 </div>
+       
+        </lightning:layoutItem>
+            
+           </lightning:layout>
+        
+        <aura:if isTrue="{!v.showLineComponent005}">
+
+        	<c:Giic_LCP005_POLine recordId="{!v.recordId}"  isForSpain="{!v.isForSpain}">        </c:Giic_LCP005_POLine>
+        </aura:if>
+        
+       
+        </div>
+     
+    
+    
+</aura:component>

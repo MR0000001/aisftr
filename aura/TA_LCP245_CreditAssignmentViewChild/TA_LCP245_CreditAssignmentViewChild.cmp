@@ -1,0 +1,164 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global">
+
+    <ltng:require styles="{!join(',',
+                          $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                          $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                          $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:attribute name="incentiveItem" type="Object" />
+    <aura:attribute name="generalAttributes" type="Object" />
+    <aura:attribute name="orderStatus" type="String" />
+    <aura:attribute name="isFromCTI" type="Boolean" default="false" />
+    <aura:attribute name="showAdditionalFields" type="Boolean" default="false" />
+    <aura:attribute name="allowFieldPropagation" type="Boolean" default="true"/>
+
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt" />
+    <aura:registerEvent name="XC_LCE021_CreditTransferDataEvent" type="c:XC_LCE021_CreditTransferDataEvent"/>
+
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+    <!--<lightning:card class="slds-card_boundary slds-p-around_small" variant="narrow" iconName="utility:money"
+        title="{!v.incentiveItem.incentiveItemName}" style="background-color: transparent !important;">-->
+        <div style="background-color: transparent !important;">
+            <lightning:layoutItem size="12">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="10">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12" >
+                                    <h3 class="ta-color-white">{!v.incentiveItem.incentiveItemName}</h3>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="2">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.generalAttributes.iconName}" class="slds-float_right ta-accordion-header-icon" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+        
+        <lightning:recordViewForm recordId="{!v.recordId}" objectApiName="NE__OrderItem__c">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="12" class="slds-m-top_medium">
+                    <lightning:input label="{!$Label.c.XC_CL_LCP183_MainProductField}" value="{!v.incentiveItem.bundleProdName}" disabled="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-m-top_medium">
+                    <lightning:input label="{!$Label.c.XC_CL_LCP183_BundleTotalField}" type="number" value="{!v.incentiveItem.totalBundleAmount}" disabled="true" formatter="currency"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-m-top_medium">
+                    <lightning:outputField fieldName="XC_CreditAssignmentAmount__c"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-m-top_medium">
+                    <lightning:outputField fieldName="XC_CreditAssignmentCustomerAmount__c"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-m-top_medium">
+                    <lightning:outputField fieldName="XC_CreditAssignmentAvailable__c"/>
+                </lightning:layoutItem>
+                
+                <aura:if isTrue="{!v.incentiveItem.creditAssignmentSurveyTaken}">
+                    <lightning:layoutItem size="12" class="slds-m-top_medium">
+                        <lightning:icon class="slds-float_left" iconName="utility:success" alternativeText="Success!" variant="Success"
+                        title="success variant" size="x-small" />
+                        <p class="ta-color-white slds-float_left slds-m-left_x-small"> {!$Label.c.XC_CL_LCP183_SurveyAlreadyTaken} </p>
+                    </lightning:layoutItem>
+                    <!-- CHECK ON ADDITIONAL FIELDS -->
+                    <aura:if isTrue="{!v.incentiveItem.hasAdditionalFieldsFilled}">
+                        <lightning:layoutItem size="12" class="slds-m-top_medium">
+                            <lightning:icon class="slds-float_left" iconName="utility:success" alternativeText="Success!" variant="Success"
+                            title="success variant" size="x-small" onclick="{!c.openFieldsModal}"/>
+                            <p class="ta-color-white slds-float_left slds-m-left_x-small"> {!$Label.c.XC_CL_LCP183FillOtherFieldsSuccess} </p>
+                        </lightning:layoutItem>
+                        
+                        <aura:set attribute="else">
+                            <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                <div class="ta-button-simple" onclick="{!c.openFieldsModal}">{!$Label.c.XC_CL_LCP183FillOtherFIelds}</div>
+                            </lightning:layoutItem>
+                        </aura:set>
+                    </aura:if>
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{!and(or(v.orderStatus == 'In Progress',v.orderStatus == 'Draft'), not(v.incentiveItem.hasContract),not(v.isFromCTI))}">
+                            <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                <div class="ta-button-simple" onclick="{!c.goToSurvey}"> {!$Label.c.XC_CL_LCP183_GoToSurvey} </div>
+                            </lightning:layoutItem>
+                            
+                            <aura:set attribute="else">
+                                <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                    <p class="ta-color-white"> {!$Label.c.XC_LCP183_NoSurveyInThisStatus} </p>
+                                </lightning:layoutItem>   
+                            </aura:set>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+            </lightning:layout>
+        </lightning:recordViewForm>
+    <!--</lightning:card>-->
+    </div>
+
+
+    <!-- MODAL COMPONENT FOR ADDITIONAL FIELDS -->
+    <aura:if isTrue="{!v.showAdditionalFields}">
+        <lightning:layout multipleRows="true" class="ta-modal-bg">
+            <lightning:layoutItem size="12" class="ta-modal-container">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="10" class="ta-modal-header-title-purple slds-text-align_left"> Credit Assignment Additional Infos </lightning:layoutItem> 
+                    <lightning:layoutItem size="2" class="slds-text-align_right slds-m-bottom_large">
+                        <img src="{!$Resource.TA_Icons + '/xc-icons/close.svg'}" onclick="{!c.handleCancel}" class="ta-icon-close" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" class="ta-modal-body">
+                        <lightning:recordEditForm objectApiName="NE__OrderItem__c" 
+                                                  recordId="{!v.incentiveItem.recordId}"
+                                                  onsuccess="{!c.handleOiFormSuccess}"
+                                                  onsubmit="{!c.handleSubmit}"
+                                                  onerror="{!c.handleError}">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12">
+                                    <lightning:input  value="{!v.incentiveItem.incentiveItemName}" disabled="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <lightning:input label="{!$Label.c.XC_CL_LCP183_MainProductField}"
+                                        value="{!v.incentiveItem.bundleProdName}" disabled="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <lightning:inputField aura:id="cityCode" fieldName="XC_CityCode__c" required="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <lightning:inputField aura:id="urbanSection" fieldName="XC_UrbanSection__c" required="false" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <lightning:inputField aura:id="subordinate" fieldName="XC_Subordinate__c" required="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <lightning:inputField aura:id="houseType" fieldName="XC_HouseType__c" required="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <lightning:inputField aura:id="particle" fieldName="XC_Particle__c" required="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <lightning:inputField aura:id="sheet" fieldName="XC_Sheet__c" required="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <lightning:input type="checkbox" checked="{!v.allowFieldPropagation}" label="{!$Label.c.XC_CL_LCP183_CheckBoxLabel}"/>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+
+                            <lightning:layout multipleRows="true" class="slds-p-bottom_medium">
+                                <lightning:layoutItem size="6" class="slds-text-align_left slds-p-right_small">
+                                    <lightning:button class="ta-button-closing slds-m-top_medium" label="{!$Label.c.TA_Cancel}" onclick="{!c.handleCancel}"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="6" class="slds-text-align_right slds-p-left_small">
+                                    <lightning:button class="slds-m-top_medium" type="submit" name="insert" label="{!$Label.c.TA_Save}" />
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:recordEditForm>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </aura:if>
+
+</aura:component>

@@ -1,0 +1,70 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:isUrlAddressable" access="global" controller="XC_LCC269_LOACreation">
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="formLoaded" type="Boolean" />
+    <aura:attribute name="loading" type="Boolean" default="true"/>
+    <aura:attribute name="options" type="List" default="[]"/>
+    <aura:attribute name="pageReference" type="Object"/>
+    
+    <!--<aura:handler name="init" value="{!this}" action="{!c.doInit}" />-->
+    <lightning:navigation aura:id="navService"/>
+    <aura:html tag="style">
+        .cuf-content {
+        padding: 0 0rem !important;
+        }
+        .slds-p-around--medium {
+        padding: 0rem !important;
+        }
+        .slds-modal__content{
+        height:unset !important;
+        max-height:unset !important;
+        }
+    </aura:html>
+    <div class="slds-col modal-header slds-modal__header">
+        <h2 class="title slds-text-heading--medium">{!$Label.c.XC_CL_LCP269_QuickActionName}</h2>
+    </div>
+    <aura:if isTrue="{!v.loading}">
+        <lightning:spinner alternativeText="Loading" size="medium" />
+    </aura:if>
+    <div class="slds-col modal-body scrollable slds-p-around--medium" style="height: 400px; max-height: 400px; overflow-y: auto !important;">
+        <lightning:recordEditForm aura:id="contractForm" objectApiName="Contract" onload="{!c.doInit}" onsuccess="{!c.handleSuccess}" onerror="{!c.handleError}">
+            <lightning:messages aura:id="message"/>
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem padding="around-small" size="6">
+                    <lightning:inputField aura:id="accountId" fieldName="AccountId" disabled="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="6"> 
+                    <lightning:inputField aura:id="contactId" fieldName="XC_Primary_Contact__c" disabled="true"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="6"> 
+                    <lightning:inputField aura:id="utilityId" fieldName="XC_Utility_Account__c" required="true" onchange="{!c.getServiceAccounts}" />
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="6"> 
+                    <lightning:inputField aura:id="loaStartDate" fieldName="XC_LOA_Start_Date__c" />
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="6"> 
+                    <lightning:inputField aura:id="loaValidity" fieldName="XC_LOA_Validity__c" />
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="6"> 
+                    <lightning:inputField aura:id="loaTemplate" fieldName="XC_LOA_Template__c" disabled="true"/>
+                </lightning:layoutItem>
+                <aura:if isTrue="{!v.formLoaded}">
+                    <lightning:layoutItem padding="around-small" size="12">
+                        <lightning:dualListbox aura:id="dualbox"
+                                               name="languages"
+                                               label= "{!$Label.c.XC_CL_LCP269_DualBoxLabel}"
+                                               sourceLabel="{!$Label.c.XC_CL_LCP269_DualBoxAvailable}"
+                                               selectedLabel="{!$Label.c.XC_CL_LCP269_DualBoxSelected}"
+                                               required="true"
+                                               fieldLevelHelp="{!$Label.c.XC_CL_LCP269_DualBoxHelpMsg}"
+                                               options="{!v.options}"
+                                               class="slds-p-left_x-small"/>
+                    </lightning:layoutItem>
+                </aura:if>
+            </lightning:layout>
+        </lightning:recordEditForm>
+    </div>
+    <div class="slds-col modal-footer slds-modal__footer">        
+        <lightning:button variant="neutral" label="Cancel" onclick="{! c.cancelClick }" />      
+        <lightning:button variant="brand" label="Save" onclick="{! c.saveClick }" />
+    </div>
+</aura:component>

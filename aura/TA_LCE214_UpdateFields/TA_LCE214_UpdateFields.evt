@@ -1,0 +1,7 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="cmpName" type="String"/>
+    <aura:attribute name="objectName" type="String"/>
+    <aura:attribute name="objectLookup" type="String"/>
+    <aura:attribute name="whereCondition" type="String"/>
+    <aura:attribute name="fields" type="List"/>    
+</aura:event>

@@ -1,0 +1,90 @@
+<!--
+ * @author Marco Rosa - marco.rosa@nttdata.com & Nicolò Leonardi - nleonardi@deloitte.it
+ * @date Creation  09/10/2018
+ * @date Modification 25/10/2019 - Salvatore Agrillo - salvatore.agrillo@nttdata.com
+ * @description XC_LCP000_RedirectLogicNewSobject – Component to redirect Login "New Sobject"
+-->
+
+<aura:component controller="XC_LCC000_RedirectLogicNewSobject" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference" 
+                access="global">
+                
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+    <aura:attribute name="userIdRetrieved" type="Boolean" default="false" />
+    <aura:attribute name="showCustomNew" type="Boolean" default="false" />
+    <aura:attribute name="isCustUser" type="Boolean" default="false" />
+    <aura:attribute name="legalEntityValue" type="String" default=""/>
+    <aura:attribute name="name" type="String"/>
+    <aura:attribute name="surname" type="String"/>
+    <aura:attribute name="recordTypeId" type="String"/>
+    <aura:attribute name="currentUserId" type="String" />
+    <aura:attribute name="record" type="Object" description="The record object to be displayed"/>
+    <aura:attribute name="simpleRecord" type="Object" description="A simplified view record object to be displayed"/>
+    <aura:attribute name="recordError" type="String" description="An error message bound to force:recordData"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="parentRecordId" type="String" />
+    <aura:attribute name="showBodyControl" type="Boolean" default="false" />
+    <aura:attribute name="isCommunity" type="Boolean" default="false" />
+    <aura:attribute name="fromContact" type="Boolean" default="false" />
+    <aura:attribute name="objectName" type="String" description="Name of sObject"/>
+    <aura:attribute name="objectPrefix" type="String" description="Prefix of sObject"/>
+    <aura:attribute name="contactId" type="String" />
+    <aura:attribute name="accountId" type="String" />
+    <aura:attribute name="workOrderId" type="String" />
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="serviceId" type="String" default=""/> <!--cr 763-->
+    <aura:attribute name="catalogCategory" type="String" />
+    <aura:attribute name="description" type="String" />
+    <aura:attribute name="modelValue" type="String" />  
+    <aura:attribute name="catalog" type="String" />
+    <aura:attribute name="podId" type="String" />
+    <aura:attribute name="stageName" type="String" />
+    <aura:attribute name="closeDate" type="Date" />
+    <aura:attribute name="receivingChannel" type="String" />
+    <aura:attribute name="socialPersonaId" type="String" />
+    <aura:attribute name="addressId" type="String" />
+    <aura:attribute name="addressIdResidential" type="String" />
+    <aura:attribute name="productCategory" type="String" />
+    <aura:attribute name="segmentOp" type="String" />   <!--VDB 15032002 CR758-->
+    <aura:attribute name="legalEntityUser" type="String" default=""/><!--VDB 17032002 CR758-->
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <lightning:navigation aura:id="navService"/> 
+    <lightning:workspaceAPI aura:id="workspace" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler name="change" value="{!v.record}" action="{!c.verifyUser}" />
+    <aura:handler name="change" value="{!v.recordTypeId}" action="{!c.showBody}" />
+    
+    <aura:if isTrue="{!v.userIdRetrieved}" >
+        <force:recordData aura:id="record"
+                          fields="XC_X_Customer_User__c"
+                          layoutType="FULL"
+                          recordId="{!v.currentUserId}"
+                          targetError="{!v.recordError}"
+                          targetRecord="{!v.record}"
+                          targetFields ="{!v.simpleRecord}"
+                          mode="VIEW"/>
+    </aura:if>
+
+    <aura:if isTrue="{!v.spinnerControl}">
+        <lightning:spinner aura:id="mySpinner"/>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showCustomNew}">
+        <aura:if isTrue="{!v.objectName == 'Lead'}"> 
+            <aura:if isTrue="{!!v.isCommunity}">
+                <c:XC_LCP002_NewLead recordTypeToReturn="{!v.recordTypeId}" parentRecordId="{!v.parentRecordId}" recordId="{!v.recordId}" socialPersonaId="{!v.socialPersonaId}"/>
+            <aura:set attribute="else">
+                <c:XC_LCP028_CreateOppFromContact objectType="Lead" objectName="{!$Label.c.XC_CL_LeadLabel}" isCommunity="{!v.isCommunity}"  />
+            </aura:set></aura:if>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.objectName == 'Account'}" > 
+            <aura:if isTrue="{!!v.isCommunity}" >
+                <c:XC_LCP003_NewAccountWrapper recordTypeToReturn="{!v.recordTypeId}" recordId="{!v.recordId}"/>
+            <aura:set attribute="else">
+                <c:XC_LCP028_CreateOppFromContact objectType="Account" objectName="{!$Label.c.XC_CL_AccountLabel}" isCommunity="{!v.isCommunity}"  />
+            </aura:set></aura:if>
+        </aura:if>             
+    </aura:if>
+    
+</aura:component>

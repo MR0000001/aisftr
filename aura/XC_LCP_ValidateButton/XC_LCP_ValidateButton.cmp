@@ -1,0 +1,11 @@
+<aura:component controller="XC_LCC_ValidateButton" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasSObjectName,lightning:availableForFlowScreens" access="global">
+    
+    <aura:attribute access="public" name="recordId" type="String" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+	<!--<div class="slds-align_absolute-center" style="position: relative; height: 200px; background-color: rgba(255, 255, 255, 0)">
+        <lightning:spinner aura:id="mySpinner" alternativeText="Loading" size="medium" />
+    </div>-->
+    
+</aura:component>

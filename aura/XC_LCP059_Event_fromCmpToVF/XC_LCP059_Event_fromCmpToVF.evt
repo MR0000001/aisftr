@@ -1,0 +1,8 @@
+<aura:event type="APPLICATION" description="Event template">
+	<aura:attribute name="paymentMethodType" type="String"/>
+    <aura:attribute name="account" type="Account"/>
+    <aura:attribute name="billingContact" type="Contact"/>
+    <aura:attribute name="soldContact" type="Contact"/>
+    <aura:attribute name="country" type="String"/>
+    <aura:attribute name="modalMessage" type="String"/>
+</aura:event>

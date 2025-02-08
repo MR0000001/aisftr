@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="returnValue"      type="Boolean" default="false"/>
+    <aura:attribute name="checkMap" type="Map"/>
+    <aura:attribute name="valueModified" type="Boolean" default="false"/>
+
+</aura:event>

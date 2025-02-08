@@ -1,0 +1,89 @@
+.layoutstyle {
+        padding-right: 1%;
+        padding-bottom: 1%;
+}
+.mycard {
+        box-shadow: 0px 0px 20px 5px #899aa3;
+        border-radius: var(--lwc-borderRadiusMedium,0.25rem); 
+}
+.classOperationOver {
+        padding: 25px !important;
+        text-align: center !important;
+        border-radius: var(--lwc-borderRadiusMedium,0.25rem);
+        border: var(--lwc-borderWidthThin,1px) solid var(--lwc-colorBorder,rgb(221, 219, 218));
+        margin: 15px !important;
+        background-color: #c2d0e2 !important;
+}
+
+.classOperation {
+        padding: 25px !important;
+        text-align: center !important;
+        border-radius: var(--lwc-borderRadiusMedium,0.25rem);
+        border: var(--lwc-borderWidthThin,1px) solid var(--lwc-colorBorder,rgb(221, 219, 218));
+        margin: 15px !important;
+    }
+.classToggle {
+        padding-top: 10px;
+}
+
+     .classOperationText {
+        padding-top: 10px;
+    }
+
+    .modalBody {
+        position: relative !important;   
+    }
+
+    .createUserModal {
+        overflow: initial !important; 
+        overflow-y: initial !important;
+    }
+
+    @media (width: 48em){
+        .THIS .slds-form-element{
+                padding-left: 0px !important;
+        }
+    }
+    .togglePaddingClass{
+        padding-left: 0px !important;
+    }
+
+    customCheckbox{
+        width: 13px;
+        height: 13px;
+        padding: 0;
+        margin:0;
+        vertical-align: bottom;
+        position: relative;
+        top: -1px;
+        *overflow: hidden;
+     }
+
+     .THIS.slds-readonly-path{
+        pointer-events: none;
+    }
+
+    .my-icon {
+        --sds-c-icon-color-background: rgb(255, 255, 255);
+    }
+
+    .formattedText {
+        text-align: center !important;
+        font-size: 25px !important;
+    }
+
+    .successDiv {
+        display: flex;
+        align-items: center;
+        padding-left: 61%;
+        padding-top: 6px;
+    }
+    .successDivText {
+        display: flex;
+        align-items: center;
+        padding-left: 50%;
+    }
+
+    .noPointClick{
+        pointer-events:none;
+    }

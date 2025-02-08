@@ -1,0 +1,56 @@
+<aura:component controller="XC_LCC241_SendPEC" implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:isUrlAddressable,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasSObjectName,lightning:availableForFlowScreens" access="global" > >
+	<aura:attribute name="recordId" type="String" />    
+    <aura:attribute name="partner" type="String" />   
+    <aura:attribute name="pec" type="String" />   
+    <aura:attribute name="sap" type="String" />   
+    <aura:attribute name="summary" type="String" />   
+    <aura:attribute name="workorder" type="String" /> 
+    <aura:attribute name="customer" type="String" />   
+    <aura:attribute name="inspectionDate" type="String" />   
+    <aura:attribute name="inspectionLocation" type="String" />    
+    <aura:attribute name="legalEntity" type="String" />    
+    <aura:attribute name="nocheck" type="Boolean" />   
+    <aura:attribute name="canSend" type="Boolean" />   
+    <aura:handler name="init" value="{! this }" action="{!c.doInit}" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+
+    <aura:if isTrue="{!v.nocheck}">
+        <ui:message title="Error" severity="error" closable="false">
+            No checklist present
+        </ui:message>
+    </aura:if>
+
+    <aura:if isTrue="{!!v.nocheck}">
+        <lightning:card variant="Narrow" >
+            <aura:set attribute="footer">
+                <br></br>
+            </aura:set>
+        </lightning:card>
+
+        <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner variant="brand" size="large" alternativeText="Loading" style="background-color: rgba(0, 0, 0, 0)"/>
+        </aura:if>
+
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                <lightning:input label="Partner's name:" aura:id="partner" value="{!v.partner}" variant="" disabled="true"/>
+                <lightning:input type="email" label="PEC:" aura:id="pec" value="{!v.pec}" variant="" required="true" />
+                <lightning:input label="SAP Contract Number:" aura:id="sap" value="{!v.sap}" variant="" disabled="true"/>
+                <lightning:textarea label="Summary:" aura:id="summary" value="{!v.summary}" variant="" />
+            </lightning:layoutItem>
+            
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                <lightning:input label="Work Order:" aura:id="workorder" value="{!v.workorder}" variant="" disabled="true"/>
+                <lightning:input label="Customer:" aura:id="customer" value="{!v.customer}" variant="" disabled="true"/>
+                <lightning:input label="Inspection Date:" aura:id="inspectionDate" value="{!v.inspectionDate}" variant="" disabled="true" />
+                <lightning:input label="Inspection Location:" aura:id="inspectionLocation" value="{!v.inspectionLocation}" variant="" disabled="true" />
+            </lightning:layoutItem>
+        </lightning:layout >
+
+        <lightning:layout horizontalAlign="end">
+            <lightning:button aura:id="send" label="{!$Label.c.XC_CL_Send}" onclick="{!c.send}" disabled="{!!v.canSend}"/>	
+        </lightning:layout>
+    </aura:if>
+    
+
+</aura:component>

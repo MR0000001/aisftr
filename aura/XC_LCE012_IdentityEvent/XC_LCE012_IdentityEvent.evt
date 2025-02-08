@@ -1,0 +1,10 @@
+<!--
+* @author Monica Cutillo
+* @date Creation 08/10/2018
+* @date Modification dd/mm/yyyy
+* @description XC_LCE012_IdentityEvent - Event to identify who fire it and do something
+-->
+<aura:event type="APPLICATION" description="Event template" >
+	<aura:attribute name="message"   type="String"/>
+	<aura:attribute name="isWaiting" type="Boolean"/>
+</aura:event>

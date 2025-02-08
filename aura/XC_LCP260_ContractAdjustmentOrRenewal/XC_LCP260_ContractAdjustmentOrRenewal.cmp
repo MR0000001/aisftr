@@ -1,0 +1,19 @@
+<!--
+  @File Name          : XC_LCP260_ContractAdjustmentOrRenewal.cmp
+  @Description        : Parent container for Contract Adjustment and Contract Renewal
+  @Author             : Luca Calicchio - lcalicchio@deloitte.it
+  @Group              : 
+  @Last Modified By   : 
+  @Last Modified On   : 
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    11/10/2021   Luca Calicchio               Initial Version
+-->
+<aura:component>
+    <aura:attribute name="showMyself" type="Boolean" /><!-- To tell parent to show/hide this component -->
+    <aura:attribute name="showNext258" type="Boolean" /><!-- To tell parent to show/hide next wizard component Contract renewal -->
+    <aura:attribute name="showNext263" type="Boolean" /><!-- To tell parent to show/hide next wizard component Contract adjustment-->
+    <c:XC_LCP261_ContractAdjustment showMyself="{!v.showMyself}" showNext="{!v.showNext263}">
+    </c:XC_LCP261_ContractAdjustment>
+    <c:XC_LCP262_ContractRenewal showMyself="{!v.showMyself}" showNext="{!v.showNext258}"></c:XC_LCP262_ContractRenewal>
+</aura:component>

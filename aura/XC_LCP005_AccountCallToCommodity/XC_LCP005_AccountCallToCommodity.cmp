@@ -1,0 +1,357 @@
+<!--
+* @author Nicolò Leonardi - nleonardi@deloitte.it & Marco Rosa - marco.rosa@nttdata.com
+* @date Creation 12/09/2018
+* @date Modification 2019 by Monica Cutillo - monica.cutillo@nttdata.com
+* @description XC_LCP005_AccountCallToCommodity – STUB Component to call Commodity System to retrieve account Data
+-->
+<aura:component controller="XC_LCC005_AccountCallToCommodity"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference"
+    access="global">
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="resultList" type="Object[]" />
+    <aura:attribute name="commodityAccData" type="Object" />
+    <aura:attribute name="caseCommodityObj" type="Object" />
+    <aura:attribute name="contractCommodityObj" type="Object" />
+    <aura:attribute name="invoiceCommodityObj" type="Object" />
+    <aura:attribute name="legalEntity" type="Object[]" />
+    <aura:attribute name="accIndex" type="String" />
+    <aura:attribute name="mainTitle" type="String" />
+    <aura:attribute name="sobjecttype" type="String" />
+    <aura:attribute name="body0" type="Object[]" />
+    <aura:attribute name="bodyCard" type="Object[]" />
+    <aura:attribute name="contactSectionBody" type="Object[]" />
+    <aura:attribute name="contactBody" type="Object[]" />
+    <aura:attribute name="leData0" type="Object[]" />
+    <aura:attribute name="leData1" type="Object[]" />
+    <aura:attribute name="leData2" type="Object[]" />
+    <aura:attribute name="leData3" type="Object[]" />
+    <aura:attribute name="billProfSectionBody" type="Object[]" />
+    <aura:attribute name="billProfBody" type="Object[]" />
+    <aura:attribute name="addressSectionBody" type="Object[]" />
+    <aura:attribute name="addressData" type="Object[]" />
+    <aura:attribute name="podSectionBody" type="Object[]" />
+    <aura:attribute name="podData0" type="Object[]" />
+    <aura:attribute name="podData1" type="Object[]" />
+    <aura:attribute name="podData2" type="Object[]" />
+    <aura:attribute name="podData3" type="Object[]" />
+    <aura:attribute name="podData4" type="Object[]" />
+    <aura:attribute name="podData5" type="Object[]" />
+    <aura:attribute name="podData6" type="Object[]" />
+    <aura:attribute name="podData7" type="Object[]" />
+    <aura:attribute name="podData8" type="Object[]" />
+    <aura:attribute name="podData9" type="Object[]" />
+    <aura:attribute name="podData10" type="Object[]" />
+    <aura:attribute name="casesSectionBody" type="Object[]" />
+    <aura:attribute name="casesData" type="Object[]" />
+    <aura:attribute name="contractsSectionBody" type="Object[]" />
+    <aura:attribute name="contractsData" type="Object[]" />
+    <aura:attribute name="invoicesSectionBody" type="Object[]" />
+    <aura:attribute name="invoicesData" type="Object[]" />
+    <aura:attribute name="showModal" type="Boolean" default="false" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+    <aura:attribute name="IdFromMobile" type="String" />
+    <aura:attribute name="activeSections" type="List" default="['A']" />
+    <lightning:notificationsLibrary aura:id="notifLib" />
+    <aura:attribute name="AccountType" type="String" />
+    <aura:attribute name="accountDocCountry" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <!--<aura:handler event="c:XC_LCE014_SaveSectionValue" action="{!c.handleSaveSectionEvent}" />-->
+
+    <!--<ui:scrollerWrapper class="scrollerSize">-->
+    <!--div id="cardBodyDiv"-->
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" /> 
+
+    <lightning:accordion allowMultipleSectionsOpen="true" activeSectionName="{! v.activeSections }">
+        <lightning:accordionSection name="A" label="{!$Label.c.XC_CL_AccountData}">
+            <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+
+                <div class="div">
+                    <div class="slds-box slds-box_x-small"
+                        style="margin:10px; border-color:lightgrey; background-color:white; border-radius:15px; ">
+                        <aura:if isTrue="{!v.resultList[0].fieldValue == 'Residential'}">
+                            <aura:if isTrue="{!v.sobjecttype == 'Account'}">
+                                <div class="slds-box slds-box_xx-small" style="margin:10px; border-color:transparent;">
+                                    <lightning:layout horizontalAlign="space" verticalAlign="start" multipleRows="true">
+                                        <lightning:layoutItem flexibility="auto" size="4" alignmentBump="top">
+                                            <ui:inputText label="{!v.resultList[0].fieldLabel}" class="field"
+                                                value="{!v.resultList[0].fieldValue}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" alignmentBump="top">
+
+                                            <lightning:button label="{!$Label.c.XC_CL_SaveButton}" class="hide" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" size="4" alignmentBump="top">
+                                            <ui:inputText label="{!v.resultList[1].fieldLabel}" class="field"
+                                                value="{!v.resultList[1].fieldValue}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" alignmentBump="top">
+                                            <lightning:button label="{!$Label.c.XC_CL_SaveButton}" class="hide" />
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </div>
+
+                                <div class="slds-box slds-box_xx-small" style="margin:10px; border-color:lightgrey;  border-radius:15px; ">
+                                    <lightning:layout horizontalAlign="space" verticalAlign="start" multipleRows="true">
+                                        <lightning:layoutItem flexibility="auto" size="4" alignmentBump="top">
+                                            <ui:inputText label="{!v.resultList[2].fieldLabel}" class="field"
+                                                value="{!v.resultList[2].fieldValue}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" alignmentBump="top">
+                                            <lightning:button label="{!$Label.c.XC_CL_SaveButton}" class="hide" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" size="4" alignmentBump="top">
+                                            <ui:inputText label="{!v.resultList[3].fieldLabel}" class="field"
+                                                value="{!v.resultList[3].fieldValue}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" alignmentBump="top">
+                                            <ui:button label="{!$Label.c.XC_CL_SaveButton}" press="{!c.saveNameAndSurname}" />
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </div>
+                                <div class="slds-box slds-box_xx-small" style="margin:10px; border-color:lightgrey;  border-radius:15px; ">
+                                    <lightning:layout horizontalAlign="space" verticalAlign="start" multipleRows="true">
+                                        <lightning:layoutItem flexibility="auto" size="4" alignmentBump="top">
+                                            <ui:inputText label="{!v.resultList[4].fieldLabel}" class="field"
+                                                value="{!v.resultList[4].fieldValue}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" alignmentBump="top">
+
+                                            <lightning:button label="{!$Label.c.XC_CL_SaveButton}" class="hide" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" size="4" alignmentBump="top">
+
+
+                                            <ui:inputText label="{!v.resultList[5].fieldLabel}" class="field"
+                                                value="{!v.resultList[5].fieldValue}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" alignmentBump="top">
+
+                                            <ui:button label="{!$Label.c.XC_CL_SaveButton}" press="{!c.savePrimaryPhoneHandler}" />
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </div>
+                                <div class="slds-box slds-box_xx-small" style="margin:10px; border-color:lightgrey;  border-radius:15px; ">
+                                    <lightning:layout horizontalAlign="space" verticalAlign="start" multipleRows="true">
+
+                                        <lightning:layoutItem flexibility="auto" size="4" alignmentBump="top">
+
+
+                                            <ui:inputText label="{!v.resultList[6].fieldLabel}" class="field"
+                                                value="{!v.resultList[6].fieldValue}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" alignmentBump="top">
+
+                                            <lightning:button label="{!$Label.c.XC_CL_SaveButton}" class="hide" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" size="4" alignmentBump="top">
+
+
+                                            <ui:inputText label="{!v.resultList[7].fieldLabel}" class="field"
+                                                value="{!v.resultList[7].fieldValue}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" alignmentBump="top">
+
+                                            <ui:button label="{!$Label.c.XC_CL_SaveButton}" press="{!c.saveSecondaryPhoneHandler}" />
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </div>
+                                <div class="slds-box slds-box_xx-small" style="margin:10px; border-color:transparent;">
+                                    <lightning:layout horizontalAlign="space" verticalAlign="start" multipleRows="true">
+
+                                        <lightning:layoutItem flexibility="auto" size="4" alignmentBump="top">
+
+
+                                            <ui:inputText label="{!v.resultList[8].fieldLabel}" class="field"
+                                                value="{!v.resultList[8].fieldValue}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" alignmentBump="top">
+
+                                            <lightning:button label="{!$Label.c.XC_CL_SaveButton}" onclick="{!c.saveEmailHandler}"
+                                                value="{!v.resultList[8].fieldValue}" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" size="4" alignmentBump="top">
+
+
+                                            <ui:inputText label="{!v.resultList[9].fieldLabel}" class="field"
+                                                value="{!v.resultList[9].fieldValue}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" alignmentBump="top">
+
+                                            <lightning:button label="{!$Label.c.XC_CL_SaveButton}" onclick="{!c.saveEmailHandler}"
+                                                value="{!v.resultList[9].fieldValue}" />
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </div>
+                                <div class="slds-box slds-box_xx-small" style="margin:10px; border-color:transparent;">
+                                    <lightning:layout horizontalAlign="space" verticalAlign="start" multipleRows="true">
+
+                                        <lightning:layoutItem flexibility="auto" size="4" alignmentBump="top">
+
+
+                                            <ui:inputText label="{!v.resultList[10].fieldLabel}" class="field"
+                                                value="{!v.resultList[10].fieldValue}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" alignmentBump="top">
+
+                                            <lightning:button label="{!$Label.c.XC_CL_SaveButton}" class="hide" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" size="4" alignmentBump="top">
+
+
+                                            <ui:inputText label="{!v.resultList[11].fieldLabel}" class="field"
+                                                value="{!v.resultList[11].fieldValue}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem flexibility="auto" alignmentBump="top">
+
+                                            <lightning:button label="{!$Label.c.XC_CL_SaveButton}" class="hide" />
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </div>
+                                <aura:set attribute="else">
+                                   
+                                        <lightning:layout horizontalAlign="spread" verticalAlign="center"
+                                            multipleRows="true">
+                                            {!v.body0}</lightning:layout>
+                                    
+                                </aura:set>
+                            </aura:if>
+                            <aura:set attribute="else">
+
+                                <lightning:layout horizontalAlign="space" verticalAlign="center" multipleRows="true">
+                                    <lightning:layoutItem flexibility="auto" size="5" alignmentBump="top">
+                                        <ui:inputText label="{!v.resultList[0].fieldLabel}" class="field"
+                                            value="{!v.resultList[0].fieldValue}" disabled="true" />
+                                    </lightning:layoutItem>
+
+                                    <lightning:layoutItem flexibility="auto" size="5" alignmentBump="top">
+                                        <ui:inputText label="{!v.resultList[1].fieldLabel}" class="field"
+                                            value="{!v.resultList[1].fieldValue}" disabled="true" />
+                                    </lightning:layoutItem>
+
+                                </lightning:layout>
+
+
+
+                                <lightning:layout horizontalAlign="space" verticalAlign="center" multipleRows="true">
+                                    <lightning:layoutItem flexibility="auto" size="5" alignmentBump="top">
+                                        <ui:inputText label="{!v.resultList[2].fieldLabel}" class="field"
+                                            value="{!v.resultList[2].fieldValue}" disabled="true" />
+                                    </lightning:layoutItem>
+
+                                    <lightning:layoutItem flexibility="auto" size="5" alignmentBump="top">
+                                        <ui:inputText label="{!v.resultList[3].fieldLabel}" class="field"
+                                            value="{!v.resultList[3].fieldValue}" disabled="true" />
+                                    </lightning:layoutItem>
+
+                                </lightning:layout>
+
+
+                                <lightning:layout horizontalAlign="space" verticalAlign="center" multipleRows="true">
+                                    <lightning:layoutItem flexibility="auto" size="5" alignmentBump="top">
+                                        <ui:inputText label="{!v.resultList[4].fieldLabel}" class="field"
+                                            value="{!v.resultList[4].fieldValue}" disabled="true" />
+                                    </lightning:layoutItem>
+
+                                    <lightning:layoutItem flexibility="auto" size="5" alignmentBump="top">
+
+
+                                        <ui:inputText label="{!v.resultList[5].fieldLabel}" class="field"
+                                            value="{!v.resultList[5].fieldValue}" disabled="true" />
+                                    </lightning:layoutItem>
+
+                                </lightning:layout>
+
+
+                                <lightning:layout horizontalAlign="space" verticalAlign="center" multipleRows="true">
+
+                                    <lightning:layoutItem flexibility="auto" size="5" alignmentBump="top">
+
+
+                                        <ui:inputText label="{!v.resultList[6].fieldLabel}" class="field"
+                                            value="{!v.resultList[6].fieldValue}" disabled="true" />
+                                    </lightning:layoutItem>
+
+                                    <lightning:layoutItem flexibility="auto" size="5" alignmentBump="top">
+
+
+                                        <ui:inputText label="{!v.resultList[7].fieldLabel}" class="field"
+                                            value="{!v.resultList[7].fieldValue}" disabled="true" />
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+
+                                <lightning:layout horizontalAlign="space" verticalAlign="center" multipleRows="true">
+                                    <lightning:layoutItem flexibility="auto" size="5" alignmentBump="top">
+                                        <ui:inputText label="{!v.resultList[8].fieldLabel}" class="field"
+                                            value="{!v.resultList[8].fieldValue}" disabled="true" />
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem flexibility="auto" size="5" alignmentBump="top">
+                                        <ui:inputText label="{!v.resultList[9].fieldLabel}" class="field"
+                                            value="{!v.resultList[9].fieldValue}" disabled="true" />
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+
+                                <lightning:layout horizontalAlign="space" verticalAlign="center" multipleRows="true">
+                                    <lightning:layoutItem flexibility="auto" size="5" alignmentBump="top">
+                                        <ui:inputText label="{!v.resultList[10].fieldLabel}" class="field"
+                                            value="{!v.resultList[10].fieldValue}" disabled="true" />
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem flexibility="auto" size="5" alignmentBump="top">
+                                        <ui:inputText label="{!v.resultList[11].fieldLabel}" class="field"
+                                            value="{!v.resultList[11].fieldValue}" disabled="true" />
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+
+                            </aura:set>
+
+                        </aura:if>
+                    </div>
+                </div>
+            </lightning:layout>
+            <br></br>
+            <h2 class="slds-text-heading_xsmall">{!$Label.c.XC_CL_ConsentData}</h2>
+
+            <!--div class="slds-box slds-box_x-small" style="margin:10px; border-color:transparent;"-->
+            {!v.legalEntity}
+            <!--/div-->
+        </lightning:accordionSection>
+        <lightning:accordionSection name="B" label="{!$Label.c.XC_CL_Contact}">
+            {!v.contactSectionBody}
+        </lightning:accordionSection>
+        <lightning:accordionSection name="C" label="{!$Label.c.XC_CL_Address}">
+            {!v.addressSectionBody}
+        </lightning:accordionSection>
+        <lightning:accordionSection name="D" label="{!$Label.c.XC_CL_BillingProfile}">
+            {!v.billProfSectionBody}
+        </lightning:accordionSection>
+        <lightning:accordionSection name="E" label="{!$Label.c.XC_CL_CommodityContracts}">
+            <c:XC_LCP132_CallToCommodityContract contractCommodityObj="{!v.contractCommodityObj}"
+                commodityGlobalMessage="{!v.commodityGlobalMessage}" />
+        </lightning:accordionSection>
+
+        <!--lightning:accordionSection name="F" label="Invoices">
+            <aura:set attribute="body">
+                    <c:XC_LCP135_CallToCommodityInvoice invoiceCommodityObj="{!v.invoiceCommodityObj}" commodityGlobalMessage="{!v.commodityGlobalMessage}" />
+            </aura:set>
+        </lightning:accordionSection-->
+
+        <lightning:accordionSection name="G" label="{!$Label.c.XC_CL_CommodityCases}">
+            <c:XC_LCP133_CallToCommodityCase caseCommodityObj="{!v.caseCommodityObj}"
+                commodityGlobalMessage="{!v.commodityGlobalMessage}" />
+        </lightning:accordionSection>
+        <lightning:accordionSection name="F" label="{!$Label.c.XC_CL_CommodityInvoices}">
+            <c:XC_LCP135_CallToCommodityInvoice invoiceCommodityObj="{!v.invoiceCommodityObj}" 
+                commodityGlobalMessage="{!v.commodityGlobalMessage}" accountDocCountry="{!v.accountDocCountry}" />
+        </lightning:accordionSection>
+    </lightning:accordion>
+
+    <br />
+    <!--</ui:scrollerWrapper> -->
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div
+            style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+
+</aura:component>

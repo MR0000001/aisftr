@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Send the Commodity section value to save" >
+    <aura:attribute name="objectType" 	type="String" />
+    <aura:attribute name="values" 		type="String" />
+    <aura:attribute name= "subvalues"   type = "String" />
+</aura:event>

@@ -1,0 +1,112 @@
+<aura:component controller="TA_LCC262_Geolocalization"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" >
+
+    <aura:attribute access="public" name="workOrderId" type="String"/>
+    <aura:attribute access="public" name="fieldSet" type="String"/>
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="public" name="cmpName" type="String" default="TA_LCP262_Geolocalization"/>
+
+    <aura:attribute access="private" name="customerCardBg" type="String"/>
+    <aura:attribute access="private" name="checkIcon" type="String"/>
+    <aura:attribute access="private" name="general" type="Object"/>
+    <aura:attribute access="private" name="custom" type="Object"/>
+    <aura:attribute access="private" name="title" type="String"/>
+    <aura:attribute access="private" name="description" type="String"/>
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="whereCondition" type="String" />
+
+    <aura:attribute name="currentLongitude" type="String" default=""/>
+    <aura:attribute name="currentLatitude" type="String" default=""/>
+    <aura:attribute name="currentAccuracy" type="String" default=""/>
+    <aura:attribute name="mapMarkers" type="Object"/>
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+
+    <aura:registerEvent name="validationEvt" 	type="c:TA_LCE199_Validation" />
+    <aura:registerEvent name="updateFieldsEvt" 	type="c:TA_LCE214_UpdateFields" />
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/>
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <lightning:layout multipleRows="true" class="slds-m-top_large slds-m-left_small slds-m-right_small">
+            <div class="{!v.general.show == 'true' ? 'slds-col slds-size_12-of-12 ta-box-shadow ta-accordion-header ta-accordion-open'
+                                            : 'slds-col slds-size_12-of-12 ta-accordion-header ta-accordion-close'}"
+                style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover;
+                        background-position: bottom; background-color: ' + v.general.bgColor + ';background-blend-mode: lighten;'}">
+                <lightning:layout multipleRows="true">
+
+                    <lightning:layoutItem size="10">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="12">
+                                <h3>{!v.title}</h3>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-m-top_small">
+                                <span class="ta-description-grey"> {!v.description} </span>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                <span name="{!v.general.defaultTitle}" id="{!v.general.defaultTitle}"
+                                    class="ta-accordion-header-button" onclick="{!c.handleManageAccordion}">
+                                        {!if(v.general.show == false, $Label.c.TA_ShowDetails, $Label.c.TA_CloseDetails)}
+                                </span>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <lightning:layoutItem size="2">
+                        <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}" class="slds-float_right ta-accordion-header-icon" />
+                    </lightning:layoutItem>
+
+                    <!-- COORDINATES FIELDS -->
+                    <aura:if isTrue="{!v.general.show}">
+                        <lightning:layoutItem size="12" class="ta-border-top-white slds-p-top_small">
+                            <lightning:layout multipleRows="true">
+
+                                <aura:if isTrue="{!and(v.mapMarkers, v.custom.showMap)}">
+                                    <lightning:layoutItem size="12" class="slds-m-bottom_small slds-m-top_small">
+                                        <lightning:map mapMarkers="{!v.mapMarkers}"
+                                            zoomLevel="15"
+                                            showFooter="false"/>
+                                    </lightning:layoutItem>
+                                </aura:if> 
+
+                                <lightning:layoutItem size="12" class="slds-form-element__label"> {!$Label.c.TA_Longitude} </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                                    <p class="slds-float_left ta-value-container"> {!if(v.currentLongitude != '', v.currentLongitude, $Label.c.TA_NotYetGeolocated)} </p>
+                                </lightning:layoutItem>
+    
+                                <lightning:layoutItem size="12" class="slds-form-element__label"> {!$Label.c.TA_Latitude} </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                                    <p class="slds-float_left ta-value-container"> {!if(v.currentLatitude != '', v.currentLatitude, $Label.c.TA_NotYetGeolocated)} </p>
+                                </lightning:layoutItem>
+    
+                                <lightning:layoutItem size="12" class="slds-form-element__label"> {!$Label.c.TA_Accuracy} </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                                    <p class="slds-float_left ta-value-container"> {!if(v.currentAccuracy != '', v.currentAccuracy, $Label.c.TA_NotYetGeolocated)} </p>
+                                </lightning:layoutItem>
+    
+                            </lightning:layout>
+                        </lightning:layoutItem>
+    
+                        <lightning:layoutItem size="12" class="slds-text-align_right">
+                            <span name="Search" class="ta-accordion-header-button" onclick="{!c.handleGetCurrentCoordinates}">
+                                {!$Label.c.TA_StartGeolocalization}
+                            </span>
+                        </lightning:layoutItem>
+                    </aura:if>
+
+                </lightning:layout>
+            </div>
+        </lightning:layout>
+    </aura:if>
+
+</aura:component>

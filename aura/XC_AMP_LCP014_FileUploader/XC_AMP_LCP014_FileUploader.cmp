@@ -1,0 +1,54 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 01-26-2021
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   12-21-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId"
+    controller="XC_AMP_LCC014_FileUploader">
+
+    <aura:registerEvent name="XC_AMP_LCE001_AMPCommunicationEvent" type="c:XC_AMP_LCE001_AMPCommunicationEvent"/>
+
+
+    <aura:attribute name="visibile" type="Boolean" required="true" default="true" />
+    <aura:attribute name="required" type="Boolean" required="true" default="true" />
+    <aura:attribute name="notSelected" type="Boolean" default="true" />
+    <aura:attribute name="fileLoaded" type="Boolean" default="false"/>
+    <aura:attribute name="fileName" type="String"/>
+    <lightning:notificationsLibrary aura:id="notifLib" />
+
+
+
+    <aura:if isTrue="{!v.visibile}">
+        <div class="slds-p-around_small">
+            <c:XC_AMP_LCP005_SectionHeaderIcon text="{!$Label.c.XC_CL_AMP_FileUploadHeader}"
+                iconName="utility:upload" />
+            <lightning:card class="slds-card_boundary">
+                <aura:if isTrue="{!and(v.required,v.notSelected)}">
+                    <div class="slds-p-around_xx-small">
+                        <span class="slds-text-color_destructive">{!$Label.c.XC_CL_AMP_RequiredFileMessage}</span>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.fileLoaded}">
+                    <div class="slds-p-around_small">
+                        <lightning:icon iconName="doctype:attachment" size="medium"/>
+                        <div class="slds-p-top_small">
+                            {!v.fileName}
+                        </div>
+                    </div>
+                </aura:if>
+                <div class="slds-p-around_small">
+                    <lightning:fileUpload multiple="false" recordId="{!v.recordId}"
+                        onuploadfinished="{!c.handleFileUpload}" />
+                </div>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+
+</aura:component>

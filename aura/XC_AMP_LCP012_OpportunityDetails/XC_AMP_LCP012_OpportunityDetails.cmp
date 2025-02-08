@@ -1,0 +1,131 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 12-21-2020
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   12-18-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+
+<!-- TODO: Add dynamic fieldset management -->
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId">
+
+    <aura:attribute name="optyRecord" type="Object" />
+    <aura:attribute name="recordError" type="String" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="true" />
+    <aura:attribute name="tagOpen" type="String" />
+    <aura:attribute name="tagClose" type="String" />
+
+    <!--    
+    XC_AMP_Order__r.XC_UserChannelCode__c,
+    XC_AMP_Order__r.XC_UserSubchannelCodeFormula__c,
+    XC_AMP_Order__r.XC_SalesSubChannelFormula__c,
+    XC_AMP_Order__r.XC_SalesChannelFormula__c -->
+
+    <force:recordData aura:id="recordLoader" recordId="{!v.recordId}" targetFields="{!v.optyRecord}"
+        targetError="{!v.recordError}" fields="
+    XC_AMP_Order__c, XC_AMP_ProductName__c, XC_AMP_ProductDescription__c,
+    XC_AMP_OrderCSPSNumber__c, XC_AMP_OrderCSPSLineNumber__c, XC_AMP_OrderCSPSMarket__c,
+    XC_AMP_Order__r.XC_UserSubchannelCodeFormula__c,
+    XC_AMP_Order__r.XC_SalesSubChannelFormula__c,
+    XC_AMP_Order__r.XC_SalesChannelFormula__c" mode="EDIT" recordUpdated="{!c.init}" />
+
+
+
+    <div class="slds-p-around_x-small">
+        <c:XC_AMP_LCP005_SectionHeaderIcon text="{!$Label.c.XC_CL_AMP_LCP012_Header}" iconName="standard:opportunity" />
+
+        <aura:if isTrue="{!v.spinnerControl}">
+            <div class="slds-is-relative slds-p-around_small">
+                <lightning:spinner aura:id="mySpinner" variant="brand" size="large"
+                    style="background-color: rgba(0, 0, 0, 0)" />
+            </div>
+
+            <aura:set attribute="else">
+                <lightning:card variant="narrow" class="slds-card_boundary">
+                    <div class="slds-p-around_x-small">
+                        <lightning:recordViewForm objectApiName="Opportunity" recordId="{!v.recordId}">
+                            <lightning:messages aura:id="errorMessages" />
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="6" padding="around_small">
+                                    <lightning:outputField fieldName="Name" disabled="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="6" padding="around_small">
+                                    <lightning:outputField fieldName="AccountId" disabled="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="6" padding="around_small">
+                                    <lightning:outputField fieldName="StageName" disabled="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="6" padding="around_small">
+                                    <lightning:outputField fieldName="XC_RelatedOpportunity__c" disabled="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="6" padding="around_small">
+                                    <lightning:outputField fieldName="XC_AMP_ChildOpportunity__c" disabled="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="6" padding="around_small">
+                                    <lightning:outputField fieldName="XC_AMP_Order__c" disabled="true" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="6" padding="around_small">
+                                        <lightning:input label="{!$Label.c.XC_CL_AMP_SalesChannel}"
+                                            value="{!v.optyRecord.XC_AMP_Order__r.XC_SalesChannelFormula__c}"
+                                            disabled="true" variant="label-inline"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="6" padding="around_small">
+                                        <lightning:input label="{!$Label.c.XC_CL_AMP_SalesSubChannel}"
+                                            value="{!v.optyRecord.XC_AMP_Order__r.XC_SalesSubChannelFormula__c}"
+                                            disabled="true" variant="label-inline"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="6" padding="around_small">
+                                        <lightning:input label="{!$Label.c.XC_CL_AMP_ProductName}"
+                                            value="{!v.optyRecord.XC_AMP_ProductName__c}"
+                                            disabled="true" variant="label-inline"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="6" padding="around_small">
+                                        <lightning:input label="{!$Label.c.XC_CL_AMP_SubChanelCode}"
+                                            value="{!v.optyRecord.XC_AMP_Order__r.XC_UserSubchannelCodeFormula__c}"
+                                            disabled="true" variant="label-inline"/>
+                                </lightning:layoutItem>
+                                <br/>
+                                <lightning:layoutItem size="12" padding="around_small">
+                                    <h3 class="slds-text-title_caps">{!$Label.c.XC_CL_AMP_ProductDescription}</h3>
+                                    <div aura:id="productDescription" class="slds-box editor slds-text-longform">
+                                        <lightning:formattedRichText 
+                                            value="{!v.optyRecord.XC_AMP_ProductDescription__c}"
+                                            disabled="true" variant="label-inline"/>
+                                    </div>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                            <aura:if isTrue="{!!empty(v.optyRecord.XC_AMP_OrderCSPSMarket__c)}">
+                                <br/>
+                                <div class="slds-p-around_x-small">
+                                    <c:XC_AMP_LCP005_SectionHeaderIcon text="{!$Label.c.XC_CL_OrderCSPSElements}" />
+                                </div>
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="6" padding="around_small">
+                                            <lightning:input label="{!$Label.c.XC_CL_AMP_OrderCSPSNumber}"
+                                                value="{!v.optyRecord.XC_AMP_OrderCSPSNumber__c}"
+                                                disabled="true" variant="label-inline"/>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="6" padding="around_small">
+                                            <lightning:input label="{!$Label.c.XC_CL_AMP_OrderCSPSLineNumber}"
+                                                value="{!v.optyRecord.XC_AMP_OrderCSPSLineNumber__c}"
+                                                disabled="true" variant="label-inline"/>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="6" padding="around_small">
+                                            <lightning:input label="{!$Label.c.XC_CL_AMP_OrderCSPSMarket}"
+                                                value="{!v.optyRecord.XC_AMP_OrderCSPSMarket__c}"
+                                                disabled="true" variant="label-inline"/>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </aura:if>
+                        </lightning:recordViewForm>
+                    </div>
+                </lightning:card>
+            </aura:set>
+        </aura:if>
+    </div>
+
+</aura:component>

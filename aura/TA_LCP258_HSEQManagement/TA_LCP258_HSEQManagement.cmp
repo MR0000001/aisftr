@@ -1,0 +1,201 @@
+<!--
+  @description       : HSEQ open work orders cmp
+  @author            : benjamin.geronimo
+  @group             : WebResults
+  @last modified on  : 29-07-2021
+  @last modified by  : benjamin.geronimo
+  Modifications Log 
+  Ver   Date         Author              Modification
+  1.0   15-06-2021   benjamin.geronimo   Initial Version
+-->
+
+<aura:component controller="TA_LCC258_HSEQManagement" extends="c:TA_LCP209_BaseWizard"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global">
+
+    <aura:attribute     access="public"     name="custom"               type="Object"   />
+    <aura:attribute     access="public"     name="isOpen"               type="Boolean"  />
+    <aura:attribute     access="public"     name="hseqList"             type="List"     />
+    <aura:attribute     access="public"     name="hseqListAll"          type="List"     />
+    <aura:attribute     access="public"     name="qualityCheckToReview" type="Boolean"  />
+
+    <aura:attribute     access="private"    name="isExternal"           type="Boolean"  default="false"/>
+    <aura:attribute     access="private"    name="infoBag"              type="Object"   />
+    <aura:attribute     access="private"    name="isInitialized"        type="Boolean"  default="false"/>
+    <aura:attribute     access="private"    name="partnerList"          type="List"     />
+    <aura:attribute     access="private"    name="selectedPartner"      type="String"   default=""/>
+    <aura:attribute     access="private"    name="cityList"             type="List"     />
+    <aura:attribute     access="private"    name="selectedCity"         type="String"   default=""/>
+    <!-- XINSAPP-523 - jacopo.scaravaggi@webresults.it - 08/04/2022 - START -->
+    <!--<aura:attribute     access="private"    name="selectedDate"         type="String"   default=""/>-->
+    <aura:attribute     access="private"    name="selectedStartDate"    type="Date"   default=""/>
+    <aura:attribute     access="private"    name="selectedEndDate"      type="Date"   default=""/>
+    <!-- XINSAPP-523 - jacopo.scaravaggi@webresults.it - 08/04/2022 - END -->
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt" />
+    <aura:registerEvent name="appointmentPreviewEvent" type="c:TA_LCE200_AppointmentPreviewEvt" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}"/>
+
+    <div class="ta-modal-bg">
+        <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" class="slds-text-align_center">
+                            <h3 class="ta-color-black">
+                                <aura:if isTrue="{!!v.isExternal}">
+                                    {!$Label.c.TA_Case}
+                                    <aura:set attribute="else">
+                                        {!$Label.c.TA_WorkOrders}
+                                    </aura:set>
+                                </aura:if>
+                            </h3>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleCloseModal}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <aura:if isTrue="{!v.isInitialized}">
+
+                    <lightning:layoutItem size="12" class="slds-p-horizontal_medium">
+                        <lightning:layout multipleRows="true" verticalAlign="center">
+                            <lightning:layoutItem size="3">
+                                <p class="ta-color-black ta-filter-label">{!$Label.c.TA_Partner}</p>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="9" class="ta-hide-label">
+                                <lightning:select name="partner" aura:id="searchPartner" onchange="{!c.handleFilter}" value="{!v.selectedPartner}" variant="label-hidden">
+                                    <aura:iteration items="{!v.partnerList}" var="partner">
+                                        <option text="{!partner}"></option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="3">
+                                <p class="ta-color-black ta-filter-label">{!$Label.c.TA_City}</p>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="9"  class="ta-hide-label">
+                                <lightning:select name="city" aura:id="searchDate" onchange="{!c.handleFilter}" value="{!v.selectedCity}" variant="label-hidden">
+                                    <aura:iteration items="{!v.cityList}" var="ct">
+                                        <option text="{!ct}"></option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </lightning:layoutItem>
+                            <!-- XINSAPP-523 - jacopo.scaravaggi@webresults.it - 08/04/2022 - START -->
+                            <!--<lightning:layoutItem size="3">
+                                <p class="ta-color-black ta-filter-label">{!$Label.c.TA_Data}</p>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="9"  class="ta-hide-label">
+                                <lightning:input type="date" name="date" value="{!v.selectedDate}" onchange="{!c.handleFilter}" class="ta-input" variant="label-hidden"/>
+                            </lightning:layoutItem>-->
+
+                            <lightning:layoutItem size="3">
+                                <p class="ta-color-black ta-filter-label">{!$Label.c.TA_StartDate}</p>  <!-- 20062022 FD - ENXCRM-208 -->
+                            </lightning:layoutItem>
+
+                            <lightning:layoutItem size="9"  class="ta-hide-label">
+                                <lightning:input type="date" name="startDate" value="{!v.selectedStartDate}" max="{!v.selectedEndDate}" onchange="{!c.handleFilter}" class="ta-input" variant="label-hidden"/>
+                            </lightning:layoutItem>
+
+                            <lightning:layoutItem size="3">
+                                <p class="ta-color-black ta-filter-label">{!$Label.c.TA_EndDate}</p>  <!-- 20062022 FD - ENXCRM-208 -->
+                            </lightning:layoutItem>
+
+                            <lightning:layoutItem size="9"  class="ta-hide-label">
+                                <lightning:input type="date" name="endDate" value="{!v.selectedEndDate}" min="{!v.selectedStartDate}" onchange="{!c.handleFilter}" class="ta-input" variant="label-hidden"/>
+                            </lightning:layoutItem>
+                            <!-- XINSAPP-523 - jacopo.scaravaggi@webresults.it - 08/04/2022 - END -->
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <lightning:layoutItem size="12" class="slds-p-horizontal_medium slds-m-top_small">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="6">
+                                <lightning:input type="checkbox" label="{!$Label.c.TA_InspectionNotPerformed}" disabled="true" class="ta-checkbox-blu"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="6">
+                                <lightning:input type="checkbox" label="{!$Label.c.TA_InspectionInProgress}" disabled="true" class="ta-checkbox-orange"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="6">
+                                <lightning:input type="checkbox" label="{!$Label.c.TA_InspectionCompleted}" disabled="true" class="ta-checkbox-green"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <lightning:layoutItem size="12" class="ta-modal-body">
+
+                        <aura:if isTrue="{!empty(v.hseqList)}">
+                            <p class="ta-color-black">{!$Label.c.TA_HSEQ_NoElements}</p>
+                            <aura:set attribute="else">
+                                <aura:iteration items="{!v.hseqList}" var="hseq">
+                        
+                                    <lightning:layoutItem size="12">
+                                        <div id="{!hseq.recordId}" 
+                                            onclick="{!c.handleCardClick}"
+                                            class="slds-m-bottom_large">
+                                            <div class="{! if((hseq.isCompleted), 'ta-workorder-bg-green', if(hseq.woPhase == 'Action', 'ta-workorder-bg-orange', 'ta-workorder-bg')) }">
+                                            <!-- <div class="{! if(hseq.woPhase == 'Action', 'ta-workorder-bg-orange','ta-workorder-bg') }"> -->
+                                                <lightning:layout class="slds-wrap"> 
+                                                    <lightning:layoutItem size="11">
+                                                        <h3 class="ta-color-black">{!hseq.name}</h3>
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="1">
+                                                        <aura:if isTrue="{!hseq.isCompleted}">
+                                                            <img src="{!$Resource.TA_Icons + '/xc-icons/check-green.svg'}" class="ta-icon-size-small slds-float_right" />
+                                                            <aura:set attribute="else">
+                                                                <!-- <aura:if isTrue="{! or(hseq.woPhase == 'PreService', empty(hseq.woPhase)) }">
+                                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/edit-blue.svg'}" class="ta-icon-size-small slds-float_right" />
+                                                                </aura:if> -->
+                                                                <aura:if isTrue="{!hseq.woPhase == 'Action'}">
+                                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/settings-2-orange.svg'}" class="ta-icon-size-small slds-float_right" />
+                                                                    <aura:set attribute="else">
+                                                                        <img src="{!$Resource.TA_Icons + '/xc-icons/edit-blue.svg'}" class="ta-icon-size-small slds-float_right" />
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </lightning:layoutItem>
+                                                    
+
+                                                    <aura:iteration items="{!hseq.fields}" var="field">  
+                                                        <aura:if isTrue="{!and(not(field.hidden),not(empty(field.value)))}">
+                                                            <lightning:layoutItem size="12" class="slds-m-top_x-small">
+                                                                
+                                                                <p class="slds-float_left ta-color-grey">
+                                                                    {!field.label} : {!field.value} 
+                                                                </p>
+                                                                
+                                                            </lightning:layoutItem>
+                                                        </aura:if>
+                                                    </aura:iteration>
+
+                                                    <aura:if isTrue="{!not(empty(hseq.qcName))}">
+                                                        <lightning:layoutItem size="12" class="slds-m-top_x-small">
+                                                            
+                                                            <p class="slds-float_left ta-color-grey">
+                                                                Controlli conformità : {!hseq.qcName} 
+                                                            </p>
+                                                            
+                                                        </lightning:layoutItem>
+                                                    </aura:if>
+
+                                                </lightning:layout>
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+                                </aura:iteration>
+                                
+                            </aura:set>
+                        </aura:if>
+                    </lightning:layoutItem>
+                </aura:if>
+            </lightning:layout>
+    </div>
+    
+</aura:component>

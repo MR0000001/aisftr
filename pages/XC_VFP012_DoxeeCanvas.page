@@ -1,0 +1,15 @@
+<apex:page standardController="Individual" extensions="XC_VFC012_DoxeeCanvas" showHeader="false" sidebar="false">
+ 
+    <apex:canvasApp canvasId="123DoxeeF"
+                    developerName="XC_Doxee_ConnectedApp"
+                    maxWidth="infinite"
+                    maxHeight="infinite"
+                    height="500"
+                    width="100%" 
+                    parameters="{CanvasApp:'EnelX',
+                                User:'{!$User.Username}',
+                                Country:'{!country}',
+                                Company:'{!company}',
+                                Individual_Id:'{!Individual.Id}'}" />
+
+</apex:page>

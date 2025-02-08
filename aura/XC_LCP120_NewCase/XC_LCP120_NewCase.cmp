@@ -1,0 +1,240 @@
+<!--
+* @author Lorenzo Orlanducci lorenzo.orlanducci@nttdata.com 
+* @date Creation 13/07/2019
+* @date Modification dd/mm/yyyy
+* @description component for create new Case
+-->
+<aura:component controller="XC_LCC120_NewCase" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,force:hasSObjectName">
+    
+     <aura:attribute name="recordId" type="String" />
+     <aura:attribute name="isCommunity" type="Boolean" default="false" />
+     <aura:attribute name="caseReason" type="String" />
+     <aura:attribute name="recordTypeId" type="String" />
+     <aura:attribute name="contactValue" type="String" />
+     <aura:attribute name="relatedAccountId" type="String" /> <!--invoiceAccountId-->
+     <aura:attribute name="accountSegment" type="String" />
+     <aura:attribute name="isLogic" type="Boolean" />
+     <aura:attribute name="isTechnical" type="Boolean" />
+     <aura:attribute name="address" type="String" />
+     <aura:attribute name="commercialAsset" type="String" />
+     <aura:attribute name="businessLine" type="String" />
+     <aura:attribute name="cardTitle" type="String" default="{!$Label.c.XC_CL_NewCase}" /> <!--OLD VALUE: " New Case"-->
+     <aura:attribute name="showSpinner" type="Boolean" default="false" />
+     <aura:attribute name="contactSelectionDisabled" type="Boolean" default="true" />
+     <aura:attribute name="contactOptions" type="List" />
+     <aura:attribute name="sobjecttype" type="String" default="{!v.sObjectName}"/>
+     <aura:attribute name="accountSelectionDisabled" type="Boolean" default="true"/>
+     <aura:attribute name="accountOptions" type="List"/>
+     <aura:attribute name="accountAndContactSelectionDisabled" type="Boolean" default="true"/>
+     <aura:attribute name="fromCaseList" type="Boolean" default="false"/>
+     <!-- DeAv 30.06.2022 - NR2330 START -->
+     <aura:attribute name="caseAddress" type="String" /> 
+     <aura:attribute name="caseAsset" type="String" /> 
+     <aura:attribute name="rtCase" type="String" /> 
+     <aura:attribute name="rtDevName" type="String" /> 
+     <aura:attribute name="filterAddress" type="String" />
+     <aura:attribute name="filterAsset" type="String" />
+     <aura:attribute name="showNewAddress" type="Boolean" default="false" /> 
+     <aura:handler event="c:XC_LCE004_closeNewAddress" name="XC_LCE004_closeNewAddress" action="{!c.closeNewAddress}"/>
+     <!-- DeAv 30.06.2022 - NR2330 END -->
+     <lightning:notificationsLibrary aura:id="notifLib"/>
+     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+     <lightning:card>
+        <aura:set attribute="title">
+            <aura:if isTrue="{!!v.showNewAddress}"> <!--Deav 30.06.2022 - NR2330: Added auraif -->
+                <lightning:icon iconName="standard:case" size="large"/>
+                <b>&nbsp; {! v.cardTitle } </b>
+            </aura:if> <!--Deav 30.06.2022 - NR2330: Added auraif -->
+        </aura:set>
+
+     <lightning:recordEditForm objectApiName="Case" >   
+         
+            <lightning:messages />
+<br></br><br></br>
+<!--<lightning:layoutItem size="12" smallDeviceSize="3" mediumDeviceSize="3" largeDeviceSize="3" padding="around-small"> </lightning:layoutItem>-->
+        <!-- DeAv 30.06.2022 - NR2330 START-->         
+        <aura:if isTrue="{!and(v.showNewAddress, v.sobjecttype=='Account')}">
+            <c:XC_LCP_Address recordId="{!v.recordId}" source="120"/>
+        </aura:if>
+        <aura:if isTrue="{!and(v.showNewAddress, v.sobjecttype=='Asset')}">
+            <c:XC_LCP_Address recordId="{!v.relatedAccountId}" source="120"/>
+        </aura:if>
+        <!-- DeAv 30.06.2022 - NR2330 END--> 
+        <aura:if isTrue="{!!v.showNewAddress}"> <!--Deav 30.06.2022 - NR2330: Added auraif -->
+            <lightning:layout multipleRows="true">            
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                    <lightning:inputField aura:id="reason" fieldName="Reason" value="{!v.caseReason}" onchange="{!c.checkRecordType}" required="true" />    
+                    <!-- DeAv 30.06.2022 - NR2330 START-->                
+                        <aura:if isTrue="{!or(and(v.caseReason=='XCMOT002', v.rtDevName=='XC_B2B_EnelXItalia_Management_Case'), and(v.caseReason=='XCMOT002', v.rtDevName=='XC_B2G_EnelXItalia_Management_Case'))}">
+                            <c:strike_lookup
+                                label="{!$Label.c.XC_CL_Address}"
+                                object="XC_Address__c"
+                                value="{!v.caseAddress}"
+                                searchField="Name"
+                                subtitleField="XC_CategoryText__c"
+                                order="Name"
+                                filter="{!v.filterAddress}"
+                                showRecentRecords="true"
+                                iconName="custom:custom51"/>
+                            <c:strike_lookup
+                                label="{!$Label.c.XC_CL_TechnicalAssetType}"
+                                object="Asset"
+                                value="{!v.caseAsset}"
+                                searchField="Name"
+                                subtitleField="SerialNumber"
+                                order="Name"
+                                filter="{!v.filterAsset}"
+                                showRecentRecords="true"
+                                iconName="standard:asset_object"/>
+                        </aura:if>                
+                    <!-- DeAv 30.06.2022 - NR2330 END-->
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                    <!-- DeAv 30.06.2022 - NR2330 START--> 
+                    <aura:if isTrue="{!or(and(v.caseReason=='XCMOT002', v.rtDevName=='XC_B2B_EnelXItalia_Management_Case'), and(v.caseReason=='XCMOT002', v.rtDevName=='XC_B2G_EnelXItalia_Management_Case'))}">
+                        <br></br><br></br><br></br><br></br><br></br>
+                        <lightning:button name="newAddressBtn" label="{!$Label.c.XC_CL_NewAddress}" class="slds-button slds-button_neutral" onclick="{!c.createNewAddress}"/><br></br><br></br><br></br>
+                        <lightning:button name="nextBtn" label="Next" class="slds-button slds-button_brand slds-float_right" aura:id="nextButtonId" disabled="{!!or(and(v.caseAddress!=null, v.caseAddress!=''),and(v.caseAsset!=null, v.caseAsset!=''))}" onclick="{!c.createCase}"/>
+                    </aura:if>
+                    <!-- DeAv 30.06.2022 - NR2330 END-->
+                </lightning:layoutItem>
+                
+                <aura:if isTrue="{!v.fromCaseList}">
+                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                        <lightning:inputField aura:id="caseAccountId" fieldName="AccountId" value="{!v.relatedAccountId}" required="true" onchange="{!c.searchContactToSelect}"/>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small"> </lightning:layoutItem>
+
+                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                        <lightning:combobox aura:id="contactId" name="ChooseContact" 
+                                            label="{!$Label.c.XC_CL_Contact}" placeholder="{!$Label.c.XC_CL_Contact_ChooseAContact}" 
+                                            value="{! v.contactValue }" options="{! v.contactOptions }" 
+                                            variant='standard' required="true" onchange="{!c.checkRecordType}" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small"> </lightning:layoutItem>
+                </aura:if>
+                <!--aura:if isTrue="{!not(v.accountAndContactSelectionDisabled)}">
+                        <lightning:inputField  fieldName="AccountId" />    
+                        <lightning:inputField  fieldName="ContactId"  />
+                
+                </aura:if-->            
+            </lightning:layout>
+        </aura:if> <!--Deav 30.06.2022 - NR2330: Added auraif -->
+        <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner alternativeText="Loading" size="large" />
+        </aura:if>
+    </lightning:recordEditForm>
+
+    <!--<aura:if isTrue="{!v.sobjecttype=='Contact'}">
+        <lightning:recordViewForm recordId="{!v.recordId}" objectApiName="{!v.sobjecttype}">
+            <lightning:messages />
+            <lightning:recordEditForm
+            recordId="{!v.recordId}"
+            objectApiName="{!v.sobjecttype}">
+            <!- - the messages component is for error messages - ->
+            <lightning:messages />
+
+            <lightning:inputField fieldName="AccountId" aura:id="accountId" disabled="true" />
+        </lightning:recordEditForm>
+    </aura:if> -->
+    <aura:if isTrue="{!v.sobjecttype=='Opportunity'}">
+        <lightning:recordEditForm
+                recordId="{!v.recordId}"
+                objectApiName="{!v.sobjecttype}">
+                <!-- the messages component is for error messages -->
+                <lightning:messages />
+    
+                <lightning:inputField fieldName="AccountId"     aura:id="accountId" disabled="true" />
+            <aura:if isTrue="{!v.contactSelectionDisabled}">
+                <lightning:inputField fieldName="XC_Contact__c" aura:id="contactId" disabled="true" />
+            </aura:if>
+        </lightning:recordEditForm>
+            <aura:if isTrue="{!!v.contactSelectionDisabled}">
+                <lightning:combobox aura:id="contactId" name="ChooseContact" 
+                                    label="{!$Label.c.XC_CL_Contact}" placeholder="{!$Label.c.XC_CL_Contact_ChooseAContact}" 
+                                    value="{! v.contactValue }" options="{! v.contactOptions }" 
+                                    variant='standard' required="true" onchange="{!c.checkRecordType}" />
+            </aura:if>
+    </aura:if>
+
+    <aura:if isTrue="{!and(v.sobjecttype=='Account', !v.contactSelectionDisabled)}">
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" smallDeviceSize="3" mediumDeviceSize="3" largeDeviceSize="3" padding="around-small"> 
+                 
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                <lightning:combobox aura:id="contactId" name="ChooseContact" 
+                                    label="{!$Label.c.XC_CL_Contact}" placeholder="{!$Label.c.XC_CL_Contact_ChooseAContact}" 
+                                    value="{! v.contactValue }" options="{! v.contactOptions }" 
+                                    variant='standard' required="true" onchange="{!c.checkRecordType}" />
+            </lightning:layoutItem>
+        </lightning:layout>
+    </aura:if>
+
+    <aura:if isTrue="{!or(v.sobjecttype=='WorkOrder' , v.sobjecttype=='Case') }">
+        <lightning:recordEditForm
+            recordId="{!v.recordId}"
+            objectApiName="{!v.sobjecttype}">
+            <!-- the messages component is for error messages -->
+            <lightning:messages />
+
+            <aura:if isTrue="{!not(v.accountAndContactSelectionDisabled)}">
+                <lightning:inputField fieldName="AccountId" aura:id="accountId" disabled="{!v.accountAndContactSelectionDisabled}"   />
+                <lightning:combobox aura:id="contactId" name="ChooseContact" 
+                                    label="{!$Label.c.XC_CL_Contact}" placeholder="{!$Label.c.XC_CL_Contact_ChooseAContact}" 
+                                    value="{! v.contactValue }" options="{! v.contactOptions }" 
+                                    variant='standard' required="true" onchange="{!c.checkRecordType}" />
+                
+                <aura:set attribute="else">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="3" mediumDeviceSize="3" largeDeviceSize="3" padding="around-small"> 
+                            <lightning:inputField fieldName="AccountId" aura:id="accountId" disabled="true" class="slds-hidden"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="3" mediumDeviceSize="3" largeDeviceSize="3" padding="around-small">
+                            <lightning:inputField fieldName="ContactId" aura:id="contactId" disabled="true" class="slds-hidden"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </aura:set>
+            </aura:if>
+            <lightning:inputField fieldName="XC_Configuration__c" aura:id="configurationId" disabled="true" class="slds-hidden" />
+        </lightning:recordEditForm>
+    </aura:if>
+
+    <aura:if isTrue="{!or((v.sobjecttype=='Contact'),(v.sobjecttype=='Zuora__ZInvoice__c'))}">
+        <aura:if isTrue="{!v.accountSelectionDisabled}">
+            <c:strike_lookup
+                label="{!$Label.c.XC_CL_AccountLabel}"
+                object="Account"
+                value="{!v.relatedAccountId}"
+                searchField="Name"
+                iconName="standard:account"
+                placeholder=""
+                order="Name"
+                limit="100"
+                searchingMessage=""
+                noResultsMessage="{!$Label.c.XC_CL_NoResultsFound}"
+                loadingMessage="{!$Label.c.XC_CL_Loading}"
+                errorMessage="{!$Label.c.XC_CL_InvalidInput}"
+                disabled="true"/> <!--value="{!v.invoiceAccountId}"-->
+
+            <!--<lightning:recordEditForm
+                
+                recordId="{!v.recordId}"
+                objectApiName="{!v.sobjecttype}">
+                <!- - the messages component is for error messages - ->
+                <lightning:messages />
+
+                <lightning:inputField fieldName="Zuora__Account__c" aura:id="accountId" disabled="true" />
+                
+            </lightning:recordEditForm>-->
+            <aura:set attribute="else">
+                <lightning:layoutItem size="12">
+            <br></br>
+            <lightning:combobox aura:id="relatedContactAccount" name="Account" label="{!$Label.c.Account}" value="{!v.relatedAccountId}" options="{!v.accountOptions}" onchange="{!c.checkRecordType}"/>
+          </lightning:layoutItem>   
+            </aura:set>
+        </aura:if>
+    </aura:if><br></br><br></br><br></br>
+</lightning:card>
+</aura:component>

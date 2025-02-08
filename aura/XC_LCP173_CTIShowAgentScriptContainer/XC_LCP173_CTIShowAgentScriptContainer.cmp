@@ -1,0 +1,74 @@
+<!--
+  @File Name          : XC_LCP173_CTIShowAgentScriptContainer.cmp
+  @Description        : 
+  @Author             : Francesco Imperioli - fimperioli@deloitte.it
+  @Group              : 
+  @Last Modified By   : Francesco Imperioli - fimperioli@deloitte.it
+  @Last Modified On   : 02-08-2021
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    14/5/2020   Francesco Imperioli - fimperioli@deloitte.it     Initial Version
+-->
+<aura:component controller="XC_LCC173_CTIShowAgentScript"
+    implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes,force:hasSObjectName,forceCommunity:availableForAllPageTypes"
+    access="global">
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+
+    <aura:attribute name="showScriptModal" type="Boolean" default="false" />
+    <aura:attribute name="showCongaTrCmp" type="Boolean" default="false"/>
+    <aura:attribute name="useCongaTrigger" type="Boolean" default="false"/>
+    <aura:attribute name="congaTriggerScripts" type="List" />
+
+    <aura:attribute name="evtChannel" type="String" default="/event/XC_CTI_Call_Event__e" />
+    <aura:attribute name="showTextInModal" type="Boolean" default="false" />
+    <aura:attribute name="showComponent" type="Boolean" default="false" />
+    <aura:attribute name="scriptText" type="String" />
+    <aura:attribute name="showRecControls" type="Boolean" default="false" />
+    <aura:attribute name="showCard" type="Boolean" default="true" />
+    <aura:attribute name="fromAnotherComponent" type="Boolean" default="false" />
+
+    <!-- ADAPT THIS TO BE A CARD OR A BUTTON ONLY -->
+
+
+    <lightning:empApi aura:id="empApi" />
+
+    <aura:if isTrue="{!v.showComponent}">
+        <aura:if isTrue="{!v.showCard}">
+            <lightning:card variant="narrow" title="{!$Label.c.XC_CL_LCP173_ShowScriptCardHeader}"
+                iconName="standard:call">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" padding="around-small">
+                        <lightning:formattedText value="{!$Label.c.XC_CL_LCP173_ShowScriptInfoText}" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" padding="around-small">
+                        <lightning:button variant="brand" iconName="standard:proposition"
+                            label="{!$Label.c.XC_CL_CTIShowScriptBTN}" onclick="{!c.showScript}" />
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+            <aura:set attribute="else">
+                <lightning:button variant="brand" iconName="standard:proposition"
+                    label="{!$Label.c.XC_CL_CTIShowScriptBTN}" onclick="{!c.showScript}" />
+            </aura:set>
+        </aura:if>
+
+        <aura:if isTrue="{!v.showScriptModal}">
+            <c:XC_LCP173_CTIShowAgentScript recordId="{!v.recordId}" sObjectName="{!v.sObjectName}"
+                openModal="{!v.showScriptModal}" showText="{!v.showTextInModal}" scriptText="{!v.scriptText}"
+                showRecControls="{!v.showRecControls}" />
+        </aura:if>
+        <aura:if isTrue="{!v.showCongaTrCmp}">
+            <c:XC_LCP173_CTIShowAgentMultipleScript recordId="{!v.recordId}" openModal="{!v.showCongaTrCmp}" scripts="{!v.congaTriggerScripts}" showRecControls="{!v.showRecControls}"/>
+        </aura:if>
+
+        <aura:set attribute="else">
+            <aura:if isTrue="{!v.fromAnotherComponent}">
+                {!$Label.c.XC_CL_NoVocalScript}
+            </aura:if>
+        </aura:set>
+    </aura:if>
+
+
+</aura:component>

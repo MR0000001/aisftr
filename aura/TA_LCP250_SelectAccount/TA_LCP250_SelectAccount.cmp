@@ -1,0 +1,421 @@
+<aura:component controller="TA_LCC250_SelectAccount"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global">
+
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="public" name="showSelectAccountModal" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="showSelectAddressModal" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="searchParam" type="String" default=""/>
+    <aura:attribute access="public" name="disableSearch" type="Boolean" default="true"/>
+    <aura:attribute access="public" name="disableConfirmAccount" type="Boolean" default="true"/>
+    <aura:attribute access="public" name="disableConfirmAddress" type="Boolean" default="true"/>
+    <aura:attribute access="public" name="searchResultList" type="List"/>
+    <aura:attribute access="public" name="selectedAccountId" type="String"/>
+    <aura:attribute access="public" name="selectedAddressId" type="String"/>
+    <aura:attribute access="public" name="communityBaseUrl" type="String"/>
+    <aura:attribute access="public" name="noAccountFound" type="Boolean" default="true"/>
+    <aura:attribute access="public" name="productCategoryValues" type="List"/>
+    <aura:attribute access="public" name="filteredProductCategoryValues" type="List"/>
+    <aura:attribute access="public" name="selectedProductCategory" type="String"/>
+    <aura:attribute access="public" name="selectedAccountRecordTypeDeveloperName" type="String"/>
+    <aura:attribute access="public" name="productCategoryDisabled" type="Boolean" default="true"/>
+    <aura:attribute access="public" name="showProductCategory" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="createAddressLabel" type="String" default="{!$Label.c.TA_CreateNewAddress}"/>
+    <aura:attribute access="public" name="showAddressSection" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="addressMap" type="Map" />
+    <aura:attribute access="public" name="calledFromExternalCmp" type="Boolean" default="false" />
+    <aura:attribute access="public" name="recordTypesMap" type="List"/>
+    <aura:attribute access="public" name="handleResponseLayout" type="Object"/>
+    <aura:attribute access="public" name="recordTypeId" type="String"/>
+
+    <aura:attribute access="private" name="accountSelected" type="Object"/>
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}" />
+    <aura:handler event="c:XC_LCE013_SetAddressObject" name="XC_LCE013_SetAddressObject" action="{!c.handleAddressEvent}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt" />
+    <aura:registerEvent name="closeModal" type="c:TA_LCE248_GenericEvent" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <!-- <div class="ta-modal-bg">
+        <aura:if isTrue="{!v.showSelectAccountModal}">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" class="ta-modal-header-title slds-text-align_center">
+                            {!$Label.c.TA_SelectAccount}
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleCloseModal}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="ta-modal-body">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-text-align_center">
+                            <aura:if isTrue="{!not(v.calledFromExternalCmp)}">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="9">
+                                        <lightning:input type="text" class="slds-float_left slds-p-right_medium ta-account-search"
+                                            name="searchParam"
+                                            placeholder="{!$Label.c.TA_SelectAccountSearchAccount}"
+                                            value="{!v.searchParam}"
+                                            onchange="{!c.handleCheckSearchParam}"/>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="3">
+                                        <lightning:button class="ta-button-search slds-float_left"
+                                            label="{!$Label.c.TA_CartDiscountCodeSearch}"
+                                            name="Search"
+                                            onclick="{!c.handleSearchAccount}"
+                                            disabled="{!v.disableSearch}"/>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </aura:if>
+                        </lightning:layoutItem>
+                        <aura:if isTrue="{!v.noAccountFound}">
+                            <lightning:layoutItem size="1"/>
+                            <lightning:layoutItem size="10" class="slds-text-align_center slds-m-bottom_large slds-m-top_medium">
+                                <h3 class="ta-color-grey"> {!$Label.c.TA_SelectAccountNoAccountFound} </h3>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="1"/>
+
+                            <aura:set attribute="else">
+                                <lightning:layoutItem size="12" class="slds-text-align_center slds-m-vertical_small slds-scrollable_y ta-account-list-container">
+                                    <aura:iteration items="{!v.searchResultList}" var="account">
+                                        <div id="{!account.accountId}" onclick="{!c.handleSelectAccount}" class="{!if(account.selected, 'ta-account-card-selected', 'ta-account-card')}">
+                                            <lightning:layout multipleRows="true" class="ta-height-100 slds-p-around_medium">
+                                                <lightning:layoutItem size="6" class="slds-text-align_left slds-m-bottom_x-small">
+                                                    <p class="ta-color-purple ta-font-weight-800 ta-width"> {!account.name} </p>
+                                                </lightning:layoutItem>
+                                                <aura:if isTrue="{!not(empty(account.fiscalCode))}">
+                                                    <lightning:layoutItem size="12" class="slds-text-align_left">
+                                                        <p class="ta-color-purple ta-font-weight-300"> {!$Label.c.TA_SelectAccountFiscalCode}: </p>
+                                                        <p class="ta-color-purple ta-font-weight-800"> {!account.fiscalCode} </p>
+                                                    </lightning:layoutItem>
+                                                </aura:if>
+                                                <aura:if isTrue="{!not(empty(account.phone))}">
+                                                    <lightning:layoutItem size="12" class="slds-text-align_left">
+                                                        <p class="ta-color-purple ta-font-weight-300"> {!$Label.c.TA_SelectAccountPhone}: </p>
+                                                        <p class="ta-color-purple ta-font-weight-800"> {!account.phone} </p>
+                                                    </lightning:layoutItem>
+                                                </aura:if>
+                                                <aura:if isTrue="{!not(empty(account.email))}">
+                                                    <lightning:layoutItem size="12" class="slds-text-align_left">
+                                                        <p class="ta-color-purple ta-font-weight-300"> {!$Label.c.TA_SelectAccountEmail}: </p>
+                                                        <p class="ta-color-purple ta-font-weight-800"> {!account.email} </p>
+                                                    </lightning:layoutItem>
+                                                </aura:if>
+                                            </lightning:layout>  
+                                        </div>
+                                    </aura:iteration>
+                                </lightning:layoutItem>
+                            </aura:set>
+                        </aura:if>
+
+                        <aura:if isTrue="{!and(v.showProductCategory, not(v.calledFromExternalCmp))}">
+                            <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_x-small">
+                                <p class="ta-color-purple slds-m-bottom_x-small"> {!$Label.c.TA_SearchAccountSelectProductType} </p>
+                                <lightning:select class="ta-category-picklist"
+                                    name="productCategoryList"
+                                    value="{!v.selectedProductCategory}"
+                                    disabled="{!v.productCategoryDisabled}">
+                                    <aura:iteration items="{!v.filteredProductCategoryValues}" var="product">
+                                        <option value="{!product}">{!product}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </lightning:layoutItem>
+                        </aura:if>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-footer-one-button">
+                    <lightning:button class="ta-button-primary-modal"
+                                    label="{!$Label.c.TA_SelectOrCreateAddress}"
+                                    name="SelectOrCreateAddress"
+                                    onclick="{!c.handleShowAddressModal}"
+                                    disabled="{!v.disableConfirmAccount}"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            </aura:if>
+
+            <aura:if isTrue="{!v.showSelectAddressModal}">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                <aura:if isTrue="{!and(and(v.accountSelected != null, not(empty(v.accountSelected.addressList))), not(v.showAddressSection))}">
+                    <lightning:layoutItem size="12" class="ta-modal-header">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="1" class="ta-modal-header-button">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/back.svg'}" onclick="{!c.handleBackModal}"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="11" class="ta-modal-header-title slds-text-align_center">
+                                {!$Label.c.TA_SelectAddress}
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" class="ta-modal-body">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="12" class="ta-height-custom slds-scrollable">
+                                <aura:iteration items="{!v.accountSelected.addressList}" var="address">
+                                    <div id="{!address.addressId}" onclick="{!c.handleSelectAddress}" class="{!if(address.selected, 'ta-account-card-selected', 'ta-account-card')}">
+                                        <lightning:layout multipleRows="true" class="ta-height-100 slds-p-around_medium">
+                                            <lightning:layoutItem size="6" class="slds-text-align_left slds-m-bottom_x-small">
+                                                <p class="ta-color-purple ta-font-weight-800 ta-width"> {!address.streetType + ' ' + address.streetName + ' ' + address.streetNumber + ', ' + address.city + ', ' + address.postalCode} </p>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>  
+                                    </div>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" class="ta-modal-footer-two-button">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                <lightning:button class="ta-button-secondary-modal"
+                                                label="{!v.createAddressLabel}"
+                                                name="toggleNewAddressSection"
+                                                onclick="{!c.handleToggleAddressSection}"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12">
+                                <lightning:button class="ta-button-primary-modal"
+                                                label="{!$Label.c.TA_ProceedWithSale}"
+                                                onclick="{!c.handleConfirmAccount}"
+                                                disabled="{!v.disableConfirmAddress}"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+                    <aura:set attribute="else">
+                        <lightning:layoutItem size="12" class="ta-modal-header">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="1" class="ta-modal-header-button">
+                                    <img src="{!$Resource.TA_Icons + '/xc-icons/back.svg'}" onclick="{!c.handleBackModal}"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="11" class="ta-modal-header-title slds-text-align_center">
+                                    {!$Label.c.TA_CreateNewAddress}
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="ta-modal-body">
+                            <c:XC_LCP_Address source="003" parentRecordType="{!v.selectedAccountRecordTypeDeveloperName}"/>
+                        </lightning:layoutItem>
+                        <aura:if isTrue="{!and(v.accountSelected != null, not(empty(v.accountSelected.addressList)))}">
+                            <lightning:layoutItem size="12" class="ta-modal-footer-two-button">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                        <lightning:button class="ta-button-secondary-modal"
+                                                        label="{!v.createAddressLabel}"
+                                                        name="toggleNewAddressSection"
+                                                        onclick="{!c.handleToggleAddressSection}"/>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="12">
+                                        <lightning:button class="ta-button-primary-modal"
+                                                        label="{!$Label.c.TA_ProceedWithSale}"
+                                                        onclick="{!c.handleConfirmAccount}"
+                                                        disabled="{!v.disableConfirmAddress}"/>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </lightning:layoutItem>
+                            <aura:set attribute="else">
+                                <lightning:layoutItem size="12" class="ta-modal-footer-one-button">
+                                    <lightning:button class="ta-button-primary-modal"
+                                                    label="{!$Label.c.TA_ProceedWithSale}"
+                                                    onclick="{!c.handleConfirmAccount}"
+                                                    disabled="{!v.disableConfirmAddress}"/>
+                                </lightning:layoutItem>
+                            </aura:set>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+            </lightning:layout>
+        </aura:if>
+    </div> -->
+
+    <aura:if isTrue="{!v.showSelectAccountModal}">
+        <div class="ta-full-screen-modal-container">
+            <div class="ta-full-screen-modal-header">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="11" class="ta-modal-header-title slds-text-align_center">
+                        {!$Label.c.TA_SelectAccount}
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="1">
+                        <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" class="ta-full-screen-modal-header-button" onclick="{!c.handleCloseModal}" />
+                    </lightning:layoutItem>
+                    <aura:if isTrue="{!not(v.calledFromExternalCmp)}">
+                        <lightning:layoutItem size="9" class="slds-p-top_small">
+                            <lightning:input type="text" class="ta-account-search"
+                                name="searchParam"
+                                placeholder="{!$Label.c.TA_SelectAccountSearchAccount}"
+                                value="{!v.searchParam}"
+                                onchange="{!c.handleCheckSearchParam}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="3" class="slds-p-top_small">
+                            <lightning:button class="ta-button-search slds-float_right"
+                                label="{!$Label.c.TA_CartDiscountCodeSearch}"
+                                name="Search"
+                                onclick="{!c.handleSearchAccount}"
+                                disabled="{!v.disableSearch}"/>
+                        </lightning:layoutItem>
+                    </aura:if>
+                </lightning:layout>
+            </div>
+
+            <div class="ta-full-screen-modal-body">
+                <lightning:layout multipleRows="true">
+                    <aura:if isTrue="{!v.noAccountFound}">
+                        <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large slds-m-top_medium">
+                            <h3 class="ta-color-grey"> {!$Label.c.TA_SelectAccountNoAccountFound} </h3>
+                        </lightning:layoutItem>
+
+                        <aura:set attribute="else">
+                            <lightning:layoutItem size="12" class="slds-text-align_center slds-m-vertical_small slds-scrollable_y ta-account-list-container">
+                                <aura:iteration items="{!v.searchResultList}" var="account">
+                                    <div id="{!account.accountId}" onclick="{!c.handleSelectAccount}" class="{!if(account.selected, 'ta-account-card-selected', 'ta-account-card')}">
+                                        <lightning:layout multipleRows="true" class="ta-height-100 slds-p-around_medium">
+                                            <lightning:layoutItem size="6" class="slds-text-align_left slds-m-bottom_x-small">
+                                                <p class="ta-color-purple ta-font-weight-800 ta-width"> {!account.name} </p>
+                                            </lightning:layoutItem>
+                                            <aura:if isTrue="{!not(empty(account.fiscalCode))}">
+                                                <lightning:layoutItem size="12" class="slds-text-align_left">
+                                                    <p class="ta-color-purple ta-font-weight-300"> {!$Label.c.TA_SelectAccountFiscalCode}: </p>
+                                                    <p class="ta-color-purple ta-font-weight-800"> {!account.fiscalCode} </p>
+                                                </lightning:layoutItem>
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(account.phone))}">
+                                                <lightning:layoutItem size="12" class="slds-text-align_left">
+                                                    <p class="ta-color-purple ta-font-weight-300"> {!$Label.c.TA_SelectAccountPhone}: </p>
+                                                    <p class="ta-color-purple ta-font-weight-800"> {!account.phone} </p>
+                                                </lightning:layoutItem>
+                                            </aura:if>
+                                            <aura:if isTrue="{!not(empty(account.email))}">
+                                                <lightning:layoutItem size="12" class="slds-text-align_left">
+                                                    <p class="ta-color-purple ta-font-weight-300"> {!$Label.c.TA_SelectAccountEmail}: </p>
+                                                    <p class="ta-color-purple ta-font-weight-800"> {!account.email} </p>
+                                                </lightning:layoutItem>
+                                            </aura:if>
+                                        </lightning:layout>  
+                                    </div>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                        </aura:set>
+                    </aura:if>
+                </lightning:layout>
+            </div>
+
+            <div class="ta-full-screen-modal-footer">
+                <aura:if isTrue="{!and(v.showProductCategory, not(v.calledFromExternalCmp))}">
+                    <div class="slds-text-align_center slds-m-bottom_small">
+                        <p class="ta-color-purple slds-m-bottom_x-small"> {!$Label.c.TA_SearchAccountSelectProductType} </p>
+                        <lightning:select class="ta-category-picklist"
+                            name="productCategoryList"
+                            value="{!v.selectedProductCategory}"
+                            disabled="{!v.productCategoryDisabled}">
+                            <aura:iteration items="{!v.filteredProductCategoryValues}" var="product">
+                                <option value="{!product}">{!product}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                </aura:if>
+
+                <lightning:button class="ta-button-primary-modal"
+                    label="{!$Label.c.TA_SelectOrCreateAddress}"
+                    name="SelectOrCreateAddress"
+                    onclick="{!c.handleShowAddressModal}"
+                    disabled="{!v.disableConfirmAccount}" />
+            </div>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showSelectAddressModal}">
+        <div class="ta-full-screen-modal-container">
+            <aura:if isTrue="{!and(and(v.accountSelected != null, not(empty(v.accountSelected.addressList))), not(v.showAddressSection))}">
+                <div class="ta-full-screen-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="1">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/back.svg'}" class="ta-full-screen-modal-header-button" onclick="{!c.handleBackModal}" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="11" class="ta-modal-header-title slds-text-align_center">
+                            {!$Label.c.TA_SelectAddress}
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+
+                <div size="12" class="ta-full-screen-modal-body">
+                    <aura:iteration items="{!v.accountSelected.addressList}" var="address">
+                        <div id="{!address.addressId}" onclick="{!c.handleSelectAddress}" class="{!if(address.selected, 'ta-account-card-selected', 'ta-account-card')}">
+                            <lightning:layout multipleRows="true" class="slds-p-around_medium">
+                                <lightning:layoutItem size="12">
+                                    <p class="ta-color-purple ta-font-weight-800"> {!address.streetType + ' ' + address.streetName + ' ' + address.streetNumber + ', ' + address.city + ', ' + address.postalCode} </p>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </div>
+                    </aura:iteration>
+                </div>
+
+                <div class="ta-full-screen-modal-footer">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                            <lightning:button class="ta-button-secondary-modal"
+                                label="{!v.createAddressLabel}"
+                                name="toggleNewAddressSection"
+                                onclick="{!c.handleToggleAddressSection}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <lightning:button class="ta-button-primary-modal"
+                                label="{!$Label.c.TA_ProceedWithSale}"
+                                onclick="{!c.handleConfirmAccount}"
+                                disabled="{!v.disableConfirmAddress}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+
+                <aura:set attribute="else">
+                    <div class="ta-full-screen-modal-header">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="1">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/back.svg'}" class="ta-full-screen-modal-header-button" onclick="{!c.handleBackModal}"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="11" class="ta-modal-header-title slds-text-align_center">
+                                {!$Label.c.TA_CreateNewAddress}
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </div>
+
+                    <div class="ta-full-screen-modal-body">
+                        <c:XC_LCP_Address source="003" parentRecordType="{!v.selectedAccountRecordTypeDeveloperName}"/>
+                    </div>
+
+                    <div class="ta-full-screen-modal-footer">
+                        <aura:if isTrue="{!and(v.accountSelected != null, not(empty(v.accountSelected.addressList)))}">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                    <lightning:button class="ta-button-secondary-modal"
+                                        label="{!v.createAddressLabel}"
+                                        name="toggleNewAddressSection"
+                                        onclick="{!c.handleToggleAddressSection}"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <lightning:button class="ta-button-primary-modal"
+                                        label="{!$Label.c.TA_ProceedWithSale}"
+                                        onclick="{!c.handleConfirmAccount}"
+                                        disabled="{!v.disableConfirmAddress}"/>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                            <aura:set attribute="else">
+                                <lightning:button class="ta-button-primary-modal"
+                                    label="{!$Label.c.TA_ProceedWithSale}"
+                                    onclick="{!c.handleConfirmAccount}"
+                                    disabled="{!v.disableConfirmAddress}"/>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                </aura:set>
+            </aura:if>
+        </div>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,122 @@
+/* .THIS .ta-title {
+    font-size: 4vw;
+    color: white;
+    font-weight: 800;
+}
+
+.THIS .ta-price {
+    font-size: 4vw;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 800;
+}
+
+.THIS .ta-accordion-header-button {
+    font-size: 3.5vw;
+    font-weight: 100;
+    border: 1px solid white;
+    padding: 1vw 2vw 1vw 2vw;
+    border-radius: 2.5vw;
+    color: white;
+    background: transparent;
+    text-transform: capitalize;
+}
+
+.THIS .ta-accordion-header-icon {
+    width: 9vw;
+    margin-top: 2vw;
+}
+
+.THIS .ta-modal-box {
+    border-top: .3vw solid white;
+    padding-top: 6vw;
+    margin-top: 6vw;
+}
+
+.THIS .ta-item-title {
+    font-size: 3.3vw;
+    font-weight: 800;
+    color: white;
+}
+
+.THIS .ta-item-description {
+    font-size: 3.3vw;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.THIS .ta-quantity {
+    font-size: 3.3vw;
+    color: white;
+    font-weight: 800;
+    padding: .8vw;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 6vw;
+    height: 6vw;
+    text-align: center;
+    float: right;
+}
+
+.THIS .ta-item-price {
+    color: white;
+    font-weight: 800;
+    font-size: 4vw;
+}
+
+.THIS .ta-item-payment {
+    font-size: 3.3vw;
+    font-weight: 800;
+    color: white;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2.5vw;
+    width: 45vw;
+    text-align: center;
+    padding: 1vw;
+}
+
+.THIS .ta-quantity-operator {
+    color: #00c983;
+    font-size: 5vw;
+    background: rgba(255, 255, 255, 0.9);
+    width: 8vw;
+    text-align: center;
+    border-radius: 2.5vw;
+}
+
+.THIS .ta-quantity-editable {
+    font-size: 3.3vw;
+    color: white ;
+    font-weight: 800;
+    padding: .6vw;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 6vw;
+    height: 6vw;
+    text-align: center;
+    margin: .5vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-quote-accepted {
+    font-size: 3.5vw;
+    font-weight: 100;
+    padding: 1vw 2vw 1vw 2vw;
+    border-radius: 2.5vw;
+    color: white;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-transform: capitalize;
+}
+
+/* CUSTOM-TAG */
+.THIS.ta-box-custom-margin {
+    margin: 6vw 3vw 3vw 3vw; 
+}
+
+/* CUSTOM-TAG */
+@media only screen and (min-width: 601px) {
+    .THIS.ta-box-custom-margin {
+        margin: 3vw 1.5vw 3vw 1.5vw;
+    }
+}

@@ -1,0 +1,88 @@
+<!-- 
+* @author FirstName LastName - email
+* @date Creation dd/mm/yyyy
+* @date Modification 18/01/2019 by Monica Cutillo - monica.cutillo@nttdata.com (various corrections related to the labels; new helper method setGridColumns)
+* @description Component Name – Describe the functionality
+--> 
+<aura:component 
+    implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,force:appHostable,lightning:hasPageReference"
+    controller="XC_LCC067_RelatedAssetsByAccount" 
+    access="global">
+    
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="columns" type="List" />
+    <aura:attribute name="data" type="Object" />
+    <aura:attribute name="columns2" type="List" />
+    <aura:attribute name="data2" type="Object" />
+    <aura:attribute name="product" type="String" />
+    <aura:attribute name="coverage" type="String" />
+    <aura:attribute name="service" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <div class="slds-box">
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+
+                    <lightning:icon class="slds-icon slds-icon-standard-email-iq" iconName="standard:asset_relationship" alternativeText="{!v.coverage - v.service}" />
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <div class="slds-text-heading_small">&nbsp; <b>{!$Label.c.XC_CL_AssetType_Coverage}</b></div>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+        </article>
+        <div class="slds-card__body">
+            <div class="slds-no-flex">
+                <c:XC_LCP107_AssetTreeHierarchy recordId="{! v.recordId }" assetTreeType="Services" />
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="slds-box">
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+
+                    <lightning:icon class="slds-icon slds-icon-standard-email-iq" iconName="standard:asset_relationship" alternativeText="{!v.coverage - v.service}" />
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <div class="slds-text-heading_small">&nbsp; <b>{!$Label.c.XC_CL_AssetType_Coverage}</b></div>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+        </article>
+        <div class="slds-card__body">
+            <div class="slds-no-flex">
+                <lightning:datatable data="{! v.data }" columns="{! v.columns }" keyField="Id" hideCheckboxColumn="true" resizeColumnDisabled="true" />
+            </div>
+        </div>
+    </div>-->
+
+    <div class="slds-box">
+        <article class="slds-card"> 
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+    
+                    <lightning:icon class="slds-icon slds-icon-standard-email-iq" iconName="standard:asset_relationship"
+                        alternativeText="{!$v.product}" />
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <div class="slds-text-heading_small">&nbsp; <b>{!$Label.c.XC_CL_AssetType_Product}</b></div>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+        </article>
+        <div class="slds-card__body">
+            <div class="slds-no-flex">
+                <c:XC_LCP107_AssetTreeHierarchy recordId="{! v.recordId }" assetTreeType="Products" />
+            </div>
+        </div>
+        <!--<div class="slds-no-flex">            
+                <lightning:datatable data="{! v.data2 }" columns="{! v.columns2 }" keyField="id" hideCheckboxColumn="true"/>
+            </div>-->
+        </div>
+</aura:component>

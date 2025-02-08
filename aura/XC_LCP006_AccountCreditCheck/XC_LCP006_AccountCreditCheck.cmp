@@ -1,0 +1,22 @@
+<!--
+* @author Salvatore Scarpato - salvatore.scarpato@nttdata.com
+* @date Creation 17/09/2018
+* @date Modification dd/mm/yyyy
+* @description XC_LCP006_AccountCreditCheck – STUB Component calling an External System to verify a Credit Check on the account.
+-->
+<aura:component controller="XC_LCC006_AccountCreditCheck" implements="force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+ 
+    <aura:attribute name="body0" type="Object[]" />
+    <aura:attribute name="recordId" type="Id" />
+	<aura:attribute name="showModal" type="Boolean" default="false" />
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+ 
+    <ui:scrollerWrapper class="scrollerSize">
+    	<lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="false">  
+    		{!v.body0} 
+        </lightning:layout>
+    </ui:scrollerWrapper> 
+	
+</aura:component>

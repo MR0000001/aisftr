@@ -1,0 +1,55 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference"
+    access="global">
+
+    <aura:attribute name="title" type="String" />
+    <aura:attribute name="subsectionLabel" type="String" />
+    <aura:attribute name="dataObj" type="String" />
+    <aura:attribute name="showSaveSection" type="Boolean" default="false" />
+    <aura:attribute name="showPDFSection" type="Boolean" default="false" />
+    <aura:attribute name="superBody" type="Object[]" />
+    <aura:attribute name="subsectionBody" type="Object[]" />
+    <aura:attribute name="stringDataValues" type="String" />
+    <aura:attribute name="stringSubDataValues" type="String" />
+    <aura:attribute name="viewSubsection" type="Boolean" default="false" />
+    <aura:attribute name="activeSections" type="List" default="[]" />
+    <aura:attribute name="mainTitle" type="String" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:registerEvent name="XC_LCE014_SaveSectionValue" type="c:XC_LCE014_SaveSectionValue" />
+    <aura:registerEvent name="XC_LCE018_CallReadInvoicePDF" type="c:XC_LCE018_CallReadInvoicePDF" />
+    <div class="slds-box slds-box_x-small"
+        style="margin:10px; border-color:lightgrey; background-color:white; border-radius:15px; ">
+        <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+            <BR />
+        </lightning:layout>
+
+        <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+            <h2 class="slds-text-heading_xsmall">{!v.title}</h2>
+            <aura:if isTrue="{!v.showSaveSection}">
+                <div class="buttonstyle" style="text-align:right">
+                    <lightning:button label="{!$Label.c.XC_CL_SaveButton}" title="Save"
+                        onclick="{! c.saveCommodityObject }" />
+                </div>
+            </aura:if>
+            <aura:if isTrue="{!v.showPDFSection}">
+                <div class="buttonstyle" style="text-align:right">
+                    <lightning:button label="{!$Label.c.XC_CL_PDFButton}" title="PDF"
+                        onclick="{! c.loadPDF }" />
+                </div>
+            </aura:if>
+        </lightning:layout>
+        <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+            <BR />
+        </lightning:layout>
+        <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+            {!v.superBody}
+        </lightning:layout>
+        <br />
+        <aura:if isTrue="{!v.viewSubsection}">
+            <lightning:accordionSection name="A" label="{!v.subsectionLabel}">
+                {!v.subsectionBody}
+            </lightning:accordionSection>
+        </aura:if>
+    </div>
+</aura:component>

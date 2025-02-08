@@ -1,0 +1,20 @@
+<!--
+* @author Monica Cutillo - monica.cutillo@nttdata.com
+* @date Creation 12/07/2019
+* @date Modification 
+* @description XC_LCP134_ViewFieldsBuilder – STUB father Component to view fields from external calls
+-->
+<aura:component 
+	extensible="true" abstract="true" 
+	implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference" access="global" >
+    
+    <aura:attribute name="commodityGlobalMessage" type="String" />
+    <aura:attribute name="sobjecttype" type="String" />
+    <aura:attribute name="sectionBody" type="Object[]" />
+    <aura:attribute name="body0" type="Object[]" />
+    <aura:attribute name="showPDFSection" type="Boolean" default="false" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+
+    <div class="c-container">{!v.body}</div>
+	
+</aura:component>

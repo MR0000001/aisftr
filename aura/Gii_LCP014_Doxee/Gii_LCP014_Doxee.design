@@ -1,0 +1,4 @@
+<design:component label="Gii_LCP014_Doxee">
+    <design:attribute name="widthPar" label="width" description="Width of Canvas" />
+    <design:attribute name="heightPar" label="height" description="Height of Canvas" />
+</design:component>

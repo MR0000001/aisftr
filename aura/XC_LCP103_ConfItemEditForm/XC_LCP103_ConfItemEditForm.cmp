@@ -1,0 +1,189 @@
+<!--
+* @author Lorenzo Orlanducci lorenzo.orlanducci@nttdata.com
+* @date Creation 13/02/2019
+* @date Modification dd/mm/yyyy
+* @description component for create line item in Select Payment method
+-->
+<aura:component controller="XC_LCC103_ConfItemEditForm"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable">
+
+
+    <aura:attribute name="filter3" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="accountId" type="String" />
+    <aura:attribute name="contactId" type="String" />
+    <aura:attribute name="auraPaymentValue" type="String" />
+    <aura:attribute name="filter2" type="String" />
+    <aura:attribute name="legalEntityId" type="String" />
+    <aura:attribute name="showSpinner" type="Boolean" default="true" />
+    <aura:attribute name="billingId" type="String" />
+    <!-- [ BEGIN, mridul.b.jain@accenture.com, 06/01/2022, ID-1 Select Payment Method, NR2073, ENEL X - r12 ]!-->
+    <aura:attribute name="billingpaymentTerm" type="String" />
+    <aura:attribute name="isB2B" type="Boolean" default= "false"/>
+    <aura:attribute name="paymentTermFilter" type="String"/>
+    <aura:attribute name="isItaly" type="Boolean" default= "false" />
+    <!-- [ END, mridul.b.jain@accenture.com, 06/01/2022, ID-1 Select Payment Method, NR2073, ENEL X - r12 ]!-->
+    <aura:attribute name="paymentOptions" type="List" />
+    <aura:attribute name="availableMopsMap" type="Object"/>
+    <aura:attribute name="mapbillingIds" type="Map" default="{}" />
+    <aura:attribute name="mapOrderItemPayment" type="Map" default="{}" />
+    <aura:attribute name="addressId" type="String" />
+    <aura:attribute name="soldAddressId" type="String" />
+
+    <aura:attribute name="payment" type="String" />
+    <aura:attribute name="setReadOnly" type="Boolean" default="false" />
+    <aura:attribute name="onlyOnePickValue" type="Boolean" default="false" />
+    <aura:attribute name="paymentMethodReadOnly" type="Boolean" default="false" />
+    <aura:attribute name="showCustomPaymentMethod" type="Boolean" default="false" />
+    <aura:attribute name="isComfy" type="Boolean" default="false" />
+    <aura:attribute name="secondStrike" type="Boolean" default="false" />
+    <aura:attribute name="showInstallmentPlan" type="Boolean" default="false" />
+    <aura:attribute name="showImpliedInterest" type="Boolean" default="false" />
+    <aura:attribute name="isBillingAccountFilter" type="Boolean" default="false"/>
+    
+    <aura:attribute name="installmentPlanFields" type="Map" default="{ installmentType: null, installmentTax: null, installmentFreq: null, installmentNum: null, installmentRate: null }" />
+    <!-- <aura:handler name="init" value="{! this }" action="{! c.doInit }" /> -->
+    <aura:attribute name="isBillToPartner" type="Boolean" default= "false"/>
+    <!--Start EA TPB 13/10/2021-->
+    <aura:attribute name="partnerCode" type="String" />
+    <!--End EA TPB 13/10/2021-->
+    <aura:handler name="change" value="{!v.billingId}" action="{!c.sendEvent}" />
+    <aura:handler name="change" value="{!v.addressId}" action="{!c.onBillToAddressChange}" />
+
+
+    <aura:registerEvent name="setConfObject" type="c:XC_LCE002_SendConfigurationItemValues" />
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner alternativeText="Loading" size="large" />
+    </aura:if>
+    <lightning:recordEditForm objectApiName="NE__OrderItem__c" recordId="{!v.recordId}" onload="{!c.doInit}">
+
+        <lightning:messages />
+
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="3"
+                                  padding="around-small">
+                <br></br>
+                <lightning:inputField fieldName="NE__ProdName__c" />
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="3" mediumDeviceSize="2" largeDeviceSize="3"
+                                  padding="around-small">
+                <br></br>
+                <lightning:inputField aura:id="billModel" fieldName="XC_BillingModel__c" disabled="true" />
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="3" mediumDeviceSize="2" largeDeviceSize="3"
+                padding="around-small">
+                <!-- <aura:if isTrue="{!!v.showCustomPaymentMethod}"> -->
+                <div class="slds-form_horizontal">
+                    <br></br>
+                    <lightning:combobox aura:id="auraPayment" label="{!$Label.c.XC_CL_PaymentMethod}" options="{!v.paymentOptions}"
+                        onchange="{!c.changePickVal}" disabled="{!v.setReadOnly  || v.paymentMethodReadOnly}"
+                        value="{!v.auraPaymentValue}" />
+                </div>
+                <!-- <lightning:inputField aura:id="auraPayment" fieldName="XC_PaymentMethod__c"
+                    onchange="{!c.changePickVal}" disabled="{!v.setReadOnly  || v.paymentMethodReadOnly}" />
+                <aura:set attribute="else">
+                        <div class="slds-form_horizontal"><br></br>
+                            <lightning:combobox name="PaymentMethod" label="Payment Method"
+                                value="{! v.auraPaymentValue }" options="{! v.paymentOptions }"
+                                disabled="{!v.onlyOnePickValue || v.paymentMethodReadOnly}" onchange="{!c.changePickVal}"/>
+                        </div>
+                    </aura:set> -->
+                <!-- </aura:if> -->
+            </lightning:layoutItem>
+            
+            <!-- [ BEGIN, mridul.b.jain@accenture.com, 06/01/2022, ID-1 Select Payment Method, NR2073, ENEL X - r12 ]!--> 
+            <aura:if isTrue="{!and(v.isB2B,v.isItaly)}">  
+                <lightning:layoutItem size="12" smallDeviceSize="3" mediumDeviceSize="2" largeDeviceSize="3"
+                padding="around-small">   
+                    <div class="slds-form_horizontal">
+                        <br></br>          
+                        <lightning:recordEditForm objectApiName="NE__Billing_Profile__c">                   
+                            <lightning:messages />    
+                            <lightning:inputField aura:id="payTerm" fieldName="XC_PaymentTerm__c" onchange="{!c.changePickValPayterm}" value ="{!v.paymentTermFilter}"/>
+                        </lightning:recordEditForm> 
+                    </div>
+                </lightning:layoutItem>                       
+            </aura:if>
+            <!-- [ END, mridul.b.jain@accenture.com, 06/01/2022, ID-1 Select Payment Method, NR2073, ENEL X - r12 ] !-->
+            
+            <lightning:layoutItem size="12" smallDeviceSize="3" mediumDeviceSize="3" largeDeviceSize="3"
+                                  padding="around-small" flexibility="auto">
+                <div>
+                    <aura:if isTrue="{!!v.secondStrike}">
+                        <aura:if isTrue="{!v.isComfy}">
+                            <div class="abbass"></div>
+                        </aura:if>
+                        <c:strike_lookup label="{!$Label.c.XC_CL_LCP103_HelpBPLILookupTitle}"
+                            object="XC_BillingProfileLineItem__c" value="{!v.billingId}"
+                            searchField="XC_BillingProfileName__c" placeholder="" iconName="custom:custom93" order="Id"
+                            limit="100" searchingMessage="Search..." noResultsMessage="No Result found"
+                            subtitleField="XC_SoldToAddressText__c" loadingMessage="" errorMessage=""
+                            filter="{!v.filter3}" helpText="{!$Label.c.XC_CL_LCP103_HelpTextBPLI}" />
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.isComfy}">
+                                <div class="abbass"></div>
+                            </aura:if>
+                            <c:strike_lookup label="{!$Label.c.XC_CL_LCP103_HelpBPLILookupTitle}"
+                                object="XC_BillingProfileLineItem__c" value="{!v.billingId}"
+                                searchField="XC_BillingProfileName__c" placeholder="" iconName="custom:custom93"
+                                order="Id" limit="100" searchingMessage="Search..." noResultsMessage="No Result found"
+                                subtitleField="XC_SoldToAddressText__c" loadingMessage="" errorMessage=""
+                                filter="{!v.filter2}" helpText="{!$Label.c.XC_CL_LCP103_HelpTextBPLI}" />
+                        </aura:set>
+                    </aura:if>
+                </div>
+
+            </lightning:layoutItem>
+
+
+
+
+        </lightning:layout>
+        <aura:if isTrue="{!v.showInstallmentPlan}">
+            <lightning:layout multipleRows="true" horizontalAlign="end">
+                <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2"
+                                      padding="around-small">
+
+                    <lightning:inputField aura:id="installmentType" fieldName="XC_InstallmentPlanType__c" variant="label-stacked" onchange="{!c.sendEvent}" disabled="{!and(v.isB2B,v.isItaly)}"/><!--gaurav.tejpal@accenture.com, 04/05/2022,Enel X - NR2187-->
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2"
+                                      padding="around-small">
+
+                    <lightning:inputField aura:id="installmentTax" fieldName="InstallmentDivisionTax__c" variant="label-stacked" onchange="{!c.sendEvent}"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2"
+                                      padding="around-small">
+
+                    <lightning:inputField aura:id="installmentFreq" fieldName="XC_InstallmentFrequency__c" variant="label-stacked" onchange="{!c.sendEvent}" disabled="{!and(v.isB2B,v.isItaly)}"/><!--gaurav.tejpal@accenture.com, 04/05/2022,Enel X - NR2187-->
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2"
+                                      padding="around-small">
+
+                    <lightning:inputField aura:id="installmentNum" fieldName="XC_InstallmentsNumber__c" variant="label-stacked" onchange="{!c.sendEvent}" disabled="{!and(v.isB2B,v.isItaly)}"/><!--gaurav.tejpal@accenture.com, 04/05/2022,Enel X - NR2187-->
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2"
+                                      padding="around-small">
+
+                    <lightning:inputField aura:id="interestIndex" fieldName="XC_Interests_Index__c" variant="label-stacked" onchange="{!c.sendEvent}"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2"
+                                      padding="around-small">
+
+                    <lightning:inputField aura:id="installmentRate" fieldName="XC_InstallmentRate__c" variant="label-stacked" onchange="{!c.sendEvent}"/>
+                </lightning:layoutItem>
+                <hr style="width:85%;text-align:left;margin-left:0"/>
+            </lightning:layout>
+        </aura:if>
+        <aura:if isTrue="{!v.showImpliedInterest}">
+            <lightning:layout multipleRows="true" horizontalAlign="end">
+                <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2"
+                                      padding="around-small">
+
+                    <lightning:inputField aura:id="impliedInterest" fieldName="XC_ImpliedInterest__c" variant="label-stacked" onchange="{!c.sendEvent}"/>
+                </lightning:layoutItem>
+                <hr style="width:85%;text-align:left;margin-left:0"/>
+            </lightning:layout>
+        </aura:if>
+    </lightning:recordEditForm>
+
+</aura:component>

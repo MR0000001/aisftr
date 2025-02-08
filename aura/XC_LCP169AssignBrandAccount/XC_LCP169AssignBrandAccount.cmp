@@ -1,0 +1,50 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader,forceCommunity:availableForAllPageTypes"
+    controller="XC_LCC169_AssignBrandAccount" access="global">
+
+    <aura:attribute name="pickListValue" type="List" default="[]" />
+    <aura:attribute name="brandString" type="String" default="--None--" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <aura:html tag="style">
+        .slds-modal__content{
+        overflow: initial;
+        }
+        .slds-p-around_medium, .slds-p-around--medium {
+        padding: unset;
+        }
+
+        .forceChatterBasePublisher .cuf-content{
+        padding: unset !important;
+        }
+    </aura:html>
+
+    <div class="modal-header slds-modal__header slds-size_1-of-1">
+        <h4 class="title slds-text-heading--medium">Select a Brand</h4>
+    </div>
+
+    <div class="myClass slds-modal__content slds-p-around--x-large slds-size_1-of-1 slds-is-relative">
+        <lightning:layout verticalAlign="center">
+            <lightning:layoutItem size="12" padding="around-large">
+                <lightning:combobox name="select" label="$Label.c.XC_CL_AssignBrand_SelectABrand" required="true"
+                    options="{!v.pickListValue}" value="{!v.brandString}" />
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+
+    <div class="modal-footer slds-modal__footer slds-size_1-of-1">
+        <lightning:layout>
+            <lightning:layoutItem alignmentBump="left">
+                <lightning:button variant="brand" label="$Label.c.XC_CL_Save" title="Save" onclick="{!c.doSave}" />
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+
+
+    <aura:if isTrue="{!v.spinnerControl}">
+        <lightning:spinner aura:id="mySpinner" style="background-color: rgba(0, 0, 0, 0);" />
+    </aura:if>
+</aura:component>

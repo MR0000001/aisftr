@@ -1,0 +1,15 @@
+<apex:page lightningStylesheets="true" standardController="Lead" extensions="XC_VFC004_LeadAddressForMobile">
+    
+    <apex:includeLightning />
+    <div id="lightning" />
+    <script>
+        $Lightning.use("c:XC_LAP002_Address", function() {
+          $Lightning.createComponent("c:XC_LCP013_LeadAddress",
+          { "IdFromMobile" : "{!lead.id}" },
+          "lightning");
+        });
+    </script>
+    
+   
+    
+</apex:page>

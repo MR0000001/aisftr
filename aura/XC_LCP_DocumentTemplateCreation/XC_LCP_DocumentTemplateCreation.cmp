@@ -1,0 +1,4 @@
+<aura:component controller ="XC_LCC_DocumentTemplateCreation" implements="force:lightningQuickAction,lightning:availableForFlowActions">
+   <aura:attribute name="recordId" type="String" />
+   <aura:attribute name="Templatechoice" type="String" />
+</aura:component>

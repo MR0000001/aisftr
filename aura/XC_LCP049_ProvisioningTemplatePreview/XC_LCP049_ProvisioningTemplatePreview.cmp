@@ -1,0 +1,24 @@
+<aura:component controller ="XC_LCC049_ProvisioningTemplatePreview" implements="force:appHostable,force:lightningQuickAction,flexipage:availableForAllPageTypes" access="global">
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:attribute name="picklistValues" type="Object"/>
+    <aura:attribute name="BaseURL" type="String"/>
+    <aura:attribute name="templateName" type="String"/>
+    <aura:attribute name="showSchema" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <lightning:layoutItem flexibility="auto" padding="around-small">
+        <div class="custom-box">
+            <lightning:select aura:id="fieldSelect" value="{!v.templateName}" label ="Choose the template to preview: " onchange="{! c.onChange }">
+                <option value="">{!$Label.c.XC_CL_ChooseOne}</option>
+                <aura:iteration items="{!v.picklistValues}" var="item">
+                    <option value="{!item.value}">
+                        {!item}
+                    </option>
+                </aura:iteration>
+            </lightning:select>
+        </div>            
+    </lightning:layoutItem>     
+    <aura:if isTrue="{!v.showSchema}">
+        <iframe aura:id="vfFrame" src="{!v.BaseURL + '/apex/XC_VFP008_ProvisioningTemplatePreview?templateName=' + v.templateName }" width="100%" height="100%" frameBorder="0"/>
+    </aura:if>
+</aura:component>

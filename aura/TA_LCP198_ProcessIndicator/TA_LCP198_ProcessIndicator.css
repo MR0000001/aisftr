@@ -1,0 +1,45 @@
+@media only screen and (max-width: 600px) {
+    /* CUSTOM-TAG */
+    .THIS.ta-process-indicator {
+        margin-bottom: 25px;
+    }
+}
+
+/* .THIS .slds-progress-bar, .THIS .slds-progress__marker {
+    background-color: #461e7d !important;
+    border-color: #461e7d !important;
+} */
+
+/* .THIS .complete, .THIS .actual, .THIS .slds-progress-bar__value {
+    background-color: #ff006e !important;
+    border-color: #ff006e !important;
+} */
+
+/* .THIS .slds-progress-bar {
+    width: 95%;
+    margin-left: .5vw;
+} */
+
+/* .THIS .ta-bar-label {
+    margin-top: 6vw;
+    position: absolute;
+    margin-left: -10vw;
+    color: #ff006e;
+    font-family: Montserrat;
+    font-size: 3.5vw;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    width: 100%;
+    white-space: nowrap;
+} */
+
+/* .THIS .ta-display-none {
+    display: none;
+} */
+
+/* .THIS .slds-progress__marker:focus {
+    box-shadow: none !important;
+} */

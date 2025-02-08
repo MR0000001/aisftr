@@ -1,0 +1,27 @@
+.THIS.ta-record-banner-container {
+    padding: 10vh 2vw 0vh 2vw;
+    position: fixed !important;
+    background: rgb(250, 250, 249);
+    width: 100%;
+    height: 28vh;
+    box-shadow: 0vw 0vw 6vw rgb(0 0 0 / 50%);
+    z-index: 2 !important;
+}
+
+.THIS .ta-workorder-icon {
+    background-color: rgb(70, 30, 125) !important;
+}
+
+.THIS .ta-workorder-icon svg {
+    height: 12vw;
+    width: 12vw;
+}
+
+.THIS .ta-p-bottom-small {
+    padding-bottom: 2vh;
+}
+
+.THIS .ta-record-banner-title {
+    font-size: 5vw;
+    font-weight: bold;
+}

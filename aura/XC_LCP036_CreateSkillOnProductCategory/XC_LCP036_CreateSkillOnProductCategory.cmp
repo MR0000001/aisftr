@@ -1,0 +1,76 @@
+<aura:component implements="force:hasRecordId,flexipage:availableForRecordHome" controller="XC_LCC036_CreateSkillOnProductCategory" access="public">
+    <!-- attributes -->
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/> 
+    <aura:attribute name="toggleModalInsert" type="Boolean" default="false"/> 
+    <aura:attribute name="modalLabel" type="String"/>
+    <!--<aura:attribute name="recordToUpsert" type="Object"/>-->
+    <!--<aura:attribute name="recordToUpsertFields" type="Object"/> -->
+    <aura:attribute name="inputFields" type="Map" default="{XC_Skill_Id__c: '', Name: '', XC_Skill_Level__c: 1}"/>
+    <aura:attribute name="recordError" type="String"/>
+
+    <!-- handlers-->
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/> 
+    <!--<force:recordData aura:id="recordUpsertHandler"
+		recordId="{!v.recordId}"
+		layoutType="FULL"
+		targetRecord="{!v.recordToUpsert}"
+		targetFields="{!v.recordToUpsertFields}"
+		targetError="{!v.recordError}"
+		mode="EDIT"
+		recordUpdated="{!c.init}"
+	/>-->
+    
+    <lightning:card  variant="base" iconName="custom:custom9">
+    	<aura:set attribute="title" >
+    		Skill Requirements
+    	</aura:set>
+        <aura:set attribute="actions">
+            <lightning:button variant="neutral" label="New" onclick="{!c.newRecord}"/>
+            <c:strike_modal
+			    title="{!v.modalLabel}"
+			    primaryButtonLabel="Ok"
+			    secondaryButtonLabel="Cancel"
+			    showHeader="true"
+			    showFooter="true"
+			    showClose="true"
+			    showModal="{!v.toggleModalInsert}">
+			    <div class="slds-form-element">
+					<c:strike_lookup
+						label="Skill"
+						object="Skill"
+						searchField="MasterLabel"
+						placeholder="Search a skill"
+						iconName="custom:custom9"
+						order="MasterLabel"
+						limit="5"
+						loadingMessage="Loading..."
+						errorMessage="Invalid input"
+						showRecentRecords="true"
+						required="true"
+						value="{!v.inputFields.XC_Skill_Id__c}"
+						valueLabel="{!v.inputFields.Name}"
+						/>      
+					<lightning:input aura:id="field" type="number" name="input-level" label="Skill Level" value="{!v.inputFields.XC_Skill_Level__c}" />
+					<aura:if isTrue="{!not(empty(v.recordError))}">
+						<div class="recordError">
+							{!v.recordError}</div>
+					</aura:if> 
+				</div>
+				<aura:set attribute="footerButtons">
+					<div class="slds-modal__footer--directional"> 
+						<lightning:button variant="neutral" label="Cancel" onclick="{!c.handleClickCancel}"/>
+						<lightning:button variant="brand" label="Save" onclick="{!c.handleClickSave}"/>
+					</div>
+				</aura:set>
+			</c:strike_modal>
+        </aura:set>
+
+		<lightning:datatable
+			columns="{!v.columns}"
+			data="{!v.data}"
+			keyField="id"
+			onrowaction="{!c.handleRowAction}"
+			hideCheckboxColumn="true"/>
+    </lightning:card> 
+</aura:component>

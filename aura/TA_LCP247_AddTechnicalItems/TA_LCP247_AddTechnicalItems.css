@@ -1,0 +1,93 @@
+.THIS .greyOut{
+   pointer-events: none;
+   background: #CCC;
+   color: #333;
+   border: 1px solid #666
+}
+
+.THIS.checkboxstyle {
+   padding-top: 1%;
+}
+
+.THIS.slds-modal__container{
+     	width: 80% !important;
+     	max-width: 80% !important;
+     }
+.THIS .slds-form-element__label{
+    color: var(--lwc-colorTextLabel,rgba(0, 0, 0, 0.6)) !important;
+}
+.THIS .slds-input{
+    border: var(--lwc-borderWidthThin,1px) solid var(--sds-c-input-color-border, var(--lwc-colorBorderInput,rgb(212, 212, 212))) !important;
+}
+.THIS .ta-notification {
+   font-weight: inherit !important;
+   font-size: 1.2em !important;
+}
+
+/* CUSTOM-TAG */
+.THIS .slds-input, .THIS .slds-select, .THIS .slds-input:focus, .THIS .slds-input:active, .THIS .slds-faux-input {
+    background-color: #ece8f2 !important;
+    border: 1px solid #ece8f2 !important;
+    border-radius: 5vw !important;
+    color: #461e7d !important;
+    height: 8vw;
+}
+
+.THIS .ta-cards-selected {
+    border-radius: 2.5vw;
+    padding: 5vw;
+    background: rgb(70, 30, 125, 0.6);
+    margin-bottom: 4vw;
+    box-shadow: 0vw 1vw 2vw -.8vw black!important;
+}
+.THIS .ta-add-button{
+    top: -13px;
+}
+.THIS .ta-hide{
+    display:none;
+}
+
+/* SR FIX */
+.THIS .ta-modal-technical-item-container {
+    position: absolute;
+    top: 10vh;
+    left: 10vw;
+    right: 10vw;
+    background: white;
+    border-radius: 5vw;
+    box-shadow: 0 0vw 1vw 0vw black;
+}
+
+.THIS .ta-modal-technical-item-body {
+    padding: 3vw;
+    height: 55vh;
+    overflow-y: auto;
+}
+
+.THIS .ta-cards {
+    border-radius: 2.5vw;
+    padding: 3vw;
+    border: 0.1vw rgb(70, 30, 125) solid;
+    margin-bottom: 4vw;
+    box-shadow: 0vw 1vw 2vw -.8vw black!important;
+}
+
+.THIS .ta-color-violet {
+    color: rgba(70, 30, 125);
+}
+
+.THIS .ta-color-violet-opacity-60 {
+    color: rgba(70, 30, 125, 0.6);
+}
+
+.THIS .ta-p-right-small {
+    padding-right: 1vw;
+}
+
+.THIS .ta-p-left-small {
+    padding-right: 1vw;
+}
+
+.THIS .ta-modal-header {
+    padding: 5vw 5vw 3vw 5vw;
+}

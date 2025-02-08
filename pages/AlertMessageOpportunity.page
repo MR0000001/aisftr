@@ -1,0 +1,6 @@
+<apex:page standardController="Opportunity" rendered="{!IF(OR(Opportunity.XC_PipelineStatus__c== 'Signed Contract',Opportunity.XC_PipelineStatus__c== 'Permitting',Opportunity.XC_PipelineStatus__c== 'Procurement specifics',Opportunity.XC_PipelineStatus__c== 'Procurement assignments',Opportunity.XC_PipelineStatus__c== 'Execution start',Opportunity.XC_PipelineStatus__c== 'Commissioning and Execution End'),TRUE,FALSE)}">
+ <script type="text/javascript">
+
+  { window.alert("{!$Label.XC_CL_AlertMessage}")} ;
+ </script>
+</apex:page>

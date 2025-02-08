@@ -1,0 +1,191 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 02-08-2021
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   12-11-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component controller="XC_AMP_LCC010_OrderComposer"
+  implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId">
+
+  <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+  <aura:attribute name="showOrderMenu" type="Boolean" default="false" />
+  <aura:attribute name="showCategoryMenu" type="Boolean" default="false" />
+  <aura:attribute name="showItemMenu" type="Boolean" default="false" />
+  <aura:attribute name="showSubmit" type="Boolean" default="false" />
+  <aura:attribute name="disableSubmit" type="Boolean" default="false" />
+  <aura:attribute name="validSections" type="Object" />
+  <aura:attribute name="sectionFieldValues" type="Object" />
+
+
+  <!-- ATTRIBUTES POPULATED FROM PARENT CMP -->
+  <aura:attribute name="opportunityId" type="String" />
+  <aura:attribute name="accountId" type="String" />
+
+  <!--################## INTERNAL ATTRIBUTES ###################-->
+
+  <!-- INITIAL INFOS -->
+  <aura:attribute name="catalogId" type="String" />
+  <aura:attribute name="categoryList" type="List" />
+  <aura:attribute name="defaultBPLIId" type="String" />
+  <aura:attribute name="preferredlanguageofcontact" type="String" />
+  <!-- B2W SESSION INFOS -->
+  <aura:attribute name="b2wAuth" type="Object" />
+  <aura:attribute name="b2wRetrieveInfos" type="Object" />
+
+  <!-- CATEGORY ATTRIBUTES -->
+  <aura:attribute name="categoryOpts" type="List" />
+  <aura:attribute name="selectedCategory" type="String" />
+  <aura:attribute name="categoryReadOnly" type="Boolean" default="false" />
+  <aura:attribute name="defaultCatalogCategories" type="String" />
+
+  <!-- ITEMS COMPONENT ATTRIBUTES -->
+  <aura:attribute name="retrievedFullItems" type="List" />
+  <aura:attribute name="itemOpts" type="List" />
+  <aura:attribute name="selectedItem" type="String" />
+  <aura:attribute name="selectedProductDescription" type="String" />
+  <aura:attribute name="productPrice" type="String" />
+  <aura:attribute name="productDiscountedPrice" type="String" />
+  <aura:attribute name="actualCart" type="List" />
+  <aura:attribute name="itemReadOnly" type="Boolean" default="false" />
+  <aura:attribute name="showAttributeList" type="Boolean" default="false"/>
+
+  <!-- FILE UPLOAD RELATED ATTRIBUTES -->
+  <aura:attribute name="showFileUpload" type="Boolean" default="true" />
+  <aura:attribute name="fileUploadRequired" type="Boolean" default="false" />
+  <aura:attribute name="categoryForFile" type="String" />
+  <aura:attribute name="checkForFileCategory" type="Boolean" default="false" />
+  <aura:attribute name="fileUploaded" type="Boolean" default="false" />
+
+  <!-- EXTRA SECTIONS RELATED ATTRIBUTES -->
+  <aura:attribute name="sectionsExtraOrder" type="List" />
+  <aura:attribute name="extraSectionsData" type="Object" />
+  <aura:attribute name="categoryForExtraSections" type="String" />
+  <aura:attribute name="sectionsEditabledBeforeOrder" type="List" />
+  <aura:attribute name="enabledSectionData" type="Object"/>
+
+  <aura:attribute name="isFullFlow" type="Boolean" default="false"/>
+  <aura:attribute name="isExternalCallCenterUser" type="Boolean" default="false" />
+  <aura:attribute name="callType" type="String" />
+
+
+  <aura:handler name="init" value="{!this}" action="{!c.init}" />
+  <aura:registerEvent name="XC_AMP_LCE002_SimpleFlowNextStep" type="c:XC_AMP_LCE002_SimpleFlowNextStep"/>
+  <aura:handler name="XC_AMP_LCE001_AMPCommunicationEvent" event="c:XC_AMP_LCE001_AMPCommunicationEvent" action="{!c.handleChildCmpEvent}" />
+  <aura:handler name="change" value="{!v.sectionsEditabledBeforeOrder}" action="{!c.setEditableValidSection}"/>
+  <aura:handler name="change" value="{!v.enabledSectionData}" action="{!c.handleEnabledSectionDataChange}"/>
+
+  <lightning:notificationsLibrary aura:id="notifLib" />
+  <lightning:navigation aura:id="navService" />
+
+  <div class="slds-p-around_x-small">
+
+    <c:XC_AMP_LCP005_SectionHeaderIcon text="{!$Label.c.XC_CL_AMP_OrderHeader}" iconName="custom:custom93" />
+    <lightning:card variant="narrow" class="slds-card_boundary">
+
+      <div class="slds-p-around_small">
+
+        <aura:if isTrue="{!v.spinnerControl}">
+          <div class="slds-is-relative slds-p-around_small">
+            <lightning:spinner aura:id="mySpinner" variant="brand" size="large"
+              style="background-color: rgba(0, 0, 0, 0)" />
+          </div>
+        </aura:if>
+        
+        <aura:if isTrue="{!and(v.isFullFlow, v.isExternalCallCenterUser)}">
+          <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="6" padding="around_small">
+                <lightning:recordEditForm objectApiName="NE__Order__c">
+                    <lightning:inputField aura:id="callType" fieldName="XC_CallType__c" required="true"
+                                          value="{!v.callType}" variant="label-inline"  onchange="{!c.orderDataValidation}" />
+                    </lightning:recordEditForm>
+                </lightning:layoutItem>
+          </lightning:layout>
+        </aura:if>
+
+        <aura:if isTrue="{!v.showOrderMenu}">
+          <lightning:layout multipleRows="true">
+            <aura:if isTrue="{!v.showCategoryMenu}">
+              <lightning:layoutItem size="12" padding="around-small">
+                <lightning:combobox label="{!$Label.c.XC_CL_AMP_CategoryPick}" options="{!v.categoryOpts}"
+                  value="{!v.selectedCategory}" disabled="{!v.categoryReadOnly}" onchange="{!c.retrieveItems}" />
+              </lightning:layoutItem>
+            </aura:if>
+            <aura:if isTrue="{!v.showItemMenu}">
+
+              <!-- ORDER ITEM PICKLIST -->
+
+              <lightning:layoutItem size="12" padding="around-small">
+                <lightning:combobox label="{!$Label.c.XC_CL_AMP_ItemPick}" options="{!v.itemOpts}"
+                  value="{!v.selectedItem}" onchange="{!c.upsertItem}" disabled="{!v.itemReadOnly}" />
+              </lightning:layoutItem>
+              <lightning:layoutItem size="12" padding="around-small">
+                <lightning:formattedRichText value="{!v.selectedProductDescription}"/>
+              </lightning:layoutItem>
+              <BR/><BR/>
+              <aura:if isTrue="{!and(v.isFullFlow,v.productPrice)}">
+                <lightning:layoutItem size="6" padding="around_small">
+                  <lightning:input name="productPrice" readonly="true" variant="label-inline" value="{!v.productPrice}" label="{!$Label.c.XC_CL_AMP_ProductPrice}" />
+                </lightning:layoutItem>
+                  <aura:if isTrue="{!v.productDiscountedPrice}">
+                    <lightning:layoutItem size="6" padding="around_small">
+                      <lightning:input name="productDiscountedPrice" readonly="true" variant="label-inline" value="{!v.productDiscountedPrice}" label="{!$Label.c.XC_CL_AMP_ProductDiscountedPrice}" />
+                    </lightning:layoutItem>
+                  </aura:if>
+              </aura:if>
+
+              <!-- ITEM ATTRIBUTES LIST -->
+              <aura:if isTrue="{!v.showAttributeList}">
+                <lightning:layoutItem size="12" padding="around-small">
+                  <c:XC_AMP_LCP016_OIAttributeManager attributes="{!v.actualCart[0].attributes}" spinnerControl="{!v.spinnerControl}" itemCode="{!v.actualCart[0].itemCode}"/>
+                </lightning:layoutItem>
+              </aura:if>
+
+              <!-- ADDITIONAL SECTIONS -->
+              <lightning:layoutItem size="12" padding="around-small">
+                    {!v.body}
+              </lightning:layoutItem>
+
+            </aura:if>
+            <aura:if isTrue="{!and(v.showFileUpload,v.checkForFileCategory)}">
+              <lightning:layoutItem size="12" padding="around-small">
+                <c:XC_AMP_LCP014_FileUploader recordId="{!v.opportunityId}" visibile="true"
+                  required="{!v.fileUploadRequired}" />
+              </lightning:layoutItem>
+            </aura:if>
+            <aura:if isTrue="{!v.showSubmit}">
+              <lightning:layoutItem size="12" padding="around-small" alignmentBump="left">
+                <div class="slds-p-around_small" style="float:right">
+                  <lightning:button label="{!$Label.c.XC_CL_SendOrderBtn}" iconName="custom:custom93" iconPosition="right"
+                    variant="brand" onclick="{!c.saveConfiguration}" disabled="{!v.disableSubmit}" />
+                </div>
+              </lightning:layoutItem>
+            </aura:if>
+          </lightning:layout>
+        </aura:if>
+
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+
+      </div>
+    </lightning:card>
+  </div>
+
+
+
+
+
+
+
+
+
+</aura:component>

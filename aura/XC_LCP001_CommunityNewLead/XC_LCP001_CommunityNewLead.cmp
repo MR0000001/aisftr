@@ -1,0 +1,21 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride" access="global" >
+    
+    <aura:attribute name="showModal" type="boolean" default="false"/>
+
+    
+
+	<div class="buttonstyle">
+		<lightning:button label="{!$Label.c.XC_CL_New}" title="New Lead" onclick="{! c.showModal }"/>
+	</div>
+	<c:strike_modal
+	    title="{!$Label.c.XC_CL_NewLead}"
+	    primaryButtonLabel="{!$Label.c.XC_CL_SaveButton}"
+	    secondaryButtonLabel="{!$Label.c.XC_CL_CPAB_Cancel}"
+	    showHeader="true"
+	    showFooter="false"
+	    showClose="true"
+	    showModal="{!v.showModal}"
+	    size="large">
+	    <c:XC_LCP002_RedirectLead /> 
+	</c:strike_modal>
+</aura:component>

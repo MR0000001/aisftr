@@ -1,0 +1,25 @@
+.THIS .modal-body {
+  overflow-y:visible;
+}
+
+.THIS .slds-modal__content {
+    overflow: visible !important;
+    overflow-y: visible !important;
+}
+
+.THIS .artiststhumbnail {
+    overflow: hidden;
+}
+
+.THIS .slds-modal__header {
+    width: 637px !important; 
+    height: 69px !important; 
+}
+
+.THIS .slds-avatar--large{
+  position: absolute !important;
+  left: 0px;
+  width: 45px;
+  padding-left: 11px;
+  padding-top: 1px !important;
+}

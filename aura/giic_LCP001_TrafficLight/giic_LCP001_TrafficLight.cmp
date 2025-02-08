@@ -1,0 +1,35 @@
+<aura:component controller="giic_LCC001_TrafficLight" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,force:hasSObjectName" access="global">
+   
+	<aura:attribute name="lightValue" type="String" default=""/>
+    <aura:attribute name="sobjectType" type="String" default="{!v.sObjectName}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+      <aura:if isTrue="{!v.lightValue != 'notraffic'}">
+    
+      <br></br>
+    <aura:if isTrue="{!v.lightValue == 'yellow'}">
+        Status&nbsp;&nbsp;&nbsp; <lightning:helptext
+        content="ORANGE: There are more requests than available products "
+    />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    	<img src="{!$Resource.semaforo_giallo}" height="130" width="85" padding-left="40px"/>
+    </aura:if>
+    <aura:if isTrue="{!v.lightValue == 'red'}">
+    	Status&nbsp;&nbsp;&nbsp;<lightning:helptext
+        content="RED: There aren't available products" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        
+    	<img src="{!$Resource.semaforo_rosso}" height="130" width="85" />  
+    </aura:if>
+    
+    <aura:if isTrue="{!v.lightValue == 'green'}"> 
+       Status&nbsp;&nbsp;&nbsp;<lightning:helptext
+        content="GREEN: All products are available "
+    /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         
+             <img src="{!$Resource.semaforo_verde}" height="130" width="85" /> 
+    </aura:if>
+    <aura:if isTrue="{!v.lightValue == ''}">
+       Status &nbsp;&nbsp;&nbsp; Loading....
+    </aura:if>
+        
+    </aura:if>
+</aura:component>

@@ -1,0 +1,628 @@
+<!--
+* @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @date Creation 24/09/2020
+* @description XC_LCP114_MassiveAssignmentWorkType – Component to insert/delete/transfer WorkType/Zipcode massively
+-->
+
+<aura:component implements="force:appHostable,force:lightningQuickActionWithoutHeader" 
+                controller="XC_LCC114_MassiveAssignmentWorkType"
+                access="global">
+
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <ltng:require scripts="{!$Resource.XC_SR_xlsx}"/>
+    <ltng:require scripts="{!$Resource.XC_SR_jszip}"/>
+
+    <aura:attribute name="cutoffOperation" type="Integer" default="5000"/>
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/> 
+    <aura:attribute name="originPartner" type="String" default=""/>
+    <aura:attribute name="originPartnerStored" type="String" default=""/>
+    <aura:attribute name="destinationPartner" type="String" default=""/>
+    <aura:attribute name="partnerChoosed" type="Boolean" default="false"/> 
+    <aura:attribute name="filterStrikeLookupDestination" type="String" default=""/>
+    <aura:attribute name="showEndButton" type="Boolean" default="false"/> 
+    <aura:attribute name="showTypeOperationMassive" type="Boolean" default="true"/> 
+    <aura:attribute name="preferredOperation" type="String" default=""/>
+    <aura:attribute name="offSetCoverageCombo" type="Integer" default="50"/>
+    <aura:attribute name="indexOffsetCoverageCombo" type="Integer" default="0"/>
+    <aura:attribute name="offsetListDataCoverageCombo" type="List"/>
+    <aura:attribute name="summaryCoverageComboView" type="String" default="Coverages shown: --/--"/>
+    <aura:attribute name="summaryTransferRemoveCoverageComboView" type="String" default="Coverages shown: --/--"/>
+    <aura:attribute name="disabledPickList" type="Boolean" default="false"/>
+    <aura:attribute name="isAdd" type="Boolean" default="false"/>
+    <aura:attribute name="isTransferRemoveReady" type="Boolean" default="false"/>
+    <aura:attribute name="isTransferRemove" type="Boolean" default="false"/>
+    <aura:attribute name="isTransferRemoveInitialFilter" type="Boolean" default="false"/>
+    <aura:attribute name="isOtherOperation" type="Boolean" default="false"/>
+    <aura:attribute name="filterWorkType" type="String" default=""/>
+    <aura:attribute name="filterZipCodeCoverage" type="String" default=""/>
+    <aura:attribute name="columnsWorkType" type="List" />
+    <aura:attribute name="workTypeOptions" type="List"/>
+    <aura:attribute name="workTypeOptionsOriginal" type="List"/>
+    <aura:attribute name="workTypeOptionsOriginalForSegment" type="List"/>
+    <aura:attribute name="oldSelectedRowWorkType" type="List" />
+    <aura:attribute name="selectedWorkType" type="List"/> 
+    <aura:attribute name="disableButtonLaunch" type="Boolean" default="false"/>
+    <aura:attribute name="filterProvinces" type="String"/>
+    <aura:attribute name="columnsProvinces" type="List" />
+    <aura:attribute name="dataProvinces" type="List"/> 
+    <aura:attribute name="dataProvincesOriginal" type="List"/> 
+    <aura:attribute name="oldSelectedRowPartnerCoverage" type="List" />
+    <aura:attribute name="columnsPartnerCoverage" type="List" />
+    <aura:attribute name="dataPartnerCoverage" type="List"/> 
+    <aura:attribute name="dataPartnerCoverageFiltered" type="List"/> 
+    <aura:attribute name="dataPartnerCoverageFilteredOriginal" type="List"/> 
+    <aura:attribute name="showTableZipCode" type="Boolean" default="false"/>
+    <aura:attribute name="filterZipCode" type="String" />
+    <aura:attribute name="columnsZipCode" type="List" />
+    <aura:attribute name="zipCodeOptions" type="List"/>
+    <aura:attribute name="zipCodeOptionsOriginal" type="List"/>
+    <aura:attribute name="oldSelectedRowProvince" type="List" />
+    <aura:attribute name="selectedProvinces" type="List"/> 
+    <aura:attribute name="oldSelectedRowZipcode" type="List" />
+    <aura:attribute name="selectedZipCode" type="List"/> 
+    <aura:attribute name="listAllZipCode" type="List"/>
+    <aura:attribute name="mapProvinceListZipCode" type="Object" />
+    <aura:attribute name="spinnerControlZipCode" type="Boolean" default="false"/>
+    <aura:attribute name="country" type="String" default=""/>
+    <aura:attribute name="nameResourceZipCode" type="String"/>
+    <aura:attribute name="isAddReady" type="Boolean" default="false"/>
+    <aura:attribute name="columnsSummaryAdd" type="List" />
+    <aura:attribute name="dataSummaryAdd" type="List"/> 
+    <aura:attribute name="dataForOperation" type="List"/> 
+    <aura:attribute name="partnerName" type="String" default=""/>
+    <aura:attribute name="quantityRowForOperation" type="String" default=""/>
+    <aura:attribute name="selectedPartnerCoverage" type="List"/>
+    <aura:attribute name="dataSummaryCoverages" type="List"/>
+    <aura:attribute name="selectedFilterTableCoverages" type="Boolean" default="false"/> 
+    <aura:attribute name="operationChoosed" type="Boolean" default="false"/> 
+    <aura:attribute name="applyInitialFilter" type="Boolean" default="false"/> 
+    <aura:attribute name="enableInfiniteLoadingAddSummary" type="Boolean" default="true"/> 
+    <aura:attribute name="enableInfiniteLoadingRemoveTransfer" type="Boolean" default="true"/> 
+    <aura:attribute name="showInfoMessageDown" type="Boolean" default="false"/>
+    <aura:attribute name="workTypeFilteredForCoverage" type="Boolean" default="false"/>
+    <aura:attribute name="showInfoMessageDownTypeOperation" type="Boolean" default="false"/>
+    <aura:attribute name="showInfoFinalMessage" type="Boolean" default="false"/>
+    <aura:attribute name="spinnerControlWithoutBack" type="Boolean" default="false"/>
+    <aura:attribute name="disabledOriginPartner" type="Boolean" default="false"/>
+    <aura:attribute name="valueProgressionBar" type="Integer" default="1"/>
+    <aura:attribute name="showSegmentSelection" type="Boolean" default="false"/>
+    <aura:attribute name="showOriginPartner" type="Boolean" default="false"/>
+    <aura:attribute name="showDestinationPartner" type="Boolean" default="false"/>
+    <aura:attribute name="valueSearchChoiceOrigin" type="Boolean" default="true"/>
+    <aura:attribute name="fieldOrigin" type="String" default="Name"/>
+    <aura:attribute name="valueSearchChoiceDestination" type="Boolean" default="true"/>
+    <aura:attribute name="fieldDestination" type="String" default="Name"/>
+    <aura:attribute name="disableMassiveOption" type="Boolean" default="false"/>
+    <aura:attribute name="showLoadExcelOption" type="Boolean" default="false"/>
+    <aura:attribute name="disabledButtonsUpload" type="Boolean" default="false"/>
+    <aura:attribute name="labelForUpload" type="String" default="{!$Label.c.XC_CL_ChooseFile}"/> 
+    <aura:attribute name="legalEntity" type="String" default=""/> 
+    <aura:attribute name="showCleanExcelFile" type="Boolean" default="false"/>
+    <aura:attribute name="valueShowCleanExcelFile" type="Boolean" default="false"/>
+
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.checkAccountUser}" />
+    <aura:handler name="change" value="{!v.originPartner}" action="{!c.init}"/>
+    <aura:handler name="change" value="{!v.isAdd}" action="{!c.handleAddOperation}"/>
+    <!-- <aura:handler name="change" value="{!v.preferredOperation}" action="{!c.onChangePicklist}" /> -->
+
+    <div class="cardViewLogs">
+        <lightning:layout verticalAlign="right" horizontalAlign="right">
+                <lightning:layoutItem padding="around-small" flexibility="auto">
+                    <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderViewLog}" title="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderViewLog}" onclick="{!c.viewLogs}"/>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+
+    <!-- For type Massive: -->
+    <aura:if isTrue="{!v.showTypeOperationMassive}">
+        <div style="margin-bottom:7px">  
+            <lightning:card title="{!$Label.c.XC_CL_MassAssSkillTitlePartner}">
+                <lightning:layout>
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <lightning:progressBar value="{!v.valueProgressionBar}" size="large"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+
+                <lightning:layout multipleRows="false">
+                    <lightning:layoutItem aura:id="cardOperationAdd" flexibility="auto" padding="around-small" class="classOperation">
+                        <div onmouseover="{!c.changeColorMouseOverSelectAdd}" onmouseout="{!c.changeColorMouseOutSelectAdd}" onclick="{!c.changeColorMouseClickSelectAdd}">
+                            <lightning:icon iconName="action:new"/>
+                            <p class="classOperationText">{!$Label.c.XC_CL_MassiveWT_AddCoverage}</p>
+                        </div>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem aura:id="cardOperationRemove" flexibility="auto" padding="around-small" class="classOperation">
+                        <div onmouseover="{!c.changeColorMouseOverRemove}" onmouseout="{!c.changeColorMouseOutRemove}" onclick="{!c.changeColorMouseClickRemove}">
+                            <lightning:icon iconName="action:close"/>
+                            <p class="classOperationText">{!$Label.c.XC_CL_MassiveWT_RemoveCoverage}</p>
+                        </div>
+                    </lightning:layoutItem>
+                    <aura:if isTrue="{!not(v.disabledOriginPartner)}">
+                        <lightning:layoutItem aura:id="cardOperationTransfert" flexibility="auto" padding="around-small" class="classOperation">
+                            <div onmouseover="{!c.changeColorMouseOverTransfert}" onmouseout="{!c.changeColorMouseOutTransfert}" onclick="{!c.changeColorMouseClickTransfert}">
+                                <lightning:icon iconName="action:user_activation"/>
+                                <p class="classOperationText">{!$Label.c.XC_CL_MassiveWT_TransferCoverage}</p>
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:if>
+                </lightning:layout> 
+                <aura:if isTrue="{!v.showInfoMessageDownTypeOperation}">
+                    <ui:message title="Information" severity="info" closable="true" class="classBackgroundMessageInfo">
+                        {!$Label.c.XC_CL_MassiveWT_MessageTypeOp}
+                    </ui:message>
+                </aura:if>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <!-- For origin Partner: -->
+    <aura:if isTrue="{!v.showOriginPartner}">
+        <div style="margin-bottom:7px">
+            <lightning:card title="{!$Label.c.XC_CL_MassAssSkillTitleOriginPartner}" iconName="utility:change_owner">
+                <lightning:layout verticalAlign="center" horizontalAlign="center">
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <lightning:helptext content="{!$Label.c.XC_CL_MassiveCovButtonInfo}"/>
+                        <lightning:buttonStateful
+                            labelWhenOff="{!$Label.c.XC_CL_MassiveCovSearchCode}"
+                            labelWhenOn="{!$Label.c.XC_CL_MassiveCovSearchName}"
+                            labelWhenHover="{!$Label.c.XC_CL_MassiveCovChangeInfo}"
+                            iconNameWhenOff="utility:topic2"
+                            iconNameWhenOn="utility:text"
+                            iconNameWhenHover="utility:change_record_type"
+                            state="{!v.valueSearchChoiceOrigin}"
+                            onclick="{!c.handleClickStatefulButtonOrigin}"
+                            variant="brand"
+                            aura:id="buttonStatefulOrigin"
+                            class="classButtonStateful"
+                        />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="6">
+                        <c:strike_lookup
+                            label="{!$Label.c.XC_CL_MassAssSkillLabelOrigin}"
+                            object="Account"
+                            searchField="{!v.fieldOrigin}"
+                            placeholder="{!$Label.c.XC_CL_MassAssSkillHolderDestination}"
+                            iconName="standard:account"
+                            order="{!v.fieldOrigin}"
+                            limit="5"
+                            loadingMessage="{!$Label.c.XC_CL_MassAssSkillLoadingOrigin}"
+                            errorMessage="{!$Label.c.XC_CL_MassAssSkillErrorOrigin}"
+                            showRecentRecords="true"
+                            value = "{!v.originPartner}"
+                            required="true"
+                            disabled="{!v.disabledOriginPartner}"
+                            filter="RecordType.Name = 'Partner' AND Name != 'No Candidate Found'"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                <aura:if isTrue="{!!v.showDestinationPartner}">
+                    <lightning:layout>
+                        <lightning:layoutItem padding="around-small" flexibility="auto" class="classRight">
+                            <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveUploadCSV}" title="{!$Label.c.XC_CL_MassiveUploadCSV}" onclick="{!c.uploadExcel}" iconName="utility:table" disabled="{!v.disableMassiveOption}"/>
+                            <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveManualSelection}" title="{!$Label.c.XC_CL_MassiveManualSelection}" onclick="{!c.manualSelection}" iconName="utility:drag" disabled="{!v.disableMassiveOption}"/>
+                            <lightning:button variant="brand-outline" label="{!$Label.c.XC_CL_MassiveWT_ResetAll}" title="{!$Label.c.XC_CL_MassiveWT_ResetAll}" onclick="{!c.resetAll}"/>
+                        </lightning:layoutItem> 
+                    </lightning:layout> 
+                </aura:if>
+
+                <!-- For Destination Partner: -->
+                <aura:if isTrue="{!v.showDestinationPartner}">
+                    <div style="margin-bottom:7px">
+                        <lightning:layout verticalAlign="center" horizontalAlign="center" multipleRows="false">
+                            <lightning:layoutItem padding="around-small" flexibility="auto">
+                                <div style="text-align-last: right !important;">
+                                    <lightning:helptext content="{!$Label.c.XC_CL_MassiveCovButtonInfo}"/>
+                                    <lightning:buttonStateful
+                                        labelWhenOff="{!$Label.c.XC_CL_MassiveCovSearchCode}"
+                                        labelWhenOn="{!$Label.c.XC_CL_MassiveCovSearchName}"
+                                        labelWhenHover="{!$Label.c.XC_CL_MassiveCovChangeInfo}"
+                                        iconNameWhenOff="utility:topic2"
+                                        iconNameWhenOn="utility:text"
+                                        iconNameWhenHover="utility:change_record_type"
+                                        state="{!v.valueSearchChoiceDestination}"
+                                        onclick="{!c.handleClickStatefulButtonDestination}"
+                                        variant="brand"
+                                        aura:id="buttonStatefulDestination"
+                                        class="classButtonStateful"
+                                    />
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem padding="around-small" flexibility="auto" size="6">
+                                <aura:if isTrue="{!v.isOtherOperation}">
+                                    <c:strike_lookup
+                                        label="{!$Label.c.XC_CL_MassAssSkillSelectDestination}"
+                                        object="Account"
+                                        searchField="{!v.fieldDestination}"
+                                        placeholder="{!$Label.c.XC_CL_MassAssSkillHolderDestination}"
+                                        iconName="standard:account"
+                                        order="{!v.fieldDestination}"
+                                        limit="5"
+                                        loadingMessage="{!$Label.c.XC_CL_MassAssSkillLoadingDestination}"
+                                        errorMessage="{!$Label.c.XC_CL_MassAssSkillErrorDestination}"
+                                        showRecentRecords="true"
+                                        value = "{!v.destinationPartner}"
+                                        required="true"
+                                        filter="{!v.filterStrikeLookupDestination}"/>
+                                    </aura:if>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem padding="around-small" flexibility="auto" class="classRight">
+                                <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveUploadCSV}" title="{!$Label.c.XC_CL_MassiveUploadCSV}" onclick="{!c.uploadExcel}" iconName="utility:table" disabled="{!v.disableMassiveOption}"/>
+                                <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveManualSelection}" title="{!$Label.c.XC_CL_MassiveManualSelection}" onclick="{!c.manualSelection}" iconName="utility:drag" disabled="{!v.disableMassiveOption}"/>
+                                <lightning:button variant="brand-outline" label="{!$Label.c.XC_CL_MassiveWT_ResetAll}" title="{!$Label.c.XC_CL_MassiveWT_ResetAll}" onclick="{!c.resetAll}"/>
+                            </lightning:layoutItem> 
+                        </lightning:layout>                        
+                    </div>
+                </aura:if>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <!-- For Add: -->
+    <aura:if isTrue="{!v.isAdd}">
+        <div style="margin-bottom:7px">  
+            <lightning:card title="{!$Label.c.XC_CL_MassAssSkillChooseFilter}" iconName="utility:center_align_text">
+                <aura:if isTrue="{!v.showSegmentSelection}">
+                    <lightning:layout verticalAlign="center" horizontalAlign="center">
+                        <lightning:layoutItem padding="around-small">
+                            <lightning:select aura:id="selectSegment" name="select1" label="{!$Label.c.XC_CL_FilterFor}" required="true" onchange="{!c.onChangeSegment}">
+                                <option value="B2C">B2C</option>
+                                <option value="B2B">B2B</option>
+                                <option value="B2G">B2G</option>
+                            </lightning:select>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </aura:if>
+
+                <lightning:layout verticalAlign="center" horizontalAlign="center">
+                        
+                    <!-- For WorkType table: -->
+                    <lightning:layoutItem padding="around-small">
+                        <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                            <lightning:input type="text" onchange="{!c.workTypeFiltered}" value="{!v.filterWorkType}" label="{!$Label.c.XC_CL_MassiveWT_SearchWT}"/>
+                            <lightning:datatable 
+                                keyField="Id"
+                                aura:id="worktypeFilterTable" 
+                                columns="{!v.columnsWorkType}" 
+                                data="{!v.workTypeOptions}"
+                                onrowselection="{!c.addSelectedWorkType}"
+                            />
+                        </div>
+                    </lightning:layoutItem>
+                    
+                    <!-- For Province/PostalCode table: -->
+                    <lightning:layoutItem padding="around-small">
+                        <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                            <lightning:layout multipleRows="false">
+                                <lightning:layoutItem size="11">
+                                    <lightning:input type="text" onchange="{!c.provincesFiltered}" value="{!v.filterProvinces}" label="{!$Label.c.XC_CL_MassiveWT_SearchProv}"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="1" class="alignCenter">
+                                    <lightning:helptext content="{!$Label.c.XC_CL_MassiveWT_HelpProv}"/>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                            <lightning:datatable 
+                                keyField="Id"
+                                aura:id="provincesFilterTable" 
+                                columns="{!v.columnsProvinces}" 
+                                data="{!v.dataProvinces}"
+                                onrowselection="{!c.addSelectedProvinces}"
+                            />
+                        </div>
+                    </lightning:layoutItem>
+                    <aura:if isTrue="{!v.showTableZipCode}"> 
+                        <lightning:layoutItem padding="around-small">
+                            <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                                <aura:if isTrue="{!v.spinnerControlZipCode}">
+                                    <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+                                        <div class="loader">Loading...</div>
+                                    </div>   
+                                </aura:if>
+                                <lightning:input type="text" onchange="{!c.zipCodeFiltered}" value="{!v.filterZipCode}" label="{!$Label.c.XC_CL_MassiveWT_SearchZP}"/>
+                                <lightning:datatable 
+                                    keyField="Id"
+                                    aura:id="zipCodeFilterTable" 
+                                    columns="{!v.columnsZipCode}" 
+                                    data="{!v.zipCodeOptions}"
+                                    onrowselection="{!c.addSelectedZipcode}"
+                                />
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:if>
+                </lightning:layout>
+                <aura:if isTrue="{!v.showInfoMessageDown}">
+                    <ui:message title="Information" severity="info" closable="true">
+                        {!$Label.c.XC_CL_MassiveWT_InfoDown}
+                    </ui:message>
+                </aura:if>
+                <lightning:layout class="classCenter">
+                    <lightning:layoutItem padding="around-small" flexibility="auto" class="classCenter">
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ApplyFilters}" title="{!$Label.c.XC_CL_MassiveWT_ApplyFilters}" onclick="{!c.applyFiltersAdd}"/>
+                    </lightning:layoutItem> 
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <!-- For Remove/Transfer initial filter: -->
+    <aura:if isTrue="{!v.isTransferRemoveInitialFilter}">
+        <div style="margin-bottom:7px">  
+            <lightning:card title="{!$Label.c.XC_CL_MassiveWT_InitialFilters}" iconName="utility:center_align_text">
+                <aura:if isTrue="{!v.showSegmentSelection}">
+                    <lightning:layout verticalAlign="center" horizontalAlign="center">
+                        <lightning:layoutItem padding="around-small">
+                            <lightning:select aura:id="selectSegment" name="select1" label="{!$Label.c.XC_CL_FilterFor}" required="true" onchange="{!c.onChangeSegment}">
+                                <option value="B2C">B2C</option>
+                                <option value="B2B">B2B</option>
+                                <option value="B2G">B2G</option>
+                            </lightning:select>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </aura:if>
+                
+                <lightning:layout verticalAlign="center" horizontalAlign="center">
+                    
+                    <!-- For WorkType table: -->
+                    <lightning:layoutItem padding="around-small">
+                        <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                            <lightning:input type="text" onchange="{!c.workTypeFiltered}" value="{!v.filterWorkType}" label="{!$Label.c.XC_CL_MassiveWT_SearchWT}"/>
+                            <lightning:datatable 
+                                keyField="Id"
+                                aura:id="worktypeFilterTable" 
+                                columns="{!v.columnsWorkType}" 
+                                data="{!v.workTypeOptions}"
+                                onrowselection="{!c.addSelectedWorkType}"
+                            />
+                        </div>
+                    </lightning:layoutItem>
+                    
+                    <!-- For Province/PostalCode table: -->
+                    <lightning:layoutItem padding="around-small">
+                        <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                            <lightning:layout multipleRows="false">
+                                <lightning:layoutItem size="11">
+                                    <lightning:input type="text" onchange="{!c.provincesFiltered}" value="{!v.filterProvinces}" label="{!$Label.c.XC_CL_MassiveWT_SearchProv}"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="1" class="alignCenter">
+                                    <lightning:helptext content="{!$Label.c.XC_CL_MassiveWT_HelpProv}"/>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                            <lightning:datatable 
+                                keyField="Id"
+                                aura:id="provincesFilterTable" 
+                                columns="{!v.columnsProvinces}" 
+                                data="{!v.dataProvinces}"
+                                onrowselection="{!c.addSelectedProvinces}"
+                            />
+                        </div>
+                    </lightning:layoutItem>
+                    <aura:if isTrue="{!v.showTableZipCode}"> 
+                        <lightning:layoutItem padding="around-small">
+                            <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                                <aura:if isTrue="{!v.spinnerControlZipCode}">
+                                    <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+                                        <div class="loader">Loading...</div>
+                                    </div>   
+                                </aura:if>
+                                <lightning:input type="text" onchange="{!c.zipCodeFiltered}" value="{!v.filterZipCode}" label="{!$Label.c.XC_CL_MassiveWT_SearchZP}"/>
+                                <lightning:datatable 
+                                    keyField="Id"
+                                    aura:id="zipCodeFilterTable" 
+                                    columns="{!v.columnsZipCode}" 
+                                    data="{!v.zipCodeOptions}"
+                                    onrowselection="{!c.addSelectedZipcode}"
+                                />
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:if>
+
+                </lightning:layout>
+                <lightning:layout class="classCenter">
+                    <lightning:layoutItem padding="around-small" flexibility="auto" class="classCenter">
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ResetAll}" title="{!$Label.c.XC_CL_MassiveWT_ResetAll}" onclick="{!c.resetAll}"/>
+                        <!--<lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ChangeOp}" title="{!$Label.c.XC_CL_MassiveWT_ChangeOp}" onclick="{!c.changeOperation}"/>-->
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ApplyFilters}" title="{!$Label.c.XC_CL_MassiveWT_InitialFilters}" onclick="{!c.applyInitialFilters}"/>
+                    </lightning:layoutItem> 
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <!-- For Remove/Transfer: -->
+    <aura:if isTrue="{!v.isTransferRemove}">
+        <div style="margin-bottom:7px">  
+            <lightning:card title="{!$Label.c.XC_CL_MassiveWT_SelectCovOp}" iconName="utility:all">
+                <aura:if isTrue="{!v.showSegmentSelection}">
+                    <lightning:layout verticalAlign="center" horizontalAlign="center">
+                        <lightning:layoutItem padding="around-small">
+                            <lightning:select aura:id="selectSegment" name="select1" label="{!$Label.c.XC_CL_FilterFor}" required="true" onchange="{!c.onChangeSegment}">
+                                <option value="B2C">B2C</option>
+                                <option value="B2B">B2B</option>
+                                <option value="B2G">B2G</option>
+                            </lightning:select>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </aura:if>
+
+                <lightning:layout verticalAlign="center" horizontalAlign="center" multipleRows="false">
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <div style="margin-top: 16px;height: 350px; width: 350px">
+                            <lightning:input type="text" onchange="{!c.workTypeFiltered}" value="{!v.filterWorkType}" label="{!$Label.c.XC_CL_MassiveWT_SearchWT}"/>
+                            <lightning:datatable 
+                                keyField="Id"
+                                aura:id="worktypeFilterTable" 
+                                columns="{!v.columnsWorkType}" 
+                                data="{!v.workTypeOptions}"
+                                onrowselection="{!c.addSelectedWorkType}"
+                            />
+                        </div>
+                    </lightning:layoutItem>
+                    <aura:if isTrue="{!v.selectedFilterTableCoverages}">
+                        <lightning:layoutItem padding="around-small" flexibility="auto">
+                            <div style="margin-bottom:20px;height: 350px; width: 800px">
+                                <ui:outputRichText  class="slds-text-longform classBorderWOShown" value="{!v.summaryCoverageComboView}"/>
+                                <lightning:input type="text" onchange="{!c.zipCodeCoverageFiltered}" value="{!v.filterZipCodeCoverage}" label="{!$Label.c.XC_CL_MassiveWT_SearchZP}"/>
+                                <lightning:datatable 
+                                    aura:id="tablePartnerCoverage" 
+                                    keyField="Id"
+                                    columns="{!v.columnsPartnerCoverage}" 
+                                    data="{!v.dataPartnerCoverageFiltered}"
+                                    hideCheckboxColumn="false"
+                                    showRowNumberColumn="false"
+                                    onrowselection="{!c.addSelectedPartnerCoverage}"
+                                />
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:if>
+                </lightning:layout>
+                <aura:if isTrue="{!v.showInfoMessageDown}">
+                    <ui:message title="Information" severity="info" closable="true" class ="classTopMargin">
+                        {!$Label.c.XC_CL_MassiveWT_ShowInfoDown}
+                    </ui:message>
+                </aura:if>
+                <lightning:layout class="classCenter">
+                    <lightning:layoutItem aura:id="layoutItemButtonRemoveTransfer" padding="around-small" flexibility="auto" class="classCenter classTopMargin">
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ResetAll}" title="{!$Label.c.XC_CL_MassiveWT_ResetAll}" onclick="{!c.resetAll}"/>
+                        <!--<lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ChangeOp}" title="{!$Label.c.XC_CL_MassiveWT_ChangeOp}" onclick="{!c.changeOperation}"/>-->
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_SelectCoverages}" title="> Summary" onclick="{!c.selectedPartnerCoverage}"/>
+                    </lightning:layoutItem> 
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showLoadExcelOption}">
+        <div style="margin-bottom:7px">
+            <lightning:card title="{!$Label.c.XC_CL_MassiveTitleCSV}">
+                <lightning:layout verticalAlign="center" horizontalAlign="center" multipleRows="false">
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="4">
+                        <lightning:layout verticalAlign="center" horizontalAlign="center" multipleRows="false">
+                            <lightning:layoutItem class="flexEnd">
+                                <lightning:button label="{!$Label.c.XC_CL_MassiveImport}" onclick="{!c.uploadFile}" iconName="utility:upload" disabled="{!v.disabledButtonsUpload}"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem>
+                                <lightning:input aura:id="file" name="file" type="file" label="{!v.labelForUpload}" onchange="{!c.handleFilesChange}" disabled="{!v.disabledButtonsUpload}"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="6">
+                        {!$Label.c.XC_CL_MassiveCovHelpLoadCSV}
+                        <br></br>
+                        <b>WorkTypeName</b>, <b>PostalCode</b>
+                        <br></br>
+                        {!$Label.c.XC_CL_MassiveCovHelpSummary}
+                        <br></br>
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveCovDownloadTemplate}" title="Excel template" onclick="{!c.downloadCSVtemplate}"/>
+                        <br></br>
+                        <aura:if isTrue="{!v.showCleanExcelFile}">
+                            <lightning:input aura:id="cleanExcelFile" type="checkbox" label="{!$Label.c.XC_CL_MassiveCovRemoveDupl}" name="cleanExcelFile" value="{!v.showCleanExcelFile}"></lightning:input>
+                        </aura:if>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <!-- For Add Summary: -->
+    <aura:if isTrue="{!v.isAddReady}">
+        <div style="margin-bottom:7px">  
+            <lightning:card title="{!$Label.c.XC_CL_MassiveWorkType_Summary}" iconName="utility:all">
+                <lightning:layout>
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <ui:outputRichText  class="slds-text-longform classBorderWOShown" value="{!v.summaryCoverageComboView}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                <lightning:layout verticalAlign="center" horizontalAlign="center">
+                    <lightning:layoutItem padding="around-small">
+                        <div style="height: 300px;">
+                            <lightning:datatable 
+                                aura:id="tableCoveragesCombo" 
+                                keyField="WorkType"
+                                columns="{!v.columnsSummaryAdd}" 
+                                data="{!v.dataSummaryAdd}"
+                                hideCheckboxColumn="true"
+                                showRowNumberColumn="true"
+                                enableInfiniteLoading="{!v.enableInfiniteLoadingAddSummary}"
+                                onloadmore="{!c.loadMoreDataTableCoverageCombo}"
+                            />
+                        </div>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <!-- For Transfer/Remove Summary: -->
+    <aura:if isTrue="{!v.isTransferRemoveReady}">
+        <div style="margin-bottom:7px">  
+            <lightning:card title="{!$Label.c.XC_CL_MassiveWorkType_Summary}" iconName="utility:all">
+                <lightning:layout>
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <ui:outputRichText  class="slds-text-longform classBorderWOShown" value="{!v.summaryTransferRemoveCoverageComboView}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                <lightning:layout verticalAlign="center" horizontalAlign="center">
+                    <lightning:layoutItem padding="around-small">
+                        <div style="height: 300px;">
+                            <lightning:datatable 
+                                aura:id="tableCoveragesComboRemoveTransfer" 
+                                keyField="Id"
+                                columns="{!v.columnsSummaryAdd}" 
+                                data="{!v.dataSummaryCoverages}"
+                                hideCheckboxColumn="true"
+                                showRowNumberColumn="true"
+                                enableInfiniteLoading="{!v.enableInfiniteLoadingRemoveTransfer}"
+                                onloadmore="{!c.loadMoreDataTableCoverageRemoveTransf}"
+                            />
+                        </div>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <!-- For destination Partner: -->
+    <aura:if isTrue="{!v.showInfoFinalMessage}">
+        <div style="margin-bottom:7px">
+            <lightning:card>
+                <lightning:layout verticalAlign="left" horizontalAlign="left" multipleRows="false">
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <ui:message title="{!$Label.c.XC_CL_Confirmation}" severity="confirm" closable="false">
+                            {!$Label.c.XC_CL_MassiveWT_SuccessMess}
+                        </ui:message>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <!-- For End Button: -->
+    <aura:if isTrue="{!v.showEndButton}">
+        <div style="margin-bottom:7px">
+            <lightning:card title="{!$Label.c.XC_CL_MassiveWT_CompleteOp}" iconName="utility:change_owner">
+                <lightning:layout verticalAlign="left" horizontalAlign="left" multipleRows="false">
+                    <lightning:layoutItem padding="around-small" flexibility="auto" class="classRight">
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ResetAll}" title="{!$Label.c.XC_CL_MassiveWT_ResetAll}" onclick="{!c.resetAll}"/>
+                        <!--<lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ChangeOp}" title="{!$Label.c.XC_CL_MassiveWT_ChangeOp}" onclick="{!c.changeOperation}"/>-->
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_Launch}" title="{!$Label.c.XC_CL_MassiveWT_Launch}" onclick="{!c.launchOperation}" disabled="{!v.disableButtonLaunch}"/>
+                    </lightning:layoutItem> 
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <!-- For spinner: -->
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <div class="loader">Loading...</div>
+        </div>   
+    </aura:if>
+    <!-- For spinner without background: -->
+    <aura:if isTrue="{!v.spinnerControlWithoutBack}">
+        <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998;">
+            <div class="loader">Loading...</div>
+        </div>   
+    </aura:if>
+
+</aura:component>

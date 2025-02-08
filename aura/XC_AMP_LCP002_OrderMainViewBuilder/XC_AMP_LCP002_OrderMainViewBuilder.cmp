@@ -1,0 +1,115 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 12-21-2020
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   12-04-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component controller="XC_AMP_LCC002_OrderMainViewBuilder"
+  implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId,lightning:isUrlAddressable">
+
+  <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+  <aura:attribute name="submitSpinner" type="Boolean" default="false" />
+  <aura:attribute name="parentOpportunityId" type="String" />
+  <aura:attribute name="createdAccountId" type="String" />
+  <aura:attribute name="accountRecordTypeId" type="String" />
+  <aura:attribute name="userCountry" type="String" />
+  <aura:attribute name="phonePrefix" type="String" />
+  <aura:attribute name="preferredLanguage" type="String" />
+  <aura:attribute name="nationality" type="String" />
+  <aura:attribute name="validSections" type="Object" />
+  <aura:attribute name="sectionFieldValues" type="Object" />
+  <aura:attribute name="disableSubmit" type="Boolean" default="true" />
+  <aura:attribute name="readOnlyAll" type="Boolean" default="false"/>
+
+  <!-- Order section attributes -->
+  <aura:attribute name="cmpInitialized" type="Boolean" default="false" />
+  <aura:attribute name="showOrderSection" type="Boolean" default="false" />
+  <aura:attribute name="fileUploadRequired" type="Boolean" default="false"/>
+  <aura:attribute name="viewFileUpload" type="Boolean" default="false"/>
+  <aura:attribute name="categoryForFile" type="String" />
+  <aura:attribute name="partnerAMP" type="String" />
+  <aura:attribute name="showSubmit" type="Boolean" default="true" />
+
+  <!-- options for recalling component from different places -->
+  <aura:attribute name="options" type="Object" />
+  <aura:attribute name="extraSectionsData" type="Object" />
+  <aura:attribute name="categoryForExtraSections" type="String" />
+  <aura:attribute name="sectionsExtraOrder" type="List" />
+  <aura:attribute name="sectionsEditabledBeforeOrder" type="List" />
+  <aura:attribute name="defaultCatalogCategories" type="String" />
+  
+  <aura:attribute name="isFullFlow" type="Boolean" default="false"/>
+  <aura:attribute name="segment" type="String"/>
+
+  <aura:handler name="init" value="{!this}" action="{!c.init}" />
+  <aura:handler name="XC_AMP_LCE001_AMPCommunicationEvent" event="c:XC_AMP_LCE001_AMPCommunicationEvent"
+    action="{!c.handleAMPCommunicationEvent}" />
+    <aura:handler name="XC_AMP_LCE002_SimpleFlowNextStep" event="c:XC_AMP_LCE002_SimpleFlowNextStep"
+      action="{!c.handleAMPSimpleFlowNextStep}" />
+
+  <lightning:navigation aura:id="navService" />
+  <lightning:workspaceAPI aura:id="workspace" />
+  <lightning:notificationsLibrary aura:id="notifLib" />
+
+
+  <aura:if isTrue="{!v.spinnerControl}">
+    <div class="slds-is-relative slds-p-around_medium">
+      <lightning:spinner aura:id="mySpinner" size="large" variant="brand" style="background-color: rgba(0, 0, 0, 0)" />
+    </div>
+  </aura:if>
+
+  {!v.body}
+
+  <aura:if isTrue="{!v.cmpInitialized}">
+    <aura:if isTrue="{!!v.showOrderSection}">
+      <lightning:layout multipleRows="true">
+        <aura:if isTrue="{!v.submitSpinner}">
+          <lightning:layoutItem size="12">
+            <div class="slds-is-relative">
+              <lightning:spinner aura:id="submitSpinner" variant="brand" size="large"
+                style="background-color: rgba(0, 0, 0, 0)" />
+            </div>
+          </lightning:layoutItem>
+        </aura:if>
+
+        <aura:if isTrue="{!!v.isFullFlow}">
+          <aura:if isTrue="{!v.showSubmit}">
+            <lightning:layoutItem size="6" alignmentBump="left">
+              <div class="slds-p-around_small" style="float:right">
+                <lightning:button name="save" label="{!$Label.c.XC_CL_SaveBtn}" variant="brand"
+                  disabled="{!v.disableSubmit}" onclick="{!c.submitSections}" />
+              </div>
+            </lightning:layoutItem>
+          </aura:if>
+          <aura:set attribute="else">
+            <aura:if isTrue="{!v.showSubmit}">
+              <lightning:layoutItem size="6" alignmentBump="left">
+                <div class="slds-p-around_small" style="float:right">
+                  <lightning:button name="save" label="{!$Label.c.XC_CL_NextMess}" variant="brand" disabled="{!v.disableSubmit}" onclick="{!c.submitSections}" />
+                  <lightning:button name="cancel" label="{!$Label.c.XC_CL_CPAB_Cancel}" variant="brand" onclick="{!c.cancel}" />
+                </div>
+              </lightning:layoutItem>
+            </aura:if>
+          </aura:set>
+        </aura:if>
+
+      </lightning:layout>
+      <aura:set attribute="else">
+        <aura:if isTrue="{!v.cmpInitialized}">
+          <!-- SHOW ORDER COMPOSITION COMPONENT -->
+          <c:XC_AMP_LCP010_OrderComposer 
+              aura:id="orderCreationCmp"
+              opportunityId="{!v.parentOpportunityId}" showFileUpload="{!v.viewFileUpload}" fileUploadRequired="{!v.fileUploadRequired}" 
+              categoryForFile="{!v.categoryForFile}" accountId="{!v.createdAccountId}" extraSectionsData="{!v.extraSectionsData}" 
+              categoryForExtraSections="{!v.categoryForExtraSections}" sectionsExtraOrder="{!v.sectionsExtraOrder}" 
+              sectionsEditabledBeforeOrder="{!v.sectionsEditabledBeforeOrder}" isFullFlow="{!v.isFullFlow}" defaultCatalogCategories="{!v.defaultCatalogCategories}" />
+          </aura:if>
+      </aura:set>
+    </aura:if>
+  </aura:if>
+
+</aura:component>

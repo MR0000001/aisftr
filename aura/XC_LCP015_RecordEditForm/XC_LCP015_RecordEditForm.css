@@ -1,0 +1,10 @@
+.THIS.container {
+    background-color:#ffffff;
+    height: 100%;
+    padding-left:20px;
+}
+
+.THIS .greyclass { 
+    background-color:#808080;
+    height: 100%;
+}

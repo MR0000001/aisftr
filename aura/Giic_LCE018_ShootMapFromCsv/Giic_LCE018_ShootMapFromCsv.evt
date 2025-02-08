@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION">
+    
+    <aura:attribute name="mapPolToSerialList" type="String" default="" />
+    <aura:attribute name="lotNumberToQuantityMap" type="map" default="{}" />
+</aura:event>

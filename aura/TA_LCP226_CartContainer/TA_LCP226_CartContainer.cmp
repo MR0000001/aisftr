@@ -1,0 +1,83 @@
+<aura:component controller="TA_LCC226_CartContainer"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable"
+    access="global">
+
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="workOrder" type="Object" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="general" type="Object" />
+    <aura:attribute access="private" name="custom" type="Object" />
+    <aura:attribute access="private" name="customerCardBg" type="String" />
+    <aura:attribute access="private" name="mappingStep" type="Object" />
+    <aura:attribute access="private" name="nextStepCmpName" type="String" />
+    <aura:attribute access="private" name="nextStepCmpParams" type="Object" />
+    <aura:attribute access="private" name="lastAction" type="String" />
+    <aura:attribute access="private" name="isBundle" type="Boolean" />
+    <aura:attribute access="private" name="bundleId" type="String" />
+    <aura:attribute access="private" name="bundleElementList" type="List" />
+    <aura:attribute access="private" name="bundleElementCurrentIndex" type="Integer" />
+    <aura:attribute access="private" name="currentProductId" type="String" />
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="opportunityId" type="String" />
+    <aura:attribute access="private" name="orderId" type="String" />
+    <aura:attribute access="private" name="actionParam" type="String" />
+    <aura:attribute access="private" name="showDiscountStep" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="cartContext" type="Object"/>
+    <aura:attribute access="private" name="isVoucherStep" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="catalogCategoryId" type="String" />
+    <aura:attribute access="private" name="isManageBitwinMapWasCalled" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="isEventFromCartSummary" type="Boolean" default="false"/>
+
+    <ltng:require styles="{!join(',',
+                            $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:handler event="NE:Bit2win_Event_UpdateContext" action="{!c.handleManageUpdateContext}" />
+    <aura:handler event="NE:Bit2win_Event_CartEvent" action="{!c.handleManageCartEvent}" />
+    <aura:handler event="NE:Bit2win_Event_SetLoading" action="{!c.handleManageLoadingEvent}" />
+    <aura:handler event="NE:Bit2win_Event_ChangeComponent" action="{!c.handleManageChangeComponent}" />
+    <aura:handler event="c:TA_LCE226_CartStep" action="{!c.handleCartStepEvt}" />
+    <aura:handler event="aura:systemError" action="{!c.handleError}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt" />
+    <aura:registerEvent name="refreshCart" type="c:TA_LCE224_Refresh" />
+    <aura:registerEvent name="TA_LCE226_CartStep" type="c:TA_LCE226_CartStep" />
+    <aura:registerEvent name="Bit2win_Event_ConfigureBundle" type="NE:Bit2win_Event_ConfigureBundle" />
+    <aura:registerEvent name="Bit2win_Event_CategoryChanged" type="NE:Bit2win_Event_CategoryChanged" />
+    <aura:registerEvent name="Bit2win_Event_BundleElements" type="NE:Bit2win_Event_BundleElements" />
+    <aura:registerEvent name="Bit2win_Event_AttributeChanged" type="NE:Bit2win_Event_AttributeChanged" />
+    <aura:registerEvent name="Bit2Win_Event_ResetSaveConfiguration" type="NE:Bit2Win_Event_ResetSaveConfiguration" />
+    <aura:registerEvent name="Bit2win_Event_AddRemoveFromCart" type="NE:Bit2win_Event_AddRemoveFromCart" />
+    <aura:registerEvent name="Bit2win_Event_CheckPenalty" type="NE:Bit2win_Event_ApplyPenalty" />
+    <aura:registerEvent name="Bit2win_Event_CartEvent" type="NE:Bit2win_Event_CartEvent" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <lightning:layout multipleRows="true" class="slds-hide">
+        <lightning:layoutItem size="12" aura:id="b2wComponent" />
+    </lightning:layout>
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <lightning:layout multipleRows="true" class="ta-cart-conteiner-body slds-m-bottom_large slds-m-top_large">
+            <lightning:layoutItem size="12" class="slds-p-left_small slds-p-right_small">
+                <div style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover; background-position: ' + v.general.bgPosition + '; background-color: ' + v.general.bgColor + '; box-shadow: 0vw 1vw 2vw -0.8vw black; background-blend-mode: lighten; border-radius: 2vw;'}">
+                    <lightning:layout multipleRows="true">
+                        <aura:if isTrue="{!v.showDiscountStep}">
+                            <lightning:layoutItem size="12" class="ta-step-container">
+                                <c:TA_LCP240_CartDiscountCode cartContext="{!v.cartContext}" workOrderId="{!v.workOrder.Id}"/>
+                            </lightning:layoutItem>
+                            <aura:set attribute="else">
+                                <lightning:layoutItem size="12" aura:id="stepCmp" class="ta-step-container" />
+                            </aura:set>
+                        </aura:if>
+                    </lightning:layout>
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </aura:if>
+</aura:component>

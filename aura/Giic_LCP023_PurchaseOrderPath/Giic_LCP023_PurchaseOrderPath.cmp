@@ -1,0 +1,14 @@
+<aura:component controller="Giic_LCC023_PurchaseOrderPath" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction,forceCommunity:availableForAllPageTypes" access="global" >
+	
+    <aura:attribute name ="showSpinner" type="Boolean" default="false"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner variant="brand" />
+    </aura:if>    
+    <lightning:picklistPath aura:id="picklistPath" recordId="{!v.recordId}"
+        variant="linear"
+        picklistFieldApiName="giic_Status__c"
+        onselect="{!c.handleSelect}">
+    </lightning:picklistPath>
+    
+</aura:component>

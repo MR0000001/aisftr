@@ -1,0 +1,35 @@
+<!--
+* @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @date Creation 27/03/2019
+* @description XC_LCC014_CreateWorkOrderForLead – Create a new Work Order for Lead
+-->
+
+<aura:component controller="XC_LCC014_CreateWorkOrder"
+                extends = "c:XC_LCP022_TabNavigationManager"
+                implements="force:hasRecordId,force:appHostable,force:lightningQuickActionWithoutHeader" access="global">
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="title" type="String" default="{!$Label.c.XC_CL_Opportunity_CreateWorlOrder}"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="data" type="List"/>
+    <aura:attribute name="SelectedRow" type="List"/>
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+    <aura:attribute name="workorderId" type="String"/>
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="catalogCategory" type="String"/>
+    <aura:attribute name="catalog" type="String"/>
+    <aura:attribute name="contactId" type="String"/>
+    <aura:attribute name="workOrderCreated" type="Boolean" default="false"/>
+    <lightning:navigation aura:id="navService"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+  
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <aura:if isTrue="{!v.spinnerControl}" >
+        <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9999; background-color: white">
+            <lightning:spinner aura:id="mySpinner2"/>
+        </div>
+        <div aura:id="masterSpinner"  class="slds-is-relative">
+            <lightning:spinner aura:id="mySpinner"/>
+        </div>
+    </aura:if>
+</aura:component>

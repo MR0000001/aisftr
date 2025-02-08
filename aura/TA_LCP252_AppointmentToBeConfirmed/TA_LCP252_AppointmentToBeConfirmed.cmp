@@ -1,0 +1,143 @@
+<aura:component controller="TA_LCC252_AppointmentToBeConfirmed" 
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global">
+
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="public" name="isOpen" type="Boolean" default="false" />
+    <aura:attribute access="public" name="serviceAppointmentList" type="List" />
+    <aura:attribute access="private" name="infoBag" type="Object" />
+    <aura:attribute access="private" name="workTypeCategory" type="List" /> <!-- ENXCRM-176 BGO -->
+    <aura:attribute access="private" name="serviceAppointmentsAll" type="List" /> <!-- ENXCRM-176 BGO -->
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="change" value="{!v.isOpen}" action="{!c.handleIsOpen}" />
+
+    <aura:registerEvent name="appointmentPreviewEvent" type="c:TA_LCE200_AppointmentPreviewEvt" />
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isOpen}">
+        <div class="ta-full-screen-modal-container">
+            <div class="ta-full-screen-modal-header">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="11" class="slds-text-align_center">
+                        <h3 class="ta-color-black">{!$Label.c.TA_AppointmentsToBeConfirmed}</h3>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="1">
+                        <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" class="ta-full-screen-modal-header-button" onclick="{!c.handleCloseModal}"/>
+                    </lightning:layoutItem>
+                    <!-- START | ENXCRM-176 BGO -->
+                    <lightning:layoutItem size="12" class="slds-p-top_x-small">
+                        <lightning:select name="workTypeCategory" label="{!$Label.c.TA_SelectWorkTypeCategory}" aura:id="workTypeCategory" variant="label-stacked" onchange="{!c.handleChangeCategory}" class="ta-select-category">
+                            <aura:iteration items="{!v.workTypeCategory}" var="cat">
+                                <option text="{!cat}"></option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </lightning:layoutItem>
+                    <!-- END | ENXCRM-176 BGO -->
+                </lightning:layout>
+            </div>
+
+            <div class="ta-full-screen-modal-body">
+                <lightning:layout multipleRows="true">
+                    <aura:iteration items="{!v.serviceAppointmentList}" var="appointment">
+                        <lightning:layoutItem size="12">
+                            <div id="{!appointment.workOrderId}"
+                                onclick="{!c.handleCardClick}"
+                                class="slds-m-bottom_large ta-appointment-card">
+                                <div class="ta-appointment-bg">
+                                    <lightning:layout class="slds-wrap">
+                                        <lightning:layoutItem size="11">
+                                            <h3 class="ta-color-black">{!appointment.customerName}</h3>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="1">
+                                            <img src="{!$Resource.TA_Icons + '/xc-icons/edit-blue.svg'}" class="ta-icon-size-small slds-float_right" />
+                                        </lightning:layoutItem>
+
+                                        <lightning:layoutItem size="12" class="slds-m-top_x-small">
+                                            <img src="{!$Resource.TA_Icons + '/xc-icons/location-pink.svg'}" class="ta-icon-size-medium slds-float_left slds-m-right_xx-small slds-m-top_xxx-small" />
+                                            <p class="slds-float_left ta-color-grey">
+                                                <aura:if isTrue="{!and(appointment.street != null, appointment.city != null)}">
+                                                    {!appointment.address}
+                                                    <aura:set attribute="else">
+                                                        {!appointment.street != null ? appointment.street : ''}
+                                                        {!appointment.city != null ? appointment.city : ''}
+                                                    </aura:set>
+                                                </aura:if>
+                                            </p>
+                                        </lightning:layoutItem>
+
+                                        <lightning:layoutItem size="12" class="slds-m-top_xx-small">
+                                            <img src="{!$Resource.TA_Icons + '/xc-icons/asset-pink.svg'}" class="ta-icon-size-medium slds-float_left slds-m-right_xx-small slds-m-top_xxx-small" />
+                                            <p class="slds-float_left ta-color-grey">{!appointment.toLabelWorkTypeLabel}</p>
+                                            <p class="slds-float_left slds-m-left_xx-small ta-color-grey">
+                                                <aura:if isTrue="{!appointment.toLabelWorkTypeLabel != null}">
+                                                    -
+                                                </aura:if>
+                                                {!appointment.workOrderName}
+                                            </p>
+                                        </lightning:layoutItem>
+
+                                        <!-- ENXCRM-88 -->
+                                        <aura:if isTrue="{!not(empty(appointment.productName))}">
+                                            <lightning:layoutItem size="12" class="slds-m-top_xx-small">
+                                                <img src="{!$Resource.TA_Icons + '/xc-icons/settings-pink.svg'}" class="ta-icon-size-small slds-float_left slds-m-right_xx-small slds-m-top_xxx-small" />
+                                                <p class="slds-float_left ta-color-grey">{!appointment.productName}</p>
+                                            </lightning:layoutItem>
+                                        </aura:if>
+                                       
+                                        <!-- ENXCRM-191 bgo 11/08/2021 -->
+                                        <aura:if isTrue="{! appointment.woHasChild }">
+                                            <lightning:layoutItem size="12" class="slds-m-top_xx-small">
+                                                <aura:iteration items="{!appointment.woChilds}" var="woc">
+                                                    <lightning:layout verticalAlign="stretch">
+                                                        <lightning:layoutItem>
+                                                            <img src="{!$Resource.TA_Icons + '/xc-icons/settings-pink.svg'}" class="ta-icon-size-medium-2 slds-float_left slds-m-right_xx-small slds-m-top_xxx-small" />
+                                                        </lightning:layoutItem>
+                                                        <lightning:layoutItem size="11">
+                                                            <p class="slds-float_left ta-color-grey">{!woc.woProductName}</p>
+                                                        </lightning:layoutItem>
+                                                    </lightning:layout>
+                                                </aura:iteration>
+                                            </lightning:layoutItem>
+                                        </aura:if>
+
+                                        <!-- ENXCRM-89 -->
+                                        <!-- <lightning:layoutItem size="12" class="slds-m-top_xx-small">
+                                            <div class="slds-float_left xc-item-vertical-align-center">
+                                                <p class="slds-float_left ta-color-grey">
+                                                    <span class="slds-float_left">{!$Label.c.XC_EstimatedTime}: {!appointment.duration}
+                                                        <aura:if isTrue="{!appointment.durationType == 'Hours'}">
+                                                            h
+                                                        </aura:if>
+                                                        <aura:if isTrue="{!appointment.durationType == 'Minutes'}">
+                                                            '
+                                                        </aura:if>
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </lightning:layoutItem> -->
+
+                                        <lightning:layoutItem size="12" class="slds-m-top_x-small">
+                                            <div class="ta-box-label ta-bg-color-blue slds-float_right">
+                                                <!-- <p class="ta-color-white">{!appointment.formatSchedStartDate} - {!appointment.schedStartTime}</p> -->
+                                                <p class="ta-color-white"> {!$Label.c.TA_AssignmentDate} {!': ' + appointment.createdDate} </p> <!-- ENXCRM-79 -->
+                                            </div>
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </div>
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:iteration>
+                </lightning:layout>
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

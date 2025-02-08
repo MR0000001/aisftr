@@ -1,0 +1,25 @@
+<aura:component controller ="XC_LCC084_AssignToBackOffice" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="record" type="Object" />
+    <aura:attribute name="componentRecord" type="Object" />
+    <aura:attribute name="recordError" type="String" />
+    
+    <force:recordData 
+        aura:id="recordLoader" 
+        recordId="{!v.recordId}" 
+        layoutType="FULL" 
+        mode="EDIT"
+        targetRecord="{!v.record}"
+        targetFields="{!v.componentRecord}"
+        targetError="{!v.recordError}" />   
+      <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:if isTrue="{!v.spinnerControl}" >
+        <div aura:id="masterSpinner" style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner"/>
+        </div>
+    </aura:if>
+    
+</aura:component>

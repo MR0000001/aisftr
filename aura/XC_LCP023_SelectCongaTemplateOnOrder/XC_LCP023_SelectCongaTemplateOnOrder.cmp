@@ -1,0 +1,36 @@
+<!--
+* @author Salvatore Scarpato - salvatore.scarpato@nttdata.com
+* @date Creation 04/10/2018
+* @date Modification dd/mm/yyyy
+* @description XC_LCP023_SelectCongaTemplateOnOrder –  Component to open a pop-up in which is possible to select a Conga 
+													   Template Picklist and download the Conga document on the Order with it.
+-->
+<aura:component controller="XC_LCC023_SelectCongaTemplateOnOrder" implements="force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="fieldName" type="String" />
+    <aura:attribute name="picklistValues" type="Object" />
+    <aura:attribute name="picklistId" type="Object" />
+    <aura:attribute name="recordId" type="Object" />
+    <aura:attribute name="fieldNameItem" type="String" />
+    <aura:attribute name="picklistValuesItem" type="Object"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+      
+    <lightning:layoutItem flexibility="auto" padding="around-small">
+        <div class="custom-box">
+            <lightning:select aura:id="fieldSelect" value="{!v.fieldName}" label ="Choose the documents to download: " >
+                
+                <option value="">{!$Label.c.XC_CL_ChooseOne}</option>
+                <aura:iteration items="{!v.picklistValues}" var="item">
+                    <option value="{!item.value}">
+                        {!item}
+                    </option>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+        <lightning:button label="{!$Label.c.XC_CL_Download}" 
+                          class="slds-m-top--medium"
+                          variant="brand"
+                          onclick="{!c.clickDownload}"/>              
+    </lightning:layoutItem> 
+</aura:component>

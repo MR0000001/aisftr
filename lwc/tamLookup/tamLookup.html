@@ -1,0 +1,30 @@
+<!--
+    @File Name          : tamLookup.html
+    @Description        : Screen flows custom lookup componet
+    @Author             : Marco Lazzaroni (mlazzaroni@pic-informatica.it)
+    @Group              :
+    @Last Modified By   : Marco Lazzaroni (mlazzaroni@pic-informatica.it)
+    @Last Modified On   : 03-05-2022
+    @Modification Log   :
+    Ver       Date            Author      		    Modification
+    1.0     03-05-2022   Marco Lazzaroni (mlazzaroni@pic-informatica.it)     Initial Version
+-->
+
+<!-- Custom Lookup Component -->
+<template>
+    <lightning-card variant="narrow">
+        <div class="slds-var-m-around_small">
+            <c-tam-lookup-component
+                    onlookup={handleLookup}
+                    obj-name={strObjectName}
+                    search-clause={strSearchClause}
+                    display-fields={strDisplayFields}
+                    fields = {fields}
+                    show-label=true
+                    label-name={strLabel}
+                    value-id={strRecordId}
+                    value-name={strRecordName}>
+            </c-tam-lookup-component>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,24 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 12-07-2020
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   12-07-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes">
+    
+    <aura:attribute name="iconName" type="String"/>
+    <aura:attribute name="text" type="String"/>
+
+
+    <div class="slds-section-title--divider slds-size_1-of-1">
+        <h4 class="title  slds-text-title_caps">
+            <lightning:icon iconName="{!v.iconName}" size="small"/><span
+                class="slds-var-p-left_small">{!v.text}</span>
+            </h4>
+    </div>
+
+</aura:component>

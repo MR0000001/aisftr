@@ -1,0 +1,21 @@
+<!--
+  @File Name          : XC_LCP174_CTIEventManager.cmp
+  @Description        : 
+  @Author             : Francesco Imperioli - fimperioli@deloitte.it
+  @Group              : 
+  @Last Modified By   : Francesco Imperioli - fimperioli@deloitte.it
+  @Last Modified On   : 14/5/2020, 15:49:06
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    14/5/2020   Francesco Imperioli - fimperioli@deloitte.it     Initial Version
+-->
+<aura:component  implements= "flexipage:availableForAllPageTypes,lightning:backgroundUtilityItem" access="global" controller="XC_LCC174_CTIEventManager">
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="evtChannel" type="String" default="/event/XC_CTI_Call_Event__e"/>
+
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <lightning:utilityBarAPI aura:id="utilitybar" />
+    <lightning:empApi aura:id="empApi"/>
+
+
+</aura:component>

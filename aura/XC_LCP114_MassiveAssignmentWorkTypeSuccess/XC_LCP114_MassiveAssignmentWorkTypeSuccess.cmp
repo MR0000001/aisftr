@@ -1,0 +1,39 @@
+<!--
+* @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @date Creation 24/09/2020
+* @description XC_LCP114_MassiveAssignmentWorkTypeSuccess – Component for Success Operation for XC_LCP114_MassiveAssignmentWorkType
+-->
+
+<aura:component implements="force:appHostable,force:lightningQuickActionWithoutHeader" 
+                access="global">
+
+    <!-- Style -->
+    <aura:html tag="style">
+        .slds-modal__container { max-width:50rem !important; width:70%!important; max-height:90rem !important; }
+        .slds-modal__content { background-color:#f7f7f7!important; }
+    </aura:html>
+
+    <aura:attribute name="partnerName" type="String" default=""/>
+    <aura:attribute name="quantityCoverages" type="String" default=""/>
+    <aura:attribute name="numberTotalCombo" type="String" default=""/>
+    <aura:attribute name="differenceCovragesInserted" type="String" default=""/>
+    <aura:attribute name="typeOperation" type="String" default=""/>
+    <aura:attribute name="destinationAccountName" type="String" default=""/>
+	<aura:attribute name="statusLogId" type="String" default=""/> <!--NF_ToBeValidatedByLore Added-->
+
+    <div style="margin-bottom: 30px">
+        <lightning:layout verticalAlign="center" horizontalAlign="center">
+            <img src="{!$Resource.XC_SR_MassiveAssignmentWorkType}" width="100" height="100"/>  
+        </lightning:layout>
+    </div>
+    <div style="text-align: center;">
+			<b>Operation in progress...</b>
+			 <br></br>
+			<!-- Lorenzo Evangelisti - lorenzo.evangelisti@webresults.it 06/06/2022 - EXSFDCSL-290 - Added [START] -->
+		     Please, check the status here: 
+			 <br></br> 
+			<lightning:formattedUrl value="{!'/' + v.statusLogId}" tooltip="Status Log" label="Status Log" target="_blank" />
+			 <!-- Lorenzo Evangelisti - lorenzo.evangelisti@webresults.it 06/06/2022 - EXSFDCSL-290 - Added [END] -->
+    </div>
+
+</aura:component>

@@ -1,0 +1,10 @@
+/**
+ * Created by alericci on 31/03/2021.
+ */
+.THIS .slds-modal__footer{
+    padding-left: 0 !important;
+    padding-right: var(--sds-c-modal-footer-spacing-inline-end, var(--lwc-spacingxSmall,6px)) !important;
+}
+.THIS .slds-modal__container {
+    width: 90% !important;
+}

@@ -1,0 +1,154 @@
+<aura:component controller="TA_LCC216_GeneratedReportCnt"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global">
+
+    <aura:attribute access="public" name="fieldSet" type="String"/>
+    <aura:attribute access="public" name="workOrderId" type="String"/>
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="general" type="Object"/>
+    <aura:attribute access="private" name="custom" type="Object"/>
+    <aura:attribute access="private" name="title" type="String"/>
+    <aura:attribute access="private" name="description" type="String"/>
+    <aura:attribute access="private" name="customerCardBg" type="String"/>
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="infoBag" type="Object" default="{}" />
+    <aura:attribute access="private" name="isReportSignedDesctiption" type="String" default="The report is not signed by the customer" />
+    <aura:attribute access="private" name="buttonReportDesctiption" type="String" default="Sign the report" />
+    <aura:attribute access="private" name="showGeneratedReportModal" type="Boolean" default="false" />
+    <aura:attribute access="private" name="showSubmitSignedReportModal" type="Boolean" default="false" />
+    <aura:attribute access="private" name="isReportSigned" type="Boolean" default="false" />
+    <aura:attribute access="private" name="iconSourcePath" type="String" default="{!$Resource.TA_Icons + '/xc-icons/edit-white.svg'}" />
+    <aura:attribute access="private" name="contentDocumentId" type="String" />
+    <aura:attribute access="private" name="isToBeSigned" type="Boolean" default="false"/>
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:registerEvent name="toggleSpinnerEvent" 	type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="sendInitStateEvt" 	type="c:TA_LCE220_SendInitStateEvt"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <div class="ta-box-custom-margin" style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover;
+                background-position:' + v.general.bgPosition + '; background-color:' + v.general.bgColor + '; box-shadow: 0vw 1vw 2vw -0.8vw black; background-blend-mode: lighten; border-radius: 2.5vw;'}">
+            <lightning:layout multipleRows="true" class="ta-report-container">
+                <lightning:layoutItem size="12">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="8">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12" class="slds-m-bottom_xx-small">
+                                    <h3 class="ta-color-white"> {!v.title} </h3>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="3">
+                                    <div class="ta-refresh-button" onclick="{!c.handleInitialize}" name="refresh"> {!$Label.c.XC_CL_RefreshButton} </div>
+                                </lightning:layoutItem>
+                                <aura:if isTrue="{!empty(v.infoBag.contentDocumentList)}">
+                                    <lightning:layoutItem size="12">
+                                        <div class="ta-refresh-description" name="refreshDescription"> {!$Label.c.TA_CL_RefreshButtonDescription} </div>
+                                    </lightning:layoutItem>
+                                </aura:if>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="4" class="slds-text-align_right">
+                            <aura:if isTrue="{!v.isReportSigned}">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}" class="slds-m-top_medium ta-icon-resize"/>
+                                <aura:set attribute="else">
+                                    <img src="{!$Resource.TA_Icons + '/xc-icons/edit-white.svg'}" class="slds-m-top_medium ta-icon-resize"/>
+                                </aura:set>
+                            </aura:if>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <aura:iteration items="{!v.infoBag.contentDocumentList}" var="cd">
+                                <lightning:layoutItem size="12" class="slds-m-top_xx-small slds-m-bottom_medium">
+                                    <div id="{!cd.Id}" class="ta-button-simple" onclick="{!c.handleManageGeneratedReportModal}">{!cd.Title}</div>
+                                </lightning:layoutItem>
+                            </aura:iteration>
+                        </lightning:layoutItem>
+                        <aura:if isTrue="{!v.isToBeSigned}">
+                            <lightning:layoutItem size="12" class="{!v.isReportSigned ? 'ta-description' : 'ta-report-not-signed'}">
+                                {!v.isReportSignedDesctiption}
+                            </lightning:layoutItem>
+                        </aura:if>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showGeneratedReportModal}">
+        <div class="ta-modal-report-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-report ta-animation-pop-in">
+                <!-- [CONTAINER] SHOW REPORT TO BE SIGNED MODAL (1st MODAL) -->
+                <aura:if isTrue="{!not(v.showSubmitSignedReportModal)}">
+
+                    <!--[HEADER] REPORT TO BE SIGNED -->
+                    <lightning:layoutItem size="12" class="ta-modal-header">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="11" class="ta-modal-header-title slds-text-align_center">{!$Label.c.TA_GeneratedReport}</lightning:layoutItem>
+                            <lightning:layoutItem size="1" class="ta-modal-header-button">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" onclick="{!c.handleManageGeneratedReportModal}" />
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <!-- [BODY] REPORT TO BE SIGNED -->
+                    <lightning:layoutItem size="12" class="ta-modal-body">
+                        <lightning:fileCard fileId="{!v.contentDocumentId}" description=" "/>
+                    </lightning:layoutItem>
+
+                    <!-- [FOOTER] REPORT TO BE SIGNED -->
+                    <lightning:layoutItem size="12" class="ta-modal-footer-anc">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="3"/>
+                            <lightning:layoutItem size="12" class="slds-p-left_medium slds-p-right_medium">
+                                <lightning:button class="ta-button-primary slds-m-bottom_large" label="Continue" onclick="{!c.handleSubmitSignedReportModal}"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="3"/>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <!-- [CONTAINER] SUBMIT SIGNED REPORT MODAL (2nd MODAL) -->
+                    <aura:set attribute="else">
+
+                        <!-- [HEADER] - SUBMIT SIGNED REPORT -->
+                        <lightning:layoutItem size="12" class="ta-modal-header ta-bg-purple">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="11"/>
+                                <lightning:layoutItem size="1" class="ta-modal-header-button">
+                                    <img src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" onclick="{!c.handleSubmitSignedReportModal}" />
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <!-- [BODY] - SUBMIT SIGNED REPORT -->
+                        <lightning:layoutItem size="12" class="ta-signed-report-modal-body">
+                            <lightning:layoutItem size="12"> 
+                                <img src="{!$Resource.TA_Images + '/imgs/report.svg'}" class="slds-m-top_medium slds-m-right_large"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-m-top_large"> <h3 class="ta-color-black"> {!$Label.c.TA_WantToSubmitReport} </h3> </lightning:layoutItem>
+                        </lightning:layoutItem>
+
+                        <!-- [FOOTER] - SUBMIT SIGNED REPORT -->
+                        <lightning:layoutItem size="12" class="ta-modal-footer">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12" class="slds-m-top_medium slds-p-left_small slds-p-right_small">
+                                    <lightning:button class="ta-button-primary" label="Yes, submit report" onclick="{!c.handleSubmitReport}" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="slds-m-top_medium slds-p-left_small slds-p-right_small">
+                                    <lightning:button class="ta-button-closing" label="Cancel" onclick="{!c.handleSubmitSignedReportModal}" />
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </aura:set>
+                </aura:if>
+            </lightning:layout>
+        </div>
+    </aura:if>
+</aura:component>

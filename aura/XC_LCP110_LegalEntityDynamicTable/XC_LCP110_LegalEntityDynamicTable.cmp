@@ -1,0 +1,96 @@
+<aura:component  
+    controller="XC_LCC110_LegalEntityDynamicTable"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasSObjectName,lightning:availableForFlowScreens" 
+    access="global">
+    <aura:attribute name="relatedObject" type="String"/>
+    <aura:attribute name="consentsInstance" type="List"/> <!--XC_LegalEntityConsent__c[]-->
+    <aura:attribute name="maxNumRows" type="Integer" default="0"/>
+    <aura:attribute name="robinsonCustomer" type="Boolean" default="false"/>
+    <aura:attribute name="thirdPartiesCheck" type="String" />
+    <aura:attribute name="thirdPartiesVersion" type="String"/>
+    <aura:attribute name="userCountry" type="String"/>
+    <aura:attribute name="userLE" type="String"/>
+    <aura:attribute name="country" type="List"/>
+    <aura:attribute name="consentsOptions" type="List"/>
+    <aura:attribute name="legalEntityConsents" type="List"/>
+    
+    <aura:handler name="XC_LCE_RowEvt" event="c:XC_LCE_RowEvt" action="{!c.processOperationOnRow}"/>
+    <aura:handler name="XC_LCE_SetLEConsents" event="c:XC_LCE_SetLEConsents" action="{!c.setLegalEntityConsents}"/>
+    <aura:handler name="XC_LCE111_SetLegalEntityConsents" event="c:XC_LCE111_SetLegalEntityConsents" action="{!c.setLegalEntityConsentsNEW}"/>
+    <aura:registerEvent name="XC_LCE_SetLEConsentsObject" type="c:XC_LCE_SetLEConsentsObject"/>
+    <aura:registerEvent name="XC_LCE110_SetLegalEntityConsents" type="c:XC_LCE110_SetLegalEntityConsents"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    
+    <div class="c-container" style="height: 300px">
+        <!--<lightning:layout multipleRows="true">
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                    <lightning:input type="checkbox" name="thirdParties" label="{!$Label.c.XC_CL_GiveDataThirdParties}" checked="{!v.thirdPartiesCheck}" aura:id="thirdParties" class="slds-p-vertical_small" onchange="{!c.setLegalEntityConsents}" />
+                </lightning:layoutItem>
+        </lightning:layout>-->
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+            <lightning:combobox name="thirdParties" label="{!$Label.c.XC_CL_GiveDataThirdParties}" aura:id="thirdParties" value="{! v.thirdPartiesCheck }" options="{! v.consentsOptions }" onchange="{!c.setLegalEntityConsents}" />
+        </lightning:layoutItem>
+        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+            <lightning:input name="thirdPartiesVersion" label="{!$Label.c.XC_CL_Version}" value="{!v.thirdPartiesVersion}" aura:id="thirdPartiesVersion" onchange="{!c.setLegalEntityConsents}" />
+        </lightning:layoutItem>
+    </lightning:layout>
+        <!--
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+            <lightning:input type="checkbox" name="robinsonCustomer" label="{!$Label.c.XC_CL_RobinsonCustomer}" checked="{!v.robinsonCustomer}" aura:id="robinsonCustomer" class="slds-p-vertical_small" onchange="{!c.setLegalEntityConsents}" />
+        </lightning:layoutItem>
+    </lightning:layout>    -->
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem size="12" smallDeviceSize="8" mediumDeviceSize="12" largeDeviceSize="12" padding="around-small">
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer"> 
+            <thead>
+                <tr> <!--class="slds-text-title_caps"-->
+                    <th scope="col">
+                        <div class="slds-truncate">&nbsp;</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="XC_LeCountry__c">{!$Label.c.XC_CL_Country}</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="XC_LegalEntity__c">{!$Label.c.XC_CL_LegalEntity}</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="XC_GiveDataTo__c">{!$Label.c.XC_CL_GiveDataTo}</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="XC_CompanyConsentVersion__c">{!$Label.c.XC_CL_Version}</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="XC_KeepMeUpdateOnProducts__c">{!$Label.c.XC_CL_KeepMeUpdateProd}</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="XC_MarketingConsentVersion__c">{!$Label.c.XC_CL_Version}</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="XC_GiveConsentToDataProcessing__c">{!$Label.c.XC_CL_ConsentDataProc}</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="XC_ProfilingConsentVersion__c">{!$Label.c.XC_CL_Version}</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Operation">Operation</div>
+                    </th>
+                </tr>
+            </thead>   
+            <tbody>      
+                <aura:iteration items="{!v.consentsInstance}" var="item" indexVar="index">
+                    <c:XC_LCP111_LegalEntityDynamicItem 
+                        ConsentsInstance="{!item}" 
+                        rowIndex="{!index}" 
+                        country="{!v.country}" 
+                        consentsOptions="{!v.consentsOptions}" />
+                        <!--legalEntityConsents="{!v.legalEntityConsents}"-->
+                </aura:iteration>
+            </tbody>
+        </table>
+        </lightning:layoutItem>
+    </lightning:layout>
+    </div>
+</aura:component>

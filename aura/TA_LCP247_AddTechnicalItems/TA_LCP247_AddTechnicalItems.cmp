@@ -1,0 +1,255 @@
+<aura:component controller ="XC_LCC195_AddTechnicalItems"
+                implements="force:lightningQuickActionWithoutHeader,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global">
+
+    <aura:attribute name="record" type="Object" description="The record object to be displayed"/>
+    <aura:attribute name="orderItemRecord" type="Object" description="A simplified view record object to be displayed"/>
+    <aura:attribute name="recordError" type="String" description="An error message bound to force:recordData"/>
+    <aura:attribute name="whichButton" type="String" default=""/>
+
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="woliSegment" type="String"/>
+    <aura:attribute name="woliLegalEntity" type="String"/>
+    <aura:attribute name="woliRecordId" type="String" access="global"/> <!-- woliId if send to glovia start from Product Required -->
+    <aura:attribute name="contestStartCI" type ="boolean" default ="true" access="global"/> <!-- woliId if send to glovia start from Product Required -->
+    <aura:attribute name="wbeElement" type ="String" default ="" access="global"/> <!-- woliId if send to glovia start from Product Required -->
+    <aura:attribute name="costCenter" type ="String" default ="" access="global"/> <!-- woliId if send to glovia start from Product Required -->
+    <aura:attribute name="workOrderId" type ="String" default ="" access="global"/> <!-- woliId if send to glovia start from Product Required -->
+
+    <aura:attribute name="rtWoli" type ="string" access="global"/> <!-- woliId if send to glovia start from Product Required -->
+
+    <aura:attribute name="pageNumber" type="Integer" default="0"/>
+    <aura:attribute name="pageSize" type="Integer" default="15"/>
+    <aura:attribute name="isLastPage" type="Boolean" default="false"/>
+    <aura:attribute name="resultSize" type="Integer" default="0"/>
+    <aura:attribute name="selection" type="List" description="attribute to hold selected all rows"/>
+    <aura:attribute name="checkExistPrice" type="List" description="attribute to hold id exist price"/>
+    <aura:attribute name="hasPageChanged" type="Boolean" default="false" description="attribute to check if the page has changed or not"/>
+    <aura:attribute name="initialLoad" type="Boolean" default="true" description="attribute to check if it is initialLoad"/>
+    <aura:attribute name="updatedRecord" type="Object[]" description="This attribute will hold the update records from data table"/>
+
+    <aura:attribute name="selected" type="List"/>
+    <aura:attribute name="families" type="List"/>
+    <aura:attribute name="country" type="String"/>
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    <aura:attribute name="showFlagForMaterials" type="boolean" default="false"/>
+    <aura:attribute name="showMaterials" type="boolean" default="false"/>
+    <aura:attribute name="noItemFound" type="boolean" default="false"/>
+    <aura:attribute name="noSavePrice" type="Boolean" default="false"/>
+    <aura:attribute name="flagDisableCatFilter" type="Boolean" default="true"/>
+    <aura:attribute name="draftValues" type="Object" default="[]"/>
+    <aura:attribute name="catalogItem" type="Object" description=""/>
+    <aura:attribute name="contractId" type="String" description="Contract Id"/>
+    <aura:attribute name="manualMapPrice" type="Object" default="[]"/>
+    <aura:attribute name="ReadExistPrice" type="Object" default="[]"/>
+    <aura:attribute name="filterList" type="List" />
+    <aura:attribute name="selectedRowsDetails" type="Object" />
+    <aura:attribute name="goToSearch" type="Boolean" default="true"/>
+
+    <aura:attribute name="isInitialized" type="Boolean" default="false" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute name="dataPaginated" type="Object" />
+    <aura:attribute name="dataToShow" type="List" />
+    <aura:attribute name="lastPageNumber" type="Integer" default="0"/>
+
+    <ltng:require styles="{!$Resource.XC_NE_PopupCss}" />
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+
+    <!-- <aura:handler name="init"   action="{!c.doInit}" value="{!this}"/> -->
+    <aura:handler name="change" value="{!v.showMaterials}" action="{!c.handleChangeShowMaterials}"/>
+    <aura:handler name="change" value="{!v.isInitialized}" action="{!c.handleIsInitializedChange}"/>
+
+    <aura:registerEvent name="refreshEvt" type="c:TA_LCE224_Refresh"/>
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+
+    <force:recordData aura:id="record"
+        layoutType="FULL"
+        recordId="{!v.recordId}"
+        targetError="{!v.recordError}"
+        targetRecord="{!v.record}"
+        targetFields="{!v.orderItemRecord}"
+        mode="VIEW"/>
+
+    <!-- You must define keyField as 'Id' to save the record back in Salesforce 'onsave' attribute will executed when user clicks on save button -->
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" horizontalAlign="center" class="ta-modal-technical-item-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" class="ta-modal-header-title slds-text-align_center">
+                            Add Product Consumed <!-- TO DO CUSTOM LABEL -->
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.closeModal}" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+                <aura:if isTrue="{!v.noItemFound}">
+                    <lightning:layoutItem size="12" class="ta-modal-technical-item-body">
+                        <div style="width:100% !important;" class="slds-notification slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+                            <h1 class="ta-notification">{!$Label.c.XC_CL_ProvideSearchCriteria}</h1>
+                        </div>
+
+                        <div class="slds-size_12-of-12">
+                            <div class="slds-col slds-col slds-var-p-top_small slds-size_12-of-12">
+                                <lightning:input name="Product2Name" aura:id="Product2Name" label="{!$Label.c.XC_CL_Name}" />
+                            </div>
+                            <div class="slds-col slds-col slds-var-p-top_small slds-size_12-of-12">
+                                <lightning:input name="SapCode" aura:id="SapCode" label="{!$Label.c.XC_CL_ProductCode}" />
+                            </div>
+                            <div class="slds-col slds-col slds-var-p-top_small slds-size_12-of-12">
+                                <lightning:input name="TypeName" aura:id="TypeName" label="{!$Label.c.XC_CL_Type}" />
+                            </div>
+                            <div class="slds-col slds-col slds-var-p-top_small slds-size_12-of-12">
+                                <lightning:input name="PositionName" aura:id="PositionName" label="Service Position"/> <!-- TO DO CUSTOM LABEL -->
+                            </div>
+                            <aura:if isTrue="{!v.showFlagForMaterials}">
+                                <div class="slds-col slds-var-p-top_small slds-size_12-of-12">
+                                    <label class="slds-checkbox__label" for="checkbox-unique-id-72">
+                                        <span class="slds-checkbox_faux"></span>
+                                        <span class="slds-form-element__label ta-p-left-small">{!$Label.c.XC_CL_ShowMaterials}</span>
+                                    </label>
+                                    <lightning:input type="checkbox" name="flagForMaterials" aura:id="flagForMaterials" checked="{!v.showMaterials}" />
+                                </div>
+                            </aura:if>
+                            <div class="slds-col slds-var-p-top_small slds-size_12-of-12">
+                                <label class="slds-checkbox__label" for="FlagApplyFilter">
+                                    <span class="slds-checkbox_faux"></span>
+                                    <span class="slds-form-element__label ta-p-left-small">Disable Category Filter</span> <!-- TO DO CUSTOM LABEL -->
+                                </label>
+                                <lightning:input type="checkbox" name="FlagApplyFilter" aura:id="FlagApplyFilter" onchange="{!c.checkCategoryFilter}"/>
+                            </div>
+                        </div>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" class="ta-modal-footer-one-button">
+                        <div class="slds-form-element slds-size_1-of-1 slds-grid">
+                            <div class="slds-form-element slds-size_12-of-12">
+                                <lightning:button class="slds-size_12-of-12 slds-button ta-button-closing" label="Search" onclick="{!c.doSearch}"/> <!-- TO DO CUSTOM LABEL -->
+                            </div>
+                        </div>
+                    </lightning:layoutItem>
+                </aura:if>
+
+                <aura:if isTrue="{!!v.noItemFound}">
+                    <lightning:layoutItem size="12">
+                        <div id="ta-modal-technical-item-body" class="ta-modal-technical-item-body">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12">
+                                    <aura:iteration items="{!v.dataToShow}" var="product">
+                                        <div id="{!product.glBookEntryId+'_div'}" name="productCartContainer" class="ta-cards">
+                                            <lightning:layout multipleRows="true">
+                                                <aura:iteration items="{!v.columns}" var="col">
+                                                    <lightning:layoutItem size="12" class="">
+                                                        <span class="ta-color-violet-opacity-60 ta-p-right-small">{!col.label}:</span>
+                                                    <aura:if isTrue="{!col.fieldName == 'name'}">
+                                                        <span class="ta-color-violet">{!product.name}</span>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!col.fieldName == 'positionName'}">
+                                                        <span class="ta-color-violet">{!product.positionName}</span>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!col.fieldName == 'productCode'}">
+                                                        <span class="ta-color-violet">{!product.productCode}</span>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!col.fieldName == 'type'}">
+                                                        <span class="ta-color-violet">{!product.type}</span>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!col.fieldName == 'Quantity'}">
+                                                        <span class="ta-color-violet">{!product.Quantity}</span>
+                                                    </aura:if>
+                                                    </lightning:layoutItem>
+                                                </aura:iteration>
+                                                <lightning:layoutItem size="12">
+                                                    <aura:if isTrue="{!not(product.selected)}">
+                                                        <div id="{!product.glBookEntryId+'_Add'}"
+                                                            class="slds-button slds-float_right ta-button-primary"
+                                                            onclick="{!c.handleSelectProduct2}">{!$Label.c.TA_Add}</div>
+                                                        <aura:set attribute="else">
+                                                            <div id="{!product.glBookEntryId+'_Remove'}"
+                                                                class="slds-button slds-float_right ta-button-closing"
+                                                                onclick="{!c.handleDeselectProduct2}">{!$Label.c.TA_Remove}</div>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </lightning:layoutItem>
+                                            </lightning:layout>
+                                        </div>
+                                    </aura:iteration>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem padding="around-small" size="12" class="slds-hide">
+                                    <lightning:datatable
+                                            aura:id="product2DataTable"
+                                            columns="{!v.columns}"
+                                            data="{!v.data}"
+                                            keyField="glBookEntryId"
+                                            expandedRows="{! v.gridExpandedRows }"
+                                            hideCheckboxColumn="false"
+                                            selectedRows = "{!v.selection}"
+                                            onrowaction="{!c.onRowActionSelect}"
+                                            draftValues="{! v.draftValues }"
+                                            onsave="{! c.handleSaveEdition }"
+                                            onrowselection ="{!c.onRowSelection}"/>
+                                </lightning:layoutItem>
+                                <!-- <lightning:layoutItem padding="around-small" size="12" flexibility="auto">
+                                    <lightning:button label="{!$Label.c.XC_CL_PrevMess}"
+                                                    iconName="utility:chevronleft"
+                                                    iconPosition="left"
+                                                    onclick="{!c.onPrev}"
+                                                    disabled="{!v.pageNumber == 1}"/>
+                                    <span class="slds-var-p-horizontal_small">
+                                        {!format($Label.c.XC_CL_PageShowingRecFromTo, v.pageNumber, ((v.pageNumber-1)*v.pageSize), ((v.pageNumber-1)*v.pageSize+v.resultSize))}
+                                    </span>
+                                    <lightning:button label="{!$Label.c.XC_CL_NextMess}"
+                                                    iconName="utility:chevronright"
+                                                    iconPosition="right"
+                                                    disabled="{!v.isLastPage}"
+                                                    onclick="{!c.onNext}"/>
+                                </lightning:layoutItem> -->
+                                <lightning:layoutItem size="12">
+                                    <lightning:layout multipleRows="true">
+                                        <lightning:layoutItem size="6" class="ta-pagination-item">
+                                            <aura:if isTrue="{!greaterthan(v.pageNumber, 0)}">
+                                                <div class="slds-float_left" onclick="{!c.onPrev}">
+                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/arrow-down.svg'}" style="transform:rotate(90deg);" />
+                                                    <span class="slds-p-left_x-small ta-color-violet">{!$Label.c.TA_MainProductPrevious}</span>
+                                                </div>
+                                            </aura:if>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="6" class="ta-pagination-item">
+                                            <aura:if isTrue="{!lessthan(v.pageNumber, (v.lastPageNumber - 1))}">
+                                                <div class="slds-float_right" onclick="{!c.onNext}">
+                                                    <span class="slds-p-right_x-small ta-color-violet">{!$Label.c.TA_MainProductNext}</span>
+                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/arrow-down.svg'}" style="transform:rotate(270deg);" />
+                                                </div>
+                                            </aura:if>
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </div>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" class="ta-modal-footer-two-button">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                <lightning:button class="ta-button-closing-modal" label="{!$Label.c.TA_Cancel}" onclick="{!c.handleGoToSearch2}"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12">
+                                <lightning:button class="ta-button-primary-modal" label="Add Material" onclick="{!c.addTechItems}"/> <!-- TO DO CUSTOM LABEL -->
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+                </aura:if>
+            </lightning:layout>
+        </div>
+    </aura:if>
+</aura:component>

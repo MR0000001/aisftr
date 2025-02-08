@@ -1,0 +1,18 @@
+<!--
+  @description       : 
+  @author            : ebaenalabandera@deloitte.es
+  @group             : 
+  @last modified on  : 10-21-2021
+  @last modified by  : ebaenalabandera@deloitte.es
+-->
+<aura:component controller="XC_REST_Payment_Platform" implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>	
+    <aura:attribute name="mostrarSpinner" type="boolean" default="false"/>
+    <aura:attribute name="result" type="Map"/>
+
+    <aura:if isTrue="{!v.mostrarSpinner}">
+        <lightning:spinner variant="brand" alternativeText="Loading..."/>
+    </aura:if>
+
+    <h3>{!v.result.message}</h3>
+</aura:component>

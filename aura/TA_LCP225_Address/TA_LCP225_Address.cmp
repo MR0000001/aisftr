@@ -1,0 +1,350 @@
+<aura:component controller="XC_LCC_Address" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable" extends="c:XC_LCP_BaseComponent">
+
+    <aura:attribute name="recordId" type="String" access="public"/>
+    <aura:attribute name="addressFields" type="List" access="public"/>
+    <aura:attribute name="disableFields" type="Boolean" access="public"/>
+    <aura:attribute name="objectName" type="String" access="public"/>
+
+    <aura:attribute name="source" type="String" default="" />
+    <aura:attribute name="IdFromMobile" type="String" />
+    <aura:attribute name="podValue" type="String" />
+    <aura:attribute name="showCheckbox" type="Boolean" default="false" />
+    <aura:attribute name="showButtonSection" type="Boolean" default="true" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="parentRecordType" type="String" />
+    <aura:attribute name="isSFMObject" type="Boolean" default="false"/>
+    <aura:attribute name="showStrikeModal" type="Boolean" default="false" />
+    <aura:attribute name="title" type="String" />
+    <aura:attribute name="showToastMessage" type="boolean" default="false"/>
+    <aura:attribute name="successMessage" type="String" default=""/>
+    <aura:attribute name="requiredAttribute" type="List" default="city,address,streetNumber,postalCode,streetType,province,municipality,country" />
+
+    <!-- After AutoComplete -->
+    <aura:attribute name="searchresultStreet" type="List" default="[]"/>
+    <aura:attribute name="searchresultCity" type="List" default="[]"/>
+    <aura:attribute name="searchresultZip" type="List" default="[]"/>
+    <aura:attribute name="returnedZipList" type="Boolean" default="false"/>
+    <aura:attribute name="timer" type="Object" default="null" />
+    <aura:attribute name="showAddressSugg" type="Boolean" default="false" />
+    <aura:attribute name="showCitySugg" type="Boolean" default="false" />
+    <aura:attribute name="showZipSugg" type="Boolean" default="false" />
+    <aura:attribute name="showPods" type="Boolean" default="false" />
+    <aura:attribute name="requestTimeOut" type="Integer" default="1000" />
+    <aura:attribute name="addressToUpdate" type="Boolean" default="false" />
+    <aura:attribute name="skipValChecked" type="Boolean" default="false" />
+    <aura:attribute name="showSave" type="Boolean" default="true" />
+    <aura:attribute name="selectedCup" type="List"/>
+    <aura:attribute name="searchresultCup" type="List" default="[]"/>
+
+    <aura:attribute name="podsTableColumns" type="List" default="[
+                    { label: 'Stair', fieldName: 'Stair' },
+                    { label: 'Floor', fieldName: 'Floor' },
+                    { label: 'Door', fieldName: 'Door' },
+                    { label: 'Gas', fieldName: 'Gas' },
+                    { label: 'Electric', fieldName: 'Electric' }]"/>
+    <aura:attribute name="podsTableData" type="List" />
+
+    <aura:attribute name="hiddenFields" type="Map" default="{}"/>    
+    <!--<aura:attribute name="myLocalAddress" type="Object" default=" {
+        country : '',
+        streetType : '',
+        address : '',
+        addressCode : '',
+        streetNumber : '',
+        door : '',
+        postalCode : '',
+        stair : '',
+        floor : '',
+        city : '',
+        cityCode : '',
+        province : '',
+        provinceCode : '',
+        category : '',
+        municipality : '',
+        streetTypeText : '',
+        gas : '',
+        electric : '',
+        lead: '',
+        account: '',
+        
+        region: '',
+
+        validate : false,
+        validatedCups : false,
+
+        clarifType : '',
+        clarifValue : ''
+    }"/>-->
+    <aura:attribute name="myLocalAddress" type="Object" default="{}"/>
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <lightning:workspaceAPI aura:id="workspace" />
+    <aura:registerEvent name="XC_LCE013_SetAddressObject" type="c:XC_LCE013_SetAddressObject"/>
+    <aura:registerEvent name="XC_LCE004_closeNewAddress" type="c:XC_LCE004_closeNewAddress"/>
+    <aura:registerEvent name="XC_LCE018_ChangeAddressCountry" type="c:XC_LCE018_ChangeAddressCountry"/>
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }"/>
+    <aura:handler name="strike_evt_modalPrimaryButtonClicked" event="c:strike_evt" action="{!c.handlePrimaryButtonClick}"/>
+
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+
+    <!--<lightning:recordEditForm objectApiName="XC_Address__c">
+        <lightning:messages />
+        <lightning:layout multipleRows="true">
+
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                <lightning:inputField aura:id="country" fieldName="XC_AddressCountry__c" onchange="{!c.setPickCountry}" value="{!v.address.country}" required="true"/>
+                <div style="position:relative;">
+                    <lightning:inputField aura:id="city" required="true" fieldName="XC_City__c" value="{!v.address.city }" onchange="{!c.typingCity}" onclick="{!c.checkCity}" variant="label-inline" disabled="false"/>
+                    <aura:if isTrue="{!v.showCitySugg}">
+                        <div id="listbox-suggestions" aura:id="query-suggest-box-city" class="slds-dropdown_length-10" role="listbox">
+                            <ul aura:id="query-suggest-list" class="slds-listbox slds-listbox_vertical slds-textarea" role="presentation">
+                                <aura:iteration items="{!v.searchresultCity}" var="sugg" indexVar="index">
+                                    <li aura:id="query-suggest-item" role="presentation" class="slds-listbox__item">
+                                        <div aura:id="query-suggestions" id="{!sugg.value}" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" value="{!sugg}" onclick="{!c.selectCity}">
+                                            {!sugg.label}
+                                        </div>
+                                    </li>
+                                </aura:iteration>
+                            </ul>
+                        </div>
+                    </aura:if>
+                </div>
+                <aura:if isTrue="{!v.hiddenFields.XC_StreetTypeText__c == null}">
+					<lightning:inputField aura:id="streetType" fieldName="XC_StreetTypeText__c" onchange="{!c.setPickStreetType }" required="true" disabled="true" value="{!v.address.streetTypeText}" />
+                </aura:if>
+                <aura:if isTrue="{! (v.address.country == 'Chile') || (v.address.country == 'Colombia')  }">
+                    <div style="position:relative;">
+                        <lightning:inputField aura:id="address" fieldName="XC_Address__c" value="{!v.address.address }" required="true" disabled="true" onchange="{!c.typingAddress}" onclick="{!c.checkAddress}"/>
+                        <aura:if isTrue="{!v.showAddressSugg}">
+                            <div id="listbox-suggestions" aura:id="query-suggest-box-address" class="slds-dropdown_length-10" role="listbox">
+                                <ul aura:id="query-suggest-list" class="slds-listbox slds-listbox_vertical slds-textarea" role="presentation">
+                                    <aura:iteration items="{!v.searchresultStreet}" var="sugg" indexVar="index">
+                                        <li aura:id="query-suggest-item" role="presentation" class="slds-listbox__item">
+                                            <div aura:id="query-suggestions" id="{!sugg.value}" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" value="{!sugg}" onclick="{!c.selectAddress}">
+                                                {!sugg.label}
+                                            </div>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </aura:if>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.hiddenFields.XC_StreetNumber__c == null}">
+                	<lightning:inputField aura:id="streetNumber" fieldName="XC_StreetNumber__c" value="{!v.address.streetNumber }" required="{!!v.isSFMObject}" disabled="true" onchange="{!c.sendChanges}"/>
+                </aura:if>
+                <aura:if isTrue="{!(v.address.country == 'Chile') || (v.address.country == 'Colombia') }">
+                    <aura:if isTrue="{!v.hiddenFields.XC_PostalCode__c == null}">
+                        <lightning:inputField aura:id="postalCode" value="{!v.address.postalCode}" fieldName="XC_PostalCode__c" required="{!!v.isSFMObject}" disabled="true" onchange="{!c.typingZip}" onclick="{!c.checkZip}" />
+                        <aura:if isTrue="{!v.showZipSugg}">
+                            <div id="listbox-suggestions" aura:id="query-suggest-box-zip" class="slds-dropdown_length-10" role="listbox">
+                                <ul aura:id="query-suggest-list" class="slds-listbox slds-listbox_vertical slds-textarea" role="presentation">
+                                    <aura:iteration items="{!v.searchresultZip}" var="sugg" indexVar="index">
+                                        <li aura:id="query-suggest-item" role="presentation" class="slds-listbox__item">
+                                            <div aura:id="query-suggestions" id="{!sugg.value}" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" value="{!sugg}" onclick="{!c.selectZip}">
+                                            {!sugg.label}
+                                            </div>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </aura:if>
+                    </aura:if>
+                </aura:if>
+                <aura:if isTrue="{!v.hiddenFields.XC_Floor__c == null}">
+                    <lightning:inputField aura:id="floor" fieldName="XC_Floor__c" value="{!v.address.floor }" onchange="{!c.sendChanges}"/>
+                </aura:if>
+                <aura:if isTrue="{!v.hiddenFields.XC_Door__c == null}">
+                    <lightning:inputField aura:id="door" fieldName="XC_Door__c" value="{!v.address.door }" onchange="{!c.sendChanges}"/>
+                </aura:if>
+                <aura:if isTrue="{!v.hiddenFields.XC_Stair__c == null}">
+                	<lightning:inputField aura:id="stair" fieldName="XC_Stair__c" value="{!v.address.stair }" onchange="{!c.sendChanges}"/>
+                </aura:if>
+                <aura:if isTrue="{!v.hiddenFields.XC_GasCUPS__c == null}">
+                	<lightning:inputField aura:id="gasCUP" fieldName="XC_GasCUPS__c" value="{!v.address.gas }" disabled="true" onchange="{!c.sendChanges}"/>
+				</aura:if>
+            </lightning:layoutItem>
+
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+				<aura:if isTrue="{!v.hiddenFields.XC_Category__c == null}">
+                    <lightning:inputField aura:id="category" fieldName="XC_Category__c" onchange="{!c.setPickCategory }" value="{!v.address.category}"/>
+                </aura:if>
+                <aura:if isTrue="{!v.hiddenFields.XC_Region__c == null}">
+					<lightning:inputField aura:id="region" fieldName="XC_Region__c" value="{!v.address.region}" disabled="{!v.address.country == 'Italy'}" onchange="{!c.sendChanges}"/>
+                </aura:if>
+                <aura:if isTrue="{!v.hiddenFields.XC_AddressProvince__c == null}">
+                	<lightning:inputField aura:id="province" fieldName="XC_AddressProvince__c" onchange="{!c.setPickProvince }" required="true" disabled="true" value="{!v.address.province}" />
+				</aura:if>
+                
+                <aura:if isTrue="{!and((v.address.country != 'Chile'),(v.address.country != 'Colombia'))}">
+                    <div style="position:relative;">
+                        <lightning:inputField aura:id="address" fieldName="XC_Address__c" value="{!v.address.address }" required="true" disabled="true" onchange="{!c.typingAddress}" onclick="{!c.checkAddress}"/>
+                        <aura:if isTrue="{!v.showAddressSugg}">
+                            <div id="listbox-suggestions" aura:id="query-suggest-box-address" class="slds-dropdown_length-10" role="listbox">
+                                <ul aura:id="query-suggest-list" class="slds-listbox slds-listbox_vertical slds-textarea" role="presentation">
+                                    <aura:iteration items="{!v.searchresultStreet}" var="sugg" indexVar="index">
+                                        <li aura:id="query-suggest-item" role="presentation" class="slds-listbox__item">
+                                            <div aura:id="query-suggestions" id="{!sugg.value}" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" value="{!sugg}" onclick="{!c.selectAddress}">
+                                                {!sugg.label}
+                                            </div>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </aura:if>
+                    </div>
+                    <div style="position:relative;">
+                        <aura:if isTrue="{!v.hiddenFields.XC_PostalCode__c == null}">
+                            <lightning:inputField aura:id="postalCode" value="{!v.address.postalCode}" fieldName="XC_PostalCode__c" required="{!!v.isSFMObject}" disabled="true" onchange="{!c.typingZip}" onclick="{!c.checkZip}" />
+                            <aura:if isTrue="{!v.showZipSugg}">
+                                <div id="listbox-suggestions" aura:id="query-suggest-box-zip" class="slds-dropdown_length-10" role="listbox">
+                                    <ul aura:id="query-suggest-list" class="slds-listbox slds-listbox_vertical slds-textarea" role="presentation">
+                                        <aura:iteration items="{!v.searchresultZip}" var="sugg" indexVar="index">
+                                            <li aura:id="query-suggest-item" role="presentation" class="slds-listbox__item">
+                                                <div aura:id="query-suggestions" id="{!sugg.value}" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" value="{!sugg}" onclick="{!c.selectZip}">
+                                                {!sugg.label}
+                                                </div>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                        </aura:if>
+                    </div>
+                </aura:if>
+                
+                <aura:if isTrue="{!v.hiddenFields.XC_Municipality__c == null}">
+                    <lightning:inputField aura:id="municipality" fieldName="XC_Municipality__c" value="{!v.address.municipality}" disabled="true" onchange="{!c.sendChanges}"/>
+                </aura:if>
+                <aura:if isTrue="{!v.hiddenFields.XC_ClarificatorType__c == null}">
+                	<lightning:inputField aura:id="clarifType" fieldName="XC_ClarificatorType__c" value="{!v.address.clarifType }" onchange="{!c.sendChanges}" size="6"/>
+                </aura:if>
+                <aura:if isTrue="{!v.hiddenFields.XC_ClarificatorValue__c == null}">
+                	<lightning:inputField aura:id="clarifValue" fieldName="XC_ClarificatorValue__c" value="{!v.address.clarifValue }" onchange="{!c.sendChanges}" size="6"/>
+                </aura:if>
+                <aura:if isTrue="{!v.hiddenFields.XC_ElectricCUPS__c == null}">
+                	<lightning:inputField aura:id="electricCUP" fieldName="XC_ElectricCUPS__c" value="{!v.address.electric }" disabled="true" onchange="{!c.sendChanges}"/>
+				</aura:if>
+            </lightning:layoutItem>
+
+        </lightning:layout>
+
+    </lightning:recordEditForm>-->
+
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem size="12">
+            <aura:iteration items="{!v.addressFields}" var="field">
+                <aura:if isTrue="{!field.isDisplayed}">       
+                    <aura:if isTrue="{!v.disableFields}">
+                        <!-- FIELD READONLY -->
+                        <lightning:layoutItem size="12" class="slds-m-top_medium">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12">
+                                    <div class="slds-float_left slds-form-element__label"> {!field.label} </div>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <p> {!field.value} </p>
+                                </lightning:layoutItem>
+                            </lightning:layout>   
+                        </lightning:layoutItem>
+
+                        <aura:set attribute="else">
+                            <!-- FIELD PICKLIST -->
+                            <aura:if isTrue="{!field.type == 'PICKLIST'}">
+                                <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                    <lightning:select required="{!field.required}"
+                                                    value="{!field.value}" label="{!field.label}" 
+                                                    name="{!field.apiName}">
+                                        <aura:iteration items="{!field.availableValues}" var="availableValue">
+                                            <option value="{!availableValue.value}">{!availableValue.label}</option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </lightning:layoutItem>
+                            </aura:if>
+
+                            <!-- FIELD TEXT OR EMAIL OR NUMBER OR DATE -->
+                            <aura:if isTrue="{!or(field.type == 'STRING', or(field.type == 'EMAIL', 
+                                                or(field.type == 'NUMBER', or(field.type == 'DATE', field.type == 'DATETIME'))))}">
+                                <lightning:input class="slds-m-top_medium" type="{!if(field.type == 'EMAIL', 'email', 
+                                                                                    if(field.type == 'NUMBER', 'number', 
+                                                                                    if(or(field.type == 'DATE',field.type == 'DATETIME'), 'date', 'text')))}" required="{!field.required}" 
+                                                    label="{!field.label}" name="{!field.apiName}" value="{!field.value}" onchange="{!c.handleOnChangeEvent}"/>
+                            </aura:if>
+
+                            <!-- FIELD AUTOCOMPLETE SUGGESTIONS -->
+                            <aura:if isTrue="{!v.showSugg}">
+                                <div aura:id="{!field.apiName}" class="slds-dropdown_length-10" role="listbox">
+                                    <ul aura:id="query-suggest-list" class="slds-listbox slds-listbox_vertical slds-textarea" role="presentation">
+                                        <aura:iteration items="{!v.searchResult}" var="sugg" indexVar="index">
+                                            <li aura:id="query-suggest-item" role="presentation" class="slds-listbox__item">
+                                                <div aura:id="query-suggestions" id="{!sugg.value}" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" value="{!sugg}" onclick="{!c.selectCity}">
+                                                    {!sugg.label}
+                                                </div>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </aura:if>
+
+                            <!-- FIELD TEXTAREA -->
+                            <aura:if isTrue="{!field.type == 'TEXTAREA'}">
+                                <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                    <lightning:textarea required="{!field.required}" name="{!field.apiName}" 
+                                                        label="{!field.label}" value="{!field.value}" onchange="{!c.handleOnChangeEvent}"/>
+                                </lightning:layoutItem>
+                            </aura:if>
+
+                        </aura:set>
+                    </aura:if> 
+                </aura:if>        
+            </aura:iteration>
+        </lightning:layoutItem>
+    </lightning:layout>
+
+
+        <!--<aura:if isTrue="{!and(v.address.validate,not(v.showCheckbox))}">
+            <lightning:input type="checkbox" label="{!$Label.c.XC_CL_Address_AddressValidated}" checked="{!v.address.validate}" disabled="true"/>
+            <br></br>
+        </aura:if>
+    
+        <br></br>
+    <aura:if isTrue = "{!not(v.isSFMObject)}">
+        <aura:if isTrue="{!v.showCheckbox}">
+            <lightning:input aura:id="skipVal" type="checkbox" label="{!$Label.c.XC_CL_SaveWithoutValidate}" onchange="{!c.skipValidation}"/>
+        </aura:if>
+    </aura:if>
+    <lightning:layout horizontalAlign="end">
+        <lightning:layoutItem padding="around-small">
+
+            <lightning:buttonGroup>
+
+                <aura:if isTrue="{!and((v.source!='002'), (v.source!='003'))}">
+                    <aura:if isTrue="{!or(v.showSave, v.isSFMObject)}">
+                        <lightning:button aura:id="saveButton" disabled="{!and(not(v.address.validate),not(v.skipValChecked))}" variant="brand" label="{!$Label.c.XC_CL_SaveButton}" title="Brand action" onclick="{!c.saveAddress}" />
+                    </aura:if>
+                    <aura:if isTrue="{!(v.source!='013')}">
+                        <lightning:button label="{!$Label.c.XC_CL_Cancel}" title="Brand action" onclick="{! c.cancel }" />
+                    </aura:if>
+                </aura:if>
+
+                <aura:if isTrue="{!and(v.showButtonSection, not(v.isSFMObject))}">
+                    <aura:if isTrue="{!and(not(v.skipValChecked),not(v.showCheckbox))}">   
+                        <lightning:button label="{!$Label.c.XC_CL_Address_Validate}" onclick="{!c.onValidate}"/>
+                    </aura:if>
+                </aura:if>
+                <aura:if isTrue ="{!not(v.isSFMObject)}">
+                    <aura:if isTrue="{!not(v.showButtonSection)}">
+                        <lightning:button aura:id="editButton" label="{!$Label.c.XC_CL_EditButton}" onclick="{!c.onModify}"/>
+                    </aura:if>
+                </aura:if>
+            </lightning:buttonGroup>
+
+        </lightning:layoutItem>
+    </lightning:layout>-->
+
+</aura:component>

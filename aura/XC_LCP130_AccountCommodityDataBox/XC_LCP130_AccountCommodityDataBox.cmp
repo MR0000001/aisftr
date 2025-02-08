@@ -1,0 +1,38 @@
+<!--
+* @author Nicolò Leonardi - nleonardi@deloitte.it & Marco Rosa - marco.rosa@nttdata.com
+* @date Creation 12/09/2018
+* @date Modification 2019 by Monica Cutillo - monica.cutillo@nttdata.com
+* @description XC_LCP005_AccountCallToCommodity – STUB Component to call Commodity System to retrieve account Data
+-->
+<aura:component controller="XC_LCC005_AccountCallToCommodity"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference"
+    access="global">
+
+    <aura:attribute name="commodityGlobalMessage" type="String" />
+    <aura:attribute name="accountCommodityObj" type="Object" />
+    <aura:attribute name="sobjecttype" type="String" />
+    <aura:attribute name="body0" type="Object[]" />
+    <aura:attribute name="contractCommodityObj" type="Object" />
+    <aura:attribute name="caseCommodityObj" type="Object" />
+    <aura:attribute name="invoiceCommodityObj" type="Object" />
+    <aura:attribute name="selectedAccount" type="String" />
+    <aura:attribute name="accountType" type="String" />
+    <aura:attribute name="serverSystem" type="String" />
+    <aura:attribute name="accountDocCountry" type="String" />
+    <!--<aura:attribute name="spinnerControl" type="Boolean" default="false" />-->
+
+    <lightning:notificationsLibrary aura:id="notifLib" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler event="c:XC_LCE014_SaveSectionValue" action="{!c.handleSaveSectionEvent}" phase="capture" />
+
+    <ui:scrollerWrapper class="scrollerSize">
+        
+        {!v.body0}
+    </ui:scrollerWrapper>
+
+    <!--<aura:if isTrue="{!v.spinnerControl}" >
+        <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>-->
+</aura:component>

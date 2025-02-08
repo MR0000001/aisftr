@@ -1,0 +1,30 @@
+<!--
+  @description       : LC to manage dynamic layout for homepage, calendar
+  @author            : benjamin.geronimo
+  @last modified on  : 01-06-2021
+  @last modified by  : benjamin.geronimo
+  Modifications Log 
+  Ver   Date         Author              Modification
+  1.0   13-05-2021   benjamin.geronimo   Initial Version
+-->
+<aura:component implements="force:hasSObjectName,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="TA_LCC253_DynamicPageBuilder">
+
+    <aura:attribute access="public" name="componentsInitStateList"  type="List"         default="[]" />
+    <aura:attribute access="public" name="showToastMessage"         type="Boolean" />
+    <aura:attribute access="public" name="isError"                  type="Boolean" />
+    <aura:attribute access="public" name="toastMessage"             type="String" />
+
+    <ltng:require styles="{!join(',',
+        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}" />
+	
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <div class="ta-container slds-m-bottom_xx-large ta-dynamic-container">
+        <!-- GENERATE DYNAMICALLY EACH COMPONENT CONFIGURETED -->
+        <aura:html aura:id="dynamicCmp" tag="div"></aura:html>
+    </div>
+</aura:component>

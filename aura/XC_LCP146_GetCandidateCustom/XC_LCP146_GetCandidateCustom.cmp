@@ -1,0 +1,51 @@
+<!--
+* @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @date Creation 04/05/2020
+* @description XC_LCP146_GetCandidateCustom – Component for Get Candidate
+-->
+
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasSObjectName,lightning:availableForFlowScreens"
+                access="global"
+                controller="XC_LCC146_BookAppointmentCustom">
+
+    <!-- Attributes: -->
+    <aura:attribute name="recordId" type="String"/> 
+    <aura:attribute name="showGetCandidate" type="Boolean" default="false"/> 
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:attribute name="urlComponent" type="String" default=""/>
+    <aura:attribute name="showRetry" type="Boolean" default="true"/> 
+    <aura:attribute name="retryMessage" type="String" default=""/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <lightning:navigation aura:id="navService"/>
+    <lightning:workspaceAPI aura:id="workspace"/>  
+    <!-- Handler: -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <aura:if isTrue="{!v.showGetCandidate}">
+        <div>
+            <iframe src="{!v.urlComponent}" width="100%" height="500px;" frameBorder = "0" />
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showRetry}">
+        <div>
+            <br></br>
+            <b>{!v.retryMessage}</b>
+            <br></br>
+            <div class="forceChangeRecordTypeFooter slds-float--right slds-m-around--medium">
+                <lightning:layout verticalAlign="right" horizontalAlign="right">
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <lightning:button onclick="{!c.init}" variant="brand" label="{!$Label.c.XC_CL_BookAppointment_Retry}"/> 
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div class="spinnerHolder">
+            <lightning:spinner alternativeText="Loading" size="large" variant="brand" />
+        </div>   
+    </aura:if>
+
+</aura:component>

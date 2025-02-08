@@ -1,0 +1,186 @@
+<aura:component controller="TA_LCC211_SecondaryContact"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global" >
+
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="workOrder" type="Object" />
+    <aura:attribute access="public" name="contactId" type="String" />
+    <aura:attribute access="public" name="accountId" type="String" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="general" type="Object"/>
+    <aura:attribute access="private" name="custom" type="Object"/>
+    <aura:attribute access="private" name="title" type="String"/>
+    <aura:attribute access="private" name="description" type="String"/>
+    <aura:attribute access="private" name="customerCardBg" type="String"/>
+    <aura:attribute access="private" name="inputParameter" type="Object" default="{}" />
+    <aura:attribute access="private" name="infoBag" type="Object" default="{}" />
+    <aura:attribute access="private" name="selectedContact" type="String" default="" />
+    <aura:attribute access="private" name="showModal" type="Boolean" default="false" />
+    <aura:attribute access="private" name="showNewContactForm" type="Boolean" default="false" />
+    <aura:attribute access="public" name="isButtonDisabled" type="Boolean" default="true" />
+    <aura:attribute access="private" name="newContact" type="Object" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}"/>
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/>
+    <aura:registerEvent name="refreshEvt" type="c:TA_LCE224_Refresh"/>
+
+    <ltng:require styles="{​​!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}​​" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}"/>
+
+    <lightning:layout multipleRows="true" class="slds-m-bottom_large slds-p-top_small slds-p-left_small slds-p-right_small ">
+        <lightning:layoutItem size="12" class="slds-m-bottom_medium"></lightning:layoutItem>
+        <lightning:layoutItem size="12">
+            <div onclick="{!c.handleOpenModal}" style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover;
+            background-position: ' + v.general.bgPosition + '; background-color: ' + v.general.bgColor + '; box-shadow: 0vw 1vw 2vw -0.8vw black; background-blend-mode: lighten; border-radius: 2vw;'}">
+                <lightning:layout multipleRows="true" class="ta-button-new-contact">
+                    <lightning:layoutItem size="12" class="slds-m-bottom_small ta-color-white"> <h3> {!v.title} </h3></lightning:layoutItem>
+                    <lightning:layoutItem size="12">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="10" class="ta-description-grey">
+                                {!v.description}
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="2" class="slds-text-align_right ta-self-align-center">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}" class="slds-float_right ta-accordion-header-icon" />
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+
+    <aura:if isTrue="{!v.showModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                <!-- [CONTAINER] ADD NEW CONTACT SECTION -->
+                <aura:if isTrue="{!v.showNewContactForm}">
+
+                    <!--[HEADER] ADD NEW CONTACT SECTION -->
+                    <lightning:layoutItem size="12" class="ta-modal-header">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="1" class="ta-modal-header-button">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/back.svg'}" onclick="{!c.handleManageModal}" />
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="10" class="ta-modal-header-title slds-text-align_center">{!$Label.c.TA_AddNewContact}</lightning:layoutItem>
+                            <lightning:layoutItem size="1" class="ta-modal-header-button">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleCloseModal}" />
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <!-- [BODY] ADD NEW CONTACT SECTION -->
+                    <lightning:layoutItem size="12" class="ta-modal-body">
+                        <lightning:layout multipleRows="true">
+                            <aura:iteration items="{!v.infoBag.fieldStructureList}" var="fieldStructure">
+                                <lightning:layoutItem size="12" class="slds-m-bottom_xx-small">
+                                    <aura:if isTrue="{!fieldStructure.required}">
+                                        <span class="ta-required-icon">*</span>
+                                    </aura:if>
+                                    <p class="ta-color-grey ta-display-inline-block">{!fieldStructure.label}</p>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-field-input">
+                                    <aura:if isTrue="{!fieldStructure.type == 'STRING'}">
+                                        <lightning:input type="text"
+                                                        name="{!fieldStructure.apiName}"
+                                                        value="{!fieldStructure.value}"
+                                                        autocomplete="off"
+                                                        onblur="{!c.handleInputChange}" />
+                                    </aura:if>
+                                    <aura:if isTrue="{!fieldStructure.type == 'EMAIL'}">
+                                        <lightning:input type="email"
+                                                        name="{!fieldStructure.apiName}"
+                                                        value="{!fieldStructure.value}"
+                                                        autocomplete="off"
+                                                        onblur="{!c.handleInputChange}" />
+                                    </aura:if>
+                                    <aura:if isTrue="{!fieldStructure.type == 'PICKLIST'}">
+                                        <lightning:select name="{!fieldStructure.apiName}" value="{!fieldStructure.value}" onchange="{!c.handleInputChange}">
+                                            <aura:iteration items="{!fieldStructure.availableValues}" var="availableValue">
+                                                <option value="{!availableValue.value}">{!availableValue.label}</option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </aura:if>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-field-error">{!fieldStructure.error}</lightning:layoutItem>
+                            </aura:iteration>
+                        </lightning:layout>
+
+                        <lightning:layout multipleRows="true">
+                            <aura:iteration items="{!v.infoBag.gdprStructureList}" var="gdprStructure">
+                                <lightning:layoutItem size="12" class="ta-gdpr-title">
+                                    <span class="{!if(gdprStructure.required, 'ta-required-icon slds-float_left', 'slds-hide')}">*</span> {!gdprStructure.title}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-gdpr-description">
+                                    {!gdprStructure.description}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="10" />
+                                <lightning:layoutItem size="2" class="ta-gdpr-toggle">
+                                    <lightning:input type="toggle"
+                                                    checked="{!gdprStructure.value}"
+                                                    name="{!gdprStructure.apiName}"
+                                                    onchange="{!c.handleInputChange}"/>
+                                </lightning:layoutItem>
+                            </aura:iteration>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <!-- [FOOTER] ADD NEW CONTACT SECTION -->
+                    <lightning:layoutItem size="12" class="ta-modal-footer-anc">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="12">
+                                <lightning:button class="{!v.isButtonDisabled ? 'ta-button-primary-modal-disabled' : 'ta-button-primary-modal'}" label="Save" onclick="{!c.handleSaveNewContact}" disabled="{!v.isButtonDisabled}"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <!-- [CONTAINER] SELECT A CONTACT SECTION -->
+                    <aura:set attribute="else">
+
+                        <!-- [HEADER] - SELECT A CONTACT -->
+                        <lightning:layoutItem size="12" class="ta-modal-header">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="1"/>
+                                <lightning:layoutItem size="10" class="ta-modal-header-title slds-text-align_center">{!$Label.c.TA_SelectContact}</lightning:layoutItem>
+                                <lightning:layoutItem size="1" class="ta-modal-header-button">
+                                    <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleCloseModal}" />
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <!-- [BODY] - SELECT A CONTACT -->
+                        <lightning:layoutItem size="12" class="ta-modal-body">
+                            <aura:iteration items="{!v.infoBag.contactWrapperList}" var="contactWrapper">
+                                <span id="{!contactWrapper.id}" onclick="{!c.handleSelectContact}">
+                                    <lightning:layout multipleRows="true" class="{!if(contactWrapper.selected, 'ta-modal-body-contact-card-selected', 'ta-modal-body-contact-card-not-selected')}">
+                                        <lightning:layoutItem size="12" class="ta-modal-body-contact-card-name">{!contactWrapper.name}</lightning:layoutItem>
+                                        <lightning:layoutItem size="12" class="ta-modal-body-contact-card-email">{!contactWrapper.email}</lightning:layoutItem>
+                                    </lightning:layout>
+                                </span>
+                            </aura:iteration>
+                        </lightning:layoutItem>
+                        
+                        <!-- [FOOTER] - SELECT A CONTACT -->
+                        <lightning:layoutItem size="12" class="ta-modal-footer">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                    <lightning:button class="ta-button-secondary-modal" label="New Contact" onclick="{!c.handleManageModal}" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                    <lightning:button class="ta-button-primary-modal" label="Save" onclick="{!c.handleUpdateContact}" />
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </aura:set>
+                </aura:if>
+            </lightning:layout>
+        </div>
+    </aura:if>
+</aura:component>

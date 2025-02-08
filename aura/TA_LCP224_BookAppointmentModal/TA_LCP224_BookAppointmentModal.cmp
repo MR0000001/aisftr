@@ -1,0 +1,256 @@
+<aura:component controller="TA_LCC213_BookAppointment"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+
+    <aura:attribute access="public" name="doConvertLead" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="doRedirect" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="workOrderId" type="String"/>
+    <aura:attribute access="public" name="leadId" type="String"/>
+    <aura:attribute access="public" name="opportunityId" type="String"/>
+    <aura:attribute access="public" name="bookNow" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="calendarName" type="String"/>
+    <aura:attribute access="public" name="showCalendarModal" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="reschedule" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="showSlotSelectionModal" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="showConfirmModal" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="isTimeSlotConfirmed" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="selectedDate" type="String"/>
+    <aura:attribute access="public" name="infoBag" type="Object"/>
+    <aura:attribute access="public" name="wrapperSlots" type="List"/>
+    <aura:attribute access="public" name="timeSlots" type="List"/>
+    <aura:attribute access="public" name="availableDates" type="List"/>
+    <aura:attribute access="public" name="timeSlotSelected" type="String"/>
+    <aura:attribute access="public" name="wrapperSlotSelected" type="Object"/>
+    <aura:attribute access="public" name ="communityBaseUrl" type="String"/>
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="public" name="toggleReloadBookAppointment" type="Boolean" default="false"/>
+
+    <aura:attribute access="private" name="isSpinnerVisible" type="Boolean" default="false" />
+    <aura:attribute access="private" name="newWorkOrderId" type="String" />
+    <aura:attribute access="private" name="durationTimeInHours" type="String" default="0:30" />
+    <aura:attribute access="private" name="durationTimeInMinutes" type="Integer" default="30" />
+    <aura:attribute access="private" name="durationTimeInMinutesToAdd" type="Integer" default="30" />
+    <aura:attribute access="private" name="durationTime" type="Decimal" default="30" />
+    <aura:attribute access="private" name="durationType" type="String" default="Minutes" />
+    <aura:attribute access="private" name="isTimeDurationSelection" type="Boolean" default="false" />
+    <aura:attribute access="public" name="selectedDateString" type="String"/>
+
+    <ltng:require styles="{!join(',',
+                                $Resource.TA_SR_FullCalendar  + '/packages/core/main.min.css',
+                                $Resource.TA_SR_FullCalendar  + '/packages/daygrid/main.min.css'
+                            )}"
+                    scripts="{!join(',',
+                                $Resource.TA_SR_jQuery,
+                                $Resource.TA_SR_FullCalendar  + '/packages/core/main.js',
+                                $Resource.TA_SR_FullCalendar  + '/packages/interaction/main.min.js',
+                                $Resource.TA_SR_FullCalendar  + '/packages/daygrid/main.min.js'
+                            )}"
+                    afterScriptsLoaded="{!c.handleInitialize}"/>
+
+    <aura:handler name="change" value="{!v.showCalendarModal}" action="{!c.handleChangeShowCalendarModal}"/>
+    <aura:handler name="change" value="{!v.toggleReloadBookAppointment}" action="{!c.handleReloadBookAppointment}"/>
+    
+    <aura:method  access="public" name="reloadBookAppointment" action="{!c.handleGetAvailableAppointments}" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleGetAvailableAppointments}"/>
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/>
+    <aura:registerEvent name="closeModalEvt" type="c:TA_LCE216_ModalManagement"/>
+    <aura:registerEvent name="sendErrorEvt" type="c:TA_LCE248_GenericEvent"/>
+
+    <aura:if isTrue="{!v.isSpinnerVisible}">
+        <c:TA_LCP207_Spinner/>
+    </aura:if>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <!-- CALENDAR MODAL -->
+    <lightning:layout multipleRows="true" class="{!if(and(v.showCalendarModal, !v.bookNow), 'slds-show ta-modal-bg', 'slds-hide')}">
+        <lightning:layoutItem size="12" class="ta-calendar-container">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="12" class="ta-margin-bottom-20px">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="1" class="ta-icon-close-size">
+                            <aura:if isTrue="{!v.doConvertLead}">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/back-white.svg'}" name="lead" onclick="{!c.handleBackModal}" />
+                            </aura:if>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="10" class="slds-text-align_center">
+                            <h3 class="ta-color-purple"> {!$Label.c.TA_ScheduleAppointment} </h3> 
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="1" class="slds-text-align_right">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleCloseModal}" class="ta-icon-close-size" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12">
+                    <div id="{!v.calendarName}" class="slds-m-bottom_small"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </lightning:layoutItem>
+    </lightning:layout>
+
+    <!-- TIMESLOT MODAL -->
+    <lightning:layout multipleRows="true" class="{!if(v.showSlotSelectionModal, 'slds-show ta-modal-bg', 'slds-hide')}">
+        <lightning:layoutItem size="12" class="ta-timeslot-container">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="12" class="slds-m-bottom_large">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="1" class="ta-icon-close-size">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/back.svg'}" name="calendar" onclick="{!c.handleBackModal}" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="10" class="slds-text-align_center">
+                            <h3 class="ta-color-purple"> {!$Label.c.TA_SelectTimeSlot} </h3>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="1" class="slds-text-align_right">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleCloseModal}" class="ta-icon-close-size" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                    <p class="ta-color-purple"> {!$Label.c.TA_SelectedDate} </p>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-m-bottom_large ta-timeslot-selecteddate">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="8">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/clock.svg'}" class="ta-icon-clock slds-float_left"/>
+                            <p class="ta-color-purple"> {!v.selectedDateString} </p>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="4">
+                            <div id="edit-date" onclick="{!c.handleManageEdit}">
+                                <span class="slds-float_right"> {!$Label.c.TA_Edit} </span>
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/edit-purple.svg'}" class="ta-icon-edit"/>
+                            </div>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <aura:if isTrue="{!v.isTimeSlotConfirmed}">
+                    <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                        <p class="ta-color-purple"> {!$Label.c.TA_TimeSlotSelected} </p>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" class="slds-m-bottom_large ta-timeslot-selecteddate">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="8">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/clock.svg'}" class="ta-icon-clock slds-float_left"/>
+                                <p class="ta-color-purple"> {!v.timeSlotSelected} </p>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="4">
+                                <div id="edit-time-slot" onclick="{!c.handleManageEdit}">
+                                    <span class="slds-float_right"> {!$Label.c.TA_Edit} </span>
+                                    <img src="{!$Resource.TA_Icons + '/xc-icons/edit-purple.svg'}" class="ta-icon-edit"/>
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <aura:if isTrue="{!v.isTimeDurationSelection}">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                            <p class="ta-color-purple">{!$Label.c.TA_Duration}</p>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-m-bottom_large">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="4">
+                                    <div id="remove-time" class="{!if(v.durationTimeInMinutes > v.durationTimeInMinutesToAdd, 'ta-quantity-operator-secondary', 'ta-quantity-operator-secondary-disabled') + ' slds-float_right'}" onclick="{!c.handleManageTime}">-</div>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="4" class="ta-duration-time-container slds-text-align_center">
+                                    <img src="{!$Resource.TA_Icons + '/xc-icons/clock.svg'}" class="ta-icon-clock"/>
+                                    <p class="ta-color-purple ta-duration-time">{!v.durationTimeInHours}</p>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="4">
+                                    <div id="add-time" class="ta-quantity-operator-secondary" onclick="{!c.handleManageTime}">+</div>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-text-align_center">
+                            <lightning:button class="ta-button-primary-modal"
+                                            label="{!$Label.c.TA_Save}"
+                                            name="saveDurationTime"
+                                            onclick="{!c.handleConfirm}"/>
+                        </lightning:layoutItem>
+
+                        <aura:set attribute="else">
+                            <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                <p class="ta-color-purple">{!$Label.c.TA_Duration}</p>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-m-bottom_large ta-timeslot-selecteddate">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="8">
+                                        <img src="{!$Resource.TA_Icons + '/xc-icons/clock.svg'}" class="ta-icon-clock slds-float_left"/>
+                                        <p class="ta-color-purple">{!v.durationTimeInHours}</p>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="4">
+                                        <div id="edit-duration-time" onclick="{!c.handleManageEdit}">
+                                            <span class="slds-float_right">{!$Label.c.TA_Edit}</span>
+                                            <img src="{!$Resource.TA_Icons + '/xc-icons/edit-purple.svg'}" class="ta-icon-edit"/>
+                                        </div>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-text-align_center">
+                                <lightning:button class="ta-button-primary-modal"
+                                                label="{!$Label.c.TA_BookAppointmentOk}"
+                                                name="confirm"
+                                                onclick="{!c.handleConfirm}"/>
+                            </lightning:layoutItem>
+                        </aura:set>
+                    </aura:if>
+
+                    <aura:set attribute="else">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                            <p class="ta-color-purple"> {!$Label.c.TA_SelectSpecificHour} </p>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                            <aura:if isTrue="{!v.timeSlots.length > 0}">
+                                <lightning:layout multipleRows="true">
+                                    <aura:iteration items="{!v.timeSlots}" var="timeSlot">
+                                        <div name="time-slot" class="slds-size_2-of-12 ta-timeslot-box" onclick="{!c.handleTimeSlotSelected}" id="{!timeSlot}">
+                                            {!timeSlot}
+                                        </div>
+                                    </aura:iteration>
+                                </lightning:layout>
+                                <aura:set attribute="else">
+                                    <p class="ta-color-pink"> {!$Label.c.TA_NoTimeSlotsAvailable} </p>
+                                </aura:set>
+                            </aura:if>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-text-align_center">
+                            <lightning:button class="{!if(v.timeSlotSelected != null, 'ta-button-primary-modal','ta-button-primary-modal-disabled')}"
+                                            label="{!$Label.c.TA_BookAppointmentRequestAvailability}"
+                                            name="request-availability"
+                                            disabled="{!v.timeSlotSelected == null}"
+                                            onclick="{!c.handleConfirm}"/>
+                        </lightning:layoutItem>
+                    </aura:set>
+                </aura:if>
+            </lightning:layout>
+        </lightning:layoutItem>
+    </lightning:layout>
+
+    <!-- CONFIRM MODAL -->
+    <lightning:layout multipleRows="true" class="{!if(v.showConfirmModal, 'slds-show ta-modal-bg', 'slds-hide')}">
+        <lightning:layoutItem size="12" class="ta-timeslot-container">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="12" class="slds-m-bottom_medium slds-text-align_center">
+                    <img src="{!$Resource.TA_Icons + '/xc-icons/check.svg'}" class="ta-check-icon"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-m-bottom_medium slds-text-align_center ta-confirm-title">
+                    {!$Label.c.TA_Perfect}
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-m-bottom_medium slds-text-align_center">
+                    <aura:if isTrue="{!v.bookNow}">
+                        <p class="ta-color-purple"> {!$Label.c.TA_AppointmentScheduledNow} </p>
+                        <aura:set attribute="else">
+                            <p class="ta-color-purple">{!$Label.c.TA_AppointmentScheduledOtherDay} {!' ' + v.selectedDateString + ' '} {!$Label.c.TA_At} {!' ' + v.timeSlotSelected} </p>
+                        </aura:set>
+                    </aura:if>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-text-align_center">
+                    <lightning:button class="ta-button-primary-modal" label="OK" onclick="{!c.handleRedirectToCalendar}"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

@@ -1,0 +1,38 @@
+<!--
+* @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @date Creation 15/06/2021
+* @description XC_LCP254_SelectInvoiceDeliveryPreference – Component to change Invoice Delivery Preference
+-->
+
+<aura:component controller= "XC_LCC254_SelectDeliveryPreference" 
+                implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference" 
+                access="global">
+
+    <aura:Attribute name="recordId" type="String"/>
+    <aura:Attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:attribute name="listOptionsPreference" type="String[]" default="-- None --"/>
+    <aura:attribute name="preferenceSelected" type="String" default=""/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <lightning:layout horizontalAlign="center" verticalAlign="center" multipleRows="true">
+        <lightning:layoutItem padding="around-small" size="12">
+            <lightning:select aura:id="selectPreference" name="selectPreference" label="{!$Label.c.XC_CL_SelectInvoiceDeliveryPreference}" required="true" value="preferenceSelected" onchange="{!c.onChangeValue}">
+                <aura:iteration items="{!v.listOptionsPreference}" var="pref">
+                        <option text="{!pref}"></option>
+                    </aura:iteration>
+            </lightning:select>
+        </lightning:layoutItem>
+        <lightning:layoutItem padding="around-small" size="12" class="center">
+            <lightning:button variant="brand" label="{!$Label.c.XC_CL_Save}" title="{!$Label.c.XC_CL_Save}" onclick="{!c.changePreference}" />
+        </lightning:layoutItem>
+    </lightning:layout>
+
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div
+            style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+
+</aura:component>

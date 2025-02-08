@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="Send answer to button section">
+    <aura:attribute name="answerValue" type="List" />
+</aura:event>

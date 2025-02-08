@@ -1,0 +1,17 @@
+<template>
+    <template if:true={isRetry}>
+        <div class="slds-clearfix" style = "margin-right: 1rem">
+            <lightning-button variant="neutral"
+                              name={label.Retry}
+                              label={label.Retry}
+                              title={label.Retry}
+                              onclick={retryCallZuora} 
+                              class="slds-float_right"></lightning-button>
+                            </div>
+        <template if:true={loading}>
+            <div class= "spinner">
+                <lightning-spinner alternative-text="Loading"></lightning-spinner>
+            </div>
+        </template>
+</template>
+</template>

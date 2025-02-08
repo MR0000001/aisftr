@@ -1,0 +1,26 @@
+<aura:component 
+	implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference"
+    controller="XC_LCC067_RelatedAssetsByAccount" 
+    access="global">
+    
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="assetTreeType" type="String" />
+    <aura:attribute name="gridColumns" type="List" access="PRIVATE" />
+    <aura:attribute name="gridData" type="Object" access="PRIVATE" />
+    <aura:attribute name="gridExpandedRows" type="List" access="PRIVATE" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+
+    <div>
+        <lightning:treeGrid
+            columns="{! v.gridColumns }"
+            data="{! v.gridData }"
+            expandedRows="{! v.gridExpandedRows }"
+            keyField="id"
+            hideCheckboxColumn="true"
+            resizeColumnDisabled="true"
+        />
+    </div>
+
+</aura:component>

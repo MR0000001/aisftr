@@ -1,0 +1,17 @@
+<aura:component controller="XC_LCC155_OmniChannelAssignWork" implements = "flexipage:availableForAllPageTypes,lightning:backgroundUtilityItem" access="global">
+    <lightning:omniToolkitAPI aura:id="omnitoolkit"/>
+    <aura:handler event="lightning:omniChannelWorkAccepted" action="{!c.onWorkAccepted}"/>
+    
+    <aura:attribute name="caseRecordId" type="String"/>
+    <aura:attribute name="caseRecord" type="Object"/>
+    <aura:attribute name="caseRecordError" type="String"/>
+
+    <force:recordData aura:id = "caseLoader" 
+    recordId="{!v.caseRecordId}"
+    fields="Status,ParentId"
+    targetFields = "{!v.caseRecord}"
+    targetError = "{!v.recordLoadError}"
+    mode = "EDIT"
+    />
+
+</aura:component>

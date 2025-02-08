@@ -1,0 +1,15 @@
+.THIS .greyOut{    
+   pointer-events: none; 
+   background: #CCC; 
+   color: #333; 
+   border: 1px solid #666 
+}
+
+.THIS.checkboxstyle {
+   padding-top: 1%;
+}
+
+.THIS.slds-modal__container{
+     	width: 80% !important;
+     	max-width: 80% !important;
+     }

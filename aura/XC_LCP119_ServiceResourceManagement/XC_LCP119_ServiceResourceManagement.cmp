@@ -1,0 +1,44 @@
+<!--
+* @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @date Creation 12/06/2019
+* @description XC_LCP119_ServiceResourceManagement – Component to manage Service Resource Skill and Document for Partner
+-->
+
+<aura:component controller="XC_LCC119_ServiceResourceManagement"
+                implements="force:appHostable,force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference"
+                access="global">
+
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="gridExpandedRows" type="List"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <div>
+        <article class="slds-card"> 
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <lightning:icon class="slds-icon slds-icon-standard-email-iq" iconName="standard:maintenance_asset"/>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <div class="slds-text-heading_small">&nbsp; <b>{!$Label.c.XC_CL_SerResMangement_ManagementSkill}</b></div>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+        </article>
+        <div class="slds-no-flex">   
+            <lightning:treeGrid
+                columns="{!v.columns}"
+                data="{!v.data}"
+                expandedRows="{!v.gridExpandedRows}"
+                keyField="Id"
+                hideCheckboxColumn="true"
+                
+            />
+        </div>
+    </div>
+	
+</aura:component>

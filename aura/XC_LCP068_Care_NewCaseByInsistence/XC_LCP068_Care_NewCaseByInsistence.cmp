@@ -1,0 +1,45 @@
+<!--
+* @author  AJJL - ajimenez@deloitte.es
+* @date Creation 09/01/2019
+* @date Modification 18/01/2019 by Monica Cutillo - monica.cutillo@nttdata.com (various corrections related to the labels)
+* @description XC_LCP068_Care_NewCaseByInsistence
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference" controller="XC_LCC068_Care_NewCaseByInsistence" access="global">
+    <aura:attribute name="recordId" type="Id" /> 
+    <aura:attribute name="isClosedWorkOrder" type="Boolean" />
+    <aura:attribute name="caseNumber" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <div style="text-align:right; padding-right:5px">
+    <lightning:button variant="Neutral" label="{!$Label.c.XC_CL_ComplaintButton}" title="{!$Label.c.XC_CL_ComplaintButton}" onclick="{! c.newRequest }"/> <!-- MCutillo 20190118 -->
+
+</div>
+
+    <!--use boolean attribute for Store true/false value,
+        make default to "false" so modal box are not display on the load of component. 
+        -->
+    <aura:attribute name="isOpen" type="boolean" default="false" />
+    <div class="slds-m-around_xx-large">
+        <aura:if isTrue="{!v.isOpen}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.refreshModel }" alternativeText="close" variant="bare-inverse" class="slds-modal__close" />
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.XC_CL_Notice}</h2> <!-- MCutillo 20190118 -->
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p>
+                            <b>{!format($Label.c.XC_CL_Warning_CaseClose, v.caseNumber)}</b> <!-- MCutillo 20190118 -->
+                        </p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral" label="{!$Label.c.XC_CL_Close}" title="{!$Label.c.XC_CL_Close}" onclick="{! c.refreshModel }" />
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    </div>
+
+
+</aura:component>

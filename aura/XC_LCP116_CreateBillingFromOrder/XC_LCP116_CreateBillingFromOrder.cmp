@@ -1,0 +1,432 @@
+<!--
+  @File Name          : XC_LCP116_CreateBillingFromOrder.cmp
+  @Description        : 
+  @Author             : Francesco Imperioli - fimperioli@deloitte.it
+  @Group              : 
+  @Last Modified By   : Francesco Imperioli - fimperioli@deloitte.it
+  @Last Modified On   : 11-10-2020
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    22/4/2020   Francesco Imperioli - fimperioli@deloitte.it     Initial Version
+-->
+<aura:component controller="ZuoraBillingProfileCreationController"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasSObjectName,lightning:availableForFlowScreens,lightning:isUrlAddressable,force:hasRecordId,lightning:hasPageReference,force:lightningQuickActionWithoutHeader"
+    access="global">
+
+    <lightning:notificationsLibrary aura:id="notifLib" />
+    <aura:attribute name="sobjecttype" type="String" default="{!v.sObjectName}" />
+    <aura:attribute name="entityName" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="firstRecordId" type="String" />
+    <aura:attribute name="electricCUP" type="String" />
+    <aura:attribute name="gasCUP" type="String" />
+    <aura:attribute name="addressId" type="String" />
+    <aura:attribute name="contactId" type="String" />
+    <aura:attribute name="legalEnt" type="String" default="" />
+    <aura:attribute name="disabledSubmit" type="Boolean" default="true" />
+    <aura:attribute name="getContractBy" type="String" />
+    <aura:attribute name="showCUPS" type="Boolean" default="false" />
+    <aura:attribute name="closeStrikeModal" type="Boolean" default="false" />
+    <aura:attribute name="showToast" type="Boolean" default="false" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="toastMessage" type="String" />
+    <aura:attribute name="sepaMandate" type="String" default="" />
+    <aura:attribute name="mandateDate" type="String" default="" />
+    <aura:attribute name="creditCardLastFourNumber" type="String" default="" />
+    <aura:attribute name="expirationMonth" type="String" default="" />
+    <aura:attribute name="expirationYear" type="String" default="" />
+    <aura:attribute name="payPalUsername" type="String" default="" />
+    <aura:attribute name="creditCardType" type="String" default="" />
+    <aura:attribute name="iban" type="String" default="" />
+    <aura:attribute name="docCountry" type="String" default="" />
+    <aura:attribute name="configurationId" type="String" />
+    <aura:attribute name="contactHasEmail" type="Boolean" default="false"/>
+    <aura:attribute name="billingProfileId" type="String" />
+    <aura:attribute name="recordTypeName" type="String" />
+    <aura:attribute name="mapContractIdContractType" type="Map" />
+    <aura:attribute name="fromOrderComponent" type="Boolean" default="false" />
+    <aura:attribute name="selectedPOS" type="String" />
+    <aura:attribute name="payment" type="List" />
+    <aura:attribute name="cupsList" type="List" />
+    <aura:attribute name="cardType" type="List" />
+    <aura:attribute name="contractOptions" type="List" />
+    <aura:attribute name="showStrikeModal" type="Boolean" default="false" />
+    <aura:handler name="strike_evt_modalPrimaryButtonClicked" event="c:strike_evt"
+        action="{!c.handlePrimaryButtonClick}" />
+    <aura:attribute name="validInvoiceChannel" type="Boolean" default="true" />
+    <aura:attribute name="showDataTable" type="Boolean" default="false" />
+    <!--  <aura:attribute name="contractId" type="String"  />
+    <aura:attribute name="cupsId" type="String"  />-->
+    <lightning:workspaceAPI aura:id="workspace" />
+    <aura:registerEvent name="openQuickAction" type="c:XC_LCE016_RefreshView" />
+    <aura:attribute name="month" type="List"
+        default="[ {'label': '1', 'value': '1'},
+                                                          {'label': '2', 'value': '2'},
+                                                          {'label': '3', 'value': '3'}, {'label': '4', 'value': '4'}, {'label': '5', 'value': '5'}, {'label': '6', 'value': '6'}, {'label': '7', 'value': '7'}, {'label': '8', 'value': '8'},  {'label': '9', 'value': '9'},  {'label': '10', 'value': '10'}, {'label': '11', 'value': '11'},  {'label': '12', 'value': '12'}  ]" />
+    <aura:attribute name="year" type="List" default="[ {'label': '2018', 'value': '2018'},
+                                                          {'label': '2019', 'value': '2019'},
+                                                          {'label': '2020', 'value': '2020'} ,
+                                                          {'label': '2021', 'value': '2021'},
+                                                          {'label': '2022', 'value': '2022'},
+                                                          {'label': '2023', 'value': '2023'}   ]" />
+
+
+
+    <aura:attribute name="options" type="List" default="[
+    {'label': 'Email', 'value': 'Email'},
+    {'label': 'Print', 'value': 'Print'}
+    ]" />
+
+    <aura:attribute name="valueCheck" type="String" />
+
+    <aura:attribute name="boolCheck" type="Boolean" default="false" />
+
+    <aura:attribute name="country" type="List" />
+    <aura:attribute name="contact1" type="List" />
+    <aura:attribute name="contact2" type="List" />
+    <aura:attribute name="address1" type="List" />
+    <aura:attribute name="address2" type="List" />
+    <aura:attribute name="doxeeLanguages" type="List" />
+    <aura:attribute name="valueMap" type="Map" />
+    <aura:attribute name="notExistsEmail" type="Boolean" default="true"/>
+    <aura:attribute name="showCreditCard" type="boolean" default="false" />
+    <aura:attribute name="showPreferences" type="boolean" default="true" />
+    <aura:attribute name="showSEPA" type="boolean" default="false" />
+    <aura:attribute name="showCommodity" type="boolean" default="false" />
+    <aura:attribute name="showContact" type="boolean" default="false" />
+    <aura:attribute name="showAfterSEPA" type="boolean" default="true" />
+    <aura:attribute name="onlyOneCup" type="boolean" default="true" />
+    <aura:attribute name="showDocument" type="boolean" default="false" />
+    <aura:attribute name="showDocumentCombo" type="boolean" default="false" />
+    <aura:attribute name="contractValue" type="String" default="" />
+    <aura:attribute name="columns" type="List" />
+    <aura:attribute name="data" type="List" />
+    <aura:attribute name="documentList" type="List" />
+
+    <aura:attribute name="mandateType" type="String" default="" />
+    <aura:attribute name="mandateOpts" type="List" />
+    <aura:attribute name="paymentAttr" type="String" />
+    <aura:attribute name="bankFromParent" type="String" />
+    <aura:attribute name="soldToAddrFromParent" type="Object" />
+    <aura:attribute name="disabledPayment" type="Boolean" default="false" />
+
+    <aura:registerEvent name="XC_LCE019_CloseChildComponent" type="c:XC_LCE019_CloseChildComponent" />
+
+    <!-- F.I. Added for better payment type values management order -->
+    <aura:attribute name="paymentMethodCatOpts" type="List" />
+    <aura:attribute name="paymentMethodCategoryVal" type="String" />
+    <aura:attribute name="debtorCode" type="String" />
+    <aura:attribute name="sohoDocument" type="Object" />
+    <aura:attribute name="invoiceDelValue" type="String"/>
+
+
+
+    <aura:attribute name="taxExemptStatus" type="boolean" default="False" />
+    <aura:attribute name="taxExemptOpts" type="List" />
+    <aura:attribute name="taxExempt" type="List" />
+    <aura:attribute name="invoiceDeliveryPreferencesStatus" type="boolean" default="False" />
+    <aura:attribute name="invoiceDeliveryPreferencesOpts" type="List" />
+    <aura:attribute name="invoiceDeliveryPreferencesPick" type="List" /> <!-- Prefered language-->
+    <aura:attribute name="paymentTerm" type="String" />
+    <aura:attribute name="isB2BLE" type="Boolean" default="false" />
+
+    <!-- FI ADDED - IT ADOPTION -->
+    <aura:attribute name="disableRecCode" type="Boolean" default="false" />
+    <aura:attribute name="disablePec" type="Boolean" default="false" />
+
+    <aura:attribute name="requiredPec" type="Boolean" default="true" />
+    <aura:attribute name="requiredRecCode" type="Boolean" default="true" />
+
+    <!-- NEW COMMODITY BILL MANAGEMENT B2C -->
+    <aura:attribute name="contractOpts" type="List" />
+    <aura:attribute name="commodityContractMap" type="Object" />
+    <aura:attribute name="choosenContractCup" type="String" />
+    <aura:attribute name="choosenContractType" type="String" />
+    <aura:attribute name="choosenContractStatus" type="String" />
+    <aura:attribute name="contractBatch" type="String" />
+    <aura:attribute name="commodityAccountId" type="String" />
+    <aura:attribute name="commodityBillingCycleFrequency" type="String" />
+
+    <!-- NEW EXTERNAL FINANCING MODEL -->
+    <aura:attribute name="showExtFinancing" type="Boolean" default="false" />
+    <aura:attribute name="showOtherExtFinancing" type="Boolean" default="false" />
+    <aura:attribute name="institutePickVal" type="String" />
+    <aura:attribute name="otherInsituteVal" type="String" />
+
+    <!-- SERVICE ATTRIBUTES -->
+    <aura:attribute name="createdBPLIId" type="String"/>
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" />
+    <div class="c-container slds-var-p-around_small">
+        <div class="slds-align_absolute-center">
+            <aura:if isTrue="{!v.showSpinner }">
+                <lightning:spinner aura:id="mySpinner" variant="brand" size="large" />
+            </aura:if>
+        </div>
+
+        <div class="whiteDiv">
+
+            <div class="modal-header slds-modal__header slds-size_1-of-1">
+                <h4 class="title slds-text-heading_medium">
+                    <lightning:icon iconName="custom:custom41" /><span
+                        class="slds-var-p-left_small">{!$Label.c.XC_CL_ZuoraPayment}</span></h4>
+            </div><br></br>
+            <aura:if isTrue="{!v.showToast}">
+                <c:XC_LCP020_ToastForMobile successMessage="{!v.toastMessage}"></c:XC_LCP020_ToastForMobile>
+            </aura:if>
+
+            <lightning:combobox aura:id="combopaymentcategory" name="paymentCat" label="{!$Label.c.XC_CL_MOP_Category}"
+                value="{!v.paymentMethodCategoryVal}" options="{!v.paymentMethodCatOpts}" disabled="true" />
+            <lightning:combobox aura:id="comboboxpayment" name="payment" label="{!$Label.c.XC_CL_PaymentMethodType}"
+                value="{! v.valueMap.payment }" required="true" options="{! v.payment }"
+                onchange="{! c.checkValuePayment }" disabled="{!v.disabledPayment}" />
+
+            <aura:if isTrue="{!v.sobjecttype == 'Account'}">
+
+                <!-- EXTERNAL FINANCING INFO -->
+                <aura:if isTrue="{!v.showExtFinancing}">
+                    <lightning:recordEditForm objectApiName="NE__Billing_Profile__c">
+                        <lightning:messages />
+                        <div class="slds-var-p-around_small">
+                            <lightning:card class="slds-card_boundary" variant="Narrow"
+                                title="{!$Label.c.XC_CL_LCP116_FinInstitutePanelHeader}" iconName="utility:money">
+                                <lightning:inputField aura:id="legalBPFinancing" fieldName="XC_LegalEntity__c"
+                                value="{!v.legalEnt}" disabled="{!v.disableLEPick}" class="slds-hide"/>
+                                <lightning:inputField aura:id="finInstitute" value="{!v.institutePickVal}"
+                                    fieldName="XC_FinancialInstitute__c" required="true"
+                                    onchange="{!c.checkExternalFinancing}" />
+                                <aura:if isTrue="{!v.showOtherExtFinancing}">
+                                    <lightning:inputField aura:id="otherFinInstitute"
+                                        fieldName="XC_OtherFinancialInstitute__c" value="{!v.otherInsituteVal}"
+                                        required="true" onchange="{!c.checkValue}" />
+                                </aura:if>
+                            </lightning:card>
+                        </div>
+                    </lightning:recordEditForm>
+                </aura:if>
+
+
+            </aura:if>
+            <aura:if
+                isTrue="{!v.recordTypeName=='XC_GLO_Account_Soho' || v.recordTypeName=='XC_GLO_Account_Condominium' || v.recordTypeName=='XC_GLO_B2B' || v.recordTypeName=='XC_GLO_B2G'}">
+                <div class="slds-var-p-around_small">
+                    <lightning:card class="slds-card_boundary" title="{!$Label.c.XC_CL_LCP116_SohoDocSectHeader}"
+                        iconName="standard:channel_program_members">
+                        <div class="slds-var-p-around_small">
+                            <lightning:input aura:id="docCountry" label="{!$Label.c.XC_CL_LCP116_SohoDocCountry}"
+                                value="{!v.sohoDocument.docCountry}" disabled="true" />
+                            <lightning:input aura:id="docNif" label="{!$Label.c.XC_CL_LCP116_SohoDocType}"
+                                value="{!v.sohoDocument.identityType}" disabled="true" />
+                            <lightning:input aura:id="docNumber" label="{!$Label.c.XC_CL_LCP116_SohoDocNumber}"
+                                value="{!v.sohoDocument.identityNumber}" disabled="true" />
+                        </div>
+                    </lightning:card>
+                </div>
+            </aura:if>
+
+
+            <aura:if isTrue="{!v.recordTypeName=='XC_GLO_Account_Residential'}">
+                <aura:if isTrue="{!v.showDocumentCombo}">
+                    <lightning:combobox aura:id="selectDocument" name="selectDocument" required="true"
+                        placeholder="Insert a Document" label="Select Document" value="{!v.valueMap.documentId}"
+                        options="{!v.documentList}" onchange="{!c.showDocumentSection}" />
+                </aura:if>
+            </aura:if>
+            <aura:if isTrue="{!v.sobjecttype == 'Account'}">
+                <aura:if isTrue="{!v.showSEPA}">
+                    <!-- Bank Account Information: -->
+                    <lightning:input aura:id="accountNumber" name="accountNumber"
+                        label="{!$Label.c.XC_CL_Account_Number}" value="{!v.valueMap.accountNumber}"
+                        onchange="{! c.checkValue }" required="true" />
+                    <lightning:input aura:id="bic" name="bic" label="BIC" value="{! v.valueMap.bic}"
+                        onchange="{! c.checkValue }" required="false" />
+                    <lightning:combobox aura:id="mandateT" name="mandateT" label="Mandate Type"
+                        options="{!v.mandateOpts}" value="{!v.mandateType}" required="true" />
+                </aura:if>
+
+                <aura:if isTrue="{! and(v.showCommodity,v.showCUPS)}">
+                    <!--aura:if isTrue="{!v.isB2BLE}"-->
+                        <!--<lightning:combobox aura:id="contractId" name="contractId"
+                            label="{!$Label.c.XC_CL_Commodity_ContractID}" value="{!v.valueMap.contractId}"
+                            onchange="{!c.checkCUPS }" options="{! v.contractOptions }" required="true" />
+                        <lightning:input aura:id="cupsId" name="cupsId" label="{!$Label.c.XC_CL_Commodity_CupsID}"
+                            value="{!v.valueMap.cupsId}" required="true" disabled="true" />
+                        <br></br>-->
+                    <aura:if isTrue="{!v.getContractBy == 'POS' || v.getContractBy == 'AccountDocAndPOD'}">
+                        <lightning:combobox aura:id="commodityDataByPOS"
+                            label="POD" name="commodityDataByPOS"
+                            required="true" options="{!v.cupsList}" value="{!v.selectedPOS}" onchange="{!c.onChooseCommodityPOS}" />
+
+                        <lightning:input aura:id="contractId" name="contractId"
+                            label="{!$Label.c.XC_CL_Commodity_ContractID}" value="{!v.valueMap.contractId}"
+                            onchange="{!c.checkValue }" required="true" disabled="true" />
+                            
+                        <aura:set attribute="else">
+                            <lightning:combobox aura:id="commodityContractsB2C"
+                                label="{!$Label.c.XC_CL_LCP116_CommodityContractPick}" name="commodityContractsB2C"
+                                required="true" options="{!v.contractOpts}" onchange="{!c.onChooseCommodityContract}" />
+                        </aura:set>
+                    </aura:if>
+                </aura:if>
+
+
+
+                <aura:if isTrue="{!v.showStrikeModal}">
+                    <c:strike_modal variant="slds-m-around_medium slds-p-around_medium" title="Search Contract And Cups"
+                        primaryButtonLabel="Ok" showModal="true">
+                        <lightning:datatable columns="{! v.columns }" data="{! v.data }" keyField="id"
+                            maxRowSelection="1" onrowselection="{! c.updateSelectedText }" />
+                    </c:strike_modal>
+                </aura:if>
+            </aura:if>
+            <div aura:id="accountInfoDiv" id="accountInfoDiv">
+                <lightning:combobox name="contact2" label="{!$Label.c.XC_CL_Contact}"
+                    value="{! v.valueMap.soldContact }" required="true" options="{! v.contact2 }" disabled="true"
+                    placeholder="No contact found on Opportunity" />
+
+                <lightning:combobox name="address1" label="{!$Label.c.XC_CL_Billing_Address}"
+                    value="{! v.valueMap.billingAddress }" required="true" options="{! v.address1 }"
+                    onchange="{! c.checkValue }" disabled="true" />
+
+
+                <lightning:combobox name="address2" label="{!$Label.c.XC_CL_SoldAddress}"
+                    value="{! v.valueMap.soldAddress }" required="true" options="{! v.address2 }" disabled="{! or(empty(v.valueMap.soldAddressesDisabled), v.valueMap.soldAddressesDisabled) }"
+                    placeholder="No address found on Opportunity" /><!-- [TP - 2021.11.30 - TPB change address]-->
+
+                <!-- FI . Additional INFO for electronic invoice IT ADOPTION -->
+                <aura:if isTrue="{!v.valueMap.showContactExtraFields}">
+                    <div class="slds-var-p-around_small">
+                        <lightning:card class="slds-card_boundary" variant="Narrow" title="Electronic Invoice Info"
+                            iconName="custom:custom90">
+                            <lightning:recordEditForm objectApiName="XC_BillingProfileLineItem__c">
+                                <lightning:messages />
+                                <lightning:inputField aura:id="pec" fieldName="XC_PEC__c" disabled="{!v.disablePec}"
+                                    required="{!v.requiredPec}" onchange="{!c.checkValue}" />
+                                <lightning:inputField aura:id="recCode" fieldName="XC_RecipientCode__c"
+                                    disabled="{!v.disableRecCode}" required="{!v.requiredRecCode}"
+                                    onchange="{!c.checkValue}" />
+                            </lightning:recordEditForm>
+                        </lightning:card>
+                    </div>
+                </aura:if>
+
+                <aura:if isTrue="{!v.valueMap.isB2BG == 'B2B'}">
+                    <div class="slds-var-p-around_small">
+                        <lightning:card class="slds-card_boundary" variant="Narrow" title="Electronic Invoice Info"
+                                        iconName="custom:custom90">
+                            <lightning:recordEditForm objectApiName="XC_BillingProfileLineItem__c">
+                                <lightning:messages />
+                                <lightning:inputField aura:id="pec" fieldName="XC_PEC__c" disabled="{!v.disablePec}"
+                                                      required="false" onchange="{!c.checkValue}" />
+
+                                <lightning:inputField aura:id="recCode" fieldName="XC_RecipientCodeB2B__c"
+                                                      required="{!v.valueMap.isB2BG == 'B2B'}"
+                                                      onchange="{!c.checkValue}" />
+                            </lightning:recordEditForm>
+                        </lightning:card>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.valueMap.isB2BG == 'B2G'}">
+                    <div class="slds-var-p-around_small">
+                        <lightning:card class="slds-card_boundary" variant="Narrow" title="Electronic Invoice Info"
+                                        iconName="custom:custom90">
+                            <lightning:recordEditForm objectApiName="XC_BillingProfileLineItem__c">
+                                <lightning:messages />
+                                <lightning:inputField aura:id="pec" fieldName="XC_PEC__c" disabled="{!v.disablePec}"
+                                                      required="false" onchange="{!c.checkValue}" />
+
+                                <lightning:inputField aura:id="recCode" fieldName="XC_OfficeCode__c"
+                                                      required="{!v.valueMap.isB2BG == 'B2G'}"
+                                                      onchange="{!c.checkValue}" />
+                            </lightning:recordEditForm>
+                        </lightning:card>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.showPreferences}">
+
+                    <lightning:combobox aura:id="comboboxdoxee" name="doxeelanguge"
+                        label="{!$Label.c.XC_PreferredLanguage}" value="{!v.valueMap.doxeeLanguage}"
+                        options="{! v.doxeeLanguages }" onchange="{! c.updateAccount }" required="true" />
+
+                    <!--  <lightning:checkboxGroup aura:id="invoiceDeliveryPreferences" name="Invoice Delivery Preferences"
+                                             label="{!$Label.c.XC_InvoiceDeliveryPreferences}" options="{! v.options }"
+                                             value="{!v.valueCheck}" onchange="{! c.invoiceDeliveryPreferencesChange }" />
+-->
+
+
+
+                    <lightning:combobox aura:id="invoiceDeliveryPreferencesPick" name="invoiceDeliveryPreferencesPick"
+                        label="{!$Label.c.XC_InvoiceDeliveryPreferences}"
+                        value="{!v.invoiceDelValue}" required="true"
+                        options="{!v.invoiceDeliveryPreferencesPick }" onchange="{! c.checkContact }" />
+                    <br></br>
+
+
+                </aura:if>
+
+                <div class="slds-var-p-around_small">
+                    <lightning:recordEditForm objectApiName="XC_BillingProfileLineItem__c">
+                        <lightning:messages />
+                        <lightning:inputField aura:id="legal" fieldName="XC_LegalEntity__c"
+                            onchange="{!c.setLegalEntity}" value="{!v.legalEnt}" disabled="{!v.showContact}" />
+                    </lightning:recordEditForm>
+                </div>
+
+                <div class="slds-var-p-around_small">
+                    <aura:if isTrue="{!v.isB2BLE}">
+                        <lightning:recordEditForm objectApiName="NE__Billing_Profile__c">
+                            <lightning:messages />
+                            <lightning:inputField aura:id="payTerm" fieldName="XC_PaymentTerm__c"
+                                onchange="{!c.onChangePayTerm}" />
+                        </lightning:recordEditForm>
+                        <lightning:combobox aura:id="taxExemptId" name="taxExempt"
+                            label="{!$Label.c.XC_CL_LCP116_TaxExempt}" value="{!v.valueMap.taxExempt}" required="true"
+                            options="{!v.taxExemptOpts }" onchange="{!c.checkValue}" />
+                    </aura:if>
+                </div>
+
+
+
+                <!--<lightning:input  name="city" label="{!$Label.c.XC_CL_City}" value="{! v.valueMap.city }" />-->
+                <!--<lightning:input type="number" name="postalCode" label="{!$Label.c.XC_CL_PostalCode}" value="{! v.valueMap.postalCode }"/>   -->
+                <!--<lightning:input  name="phoneNumber" label="{!$Label.c.XC_CL_ContactPhoneNumber}" value="{! v.valueMap.phoneNumber }"/> -->
+                <!---<lightning:input type="email" name="email" label="{!$Label.c.XC_CL_Email}" value="{! v.valueMap.email }"/>-->
+                <br></br>
+            </div>
+
+            <footer class="slds-modal__footer">
+                <lightning:button variant="neutral" label="{!$Label.c.XC_CL_Cancel}" title="Cancel"
+                    onclick="{! c.closeModal }" />
+
+
+                <lightning:button variant="brand" label="{!$Label.c.XC_CL_SaveButton}" title="Submit"
+                    disabled="{!or(v.disabledSubmit,v.notExistsEmail)}" onclick="{! c.create }" />
+
+            </footer>
+
+
+        </div>
+
+    </div>
+
+    <aura:if isTrue="{!v.showDocument}">
+        <lightning:recordEditForm objectApiName="XC_PersonalDocument__c" recordId="{!v.valueMap.documentId}"
+            onload="{!c.checkCommodity}"> <br></br>
+            <lightning:messages />
+            <lightning:inputField aura:id="docCountry" fieldName="XC_Country__c" class="slds-hidden" />
+            <lightning:inputField aura:id="docNif" fieldName="XC_DocumentType__c" class="slds-hidden" />
+            <lightning:inputField aura:id="docNumber" fieldName="XC_DocumentNumber__c" class="slds-hidden" />
+            <lightning:inputField aura:id="expiration" fieldName="XC_ExpirationDate__c" class="slds-hidden" />
+            <lightning:inputField aura:id="expedition" fieldName="XC_ReleaseDate__c" class="slds-hidden" />
+        </lightning:recordEditForm>
+    </aura:if>
+    <aura:if isTrue="{!or(v.recordTypeName=='XC_GLO_Account_Soho',v.recordTypeName=='XC_GLO_Account_Condominium')}">
+        <lightning:input aura:id="expiration" label="Document Country" value="{!v.sohoDocument.NIEExpirationdate}"
+            disabled="true" class="slds-hidden" />
+        <lightning:input aura:id="expedition" label="Identity Type" value="{!v.sohoDocument.NIEExpeditionDate}"
+            disabled="true" class="slds-hidden" />
+    </aura:if>
+
+</aura:component>

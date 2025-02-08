@@ -1,0 +1,84 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 01-19-2021
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   01-18-2021   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component controller="XC_LCC173_CTIShowAgentScript" implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes,force:hasSObjectName"
+    access="global">
+
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth70}" />
+
+
+    <aura:attribute name="scripts" type="List" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="openModal" type="Boolean" default="false" />
+    <aura:attribute name="multiple" type="Boolean" default="true"/>
+
+    <!-- TO BE USED IN FUTURE LIKE OLD COMPONENT -->
+    <aura:attribute name="showRecControls" type="Boolean" default="false" />
+    <aura:attribute name="recordingEnabled" type="Boolean" default="false" />
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.scripts}" action="{!c.handleScriptsChange}" />
+
+
+
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="Modalbox" class="slds-modal"
+        style="z-index:100 !important;">
+        <div class="slds-modal__container">
+
+            <div class="modal-header slds-modal__header slds-box">
+                <button class="slds-button slds-modal__close slds-button_icon" title="Close"
+                    onclick="{!c.handleCancel}">
+                    X
+                    <span class="slds-assistive-text slds-theme_shade">Close</span>
+                </button>
+                <h2 class="title slds-text-heading__medium">
+                    <lightning:icon iconName="standard:call" alternativeText="Script" />
+                    <span class="slds-p-left_small">{!$Label.c.XC_CL_ShowCTIScriptHeader}</span>
+                </h2>
+            </div>
+            <div class="scrollable slds-modal__content slds-p-around__medium" style="height:600px;">
+                <div class="slds-p-around_small">
+
+                    <aura:if isTrue="{!v.showSpinner}">
+                        <div class="slds-is-relative slds-p-top-medium">
+                            <br />
+                            <lightning:spinner variant="brand" size="medium" />
+                        </div>
+                    </aura:if>
+                    <aura:iteration items="{!v.scripts}" var="script">
+                        <aura:if isTrue="{!v.multiple}">
+                                <c:XC_LCP173_CTIShowAgentMultilpleScriptItem script="{!script}" />
+                            <aura:set attribute="else">
+                                <c:XC_LCP173_CTIShowAgentMultilpleScriptItem script="{!script}" showPdf="true"/>
+                            </aura:set>
+                        </aura:if>
+                    </aura:iteration>
+
+                    
+
+
+                </div>
+            </div>
+            <div class="modal-footer slds-modal__footer">
+                <div class="forceChangeRecordTypeFooter">
+                    <aura:if isTrue="{!and(v.showRecControls,v.recordingEnabled)}">
+                        <lightning:button aura:id="startRec" iconName="utility:record" variant="destructive" label="{!$Label.c.XC_CL_CTIStartRecordBTN}" onclick="{!c.sendRemoteStartRecording}"/>
+                        <lightning:button aura:id="stopRec" iconName="utility:stop" variant="neutral" label="{!$Label.c.XC_CL_CTIStopRecordBTN}" onclick="{!c.sendRemoteStopRecording}" disabled="true"/>
+                    </aura:if>
+                    <lightning:button variant="neutral" label="{!$Label.c.XC_CL_Close}" onclick="{!c.handleCancel}" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+
+
+</aura:component>

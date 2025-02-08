@@ -1,0 +1,255 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable"
+                access="global"
+                controller="TA_LCC265_PartnerSkills">
+
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="workOrderId" type="String"/>
+    <aura:attribute access="public" name="partnerId" type="String"/>
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="general" type="Object"/>
+    <aura:attribute access="private" name="title" type="String"/>
+    <aura:attribute access="private" name="customerCardBg" type="String"/>
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false"/>
+
+    <aura:attribute name="serviceResourceList" type="List" access="public" default="[]"/>
+    <aura:attribute name="skillsToShow" type="Integer" access="public" default="0"/>
+
+    <aura:attribute name="username" type="String" access="public" />
+    <aura:attribute name="objectType" type="String" access="public" />
+    <aura:attribute name="widthPar" type="String" />
+    <aura:attribute name="heightPar" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="jsonFull" type="boolean" default="false" />
+    <aura:attribute name="json" type="String" default=""/>
+
+    <ltng:require styles="{!join(',',
+                            $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}"/>
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <div class="ta-box-custom-margin" style="{!'background: url(' + v.customerCardBg +'); background-color: ' + v.general.bgColor + '; background-size: cover; border-radius: 2.5vw;
+        background-position: ' + v.general.bgPosition + '; box-shadow: 0vw 1vw 2vw -0.8vw black; background-blend-mode: lighten; padding: 5vw; margin:3vw;'}">
+            
+        <lightning:layout multipleRows="true">
+                <!-- ACCORDION HEADER SECTION -->
+                <aura:if isTrue="{!v.general.defaultTitle}">
+                    <lightning:layoutItem size="12">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="10">
+                                <lightning:layout multipleRows="true">
+
+                                    <!-- ACCORDION HEADER SECTION NAME-->
+                                    <lightning:layoutItem size="12">
+                                        <h3 class="ta-color-white"> {!v.title} </h3>
+                                    </lightning:layoutItem>
+
+                                    <!-- ACCORDION HEADER BUTTON -->
+                                    <!--<lightning:layoutItem size="12" class="slds-m-top_small">
+                                        <lightning:layout multipleRows="true">
+                                            <lightning:layoutItem size="3" class="slds-m-right_medium">
+                                                <span class="ta-accordion-header-button" onclick="{!c.refreshView}">
+                                                    {!$Label.c.XC_CL_RefreshButton}
+                                                </span>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="6">
+                                                <span class="ta-accordion-header-button" onclick="{!c.handleManageShowDetails}">
+                                                    {!if(v.showDetails, 'Hide Details', 'Show Details')}
+                                                </span>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>                        
+                                    </lightning:layoutItem> -->
+                                </lightning:layout>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="2">
+
+                                <!-- ACCORDION HEADER ICON -->
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}" 
+                                     class="slds-float_right ta-accordion-header-icon"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem> 
+                </aura:if>
+                
+                <!--<lightning:layoutItem size="12" class="slds-m-top_medium">
+                    <aura:if isTrue="{!v.jsonFull}">
+                        <force:canvasapp developerName="XC_Doxee_ConnectedApp" width="380px" height="400px" parameters="{!v.json}" />
+                    </aura:if>
+                </lightning:layoutItem>-->
+
+                <lightning:layoutItem size="12" class="slds-m-top_medium">
+                    <aura:iteration items="{!v.serviceResourceList}" var="singleServiceResource">
+                        <div aura:id="{singleServiceResource.Id}">
+                            <lightning:layout multipleRows="true" class="service-resource-container">
+                            
+                                <lightning:layoutItem size="4" class="service-resource-content service-resource-text-style">
+                                    {!$Label.c.TA_Name}:<!-- 20062022 FD - ENXCRM-211 -->
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="8" class="service-resource-content">
+                                    {!singleServiceResource.Name}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="4" class="service-resource-content service-resource-text-style status-margin">
+                                    Status:
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="8" class="service-resource-content">
+                                    <lightning:icon iconName="{!singleServiceResource.Status}" size="x-small"/>
+                                </lightning:layoutItem>
+                                <!--<lightning:layoutItem size="4" class="service-resource-content service-resource-text-style">
+                                    Active:
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="8" class="service-resource-content">
+                                    {!singleServiceResource.IsActive}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="4" class="service-resource-content service-resource-text-style">
+                                    Operating Hours:
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="8" class="service-resource-content">
+                                    {!singleServiceResource.XC_OperatingHoursName__c}
+                                </lightning:layoutItem>-->
+                                <lightning:layoutItem size="12"></lightning:layoutItem>
+                                <aura:if isTrue="{!singleServiceResource.ServiceResourceSkills.length > 0}">
+                                    <lightning:layoutItem size="12" class="skills-title">
+                                        <div id="{!singleServiceResource.Id}" onclick="{!c.handleToggleSkills}">
+                                            <aura:if isTrue="{!singleServiceResource.showSkills}">
+                                                <div class="show-skills-button">
+                                                    {!$Label.c.TA_HideSkillsList}<!-- 20062022 FD - ENXCRM-211 -->
+                                                </div>
+                                                <aura:set attribute="else">
+                                                    <div class="show-skills-button">
+                                                        {!$Label.c.TA_ShowSkillsList}<!-- 20062022 FD - ENXCRM-211 -->
+                                                    </div>
+                                                </aura:set>
+                                            </aura:if>
+                                            
+                                        </div>
+                                    </lightning:layoutItem>
+                                
+                                    <aura:if isTrue="{!singleServiceResource.showSkills}">
+                                        <aura:iteration items="{!singleServiceResource.paginatedServiceResourceSkills}" var="singleSkill">
+                                            <div style="margin-left: 3vw; margin-top: 3vw; margin-bottom:3vw;">
+                                                <div class="skill-separator"></div>
+                                                <lightning:layout multipleRows="true" class="skill-container">
+                                                    <lightning:layoutItem size="4" class="skill-content skill-text-style">
+                                                        {!$Label.c.TA_SkillName}:<!-- 20062022 FD - ENXCRM-211 -->
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="8" class="skill-content">
+                                                        {!singleSkill.Name}
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="4" class="skill-content skill-text-style">
+                                                        {!$Label.c.TA_IsActive}:<!-- 20062022 FD - ENXCRM-211 -->
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="8" class="skill-content">
+                                                        <lightning:layoutItem size="8" class="service-resource-content">
+                                                            <lightning:icon iconName="{!singleSkill.Active}" size="xx-small" class="document-is-active"/>
+                                                        </lightning:layoutItem>
+                                                    </lightning:layoutItem>
+                                                    <!--<lightning:layoutItem size="4" class="skill-content skill-text-style">
+                                                        Skill Level:
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="8" class="skill-content">
+                                                        {!singleSkill.SkillLevel}
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="4" class="skill-content skill-text-style">
+                                                        Active:
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="8" class="skill-content">
+                                                        {!singleSkill.XC_IsSkillActive__c}
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="4" class="skill-content skill-text-style">
+                                                        Start Date:
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="8" class="skill-content">
+                                                        {!singleSkill.XC_CertificationStartDate__c}
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="4" class="skill-content skill-text-style">
+                                                        End Date:
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="8" class="skill-content">
+                                                        {!singleSkill.XC_CertificationEndDate__c}
+                                                    </lightning:layoutItem>-->
+                                                    <lightning:layoutItem size="12"></lightning:layoutItem>
+
+
+                                                    
+                                                    <aura:iteration items="{!singleSkill.SkillDocuments}" var="singleDocument">
+                                                        <div style="margin-left: 3vw; margin-top: 3vw; margin-bottom:3vw;">
+                                                            <lightning:layout multipleRows="true" class="skill-container">
+                                                                <lightning:layoutItem size="4" class="skill-content skill-text-style">
+                                                                    {!$Label.c.TA_Name}:<!-- 20062022 FD - ENXCRM-211 -->
+                                                                </lightning:layoutItem>
+                                                                <lightning:layoutItem size="8" class="skill-content">
+                                                                    {!singleDocument.nameDocument}
+                                                                </lightning:layoutItem>
+                                                                <lightning:layoutItem size="4" class="skill-content skill-text-style">
+                                                                    {!$Label.c.TA_Type}:<!-- 20062022 FD - ENXCRM-211 -->
+                                                                </lightning:layoutItem>
+                                                                <lightning:layoutItem size="8" class="skill-content">
+                                                                    {!singleDocument.type}
+                                                                </lightning:layoutItem>
+                                                                <lightning:layoutItem size="4" class="skill-content skill-text-style">
+                                                                    {!$Label.c.TA_StartDate}:<!-- 20062022 FD - ENXCRM-211 -->
+                                                                </lightning:layoutItem>
+                                                                <lightning:layoutItem size="8" class="skill-content">
+                                                                    {!singleDocument.startDate}
+                                                                </lightning:layoutItem>
+                                                                <lightning:layoutItem size="4" class="skill-content skill-text-style">
+                                                                    {!$Label.c.TA_EndDate}:<!-- 20062022 FD - ENXCRM-211 -->
+                                                                </lightning:layoutItem>
+                                                                <lightning:layoutItem size="8" class="skill-content">
+                                                                    {!singleDocument.endDate}
+                                                                </lightning:layoutItem>
+                                                                <lightning:layoutItem size="12"></lightning:layoutItem>
+                                                            </lightning:layout>
+                                                        </div>
+                                                    </aura:iteration>
+
+
+
+
+                                                </lightning:layout>
+                                            </div>
+                                        </aura:iteration>
+                                        <lightning:layout multipleRows="true" class="navigate-skills">
+                                            <lightning:layoutItem  size="6" class="skill-previous" >
+                                                <div id="{!singleServiceResource.Id}" onclick="{!c.handleGoPrevious}">
+                                                    🡐 {!$Label.c.TA_MainProductPrevious}<!-- 20062022 FD - ENXCRM-211 -->
+                                                </div>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="6" class="skill-next">
+                                                <div id="{!singleServiceResource.Id}" onclick="{!c.handleGoNext}">
+                                                    {!$Label.c.TA_MainProductNext} 🡒<!-- 20062022 FD - ENXCRM-211 -->
+                                                </div>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                    </aura:if>
+
+                                    <aura:set attribute="else">
+                                        <lightning:layoutItem size="12" class="skills-title">
+                                            <div class="show-skills-button">
+                                                {!$Label.c.TA_NoSkillsToShow}<!-- 20062022 FD - ENXCRM-211 -->
+                                            </div>
+                                        </lightning:layoutItem>
+                                       
+                                    </aura:set>
+                                </aura:if>
+                            
+                            </lightning:layout>
+                        </div>
+                    </aura:iteration>
+                </lightning:layoutItem>
+                
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+</aura:component>

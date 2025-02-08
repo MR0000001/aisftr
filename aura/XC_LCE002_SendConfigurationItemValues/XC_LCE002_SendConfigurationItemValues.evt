@@ -1,0 +1,12 @@
+<!--
+* @author Lorenzo Orlanducci- lorenzo.orlanducci@nttdata.com & Sara Miozza - sara.miozza@nttdata.com
+* @date Creation 10/04/2019
+* @date Modification dd/mm/yyyy
+* @description XC_LCE002_SendConfigurationItemValues - Event to send the values of the Configuration Items from XC_LCP103_ConfItemEditForm to XC_LCP102_OrderPayment
+-->
+<aura:event type="APPLICATION" description="Event template">
+<aura:attribute name="recordId" type="String" />
+<aura:attribute name="paymentMethod" type="String" />
+<aura:attribute name="billingProfile" type="String" />
+<aura:attribute name="installmentPlanFields" type="String" />
+</aura:event>

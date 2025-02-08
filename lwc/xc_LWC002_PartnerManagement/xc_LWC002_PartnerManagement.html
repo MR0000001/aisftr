@@ -1,0 +1,432 @@
+<template>
+    <!--<article class="slds-card" style="padding:20px">--> 
+       <lightning-card title = {label.headerPartnerManagement} icon-name="standard:service_crew">
+        <div data-id = "contactSection">
+        <template if:false={notLoaded}>
+        <lightning-layout class = "layoutstyle">  
+        <lightning-layout-item flexibility="auto" padding="around-small" size = "6">
+       <!--Custom Lookup without Pre-Populate Value for account Object-->
+        <c-xc_-l-w-c003_-strike-lookup icon-name="standard:account"
+                             s-object-api-name="Account"
+                             label={label.searchLookup}
+                             onlookupupdate={lookupRecord}
+                             placeholder={label.placeholderSearch}
+                             key-to-search = 'Name'></c-xc_-l-w-c003_-strike-lookup>
+                             <template if:true={recordFound}>
+                             <div class = "classOperation" data-id = "createContact" onmouseover={changeColorMouseOverFilter} onmouseout={changeColorMouseOutFilter} onclick={openModalContact}>
+                              <lightning-icon icon-name="standard:people"></lightning-icon> 
+                              <p class="classOperationText">{label.createContactHeader}</p>
+                             </div>
+                            </template>
+                            </lightning-layout-item>
+                            <template if:true={recordFound}>
+                            <lightning-layout-item flexibility="auto" padding="around-small" class = "mycard"  alignment-bump = "left" size ="5">
+                              <!--<lightning-card  variant="Narrow"  title="Account" icon-name="standard:account">-->  
+                                <div class = "togglePaddingClass">  
+                                  <div class="slds-card__header slds-grid">
+                                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                      <div class="slds-media__figure">
+                                        <span class="slds-icon_container slds-icon-standard-account" title="Account">
+                                          <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                            <use xlink:href="/apexpages/slds/latest/assets/icons/standard-sprite/svg/symbols.svg#account"></use>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                      <div class="slds-media__body">
+                                        <h2 class="slds-card__header-title">
+                                            <span>{label.partnerInformationHeader}</span>
+                                        </h2>
+                                      </div>
+                                     
+                                    </header>
+                                  </div>
+                                  <div class="slds-form_horizontal slds-grid slds-wrap">
+                                  <lightning-input type="text" class="slds-size_1-of-2" label={label.partnerName} value ={accountName} readonly></lightning-input> 
+                                  <lightning-input type="text" class="slds-size_1-of-2" label={label.partnerDocNumb} value ={documentNumber} readonly></lightning-input>
+                                  <lightning-input type="text" class="slds-size_1-of-2" label={label.partnerDocNumbVAT1} value ={documentNumberVat1} readonly></lightning-input>
+                                  <lightning-input type="text" class="slds-size_1-of-2" label={label.partnerDocNumbVAT2} value ={documentNumberVat2} readonly></lightning-input> 
+                                  <lightning-input type="text" class="slds-size_1-of-2" label={label.partnerCommercialCode} value ={commercialCode} readonly></lightning-input>         
+                                  <div class="slds-col slds-size_1-of-13 slds-p-right_x-small">
+                                    <label class="slds-form-element__label" for="unique-id-of-input" style="padding-left: 4px;">{label.partnerIsPartner} </label>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12">
+                                  <lightning-input type="checkbox" class = "customCheckbox" name="isPartner" checked ={isPartner} disabled></lightning-input>
+                               </div>
+                                    
+                                    <!--<template if:true={isPartner}>
+                                    <lightning-icon icon-name="utility:check"></lightning-icon>
+                                  </template>
+                                  <template if:false={isPartner}>
+                                    <lightning-icon icon-name="utility:close"></lightning-icon>
+                                  </template>-->
+                                  <lightning-input type="text"  class="slds-size_1-of-2" label={label.partnerType} value ={partnerType} readonly></lightning-input>
+                                  </div>
+                                <div class="slds-align_absolute-center" >
+                                  <lightning-button variant="brand" label={label.enableAspartnerButtonLabel} title="Enable As Partner" onclick={enableAsPartner} class="slds-m-center_x-small" disabled={enableAsPartnerButtonDisabled}></lightning-button>
+                                </div>
+                              </div> 
+                              <!--</lightning-card>-->
+                            </lightning-layout-item>
+                        </template>
+    </lightning-layout>
+    <template if:true={recordFound}>
+    <div style="height: 300px;">
+      <template if:true={spinnerControlDatatable}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+      <lightning-datatable
+              key-field="id"
+              data={listViewData}
+              columns={columns}
+              onrowaction={handleRowAction}
+              hide-checkbox-column = "true">
+      </lightning-datatable>   
+  </div>
+  <div class = "slds-modal__footer">
+    <lightning-button variant="brand" label={label.nextStepButtonLabel} title="Next Step" onclick={executeNextStep} disabled={disabledNextStep}></lightning-button>
+  </div>
+</template>
+  </template>
+
+  <template if:true={isModalOpenContact}>
+    <!-- Modal/Popup Box LWC starts here -->
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <!-- Modal/Popup Box LWC header here -->
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalContact}>
+                    <lightning-icon icon-name="utility:close"
+                        alternative-text="close"
+                        variant="inverse"
+                        size="small" ></lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{label.createNewContactHeader}</h2>
+            </header>
+            <!-- Modal/Popup Box LWC body starts here -->
+            <div class="slds-modal__content slds-p-around_medium modalBody" id="modal-content-id-1">
+              <template if:true={spinnerControlModal}>
+                  <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+              </template>
+              <lightning-input type="text" name = "FirstName" label={label.firstNameCont} onchange={handleChange} required></lightning-input> 
+              <lightning-input type="text" name = "LastName" label={label.lastNameCont} onchange={handleChange} required></lightning-input> 
+              <lightning-input type="text" name = "Email" label={label.emailCont} onchange={handleChange} required></lightning-input> 
+              <lightning-combobox type="text" name = "XC_TypeOfContact__c" label={label.typeOfCont} onchange={handleChange} options={typeOfContactOpt} required></lightning-combobox> 
+              <lightning-combobox type="text"  name = "XC_PhonePrefix__c" label={label.primaryPhonePrefixCont} onchange={handleChange} options={primaryPhonePrefixOpt} ></lightning-combobox>
+              <lightning-input type="text" name = "XC_ContactPhone__c" label={label.primaryPhoneCont} onchange={handleChange} ></lightning-input>
+              <lightning-input type="toggle" class="classToggle" name = "XC_PrimaryContact__c" label={label.primaryCont} onchange={handleChangeToggle} message-toggle-active = "" message-toggle-inactive = ""></lightning-input>
+              <lightning-combobox type="text" name = "XC_ContactDocumentCountry__c" label={label.documentCountryCont} onchange={handleChangeCountry} options={documentCountryOpt} required></lightning-combobox>
+              <lightning-combobox type="text" name = "XC_DocumentType__c" label={label.documentTypeCont} onchange={handleChange} options={documentTypeOpt} required disabled ={dependentDisabled}></lightning-combobox>
+              <lightning-input type="text" name = "XC_ContactDocumentNumber__c" label={label.documentNumberCont} onchange={handleChange} required></lightning-input> 
+              <lightning-input type="toggle" class="classToggle" name = "XC_MainDocument__c" label={label.mainDocCont} onchange={handleChangeToggle} message-toggle-active = "" message-toggle-inactive = ""></lightning-input>
+              <lightning-input type="toggle" class="classToggle" name = "XC_GiveDataTo__c" label={label.giveDataToCont} onchange={handleChangeToggle} message-toggle-active = "" message-toggle-inactive = ""></lightning-input> 
+              <lightning-input type="toggle" class="classToggle" name = "XC_GiveDataToThirdParties__c" label={label.giveDataToThirdCont} onchange={handleChangeToggle} message-toggle-active = "" message-toggle-inactive = ""></lightning-input> 
+              <lightning-combobox label ={label.mainLegalEntityCont}  name = "XC_MainLegalEntity__c"  onchange={handleChange} options={legalEntityOpt} dropdown-alignment ="auto" required></lightning-combobox> 
+
+            </div>
+
+            <!-- Modal/Popup Box LWC footer starts here -->
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick={closeModalContact} title="Cancel">{label.cancelButtonLabel}</button>
+                <button class="slds-button slds-button_brand" onclick={submitDetailsContact} title="OK">OK</button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+
+<template if:true={isModalOpenContactEdit}>
+  <!-- Modal/Popup Box LWC starts here -->
+  <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+      <div class="slds-modal__container">
+          <!-- Modal/Popup Box LWC header here -->
+          <header class="slds-modal__header">
+              <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalContactEdit}>
+                  <lightning-icon icon-name="utility:close"
+                      alternative-text="close"
+                      variant="inverse"
+                      size="small" ></lightning-icon>
+                  <span class="slds-assistive-text">Close</span>
+              </button>
+              <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">{label.editContHeader}</h2>
+          </header>
+          <!-- Modal/Popup Box LWC body starts here -->
+          <div class="slds-modal__content slds-p-around_medium modalBody" id="modal-content-id-2">
+            <template if:true={spinnerControlModal}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+            <lightning-input type="text" name = "FirstName" label={label.firstNameCont} onchange={handleChange} value={firstNameContactValue} required></lightning-input> 
+            <lightning-input type="text" name = "LastName" label={label.lastNameCont} onchange={handleChange} value={lastNameContactValue} required></lightning-input> 
+            <lightning-input type="text" name = "Email" label={label.emailCont} onchange={handleChange} value={emailContactValue} ></lightning-input> 
+            <lightning-combobox type="text" name = "XC_TypeOfContact__c" label={label.typeOfCont} onchange={handleChange} value={typeOfContactValue} options={typeOfContactOpt} ></lightning-combobox> 
+            <lightning-combobox type="text"  name = "XC_PhonePrefix__c" label={label.primaryPhonePrefixCont} onchange={handleChange} value={phonePrefixContactValue} options={primaryPhonePrefixOpt} ></lightning-combobox>
+            <lightning-input type="text" name = "XC_ContactPhone__c" label={label.primaryPhoneCont} onchange={handleChange} value={phoneContactValue} ></lightning-input>
+            <lightning-input type="toggle" class="classToggle" name = "XC_PrimaryContact__c" label={label.primaryCont} checked={primaryContactValue} onchange={handleChangeToggle} message-toggle-active = "" message-toggle-inactive = "" disabled={primaryContactDisabled}></lightning-input>
+            <lightning-combobox type="text" name = "XC_ContactDocumentCountry__c" label={label.documentCountryCont} value={documentCountryContactValue} onchange={handleChangeCountry} options={documentCountryOpt} required></lightning-combobox>
+            <lightning-combobox type="text" name = "XC_ContactDocumentType__c" label={label.documentTypeCont} onchange={handleChange} value={documentTypeContactValue} options={documentTypeOpt} required disabled ={dependentDisabled}></lightning-combobox>
+            <lightning-input type="text" name = "XC_ContactDocumentNumber__c" label={label.documentNumberCont} value={documentNumberContactValue} onchange={handleChange} required></lightning-input> 
+            <lightning-input type="toggle" class="classToggle" name = "XC_GiveDataTo__c" label={label.giveDataToCont} checked={giveDataToContactValue} onchange={handleChangeToggle} message-toggle-active = "" message-toggle-inactive = "" disabled={giveDataToContactDisabled}></lightning-input> 
+            <lightning-input type="toggle" class="classToggle" name = "XC_GiveDataToThirdParties__c" checked={giveDataToThirdPartiesContactValue} label={label.giveDataToThirdCont} onchange={handleChangeToggle} message-toggle-active = "" message-toggle-inactive = "" disabled={giveDataToThirdPartiesContactDisabled}></lightning-input> 
+            <lightning-combobox label ={label.mainLegalEntityCont}  name = "XC_MainLegalEntity__c"  onchange={handleChange} value={mainLegalEntityContactValue} options={legalEntityOpt} required disabled={mainLegalEntityContactDisabled}></lightning-combobox> 
+
+          </div>
+
+          <!-- Modal/Popup Box LWC footer starts here -->
+          <footer class="slds-modal__footer">
+              <button class="slds-button slds-button_neutral" onclick={closeModalContactEdit} title="Cancel">{label.cancelButtonLabel}</button>
+              <button class="slds-button slds-button_brand" onclick={submitDetailsEditContact} title="OK">OK</button>
+          </footer>
+      </div>
+  </section>
+  <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+
+<template if:true={isModalOpenCreateUser}>
+  <!-- Modal/Popup Box LWC starts here -->
+  <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+      <div class="slds-modal__container">
+          <!-- Modal/Popup Box LWC header here -->
+          <header class="slds-modal__header">
+              <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalCreateUser}>
+                  <lightning-icon icon-name="utility:close"
+                      alternative-text="close"
+                      variant="inverse"
+                      size="small" ></lightning-icon>
+                  <span class="slds-assistive-text">Close</span>
+              </button>
+              <h2 id="modal-heading-03" class="slds-text-heading_medium slds-hyphenate">{label.createUserHeader}</h2>
+          </header>
+          <!-- Modal/Popup Box LWC body starts here -->
+          <div class="slds-modal__content slds-p-around_medium modalBody createUserModal" id="modal-content-id-3">
+            <template if:true={spinnerControlModal}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+            <lightning-combobox label ={label.receivingChannelUser}  name = "XC_Receiving_Channel__c"  onchange={handleChangeUser}  options={receivingChannelUserOpt} dropdown-alignment ="auto" required ></lightning-combobox> 
+            <lightning-combobox label ={label.roleUser}  name = "Role"  onchange={handleChangeUser}  options={roleUserOpt} dropdown-alignment ="auto" required ></lightning-combobox>
+            <lightning-input type="text" name = "SubChannel" label={label.subChannelUser} onchange={handleChangeUser} ></lightning-input>
+            <template if:true ={showUsernameBox}>
+            <lightning-input type="text" name = "Username" label="Username" onchange={handleChangeUser} required></lightning-input>
+            </template>
+          </div>
+
+          <!-- Modal/Popup Box LWC footer starts here -->
+          <footer class="slds-modal__footer">
+              <button class="slds-button slds-button_neutral" onclick={closeModalCreateUser} title="Cancel">{label.cancelButtonLabel}</button>
+              <button class="slds-button slds-button_brand" onclick={submitDetailsUser} title="OK">OK</button>
+          </footer>
+      </div>
+  </section>
+  <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+  <template if:true={notLoaded}>
+    <div class="exampleHolder">
+      <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+    </div>
+  </template>
+</div>
+</lightning-card>
+<br>
+<template if:true={isRenderedFLSCard}>
+  <lightning-card title ="FSL Management" icon-name="custom:custom98">
+    <div data-id = "FLSCard" class="slds-card" style="height:200px;">
+        <template if:true={showErrorMessageOnPathBool}>
+          <div class="slds-text-color_error formattedText">{errorMessage}</div>
+        </template>
+        <div class="slds-path">
+          <div class="slds-grid slds-path__track">
+          <div class="slds-grid slds-path__scroller-container">
+          <div class="slds-path__scroller">
+          <div class="slds-path__scroller_inner">
+          <ul class="slds-path__nav" role="listbox" aria-orientation="horizontal">
+          <li class="slds-path__item slds-is-current slds-is-active" role="presentation" data-id="pat-1" >
+          <a aria-selected="true" class="slds-path__link" id="path-1" role="option" tabindex="0">
+          <span class="slds-path__stage">
+          <svg focusable="false" data-key="check" aria-hidden="true" viewBox="0 0 52 52" class="slds-icon slds-icon_x-small"> 
+              <use xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#check"></use>
+          </svg>
+          <span class="slds-assistive-text">Current Stage:</span>
+          </span>
+          <span class="slds-path__title">{label.serviceTerritoryLabel}</span>
+          </a>
+          </li>
+          <li class="slds-path__item slds-is-incomplete" role="presentation" data-id="pat-2" >
+          <a aria-selected="false" class="slds-path__link" id="path-2" role="option" tabindex="-1">
+          <span class="slds-path__stage">
+          <svg focusable="false" data-key="check" aria-hidden="true" viewBox="0 0 52 52" class="slds-icon slds-icon_x-small"> 
+              <use xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#check"></use>
+          </svg>
+          </span>
+          <span class="slds-path__title">{label.serviceResourceLabel}</span>
+          </a>
+          </li>
+          <li class="slds-path__item slds-is-incomplete" role="presentation" data-id="pat-3" >
+          <a aria-selected="false" class="slds-path__link" id="path-3" role="option" tabindex="-1">
+          <span class="slds-path__stage">
+          <svg focusable="false" data-key="check" aria-hidden="true" viewBox="0 0 52 52" class="slds-icon slds-icon_x-small"> 
+              <use xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#check"></use>
+          </svg>
+          </span>
+          <span class="slds-path__title">{label.serviceTerritoryMemberLabel}</span>
+          </a>
+          </li>
+          <li class="slds-path__item slds-is-incomplete" role="presentation" data-id="pat-4" >
+          <a aria-selected="false" class="slds-path__link" id="path-4" role="option" tabindex="-1">
+          <span class="slds-path__stage">
+          <svg focusable="false" data-key="check" aria-hidden="true" viewBox="0 0 52 52" class="slds-icon slds-icon_x-small"> 
+              <use xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#check"></use>
+          </svg>
+          </span>
+          <span class="slds-path__title">{label.groupsMemberLabel}</span>
+          </a>
+          </li>
+          <li class="slds-path__item slds-is-incomplete" role="presentation" data-id="pat-5" >
+          <a aria-selected="false" class="slds-path__link" id="path-5" role="option" tabindex="-1">
+          <span class="slds-path__stage">
+          <svg focusable="false" data-key="check" aria-hidden="true" viewBox="0 0 52 52" class="slds-icon slds-icon_x-small"> 
+              <use xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#check"></use>
+          </svg>
+          </span>
+          <span class="slds-path__title">{label.serviceResourceShareLabel}</span>
+          </a>
+          </li>
+          <li class="slds-path__item slds-is-incomplete" role="presentation" data-id="pat-6" >
+              <a aria-selected="false" class="slds-path__link" id="path-6" role="option" tabindex="-1">
+              <span class="slds-path__stage">
+              <svg focusable="false" data-key="check" aria-hidden="true" viewBox="0 0 52 52" class="slds-icon slds-icon_x-small"> 
+                  <use xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#check"></use>
+              </svg>
+              </span>
+              <span class="slds-path__title">{label.skillLabel}</span>
+              </a>
+              </li>
+          </ul>
+          </div>
+          </div>
+          </div>
+          </div>
+          </div>
+          <lightning-layout horizontal-align="center">
+           <div style = "position:absolute">
+            <img src={enelXLogoExport} width="200" height="200"/>  
+           </div>
+            <template if:true={showSuccess}>
+               <div class = "successDiv">
+              <img src={successLogoExport} width="200" height="200"/> 
+              </div> 
+              <div class="slds-text-heading_small" style = "text-align: left; padding-top:20px">
+              <h2> <b>IMPORTANT !</b><br></h2>
+              <h3>{label.massiveOpenMessage} <a href="javascript:void(0)" onclick={navigateToTabPageMassiveWorktype}>
+                                                                                    {label.clickHereMessage} 
+                                                                          </a><br>
+              {label.sharingBatchMessage} <a href="javascript:void(0)" onclick={navigateToTabPageFLSSharing}>
+                                                                      {label.clickHereMessage} 
+                                                              </a></h3>
+            </div>
+            </template>
+        </lightning-layout>
+        </div>
+        <template if:true={isModalOpenServiceResource}>
+          <!-- Modal/Popup Box LWC starts here -->
+          <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+              <div class="slds-modal__container">
+                  <!-- Modal/Popup Box LWC header here -->
+                  <header class="slds-modal__header">
+                      <h2 id="modal-heading-04" class="slds-text-heading_medium slds-hyphenate">Create Service Resource</h2>
+                  </header>
+                  <!-- Modal/Popup Box LWC body starts here -->
+                  <div class="slds-modal__content slds-p-around_medium modalBody createUserModal" id="modal-content-id-4">
+                    <lightning-accordion
+                    allow-multiple-sections-open
+                    active-section-name={activeSections}>
+                    <template for:each={listOfServiceResourceName} for:item="serviceResourceName">
+                      <lightning-accordion-section name={serviceResourceName} label={serviceResourceName} key={serviceResourceName} class="accordian-class">
+                        <lightning-combobox label ={label.roleUser}  name ={serviceResourceName}  onchange={handleChangeServiceResourceRole}  options={roleUserOpt} dropdown-alignment ="auto" required ></lightning-combobox>
+                        </lightning-accordion-section>
+                    </template>
+                  </lightning-accordion>
+                  </div>
+        
+                  <!-- Modal/Popup Box LWC footer starts here -->
+                  <footer class="slds-modal__footer">
+                      <button class="slds-button slds-button_brand" onclick={serviceResourceDetailSubmit} title="OK">OK</button>
+                  </footer>
+              </div>
+          </section>
+          <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <template if:true={isModalGroupMemberOpen}>
+          <!-- Modal/Popup Box LWC starts here -->
+          <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+              <div class="slds-modal__container">
+                  <!-- Modal/Popup Box LWC header here -->
+                  <header class="slds-modal__header">
+                      <h2 id="modal-heading-05" class="slds-text-heading_medium slds-hyphenate">{label.groupMemberHeader}</h2>
+                  </header>
+                  <!-- Modal/Popup Box LWC body starts here -->
+                  <div class="slds-modal__content slds-p-around_medium modalBody" id="modal-content-id-5">
+                    <lightning-dual-listbox name="Group"
+                    label={label.selectGroupLabel}
+                    source-label={label.availableLabel}
+                    selected-label={label.selectedLabel}
+                    options={optionsGroup}
+                    value={selectedGroup}
+                    required-options={requiredGroup}
+                    onchange={handleChangeGroup}></lightning-dual-listbox>
+                  </div>
+        
+                  <!-- Modal/Popup Box LWC footer starts here -->
+                  <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={skipStep} title="Skip">Skip</button>
+                    <button class="slds-button slds-button_brand" onclick={addToGroupMemberInsert} title="OK">OK</button>
+                    </footer>
+              </div>
+          </section>
+          <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <template if:true={showModalSkill}>
+          <!-- Modal/Popup Box LWC starts here -->
+          <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+              <div class="slds-modal__container">
+                  <!-- Modal/Popup Box LWC header here -->
+                  <header class="slds-modal__header">
+                      <h2 id="modal-heading-06" class="slds-text-heading_medium slds-hyphenate">{label.skillHeader}</h2>
+                  </header>
+                  <!-- Modal/Popup Box LWC body starts here -->
+                  <div class="slds-modal__content slds-p-around_medium modalBody" id="modal-content-id-6">
+                    <lightning-accordion
+                    allow-multiple-sections-open
+                    active-section-name={activeSections}>
+                    <template for:each={serviceResourceListSkill} for:item="map" for:index="index">
+                      <lightning-accordion-section name={map.serviceResource.Name} label={map.serviceResource.Name} key={map.serviceResource.Name} class="accordian-class">
+                        <lightning-dual-listbox name={map.serviceResource.Name}
+                        label={label.selectSkillLabel}
+                        source-label={label.availableLabel}
+                        selected-label={label.selectedLabel}
+                        options={skillNameList}
+                        value={map.selectedSkills}
+                        required-options={map.requiredSkills}
+                        onchange={handleChangeSkill}></lightning-dual-listbox>
+                      </lightning-accordion-section>
+                    </template>
+                  </lightning-accordion>
+                  </div>
+        
+                  <!-- Modal/Popup Box LWC footer starts here -->
+                  <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={skipStep} title="Skip">Skip</button>
+                    <button class="slds-button slds-button_brand" onclick={serviceResourceDetailSkillSubmit} title="OK">OK</button>
+                  </footer>
+              </div>
+          </section>
+          <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+          <template if:true={notLoaded}>
+            <div class="exampleHolder">
+              <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </div>
+          </template>
+        </lightning-card> 
+</template>
+</template>

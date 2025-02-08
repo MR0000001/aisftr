@@ -1,0 +1,17 @@
+.THIS .customRequired{
+    font-weight: 400; } .THIS .customRequired:before{    
+    content: "*";
+    margin: 0 0.125rem 0 0.125rem;
+    color: rgb(194, 57, 52);
+    float: left; } .THIS .none{
+    display:none; }
+
+.THIS.slds-modal__container {
+
+    position: absolute;
+    top: 80px;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    
+}

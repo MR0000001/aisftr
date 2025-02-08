@@ -1,0 +1,24 @@
+<aura:component extends="c:XC_LCP022_TabNavigationManager"
+    controller="TA_LCC999_CreateNewLead"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:layout,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable"
+    access="global">
+
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="leadRecordTypeId" type="String" />
+    <aura:attribute access="private" name="initialized" type="Boolean" default="false" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+
+    <aura:if isTrue="{!v.initialized}">
+        <c:TA_LCP238_NewLead recordTypeToReturn="{!v.leadRecordTypeId}" isCommunity="true" ></c:TA_LCP238_NewLead>
+    </aura:if>
+
+</aura:component>

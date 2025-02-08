@@ -1,0 +1,95 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 11-04-2020
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   07-09-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component implements="force:hasRecordId">
+
+    <aura:attribute name="record" type="Object" />
+    <aura:attribute name="showSpinner" type="Boolean" default="true" />
+
+    <lightning:card class="slds-card_boundary" iconName="custom:custom4">
+
+        <aura:set attribute="title">
+            <a href="{!'/' + v.record.recordId}">{!$Label.c.XC_CL_LCP197_ChildCardHeader + ' (' + v.record.sObjectLabel
+                + ')'}</a>
+        </aura:set>
+
+        <div class="slds-p-around_small">
+
+            <div class="slds-p-around_small">
+                <lightning:recordViewForm objectApiName="XC_QueuedRequestStep__c" recordId="{!v.record.stepId}">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem padding="around_small" size="6">
+                            <lightning:outputField fieldName="Name" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem padding="around_small" size="6">
+                            <lightning:input value="{!v.record.sObjectLabel}" label="Object Type" disabled="true" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:recordViewForm>
+            </div>
+            <div class="slds-box slds-p-around_small">
+                <lightning:recordViewForm objectApiName="{!v.record.sObjectType}" recordId="{!v.record.recordId}">
+                    <lightning:layout multipleRows="true">
+                        <!-- IF FOR DIFFERENT OBJECTS ACCOUNT -->
+                        <aura:if isTrue="{!v.record.sObjectType == 'Account'}">
+                            <lightning:layoutItem padding="around_small" size="6">
+                                <lightning:outputField class="slds-form-element_1-col" fieldName="Name" />
+                            </lightning:layoutItem>
+                            <lightning:layoutItem padding="around_small" size="6">
+                                <lightning:outputField class="slds-form-element_1-col" fieldName="IdentityNumber__c" />
+                            </lightning:layoutItem>
+                            <lightning:layoutItem padding="around_small" size="6">
+                                <lightning:outputField class="slds-form-element_1-col" fieldName="PrimaryEmail__c" />
+                            </lightning:layoutItem>
+                        </aura:if>
+                        <!-- IF FOR DIFFERENT OBJECTS ADDRESS -->
+                        <aura:if isTrue="{!v.record.sObjectType == 'XC_Address__c'}">
+                            <lightning:layoutItem padding="around_small" size="6">
+                                <lightning:outputField class="slds-form-element_1-col" fieldName="Name" />
+                            </lightning:layoutItem>
+                        </aura:if>
+                        <!-- IF FOR DIFFERENT OBJECTS BP -->
+                        <aura:if isTrue="{!v.record.sObjectType == 'NE__Billing_Profile__c'}">
+                            <lightning:layoutItem padding="around_small" size="6">
+                                <lightning:outputField class="slds-form-element_1-col" fieldName="Name" />
+                            </lightning:layoutItem>
+                            <lightning:layoutItem padding="around_small" size="6">
+                                <lightning:outputField class="slds-form-element_1-col" fieldName="NE__Payment__c" />
+                            </lightning:layoutItem>
+                            <lightning:layoutItem padding="around_small" size="6">
+                                <lightning:outputField class="slds-form-element_1-col" fieldName="XC_Status__c" />
+                            </lightning:layoutItem>
+                        </aura:if>
+                        <!-- IF FOR DIFFERENT OBJECTS ORDER -->
+                        <aura:if isTrue="{!v.record.sObjectType == 'NE__Order__c'}">
+                            <lightning:layoutItem padding="around_small" size="6">
+                                <lightning:outputField class="slds-form-element_1-col" fieldName="Name" />
+                            </lightning:layoutItem>
+                            <lightning:layoutItem padding="around_small" size="6">
+                                <lightning:outputField class="slds-form-element_1-col" fieldName="NE__OptyId__c" />
+                            </lightning:layoutItem>
+                            <lightning:layoutItem padding="around_small" size="6">
+                                <lightning:outputField class="slds-form-element_1-col" fieldName="XC_Status__c" />
+                            </lightning:layoutItem>
+                        </aura:if>
+                        <aura:if isTrue="{!v.record.sObjectType == 'Opportunity'}">
+                            <lightning:layoutItem padding="around_small" size="6">
+                                <lightning:outputField class="slds-form-element_1-col" fieldName="Name" />
+                            </lightning:layoutItem>
+                            <lightning:layoutItem padding="around_small" size="6">
+                                <lightning:outputField class="slds-form-element_1-col" fieldName="StageName" />
+                            </lightning:layoutItem>
+                        </aura:if>
+                    </lightning:layout>
+                </lightning:recordViewForm>
+            </div>
+        </div>
+    </lightning:card>
+</aura:component>

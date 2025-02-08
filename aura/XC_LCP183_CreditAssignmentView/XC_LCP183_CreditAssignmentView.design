@@ -1,0 +1,4 @@
+<design:component >
+    <design:attribute name="availableForLE" label="Available for legal entities" description = "The legalentities for which this component has to be shown. Comma separated"/>
+    <design:attribute name="availableForRT" label="Available for recordTypes" description = "The record types for which this component has to be shown. Comma separated"/>
+</design:component>

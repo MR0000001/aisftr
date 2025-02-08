@@ -1,0 +1,361 @@
+<aura:component controller="TA_LCC226_CartContainer"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable"
+    access="global">
+
+    <aura:attribute access="public" name="b2winResponse" type="Object" />
+    <aura:attribute access="public" name="b2winCurrentBundleElement" type="Object" />
+    <aura:attribute access="public" name="workOrder" type="Object" />
+    <aura:attribute access="public" name="isBundle" type="Boolean" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="public" name="priceRangeSelectedMinPrice" type="Integer" />
+    <aura:attribute access="public" name="priceRangeSelectedMaxPrice" type="Integer" />
+
+    <aura:attribute access="private" name="paginatedListOfItems" type="Object" />
+    <aura:attribute access="private" name="numberOfItemsPerPage" type="Integer" default="10" />
+    <aura:attribute access="private" name="currentPageNumber" type="Integer" default="0" />
+    <aura:attribute access="private" name="totalPageNumber" type="Integer" />
+    <aura:attribute access="private" name="listOfItems" type="List" />
+    <aura:attribute access="private" name="listOfFilteredItems" type="List" />
+    <aura:attribute access="private" name="itemsToShow" type="List" />
+    <aura:attribute access="private" name="showMainProductDetails" type="Boolean" default="false" />
+    <aura:attribute access="private" name="mainProductSelected" type="Object" />
+    <aura:attribute access="private" name="showFilters" type="Boolean" default="false" />
+    <aura:attribute access="private" name="filterName" type="String" />
+    <aura:attribute access="private" name="filterBrand" type="String" />
+    <aura:attribute access="private" name="filterBrandValueList" type="List" />
+    <aura:attribute access="private" name="filterAvailability" type="String" />
+    <aura:attribute access="private" name="filterAvailabilityValueList" type="List" />
+    <aura:attribute access="private" name="storeUrl" type="String"/>
+    <aura:attribute access="private" name="insertedItemNumber" type="Integer" default="0" />
+    <aura:attribute access="private" name="productsSelectedIds" type="List" default="[]" />
+    <aura:attribute access="private" name="renderPriceSlider" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="priceRangeMinPrice" type="Integer" />
+    <aura:attribute access="private" name="priceRangeMaxPrice" type="Integer" />
+    <aura:attribute access="private" name="showMainProductAttributes" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="currentAction" type="String" />
+
+    <ltng:require styles="{!join(',',
+                                $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                                $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                                $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css',
+                                $Resource.TA_noUiSlider + '/noUiSlider-14.6.3/distribute/nouislider.min.css'
+                            )}"
+                  scripts="{!join(',',
+                                $Resource.TA_noUiSlider + '/noUiSlider-14.6.3/distribute/nouislider.min.js'
+                            )}"
+                  afterScriptsLoaded="{!c.handleInitialize}" />
+
+    <aura:handler name="render" value="{!this}" action="{!c.onRender}" />
+    <aura:handler event="c:TA_LCE226_CartStep" action="{!c.handleManageB2WResponse}" />
+    <aura:handler name="change" value="{!v.productsSelectedIds}" action="{!c.handleChangeProductSelectedIds}"/>
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="TA_LCE226_CartStep" type="c:TA_LCE226_CartStep"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem size="11">
+            <h3 class="ta-color-white slds-p-top_medium"> {!v.b2winCurrentBundleElement.fields.name} </h3>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="1">
+            <c:TA_LCP232_CartSummary workOrder="{!v.workOrder}"/>
+        </lightning:layoutItem>
+    </lightning:layout>
+    <lightning:layout multipleRows="true" class="ta-products-container slds-m-top_medium">
+        <lightning:layoutItem size="12" class="slds-m-bottom_small">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="12" class="slds-text-align_right">
+                    <div class="slds-float_right ta-filter-button" onclick="{!c.handleManageFilterModal}">
+                        <span class="slds-p-right_medium">{!$Label.c.TA_Filter}</span>
+                        <img class="ta-image-filter" src="{!$Resource.TA_Icons + '/xc-icons/filters-white.svg'}" />
+                    </div>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </lightning:layoutItem>
+
+        <aura:iteration items="{!v.itemsToShow}" var="mainProduct">
+            <lightning:layoutItem size="12">
+                <span id="{!mainProduct.id}" onclick="{!c.handleManageMainProductDetails}">
+                    <lightning:layout multipleRows="true" class="ta-main-product-container slds-is-relative">
+                        <aura:if isTrue="{!mainProduct.TA_selected}">
+                            <div class="ta-mp-selected slds-text-align_center">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/check-white.svg'}" class="ta-mp-selected-icon"/>
+                            </div>
+                        </aura:if>
+                        <lightning:layoutItem size="5" class="ta-main-product-image-container">
+                            <aura:if isTrue="{!mainProduct.fields.enginecode != ''}">
+                                <span class="ta-main-product-image-helper"></span>
+                                <img class="ta-main-product-image" src="{!v.storeUrl + mainProduct.fields.enginecode + '.jpg'}"/>
+                                <aura:set attribute="else">
+                                    <span class="ta-main-product-image-helper"></span>
+                                    <img class="ta-main-product-image" src="{!v.storeUrl + 'undefined.jpg'}"/>
+                                </aura:set>
+                            </aura:if>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="7" class="ta-main-product-info">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12" class="ta-font-weight-800 slds-m-bottom_x-small">{!if(mainProduct.TA_productnametruncated != null, mainProduct.TA_productnametruncated, mainProduct.fields.productname)}</lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-font-weight-300 ta-color-white-opacity-60">{!$Label.c.TA_DeliveryDate + ' ' + mainProduct.TA_deliveryDate}</lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-font-weight-800 slds-text-align_right">
+                                    <aura:if isTrue="{!mainProduct.fields.priceToDiscount != null}">
+                                        <span class="ta-cart-price-discount"> {!mainProduct.fields.priceToDiscount} € </span>
+                                    </aura:if>
+                                    <span class="slds-float_right slds-m-left_medium slds-m-top_large"> {!mainProduct.fields.baseonetimefee} € </span>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </span>
+            </lightning:layoutItem>
+        </aura:iteration>
+
+        <lightning:layoutItem size="12">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="6" class="ta-pagination-item">
+                    <aura:if isTrue="{!greaterthan(v.currentPageNumber, 0)}">
+                        <div class="slds-float_left" onclick="{!c.handleGoToPreviousPage}">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/arrow-down-white.svg'}" style="transform:rotate(90deg);" />
+                            <span class="slds-p-left_x-small">{!$Label.c.TA_MainProductPrevious}</span>
+                        </div>
+                    </aura:if>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="6" class="ta-pagination-item">
+                    <aura:if isTrue="{!lessthan(v.currentPageNumber, (v.totalPageNumber - 1))}">
+                        <div class="slds-float_right" onclick="{!c.handleGoToNextPage}">
+                            <span class="slds-p-right_x-small">{!$Label.c.TA_MainProductNext}</span>
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/arrow-down-white.svg'}" style="transform:rotate(270deg);" />
+                        </div>
+                    </aura:if>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </lightning:layoutItem>
+    </lightning:layout>
+
+    <aura:if isTrue="{!v.showMainProductDetails}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-main-product-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <aura:if isTrue="{!not(v.showMainProductAttributes)}">
+                            <lightning:layoutItem size="11" />
+                            <lightning:layoutItem size="1" class="ta-modal-header-button">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleManageMainProductDetails}" />
+                            </lightning:layoutItem>
+                            <aura:set attribute="else">
+                                <lightning:layoutItem size="12" />
+                            </aura:set>
+                        </aura:if>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <aura:if isTrue="{!not(v.showMainProductAttributes)}">
+                    <lightning:layoutItem size="12" class="ta-modal-main-product-body">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="12" class="slds-m-bottom_small slds-text-align_center">
+                                <aura:if isTrue="{!v.mainProductSelected.fields.enginecode != ''}">
+                                    <img src="{!v.storeUrl + v.mainProductSelected.fields.enginecode + '.jpg'}" />
+                                    <aura:set attribute="else">
+                                        <div class="ta-modal-image">
+                                            <img src="{!v.storeUrl + 'undefined.jpg'}" />
+                                        </div>
+                                    </aura:set>
+                                </aura:if>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-m-bottom_small slds-p-left_large slds-p-right_large slds-text-align_center">
+                                <h3 class="ta-color-purple"> {!v.mainProductSelected.fields.productname} </h3>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-m-bottom_small ta-modal-price slds-text-align_center">
+                                <aura:if isTrue="{!v.mainProductSelected.fields.priceToDiscount != null}">
+                                    <span class="ta-cart-price-discount-2"> {!v.mainProductSelected.fields.priceToDiscount} € </span>
+                                </aura:if>
+                                <span class="slds-m-left_medium"> {!v.mainProductSelected.fields.baseonetimefee} € </span>
+                                <!-- € {!v.mainProductSelected.fields.onetimefeediscounted} -->
+                            </lightning:layoutItem>
+
+                            <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="12" class="slds-m-bottom_xx-small slds-p-left_small slds-p-right_medium">
+                                        <p class="ta-font-weight-800 ta-color-black slds-p-right_medium slds-float_left">Delivery:</p>
+                                        <p class="ta-font-weight-300 ta-color-purple slds-p-left_medium">{!v.mainProductSelected.TA_deliveryDate}</p>
+                                    </lightning:layoutItem>
+                                    <!-- <lightning:layoutItem size="12" class="slds-m-bottom_xx-small slds-p-left_small slds-p-right_medium">
+                                        <p class="ta-font-weight-800 ta-color-black slds-p-right_medium slds-float_left">Availability:</p>
+                                        <p class="ta-font-weight-300 ta-color-purple slds-p-left_medium">{!v.mainProductSelected.TA_availabilityLocalWarehouse}</p>
+                                    </lightning:layoutItem> -->
+                                </lightning:layout>
+                            </lightning:layoutItem>
+
+                            <!-- <lightning:layoutItem size="12" class="slds-m-bottom_xx-small ta-characteristic-title">
+                                {!$Label.c.TA_MainProductCharacteristics}
+                            </lightning:layoutItem> -->
+                            <lightning:layoutItem size="12" class="ta-modal-main-product-fields">
+                                <aura:iteration items="{!v.mainProductSelected.listOfCharacteristics}" var="characteristic">
+                                    <aura:if isTrue="{!characteristic.fields.visible}">
+                                        <lightning:layout multipleRows="true" class="ta-characteristic-container">
+                                            <aura:if isTrue="{!characteristic.fields.value == '...'}">
+                                                    <lightning:layoutItem size="12" class="slds-p-top_x-large"> <p class="ta-color-black ta-font-weight-800"> {!characteristic.fields.name} </p> </lightning:layoutItem>
+                                                <aura:set attribute="else">
+                                                    <lightning:layoutItem size="6" class="ta-font-weight-800 ta-color-black slds-p-right_medium ta-word-break"> <p> {!characteristic.fields.name} </p></lightning:layoutItem>
+                                                    <lightning:layoutItem size="6" class="ta-font-weight-300 ta-color-purple slds-p-left_medium ta-word-break"> <p> {!characteristic.fields.value} </p></lightning:layoutItem>
+                                                </aura:set>
+                                            </aura:if>
+                                        </lightning:layout>
+                                    </aura:if>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+                    <!-- <lightning:layoutItem size="12" class="ta-modal-footer-one-button">
+                        <aura:if isTrue="{!and(not(v.mainProductSelected.TA_selected), or(lessthan(v.insertedItemNumber, v.b2winCurrentBundleElement.fields.maxqty), not(v.isBundle)))}">
+                            <button id="addItemButton" class="slds-button slds-button_neutral ta-button-primary-modal" onclick="{!c.handleAddMainProductToCart}">{!$Label.c.TA_MainProductInsert}</button>
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!v.mainProductSelected.TA_selected}">
+                                    <button id="removeItemButton" class="slds-button slds-button_neutral ta-button-closing-modal" onclick="{!c.handleRemoveMainProductFromCart}">{!$Label.c.TA_MainProductRemove}</button>
+                                    <aura:set attribute="else">
+                                        <button id="addItemButton" class="slds-button slds-button_neutral ta-button-primary-modal-disabled">{!$Label.c.TA_MainProductInsert}</button>
+                                    </aura:set>
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+                    </lightning:layoutItem> -->
+                    <aura:if isTrue="{!and(not(v.mainProductSelected.TA_selected), or(lessthan(v.insertedItemNumber, v.b2winCurrentBundleElement.fields.maxqty), not(v.isBundle)))}">
+                        <lightning:layoutItem size="12" class="ta-modal-footer-one-button">
+                            <button id="addItemButton" class="slds-button slds-button_neutral ta-button-primary-modal" onclick="{!c.handleAddMainProductToCart}">
+                                {!$Label.c.TA_MainProductInsert}
+                            </button>
+                        </lightning:layoutItem>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.mainProductSelected.TA_selected}">
+                                <lightning:layoutItem size="12" class="ta-modal-footer-two-button">
+                                    <lightning:layout multipleRows="true">
+                                        <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                            <button id="removeItemButton" class="{!concat('slds-button slds-button_neutral ta-button-closing-modal', greaterthanorequal(v.insertedItemNumber, v.b2winCurrentBundleElement.fields.minqty) ? '' : ' ta-disable-button')}" onclick="{!c.handleRemoveMainProductFromCart}">
+                                                {!$Label.c.TA_MainProductRemove}
+                                            </button>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="12">
+                                            <button class="slds-button slds-button_neutral ta-button-secondary-modal" onclick="{!c.handleEditAttribute}">
+                                                {!$Label.c.TA_Edit}
+                                            </button>
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </lightning:layoutItem>
+                                <aura:set attribute="else">
+                                    <lightning:layoutItem size="12" class="ta-modal-footer-one-button">
+                                        <button id="addItemButton" class="slds-button slds-button_neutral ta-button-primary-modal-disabled">
+                                            {!$Label.c.TA_MainProductInsert}
+                                        </button>
+                                    </lightning:layoutItem>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                    <aura:set attribute="else">
+                        <lightning:layoutItem size="12" class="ta-modal-info-body slds-text-align_center">
+                            <lightning:layout multipleRows="true">
+                                <aura:iteration items="{!v.mainProductSelected.listOfAttributes}" var="attribute">
+                                    <aura:if isTrue="{!and(attribute.fields.hidden == 'false', or(attribute.listOfDomains.length > 0, and(attribute.fields.readonly == 'true', attribute.fields.DefaultValue != '')))}">
+                                        <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                            <lightning:layout multipleRows="true">
+                                                <lightning:layoutItem size="12" class="slds-m-bottom_xx-small ta-modal-info-title">
+                                                    {!attribute.fields.name}
+                                                </lightning:layoutItem>
+                                                <lightning:layoutItem size="12" class="slds-m-bottom_xx-small">
+                                                    <aura:if isTrue="{!attribute.fields.readonly == 'true'}">
+                                                        <p>{!attribute.fields.value}</p>
+                                                        <aura:set attribute="else">
+                                                            <lightning:select value="{!attribute.fields.value}">
+                                                                <aura:if isTrue="{!attribute.fields.DefaultValue == ''}">
+                                                                    <option value="{!attribute.fields.DefaultValue}">{!attribute.fields.DefaultValue}</option>
+                                                                </aura:if>
+                                                                <aura:if isTrue="{!attribute.fields.type != 'Dynamic Lookup'}">
+                                                                    <aura:iteration items="{!attribute.listOfDomains}" var="domain">
+                                                                        <option value="{!domain.fields.value}">{!domain.fields.label}</option>
+                                                                    </aura:iteration>
+                                                                    <aura:set attribute="else">
+                                                                        <aura:iteration items="{!attribute.listOfDomains}" var="domain">
+                                                                            <option value="{!domain.Name}">{!domain.Name}</option>
+                                                                        </aura:iteration>
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </lightning:select>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </lightning:layoutItem>
+                                            </lightning:layout>
+                                        </lightning:layoutItem>
+                                    </aura:if>
+                                </aura:iteration>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="12" class="ta-modal-footer-one-button">
+                            <lightning:button class="ta-button-primary-modal" label="{!$Label.c.TA_Save}" onclick="{!c.handleSaveAttribute}"/>
+                        </lightning:layoutItem>
+                    </aura:set>
+                </aura:if>
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showFilters}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-filter-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" />
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleManageFilterModal}" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-filter-body slds-text-align_center">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                            <lightning:input type="text" label="Name" value="{!v.filterName}" autocomplete="off" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                            <lightning:select value="{!v.filterBrand}" label="Brand">
+                                <aura:iteration items="{!v.filterBrandValueList}" var="brandValue">
+                                    <option value="{!brandValue}">{!brandValue}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                            <lightning:select value="{!v.filterAvailability}" label="Availability">
+                                <aura:iteration items="{!v.filterAvailabilityValueList}" var="availabilityValue">
+                                    <option value="{!availabilityValue}">{!availabilityValue}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-m-bottom_medium ta-padding-horizontal-4vw">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12" class="slds-p-bottom_small"> <p class="ta-price-label"> {!$Label.c.TA_MainProductPrice} </p></lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-price-range-slider">
+                                    <div id="slider"></div>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="6" class="slds-text-align_left ta-padding-top-1vh"> <p> {!$Label.c.TA_MainProductMin} {!v.priceRangeSelectedMinPrice} </p></lightning:layoutItem>
+                                <lightning:layoutItem size="6" class="slds-text-align_right ta-padding-top-1vh"> <p> {!$Label.c.TA_MainProductMax} {!v.priceRangeSelectedMaxPrice} </p></lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-footer-two-button">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                            <lightning:button class="ta-button-primary-modal" label="{!$Label.c.TA_ApplyFilters}" onclick="{!c.handleApplyFilters}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <lightning:button class="ta-button-closing-modal" label="{!$Label.c.TA_ClearAllFilters}" onclick="{!c.handleClearAllFilters}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+</aura:component>

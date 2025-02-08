@@ -1,0 +1,362 @@
+@media only screen and (max-width: 600px) {
+    /* CUSTOM-TAG */
+    .THIS .ta-modal-container {
+        position: absolute;
+        margin: 5vw;
+        z-index: -1;
+        background: white;
+        top: 20vw;
+        border-radius: 5vw;
+        box-shadow: 0 0vw 1vw 0vw black;
+    }
+
+    /* CUSTOM-TAG */
+    /* .THIS .ta-modal-header {
+        border-bottom: .1vw solid #461e7d;
+        background: #461e7d;
+        border-top-left-radius: 5vw;
+        border-top-right-radius: 5vw;
+        padding: 5vw;
+    } */
+
+    /* CUSTOM-TAG */
+    .THIS .ta-modal-body {
+        padding: 3vh;
+        height: 50vh;
+        overflow-y: auto;
+    }
+
+    /* CUSTOM-TAG */
+    .THIS .ta-modal-body-contact-card-name {
+        font-weight: 800;
+        font-size: 4vw;
+    }
+    
+    /* CUSTOM-TAG */
+    .THIS .ta-modal-body-contact-card-email {
+        font-weight: 300;
+        font-size: 4vw;
+    }
+
+    /* CUSTOM-TAG */
+    .THIS .ta-gdpr-title {
+        color: #461e7d;
+        font-size: 4vw;
+        padding: 2vw 0vw;
+        border-bottom: 0.1vw solid #c6c6c6;
+    }
+
+    /* CUSTOM-TAG */
+    .THIS .ta-gdpr-description {
+        padding-top: 2vw;
+        padding-bottom: 1vw;
+    }
+}
+
+@media only screen and (min-width: 601px) {
+    .THIS .ta-accordion-header-icon {
+        margin: 0;
+    }
+
+    .THIS .ta-modal-body {
+        height: 50vh;
+    }
+
+    .THIS .slds-input {
+        font-size: 2.5vw !important;
+    }
+
+    .THIS .slds-select {
+        font-size: 2.5vw !important;
+    }
+
+    .THIS .ta-gdpr-title {
+        color: #461e7d;
+        font-size: 2.5vw;
+        padding: 2vw 0vw;
+        border-bottom: 0.1vw solid #c6c6c6;
+    }
+
+    .THIS .ta-gdpr-description {
+        padding-top: 2vw;
+        padding-bottom: 1vw;
+        font-size: 2.5vw;
+    }
+}
+
+/* .THIS .ta-modal-header-button {
+    height: inherit;
+    width: 5vw;
+}
+
+.THIS .ta-modal-header-title {
+    font-weight: 800;
+    font-size: 4.4vw;
+    color: white;
+} */
+
+/* .THIS .ta-modal-body-anc {
+    padding: 3vh;
+    overflow-y: auto;
+}
+
+.THIS .ta-field-error {
+    color: red;
+    margin-bottom: 3vw;
+    margin-top: 1vw;
+}
+
+.THIS .ta-field-label {
+    font-size: 3.3vw;
+    color: grey;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-field-input .slds-form-element__label {
+    display: none;
+}
+
+/* .THIS .ta-modal-body-contact-card-not-selected {
+    border: .5vw solid #461e7d;
+    border-radius: 2vw;
+    padding: 3vw;
+    margin-bottom: 2vw;
+    background: white;
+    color: black;
+}
+
+.THIS .ta-modal-body-contact-card-selected {
+    border-radius: 2vw;
+    padding: 3vw;
+    margin-bottom: 2vw;
+    border: .5vw solid #461e7d;
+    background: #461e7d;
+    color: white;
+} */
+
+/* .THIS .ta-modal-footer {
+    background: white;
+    border-bottom-left-radius: 5vw;
+    border-bottom-right-radius: 5vw;
+    padding: 3vw;
+}
+
+.THIS .ta-modal-footer-anc {
+    background: white;
+    border-bottom-left-radius: 5vw;
+    border-bottom-right-radius: 5vw;
+    padding: 3vw;
+}
+
+.THIS .ta-button-primary {
+    color: #ffffff;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background: linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+    border: 1px solid linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-weight: 800;
+    font-size:3.5vw;
+    text-transform: uppercase;
+    min-width: 35vw;
+    width: 100%;
+}
+
+.THIS .ta-button-secondary {
+    color: #ff006e;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background-color: #ffffff;
+    border-color: #ff006e;
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-weight: 800;
+    font-size:3.5vw;
+    text-transform: uppercase;
+    min-width: 35vw;
+    width: 100%;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-button-new-contact {
+    color: white;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    border-radius: 2vw;
+    padding: 4vw;
+    font-size: 4.4vw;
+}
+
+/* .THIS .ta-title {
+    color: #461e7d;
+    font-size: 4vw;
+}
+
+.THIS .ta-required-icon, .THIS .slds-required, .THIS .slds-has-error .slds-form-element__help {
+    color: #ff006e;
+    font-size: 3.5vw;
+    margin-right: 0.3vw;
+}
+
+.THIS .ta-button-primary-disabled {
+    color: #ffffff;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background: rgb(119,119,119);
+    border: 1px solid linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    font-weight: 800;
+    font-weight: 800;
+    font-size:3.5vw;
+    text-transform: uppercase;
+    min-width: 35vw;
+    border-radius: 5vw !important;
+    width: 100%;
+}
+
+.THIS .ta-animation-pop-in {
+    animation: pop-in 0.5s;
+    -webkit-animation-name: pop-in 0.5s;
+    animation-name: pop-in 0.5s;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-field-input .slds-input:active {
+    border: inherit;
+    box-shadow: none;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-field-input .slds-input:focus {
+    border: inherit;
+    box-shadow: none;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-field-input .slds-select:active {
+    border: inherit;
+    box-shadow: none;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-field-input .slds-select:focus {
+    border: inherit;
+    box-shadow: none;
+}
+
+/* @keyframes pop-in {
+    0% {
+        -webkit-transform: scale3d(0,0,0);
+        transform: scale3d(0,0,0);
+        opacity: 0;
+    }
+  
+    20% {
+        opacity: 1;
+    }
+  
+    40% {
+        -webkit-animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);
+        animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);  
+    }
+  
+    60% {
+        -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+        animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+        -webkit-transform: scale3d(1.08,1.08,1.08);
+        transform: scale3d(1.08,1.08,1.08);
+    }
+  
+    80% {
+        -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+        animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+    }
+  
+    100% {
+        -webkit-animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+        animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+        -webkit-transform: scale3d(1,1,1);
+        transform: scale3d(1,1,1);
+    }
+}
+
+.THIS .ta-description {
+    color: rgb(255, 255, 255, 0.6) !important;
+    font-size: 3.3vw;
+}
+
+.THIS .ta-self-align-center {
+    align-self: center;
+}
+
+.THIS .ta-title {
+    font-size: 4vw;
+    color: white;
+    font-weight: 800;
+    text-transform: capitalize;
+}
+
+.THIS .ta-gdpr-section {
+    margin-top: 4vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-gdpr-toggle {
+    padding-top: 1vw;
+    padding-bottom: 2vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-gdpr-toggle .slds-checkbox_toggle [type="checkbox"]:focus + .slds-checkbox_faux_container .slds-checkbox_faux {
+    box-shadow: none;
+    border-color: var(--lwc-colorBackgroundToggle,rgb(171, 173, 176));
+    background-color: var(--lwc-colorBackgroundToggle,rgb(171, 173, 176));
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-gdpr-toggle .slds-checkbox_toggle [type="checkbox"]:checked + .slds-checkbox_faux_container .slds-checkbox_faux{
+    background-color: #461e7d;
+    border-color: #461e7d;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-gdpr-toggle .slds-checkbox_toggle [type="checkbox"]:checked + .slds-checkbox_faux_container .slds-checkbox_faux::after {
+    display: none;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-gdpr-toggle .slds-checkbox_toggle [type="checkbox"]:checked + .slds-checkbox_faux_container .slds-checkbox_on {
+    display: none;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-gdpr-toggle .slds-checkbox_toggle [type="checkbox"] + .slds-checkbox_faux_container .slds-checkbox_off {
+    display: none;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-gdpr-toggle .slds-form-element__label {
+    padding: 0;
+}
+
+/* CUSTOM-TAG */
+.THIS .slds-input, .THIS .slds-select, .THIS .slds-input:focus, .THIS .slds-input:active {
+    background-color: #ece8f2 !important;
+    border: 1px solid #ece8f2 !important;
+    border-radius: 5vw !important;
+    color: #461e7d !important;
+}
+
+.THIS .slds-has-error .slds-input {
+    background-color: #ece8f2 !important;
+    border-color:  #ff006e !important;
+    box-shadow: none !important;
+}
+
+/* .THIS .ta-required {
+    color: #ff006e!important;
+    font-size: 4vw;
+    margin-right: .5vw;
+} */

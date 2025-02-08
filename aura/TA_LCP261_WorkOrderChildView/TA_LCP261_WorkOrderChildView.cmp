@@ -1,0 +1,159 @@
+<aura:component controller="TA_LCC261_WorkOrderChildView"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" >
+
+    <aura:attribute access="public" name="workOrderId" type="String"/>
+    <aura:attribute access="public" name="fieldSet" type="String"/>
+    <aura:attribute access="public" name="NE_orderId" type="String" default="" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="public" name="cmpName" type="String" default="TA_LCP261_WorkOrderChildView"/>
+
+    <aura:attribute access="private" name="customerCardBg" type="String"/>
+    <aura:attribute access="private" name="checkIcon" type="String"/>
+    <aura:attribute access="private" name="general" type="Object"/>
+    <aura:attribute access="private" name="custom" type="Object"/>
+    <aura:attribute access="private" name="title" type="String"/>
+    <aura:attribute access="private" name="description" type="String"/>
+    <aura:attribute access="private" name="objWrapper" type="Object"/>
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="whereCondition" type="String" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+
+    <aura:registerEvent name="validationEvt" 	type="c:TA_LCE199_Validation" />
+    <aura:registerEvent name="updateFieldsEvt" 	type="c:TA_LCE214_UpdateFields" />
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <lightning:layout multipleRows="true" class="slds-m-top_large slds-m-left_small slds-m-right_small">
+            <div class="{!v.general.show == 'true' ? 'slds-col slds-size_12-of-12 ta-box-shadow ta-accordion-header ta-accordion-open'
+                                            : 'slds-col slds-size_12-of-12 ta-accordion-header ta-accordion-close'}"
+                style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover;
+                        background-position: bottom; background-color: ' + v.general.bgColor + ';background-blend-mode: lighten;'}">
+                <lightning:layout multipleRows="true">
+                    <!-- ACCORDION HEADER SECTION -->
+                    <lightning:layoutItem size="12">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="10">
+                                <lightning:layout multipleRows="true">
+                                    <!-- ACCORDION HEADER SECTION NAME-->
+                                    <lightning:layoutItem size="12">
+                                        <h3> {!v.title} </h3>
+                                    </lightning:layoutItem>
+
+                                    <!-- ACCORDION HEADER BUTTON -->
+                                    <aura:if isTrue="{!v.objWrapper != null}">
+                                        <lightning:layoutItem size="12" class="slds-m-top_small">
+                                            <span name="{!v.general.defaultTitle}" id="{!v.general.defaultTitle}"
+                                                class="ta-accordion-header-button" onclick="{!c.handleManageDetails}">
+                                                    {!if(v.general.show == 'true', $Label.c.TA_CloseDetails, $Label.c.TA_ShowDetails)}
+                                            </span>
+                                        </lightning:layoutItem>
+                                        <aura:set attribute="else">
+                                            {!$Label.c.TA_GenericNoInfo}
+                                        </aura:set>
+                                    </aura:if>
+                                </lightning:layout>
+                            </lightning:layoutItem>
+
+                            <lightning:layoutItem size="2">
+                                <!-- ACCORDION HEADER ICON -->
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}"
+                                    class="slds-float_right ta-accordion-header-icon"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <aura:if isTrue="{!and(v.general.show == 'true', v.objWrapper != null) }">
+                        <lightning:layoutItem size="12" class="ta-border-top-white">
+                            <aura:iteration items="{!v.objWrapper.workOrderChilds}" var="womain">
+                                <lightning:layout multipleRows="true" class="ta-accordion-container">
+                                    <aura:if isTrue="{!womain.workOrderNumber != null}">
+                                        <lightning:layoutItem size="12">
+                                            <lightning:layout multipleRows="true">
+        
+                                                <lightning:layoutItem size="{! !v.objWrapper.readOnly ? '11' : '12'}" class="slds-has-flexi-truncate">
+                                                    <p class="ta-font-weight-800"> {!womain.assetName} </p> 
+                                                </lightning:layoutItem>
+                                                <aura:if isTrue="{! !v.objWrapper.readOnly }">
+                                                    <lightning:layoutItem size="1">
+                                                            <aura:if isTrue="{! womain.editEnabled }">
+                                                                <img src="{!$Resource.TA_Icons + '/xc-icons/settings-white.svg'}"/>
+                                                                <aura:set attribute="else">
+                                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/check-white.svg'}"/>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                    </lightning:layoutItem>
+                                                </aura:if>
+                                            </lightning:layout>
+                                        </lightning:layoutItem>
+                                        <aura:if isTrue="{! and(!v.objWrapper.readOnly, womain.editEnabled) }">
+                                            <lightning:layoutItem size="12" class="slds-m-top_x-smal">
+                                                <span id="{!womain.workOrderID}" class="ta-accordion-header-button slds-float_right" onclick="{!c.handleRedirectToObject}">
+                                                    {! $Label.c.TA_ToComplete }
+                                                </span>
+                                            </lightning:layoutItem>
+                                        </aura:if>
+                                        <aura:if isTrue="{! not(empty(womain.workOrderSecondary)) }">
+                                            <div class="slds-size_12-of-12 slds-m-top_x-small" name="{!womain.workOrderNumber}" onclick="{!c.handleManageAccordion}">
+                                                <lightning:layoutItem size="12">
+                                                    <!-- <span class='slds-float_right'> -->
+                                                        <aura:if isTrue="{! womain.showSecondary }">
+                                                            <lightning:icon iconName="utility:zoomout" alternativeText="Hide secondary list" variant="inverse" size="xx-small" /> {! $Label.c.TA_HideRelatedWo }
+                                                            <aura:set attribute="else">
+                                                                <lightning:icon iconName="utility:zoomin" alternativeText="Show secondary list" variant="inverse" size="xx-small" />{! $Label.c.TA_ShowRelatedWo }
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    <!-- </span> -->
+                                                </lightning:layoutItem>
+                                            </div>
+                                        </aura:if>
+            
+                                        <aura:if isTrue="{! womain.showSecondary }">
+                                            <lightning:layoutItem size="12" class="ta-accordion-body">
+                                                <ul class="slds-list_dotted">
+                                                    <aura:iteration items="{!womain.workOrderSecondary}" var="wosec">
+                                                        <lightning:layout multipleRows="true" verticalAlign="center">
+                                                            <lightning:layoutItem  flexibility="auto" size="{! !v.objWrapper.readOnly ? '8' : '12'}" class="slds-m-top_x-small" >
+                                                                <li class="ta-font-weight-800"> {!wosec.assetName} </li> 
+                                                            </lightning:layoutItem>
+                                                            <aura:if isTrue="{! !v.objWrapper.readOnly }">
+                                                                <lightning:layoutItem  flexibility="auto" size="4"  class="slds-m-top_x-small">
+                                                                        <aura:if isTrue="{! wosec.editEnabled }">
+                                                                            <span id="{!wosec.workOrderID}" class="ta-accordion-header-button slds-float_right'" onclick="{!c.handleRedirectToObject}">
+                                                                                {! $Label.c.TA_ToComplete }
+                                                                            </span>
+                                                                            <aura:set attribute="else">
+                                                                                <span class="slds-align_absolute-center">
+                                                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/check-white.svg'}"/>
+                                                                                </span>
+                                                                            </aura:set>
+                                                                        </aura:if>
+                                                                </lightning:layoutItem>
+                                                            </aura:if>
+                                                        </lightning:layout>
+                                                    </aura:iteration>
+                                                </ul>                                                    
+                                            </lightning:layoutItem>
+                                        </aura:if>
+                                    </aura:if>
+                                </lightning:layout>
+                            </aura:iteration>
+                        </lightning:layoutItem>
+                    </aura:if>
+
+                </lightning:layout>
+            </div>
+        </lightning:layout>
+    </aura:if>
+
+</aura:component>

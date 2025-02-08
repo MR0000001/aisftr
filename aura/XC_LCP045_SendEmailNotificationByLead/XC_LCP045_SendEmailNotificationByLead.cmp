@@ -1,0 +1,16 @@
+<!-- component -->
+<aura:component controller="XC_LCC039_CustomerInteraction" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasSObjectName,lightning:availableForFlowScreens" access="global" >
+    <!-- components attributes -->
+    <aura:attribute name="recordId" type="String"  />
+    <!--<aura:attribute name="recipient" type="String"  />-->
+    <!--<aura:attribute name="email" type="String"  />-->
+    <aura:attribute name="customerInteraction" type="Map" />
+    
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>  
+    <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+        <lightning:spinner aura:id="mySpinner" />
+    </div>
+    
+    
+</aura:component>

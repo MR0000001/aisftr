@@ -1,0 +1,567 @@
+<aura:component controller="TA_LCC217_Interventions"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                access="global">
+
+    <!--ATTRIBUTE-->
+    <aura:attribute access="public" name="buttonType" type="String" />
+    <aura:attribute access="public" name="formRecordTypeId" type="String" />
+    <aura:attribute access="public" name="objectName" type="String" default="WorkOrderLineItem" />
+    <aura:attribute access="public" name="parentId" type="String" />
+    <aura:attribute access="public" name="checkLegalEntity" type="Boolean" default="false" />
+
+    <aura:attribute access="private" name="infoBag" type="Object" />
+    <aura:attribute access="private" name="customerCardBg" type="String" />
+    <aura:attribute access="private" name="allWoliClosed" type="Boolean" default="false" />
+    <aura:attribute access="private" name="percentageOfCompletion" type="Integer" default="0" />
+    <aura:attribute access="private" name="isDevHub" type="Boolean" default="false" description="if is false call Doxee, else content document" />
+    <aura:attribute access="private" name="showComponentCreateRecord" type="Boolean" default="false" />
+    <aura:attribute access="private" name="showComponentFlow" type="Boolean" default="false" />
+    <aura:attribute access="private" name="showComponentEditRecord" type="Boolean" default="false" />
+    <aura:attribute access="private" name="recordSubmitId" type="String" />
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false" />
+
+    <!--Add Product Consumed-->
+    <aura:attribute access="private" name="showComponentAddPC" type="Boolean" default="false" />
+    <aura:attribute access="private" name="WOLIRecordId" type="String" default="false" />
+
+    <!--Good Issue Execution-->
+    <aura:attribute access="private" name="showComponentGoodIssue" type="Boolean" default="false" />
+
+    <!--RMA Execution-->
+    <aura:attribute access="private" name="showComponentRMA" type="Boolean" default="false" />
+
+    <!--Select warehouse-->
+    <aura:attribute access="private" name="showComponentWarehouse" type="Boolean" default="false" />
+
+    <!--Approval Process-->
+    <aura:attribute access="private" name="showComponentApprl" type="Boolean" default="false" />
+    <aura:attribute access="private" name="modalTitle" type="String" default="" />
+    <aura:attribute access="private" name="comments" type="String" default="" />
+
+    <!-- CONFIGURATIONS -->
+    <aura:attribute access="public" name="workOrderId" type="String" />
+    <aura:attribute access="public" name="cmpName" type="String" />
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="private" name="general" type="Object" />
+    <aura:attribute access="private" name="custom" type="Object" />
+    <aura:attribute access="private" name="title" type="String" />
+    <aura:attribute access="private" name="description" type="String" />
+
+    <!--ATTRIBUTE RECORDTYPE-->
+    <aura:attribute access="private" name="photo" type="String" default="XC_ESP_Woli_Photo" />
+    <aura:attribute access="private" name="manualDialing" type="String" default="XC_ESP_Woli_ManualDialing" />
+    <aura:attribute access="private" name="measure" type="String" default="XC_ESP_Woli_Measure" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:handler event="c:TA_LCE224_Refresh" action="{!c.handleRefresh}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/>
+    <aura:registerEvent name="validationEvt" type="c:TA_LCE199_Validation"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.showComponentGoodIssue}">
+        <c:TA_LCP248_GoodIssueExecution recordId="{!v.WOLIRecordId}"/>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showComponentRMA}">
+        <c:TA_LCP249_RMAExecution recordId="{!v.WOLIRecordId}"/>
+    </aura:if>
+
+    <!--START B2B FLOW TA-->
+    <aura:if isTrue="{!v.showComponentFlow}">
+        <lightning:layout multipleRows="true" class="{!if(v.showComponentFlow, 'flowComponent slds-p-around_small', 'slds-hide')}">
+            <lightning:layoutItem size="12">
+                <div class="slds-modal__content slds-p-around__medium">
+                    <lightning:layout multipleRows="true" class="{!if(v.showComponentFlow, 'slds-show ta-modal-bg', 'slds-hide')}">
+                        <lightning:layoutItem size="12" class="ta-flow-container ta-modal-container">
+                            <lightning:layoutItem size="12">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="10" class="ta-modal-header-title-purple slds-text-align_left">
+                                        {!v.modalTitle}
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="2" class="slds-text-align_right slds-m-bottom_large">
+                                        <img src="{!$Resource.TA_Icons + '/xc-icons/close.svg'}" onclick="{!c.handleManageShowComponent}" class="ta-icon-close" />
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </lightning:layoutItem>
+
+                            <lightning:flow aura:id="flowData" onstatuschange="{!c.handleStatusChange}" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </aura:if>
+    <!--END B2B FLOW TA-->
+
+    <!-- START TA_LCP251_SelectWarehouse -->
+    <c:TA_LCP251_SelectWarehouse isInitialized="{!v.showComponentWarehouse}" recordId="{!v.WOLIRecordId}"/>
+    <!-- END TA_LCP251_SelectWarehouse -->
+
+    <!-- START TA_LCP246_AddNewProductRequired -->
+    <c:TA_LCP246_AddNewProductRequired aura:id="addPCComponent" isInitialized="{!v.showComponentAddPC}" recordId="{!v.WOLIRecordId}" />
+    <!-- START TA_LCP246_AddNewProductRequired -->
+
+    <!--START B2B Approval Process-->
+    <aura:if isTrue="{!v.showComponentApprl}">
+        <lightning:layout multipleRows="true" class="{!if(v.showComponentApprl, 'flowComponent slds-p-around_small', 'slds-hide')}">
+            <lightning:layoutItem size="12">
+                <div class="ta-modal-bg">
+                    <lightning:layout multipleRows="true" class="{!if(v.showComponentApprl, 'slds-show ta-modal-bg', 'slds-hide')}">
+                        <lightning:layoutItem size="12" class="ta-flow-container ta-modal-container">
+                            <lightning:layoutItem size="12">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="10" class="ta-modal-header-title-purple slds-text-align_left">
+                                        <aura:unescapedHtml value="{!v.modalTitle}"/>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="2" class="slds-text-align_right slds-m-bottom_large">
+                                        <img src="{!$Resource.TA_Icons + '/xc-icons/close.svg'}" onclick="{!c.handleManageShowComponentApproval}" class="ta-icon-close" />
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="12">
+                                        <lightning:textarea label="{!$Label.c.TA_InterventionsComments}" value="{!v.comment}"></lightning:textarea>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                                <lightning:layoutItem size="12" class="ta-modal-footer-two-button">
+                                    <lightning:layout multipleRows="true">
+                                        <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                            <lightning:button class="ta-button-closing-modal" label="{!$Label.c.TA_Cancel}" onclick="{!c.handleManageShowComponentApproval}" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="12">
+                                            <lightning:button class="ta-button-primary-modal" label="{!$Label.c.TA_InterventionsSend}" onclick="{!c.handleApprovalRequest}" />
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </lightning:layoutItem>
+                            </lightning:layoutItem>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </aura:if>
+    <!--END B2B Approval Process-->
+
+    <!--<aura:if isTrue="{!and(v.isInitialized, or(or(v.custom.createRecordModal == 'true', v.infoBag.numberOfWoli > 0), v.infoBag.actionResponse == 'KO'))}">-->
+        <!-- CONTAINER -->
+        <lightning:layout multipleRows="true" class="slds-m-top_large slds-m-left_small slds-m-right_small">
+            <div class="ta-accordion-header"
+                 style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover;
+                    background-position:' + v.general.bgPosition + '; background-color: ' + v.general.bgColor + '; box-shadow: 0vw 1vw 2vw -0.8vw black;
+                    background-blend-mode: lighten; border-radius: 2.5vw; width: 100%'}">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" class="ta-border-bottom-white slds-p-bottom_medium slds-m-bottom_medium">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="10">
+                                <!--<h3 class="ta-color-white">{!v.title}</h3>-->
+
+                                <!-- Show label component -->
+                                <aura:if isTrue="{!and(v.isInitialized, or(or(v.custom.createRecordModal == 'true', v.infoBag.numberOfWoli > 0), v.infoBag.actionResponse == 'KO'))}">
+                                    <h3 class="ta-color-white">{!v.title}</h3>
+                                </aura:if>
+                                <aura:if isTrue="{!and(v.isInitialized, and(v.custom.createRecordModal != 'true', v.infoBag.numberOfWoli == null))}">
+                                    <h3 class="ta-color-white">{!$Label.c.TA_NoWorkOrderLineItem}</h3>
+                                </aura:if>
+
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="2">
+                                <div class="chart" id="graph" data-percent="{!v.percentageOfCompletion}"></div>
+                            </lightning:layoutItem>
+                            <aura:if isTrue="{!v.custom.createRecordModal == 'true'}">
+                                <div onclick="{!c.handleCreateRecord}" class="{!if(v.custom.isReminder == 'true','slds-hide','ta-accordion-header-button slds-text-align_center')}"> {!$Label.c.XC_CL_New} </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.infoBag.actionResponse == 'KO'}">
+                                <lightning:layoutItem size="3" class="slds-text-align_right">
+                                    <div class="{!if(v.custom.isReminder == 'true','slds-hide','ta-accordion-header-button slds-float_left slds-text-align_center')}" onclick="{!c.doInit}" name="refreshButton"> {!$Label.c.XC_CL_RefreshButton} </div>
+                                </lightning:layoutItem>
+                            </aura:if>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <!-- CREATE WOLI -->
+                    <aura:if isTrue="{!v.showComponentCreateRecord}">
+                        <lightning:layoutItem size="12" class="slds-p-around_small">
+                            <div class="slds-modal__content slds-p-around__medium">
+                                <c:TA_LCP243_CreateRecordModal aura:id="createModalComponent"
+                                    objectName='{!v.objectName}'
+                                    parentId="{!v.parentId}"
+                                    showComponent='{!v.showComponentCreateRecord}'
+                                    custom='{!v.custom}'
+                                    buttonType='{!v.buttonType}'
+                                    recordId='{!v.recordSubmitId}'
+                                    showFormModal='{!v.showComponentEditRecord}'
+                                    formRecordTypeId="{!v.formRecordTypeId}"
+                                    checkLegalEntityRT="{!v.checkLegalEntity}"
+                                />
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:if>
+
+                    <aura:if isTrue="{!v.infoBag.numberOfWoli > 0}">
+                        <!-- MACRO BLOCK ITERATION -->
+                        <aura:iteration items="{!v.infoBag.macroBlockList}" var="macroBlock" indexVar="indexj">
+
+                            <!-- ACCORDION BLOCK SECTION -->
+                            <lightning:layoutItem size="12" class="{!if(macroBlock.blockColor == 'green', 'ta-section-green', if(macroBlock.blockColor == 'orange', 'ta-section-orange', 'ta-section-red'))}">
+                                <div title="{!macroBlock.blockName}" onclick="{!c.handleShowDetail}">
+                                    <lightning:layout multipleRows="true">
+                                        <!-- ACCORDION BLOCK SECTION NAME -->
+                                        <lightning:layoutItem size="11" class="slds-p-around_xx-small">
+                                            <div class="ta-section-title"> {!macroBlock.blockName} </div>
+                                        </lightning:layoutItem>
+
+                                        <!-- ACCORDION BLOCK ICON -->
+                                        <lightning:layoutItem size="1">
+                                            <aura:if isTrue="{!not(macroBlock.showExpandButton)}">
+                                                <img src="{!$Resource.TA_Icons + '/xc-icons/arrow-down-white.svg'}" class="slds-p-vertical_x-small" />
+                                                <aura:set attribute="else">
+                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/arrow-up-white.png' }" class="slds-p-vertical_x-small" />
+                                                </aura:set>
+                                            </aura:if>
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </div>
+
+                                <aura:if isTrue="{!macroBlock.showExpandButton}">
+                                    <!-- ACCORDION SUB SECTION WOLI -->
+                                    <lightning:layout multipleRows="true" class="slds-m-around_xx-small">
+                                        <aura:iteration items="{!macroBlock.woliListWrapper}" var="woli" indexVar="index">
+                                            <aura:if isTrue="{!woli.macroBlocNumber != null}">
+                                                <!-- SECTION DESCRIPTION -->
+                                                <lightning:layoutItem size="12" class="ta-section-description">
+                                                    <lightning:layout multipleRows="true">
+                                                        <lightning:layoutItem size="11">
+                                                            <div class="slds-is-relative">
+                                                                <span class="slds-float_left"> {!$Label.c.TA_InterventionsDescription} </span>
+                                                                <aura:if isTrue="{!woli.required}">
+                                                                    <span class="ta-required">*</span>
+                                                                </aura:if>
+                                                            </div>
+                                                        </lightning:layoutItem>
+                                                        <lightning:layoutItem size="1">
+                                                            <aura:if isTrue="{!woli.description != null}">
+                                                                <lightning:icon id="{!woli.Id}" class="ta-info" iconName="utility:info" size="x-small" onclick="{!c.handleShowDescription}" />
+                                                            </aura:if>
+                                                        </lightning:layoutItem>
+                                                        <aura:if isTrue="{!woli.showDescription}">
+                                                            <lightning:layoutItem size="12" class="ta-description">
+                                                                {!woli.description}
+                                                            </lightning:layoutItem>
+                                                        </aura:if>
+                                                    </lightning:layout>
+                                                </lightning:layoutItem>
+
+                                                <!-- SECTION ACTIVITY NAME -->
+                                                <lightning:layoutItem size="12" class="slds-m-bottom_small slds-m-top_small">
+                                                    <lightning:layout multipleRows="true">
+                                                        <lightning:layoutItem size="1">
+                                                            <aura:if isTrue="{!woli.status == 'Closed'}">
+                                                                <img src="{!$Resource.TA_Icons + '/xc-icons/check-white.svg'}" class="slds-float_left slds-m-right_small ta-icon-check"/>
+                                                                <aura:set attribute="else">
+                                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" class="slds-float_left slds-m-right_small ta-icon-close"/>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </lightning:layoutItem>
+                                                        <lightning:layoutItem size="11">
+                                                            <p> {!woli.activityName} </p>
+                                                        </lightning:layoutItem>
+                                                    </lightning:layout>
+                                                </lightning:layoutItem>
+
+                                                <!-- ACCORDION WOLI WITHOUT BLOCK NUMBER -->
+                                                <aura:set attribute="else">
+                                                    <lightning:layoutItem size="12" class="ta-section-description">
+                                                        <div class="slds-p-bottom_small ta-wolitype ta-color-white">{!woli.WOLIType}</div>
+
+                                                        <aura:if isTrue="{!v.custom.isReminder != 'true'}">
+                                                            <lightning:layout multipleRows="true">
+                                                                <aura:iteration items="{!woli.actions.actions}" var="action">
+                                                                    <aura:if isTrue="{!(and(action.type=='QuickAction',or(action.subtype=='LightningComponent',action.subtype=='Flow')) || or(action.apiName=='Edit',action.apiName=='Submit'))}">
+                                                                        <lightning:layoutItem size="12" class="slds-p-bottom_small">
+                                                                            <div id="{!woli.Id}" name="{!woli.Id+'$'+woli.rtId+'$'+action.apiName+'$'+action.targetObject+'$'+action.label}" onclick="{!c.handleAction}" class="ta-accordion-header-button slds-text-align_center">
+                                                                                <aura:unescapedHtml value="{!action.label}"/>
+                                                                            </div>
+                                                                        </lightning:layoutItem>
+                                                                    </aura:if>
+                                                                </aura:iteration>
+                                                            </lightning:layout>
+                                                        </aura:if>
+
+                                                        <lightning:layout multipleRows="true">
+                                                            <lightning:layoutItem size="12">
+                                                                <div class="slds-is-relative">
+                                                                    <span class="slds-float_left"> {!$Label.c.TA_InterventionsNumber} </span>
+                                                                </div>
+                                                            </lightning:layoutItem>
+                                                            <lightning:layoutItem size="12" class="ta-description">
+                                                                {!woli.lineItemNumber}
+                                                            </lightning:layoutItem>
+                                                        </lightning:layout>
+                                                        <lightning:layout multipleRows="true">
+                                                            <lightning:layoutItem size="12">
+                                                                <div class="slds-is-relative">
+                                                                    <span class="slds-float_left"> {!$Label.c.TA_InterventionsStatus} </span>
+                                                                </div>
+                                                            </lightning:layoutItem>
+                                                            <lightning:layoutItem size="12" class="ta-description">
+                                                                {!woli.statusLabel}
+                                                            </lightning:layoutItem>
+                                                        </lightning:layout>
+                                                        <lightning:layout multipleRows="true">
+                                                            <lightning:layoutItem size="12">
+                                                                <div class="slds-is-relative">
+                                                                    <span class="slds-float_left"> {!$Label.c.TA_InterventionsActivity} </span>
+                                                                </div>
+                                                            </lightning:layoutItem>
+                                                            <lightning:layoutItem size="12" class="ta-description">
+                                                                {!woli.activityName}
+                                                            </lightning:layoutItem>
+                                                        </lightning:layout>
+
+                                                        <!-- START | ENXCRM-136 - BGO - 04062021 -->
+                                                        <lightning:layout multipleRows="true">
+                                                            <lightning:layoutItem size="12">
+                                                                <div class="slds-is-relative">
+                                                                    <span class="slds-float_left"> {!$Label.c.TA_InterventionsDescription} </span>
+                                                                </div>
+                                                            </lightning:layoutItem>
+                                                            <lightning:layoutItem size="12" class="ta-description">
+                                                                {!woli.description}
+                                                            </lightning:layoutItem>
+                                                        </lightning:layout>
+                                                        <!-- END | ENXCRM-136 - BGO - 04062021 -->
+
+                                                        <!-- START PRODUCT CONSUMED ACCORDION -->
+                                                        <aura:if isTrue="{!woli.productConsumedBl.showAccordion}">
+                                                            <lightning:layoutItem size="12" class="ta-section">
+                                                                <div id="{!'ProductConsumed_' + indexj + '_' + index}" class="ta-section-green" onclick="{!c.handleShowChildRecord}">
+                                                                    <lightning:layout multipleRows="true">
+                                                                        <lightning:layoutItem size="9" class="slds-p-around_xx-small ta-section-title">
+                                                                            {!$Label.c.TA_InterventionsProductConsumed} ({!woli.productConsumedBl.recordList.length})
+                                                                        </lightning:layoutItem>
+                                                                        <lightning:layoutItem size="3" class="slds-p-around_xx-small">
+                                                                            <aura:if isTrue="{!and(v.custom.isReminder != 'true', woli.productConsumedBl.newRecord)}">
+                                                                                <div id="{!woli.Id+'_PCNew'}" onclick="{!c.handleCreateProductConsumed}" class="ta-accordion-header-button slds-text-align_center">
+                                                                                    {!$Label.c.XC_CL_New}
+                                                                                </div>
+                                                                            </aura:if>
+                                                                        </lightning:layoutItem>
+                                                                    </lightning:layout>
+
+                                                                    <aura:if isTrue="{!woli.productConsumedBl.showRecord}">
+                                                                        <aura:iteration items="{!woli.productConsumedBl.recordList}" var="productConsumed">
+                                                                            <lightning:layout multipleRows="true" class="ta-section-description">
+                                                                                <aura:iteration items="{!productConsumed.fieldToShow}" var="field">
+                                                                                    <lightning:layoutItem size="12" class="slds-is-relative slds-float_left">
+                                                                                        {!field.label}
+                                                                                    </lightning:layoutItem>
+                                                                                    <lightning:layoutItem size="12" class="ta-description">
+                                                                                        {!field.value}
+                                                                                    </lightning:layoutItem>
+                                                                                </aura:iteration>
+
+                                                                                <aura:if isTrue="{!v.custom.isReminder != 'true'}">
+                                                                                    <lightning:layoutItem size="12" class="slds-p-top_small">
+                                                                                        <lightning:layout multipleRows="true">
+                                                                                            <lightning:layoutItem size="6" class="slds-p-left_xx-small slds-p-right_xx-small">
+                                                                                                <div id="{!productConsumed.record.Id}" name="{!productConsumed.record.RecordTypeId}" onclick="{!c.handleEditPCRecord}" class="ta-accordion-header-button slds-text-align_center">
+                                                                                                    {!$Label.c.TA_Edit}
+                                                                                                </div>
+                                                                                            </lightning:layoutItem>
+                                                                                            <lightning:layoutItem size="6" class="slds-p-left_xx-small slds-p-right_xx-small">
+                                                                                                <aura:if isTrue="{!productConsumed.record.TAM_Asset__c != null}">
+                                                                                                    <div id="{!productConsumed.record.TAM_Asset__c}" name="{!productConsumed.record.TAM_Asset__r.RecordTypeId}" onclick="{!c.handleEditTARecord}" class="ta-accordion-header-button slds-text-align_center">
+                                                                                                        {!$Label.c.TA_InterventionsEditAsset}
+                                                                                                    </div>
+                                                                                                </aura:if>
+                                                                                            </lightning:layoutItem>
+                                                                                        </lightning:layout>
+                                                                                    </lightning:layoutItem>
+                                                                                </aura:if>
+                                                                            </lightning:layout>
+                                                                        </aura:iteration>
+                                                                    </aura:if>
+                                                                </div>
+                                                            </lightning:layoutItem>
+                                                        </aura:if>
+                                                        <!-- END PRODUCT CONSUMED ACCORDION -->
+
+                                                        <!-- START PRODUCT REQUIRED ACCORDION -->
+                                                        <aura:if isTrue="{!woli.productRequiredBl.showAccordion}">
+                                                            <lightning:layoutItem size="12" class="ta-section">
+                                                                <div id="{!'ProductRequired_' + indexj + '_' + index}" class="ta-section-green" onclick="{!c.handleShowChildRecord}">
+                                                                    <lightning:layout multipleRows="true">
+                                                                        <lightning:layoutItem size="12" class="slds-p-around_xx-small ta-section-title">
+                                                                            {!$Label.c.TA_InterventionsProductRequired} ({!woli.productRequiredBl.recordList.length})
+                                                                        </lightning:layoutItem>
+                                                                    </lightning:layout>
+
+                                                                    <aura:if isTrue="{!woli.productRequiredBl.showRecord}">
+                                                                        <aura:iteration items="{!woli.productRequiredBl.recordList}" var="productRequired">
+                                                                            <lightning:layout multipleRows="true" class="ta-section-description">
+                                                                                <aura:iteration items="{!productRequired.fieldToShow}" var="field">
+                                                                                    <lightning:layoutItem size="12" class="slds-is-relative slds-float_left">
+                                                                                        {!field.label}
+                                                                                    </lightning:layoutItem>
+                                                                                    <lightning:layoutItem size="12" class="ta-description">
+                                                                                        {!field.value}
+                                                                                    </lightning:layoutItem>
+                                                                                </aura:iteration>
+                                                                            </lightning:layout>
+                                                                        </aura:iteration>
+                                                                    </aura:if>
+                                                                </div>
+                                                            </lightning:layoutItem>
+                                                        </aura:if>
+                                                        <!-- END PRODUCT REQUIRED ACCORDION -->
+
+                                                        <!-- START POSITION REQUIRED ACCORDION -->
+                                                        <aura:if isTrue="{!woli.positionRequiredBl.showAccordion}">
+                                                            <lightning:layoutItem size="12" class="ta-section">
+                                                                <div id="{!'PositionRequired_' + indexj + '_' + index}" class="ta-section-green" onclick="{!c.handleShowChildRecord}">
+                                                                    <lightning:layout multipleRows="true">
+                                                                        <lightning:layoutItem size="12" class="slds-p-around_xx-small ta-section-title">
+                                                                            {!$Label.c.TA_InterventionsRequiredPosition} ({!woli.positionRequiredBl.recordList.length})
+                                                                        </lightning:layoutItem>
+                                                                    </lightning:layout>
+
+                                                                    <aura:if isTrue="{!woli.positionRequiredBl.showRecord}">
+                                                                        <aura:iteration items="{!woli.positionRequiredBl.recordList}" var="positionRequired">
+                                                                            <lightning:layout multipleRows="true" class="ta-section-description">
+                                                                                <aura:iteration items="{!positionRequired.fieldToShow}" var="field">
+                                                                                    <lightning:layoutItem size="12" class="slds-is-relative slds-float_left">
+                                                                                        {!field.label}
+                                                                                    </lightning:layoutItem>
+                                                                                    <lightning:layoutItem size="12" class="ta-description">
+                                                                                        {!field.value}
+                                                                                    </lightning:layoutItem>
+                                                                                </aura:iteration>
+                                                                            </lightning:layout>
+                                                                        </aura:iteration>
+                                                                    </aura:if>
+                                                                </div>
+                                                            </lightning:layoutItem>
+                                                        </aura:if>
+                                                        <!-- END POSITION REQUIRED ACCORDION -->
+                                                    </lightning:layoutItem>    
+                                                </aura:set>
+                                            </aura:if>
+
+                                            <!-- ACCORDION WOLI PHOTO -->
+                                            <aura:if isTrue="{!woli.rtDeveloperName == v.photo}">
+                                                <aura:if isTrue="{!v.isDevHub}">
+                                                    <lightning:layoutItem size="12" class="slds-text-align_right">
+                                                        <lightning:fileUpload name="fileUploader" multiple="true" recordId="{!woli.Id}" onuploadfinished="{!c.handleSearchDocument}" />
+                                                    </lightning:layoutItem>
+
+                                                    <aura:iteration items="{!woli.contentVersionList}" var="cv">
+                                                        <lightning:layoutItem size="6" class="slds-m-top_medium slds-is-relative slds-text-align_center">
+                                                            <div class="ta-img-container">
+                                                                <img src="{!v.infoBag.baseUrl + cv.Id}" class="ta-box-photo" />
+                                                                <div class="ta-button-close">
+                                                                    <img id="{!cv.ContentDocumentId}" name="{!woli.Id}" src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" class="ta-icon-close-size" onclick="{!c.handleRemovePhoto}" />
+                                                                </div>
+                                                            </div>
+                                                        </lightning:layoutItem>
+                                                    </aura:iteration>
+
+                                                    <aura:set attribute="else">
+                                                        <lightning:layoutItem size="12" class="slds-text-align_right">
+                                                            <!-- START FIX [ADC16/08/2021] ENXCRM-197 -->
+                                                            <!--<lightning:input type="file" name="{!woli.lineItemNumber}" multiple="true" id="{!woli.Id}" onchange="{!c.handleCallDoxee }"/>-->
+                                                            <label class="ta-input-file-label" for="inputFile">
+                                                                <div class="ta-input-file-text">
+                                                                    <lightning:icon iconName="utility:upload" variant="inverse" size="x-small"/>
+                                                                    &nbsp; {!$Label.c.TA_UploadPhoto}
+                                                                </div>
+                                                                <lightning:input type="file" name="{!woli.lineItemNumber}" multiple="true" id="{!woli.Id}" onchange="{!c.handleCallDoxee }" class="ta-input-file-standard"/>
+                                                            </label>
+                                                            <!-- END FIX [ADC16/08/2021] ENXCRM-197 -->
+                                                        </lightning:layoutItem>
+                                                        <aura:iteration items="{!woli.doxeeUrlManList}" var="dum">
+                                                            <lightning:layoutItem size="6" class="slds-m-top_medium slds-is-relative slds-text-align_center">
+                                                                <div class="ta-img-container"> 
+                                                                    <!-- START FIX [ADC27/05/2021] ENXCRM-118 aggiunta estensione per i pdf -->                                                                   
+                                                                    <!--<img src="{!dum.TA_DoxeeURL__c}" class="ta-box-photo" />-->
+                                                                    <aura:if isTrue="{!dum.TA_isPdf__c}">
+                                                                        <div class="ta-box-photo-blank">
+                                                                            <a href="{!dum.TA_DoxeeURL__c}" target="_blank">
+                                                                                <img src="{!$Resource.TA_Icons + '/xc-icons/pdf-icon.svg'}" class="ta-pdf-icon"/>
+                                                                            </a>
+                                                                            <div class="ta-pdf-name">
+                                                                                {!dum.TA_FileName__c}
+                                                                            </div>   
+                                                                        </div>
+                                                                    </aura:if>  
+                                                                    <aura:if isTrue="{!dum.TA_isDoc__c}">
+                                                                        <div class="ta-box-photo-blank">
+                                                                            <a href="{!dum.TA_DoxeeURL__c}" target="_blank">
+                                                                                <img src="{!$Resource.TA_Icons + '/xc-icons/word-icon.svg'}" class="ta-word-icon"/>
+                                                                            </a>
+                                                                            <div class="ta-pdf-name">
+                                                                                {!dum.TA_FileName__c}
+                                                                            </div>   
+                                                                        </div>
+                                                                    </aura:if> 
+                                                                    <aura:if isTrue="{!and(not(dum.TA_isPdf__c),not(dum.TA_isDoc__c))}">
+                                                                        <img src="{!dum.TA_DoxeeURL__c}" class="ta-box-photo" />
+                                                                    </aura:if>
+                                                                     
+                                                                    <!-- END FIX [ADC27/05/2021] ENXCRM-118 aggiunta estensione per i pdf -->
+                                                                    <div class="ta-button-close">
+                                                                        <img id="{!woli.Id}" name="{!woli.lineItemNumber}" title="{!dum.TA_DoxeeURL__c}" src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" class="ta-icon-close-size" onclick="{!c.handleDeletePhoto}" />
+                                                                    </div>
+                                                                </div>
+                                                            </lightning:layoutItem>
+                                                        </aura:iteration>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </aura:if>
+
+                                            <!-- ACCORDION WOLI MANUAL DIALING/DIALOG -->
+                                            <aura:if isTrue="{!and(woli.rtDeveloperName == v.manualDialing, not(empty(woli.buttonWrapperList)))}">
+                                                <aura:if isTrue="{!not(empty(woli.macroBlocNumber))}">
+                                                    <aura:iteration items="{!woli.buttonWrapperList}" var="button">
+                                                        <lightning:layoutItem size="6" class="slds-p-right_medium">
+                                                            <div id="{!woli.lineItemNumber}" class="{!if(woli.technicianResponse == button.value, 'ta-button-simple-disabled', 'ta-button-simple')}" onclick="{!c.handleCloseWoli}" name= "{!button.value}">
+                                                            {!button.label}
+                                                        </div>
+                                                        </lightning:layoutItem>
+                                                    </aura:iteration>
+                                                </aura:if>
+                                            </aura:if>
+
+                                            <!-- ACCORDION WOLI MEASURE -->
+                                            <aura:if isTrue="{!woli.rtDeveloperName == v.measure}">
+                                                <lightning:layoutItem size="10">
+                                                    <p> {!woli.measurementUnitOne} </p>
+                                                    <lightning:input class="ta-font-weight-800 ta-color-black" value="{!woli.measurementValueOne}" formatter="decimal" step="0.01" type="number" placeholder="insert value..." name="{!woli.Id}" onblur="{!c.handleInsertMeasure}"/>
+                                                </lightning:layoutItem>
+                                                <lightning:layoutItem size="1">
+                                                    <aura:if isTrue="{!woli.showWarning}">
+                                                        <lightning:icon iconName="utility:warning" size="small" class="ta-warning" />
+                                                    </aura:if>
+                                                </lightning:layoutItem>
+                                            </aura:if>
+                                        </aura:iteration>
+                                    </lightning:layout>
+                                </aura:if>
+                            </lightning:layoutItem>
+                        </aura:iteration>
+                    </aura:if>
+                </lightning:layout>
+            </div>
+        </lightning:layout>
+</aura:component>

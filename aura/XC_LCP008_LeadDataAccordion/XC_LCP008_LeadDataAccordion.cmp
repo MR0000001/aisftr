@@ -1,0 +1,22 @@
+<aura:component implements="force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+  	<aura:attribute name="activeSections" type="List" /> 
+    <aura:attribute name="activeSectionName" type="String" />   
+    <lightning:card title="360">
+        <lightning:accordion onsectiontoggle="{! c.handleSectionToggle }" activeSectionName="{! v.activeSectionName }">
+            <lightning:accordionSection name="A" label="{!$Label.c.XC_CL_360View}">
+                <aura:set attribute="body">
+                    <aura:if isTrue="{!v.activeSectionName == 'A'}">
+                        <p> {!$Label.c.XC_CL_CustomMessageExternalSystem} </p>
+                    </aura:if>
+                </aura:set>
+            </lightning:accordionSection>
+            <lightning:accordionSection name="B" label="{!$Label.c.XC_CL_CommodityInfo}">
+                <aura:set attribute="body">
+                    <aura:if isTrue="{!v.activeSectionName == 'B'}">
+                        <c:XC_LCP008_LeadCallToCommodity/>
+                    </aura:if>
+                </aura:set>
+            </lightning:accordionSection> 
+        </lightning:accordion>
+    </lightning:card>
+</aura:component>

@@ -1,0 +1,20 @@
+<aura:component controller="XC_LCC188_ProjectMaintenanceService" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:actionOverride" access="global" >
+    <!--Attribute-->
+    <aura:attribute name="projDefaultStartDate" type="Date" default=" " />
+	<aura:attribute name="recordId" type="String" /> 
+    <aura:attribute name="projStartDate" type="Date"/>
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    <!--input-->
+        <div class="row">     
+         <lightning:input type="date"  name="input1" label="Insert Maintenance Service Start Date" value="{!v.projStartDate}" />
+    <br/>
+     <!--Create project button-->
+    <ui:button  aura:id="button" buttonTitle="Click to see what you put into the field"  
+                label="Create Reminder Project Task" press="{!c.CreateProject}"/>         
+    </div>
+    
+     
+       
+     
+    
+ </aura:component>

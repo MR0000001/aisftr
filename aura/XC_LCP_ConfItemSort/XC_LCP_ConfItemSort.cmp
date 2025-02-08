@@ -1,0 +1,26 @@
+<aura:component controller="XC_LCC_ConfItemHierController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasSObjectName,lightning:availableForFlowScreens" access="global">
+    <aura:attribute name="recordId" type="String" />  
+    <aura:attribute name="Confs" type="String"/>
+    <aura:attribute name="mycolumns" type="List"/>
+    <aura:attribute name="configurationItemHierarchy" type="NE__OrderItem__c[]"/>
+    <aura:attribute name="checkCommType" type="Integer"/> <!--CR758-->
+         <aura:handler name="init" value="{!this}" action="{!c.init}" />
+        
+        <p class="field-title" title="Componente dell'Ordine"><b>Componente dell'ordine</b></p>
+         
+        <div class= 'slds-text-links' style="height: 800px;">
+            <lightning:datatable 
+              data="{! v.configurationItemHierarchy }"
+              columns="{! v.mycolumns }"
+              keyField="id"
+              hideCheckboxColumn="true" 
+            /></div> 
+            <!-- 
+          <aura:set attribute="cellDecorators">
+            <c:XC_LCP_ConfItemSort />
+          </aura:set>
+          <aura:set attribute="cellEditors">
+            <c:defaultEditor />
+          </aura:set>
+          -->
+</aura:component>

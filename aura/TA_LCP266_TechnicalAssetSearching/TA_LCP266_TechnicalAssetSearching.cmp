@@ -1,0 +1,219 @@
+<aura:component controller="TA_LCC266_TechnicalAssetSearching"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global">
+
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="public" name="isOpen" type="Boolean" default="false" />
+    <aura:attribute access="private" name="infoBag" type="Object" />
+    
+    <aura:attribute access="private" name="city" type="String"/>
+    <aura:attribute access="private" name="assetNameLike" type="String"/>
+    <aura:attribute access="private" name="assets" type="List"/>
+    <aura:attribute access="public" name="selectedAsset" type="Object"/>
+    <aura:attribute access="private" name="step" type="String" default="search"/>
+
+    <aura:attribute name="mapMarkers" type="List" default="[]"/>
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="change" value="{!v.isOpen}" action="{!c.handleIsOpen}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isOpen}">
+        <div class="ta-full-screen-modal-container">
+            <div class="ta-full-screen-modal-header">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="11" class="slds-text-align_left">
+                        <h3 class="ta-color-black"> {!v.step == 'search' ? $Label.c.TA_TechnicalAssetSelection : $Label.c.TA_TechnicalAssetDetails}</h3>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="1">
+                        <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" class="ta-full-screen-modal-header-button" onclick="{!c.handleCloseModal}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+
+            <div class="ta-full-screen-modal-body">
+
+                <aura:if isTrue="{!v.step == 'search'}">
+                    <lightning:layout multipleRows="true" class="ta-align-items-center">
+                        <!-- SEARCH & FILTERS -->
+                        <lightning:layoutItem size="6">
+                            {!$Label.c.TA_City}
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="6" class="slds-m-bottom_x-small">
+                            <lightning:input type="text" name="searchText" value="{!v.city}" class="slds-m-top_x-small ta-search-text"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="6" class="slds-m-bottom_x-small">
+                            {!$Label.c.TA_InsertAssetName}
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="6" class="slds-m-bottom_large">
+                            <lightning:input type="text" name="searchText" value="{!v.assetNameLike}" class="slds-m-top_x-small ta-search-text"/>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="12">
+                            <button style="width: 100%;" class="ta-button-primary" name="searchButton" onclick="{!c.handleSearchAsset}">{!$Label.c.TA_Search}</button>
+                        </lightning:layoutItem>
+                        
+                        <!-- RESULTS -->
+                        <lightning:layoutItem size="12">
+                            <lightning:layout multipleRows="true">
+                                <aura:iteration items="{!v.assets}" var="asset">
+                                    <lightning:layoutItem size="12">
+                                        <div id="{!asset.id}" onclick="{!c.handleCardClick}" class="ta-asset-card">
+                                            <lightning:layout class="slds-wrap">
+                                                <lightning:layoutItem size="10">
+                                                    <h3 class="ta-color-black">{!asset.name}</h3>
+                                                </lightning:layoutItem>
+                                                <lightning:layoutItem size="2">
+                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/asset.svg'}" class="ta-icon-size-small slds-float_right" />
+                                                </lightning:layoutItem>
+    
+                                                <lightning:layoutItem size="12" class="slds-m-top_xx-small">
+                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/settings-pink.svg'}" class="ta-icon-16px slds-float_left slds-m-right_xx-small slds-m-top_xxx-small" />
+                                                    <p class="slds-float_left slds-m-left_xx-small ta-color-grey"> {!asset.serialNumber} {!asset.type ? '- ' + asset.type : null}{!asset.subType ? ', ' + asset.subType : null} </p>
+                                                </lightning:layoutItem>
+    
+                                                <lightning:layoutItem size="12" class="slds-m-top_x-small">
+                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/location-pink.svg'}" class="ta-icon-16px slds-float_left slds-m-right_xx-small slds-m-top_xxx-small" />
+                                                    <p class="slds-float_left slds-m-left_xx-small ta-color-grey"> {!asset.addressName} </p>
+                                                </lightning:layoutItem>
+    
+                                                <lightning:layoutItem size="12" class="slds-m-top_xx-small">
+                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/user-purple-pink.svg'}" class="ta-icon-16px slds-float_left slds-m-right_xx-small slds-m-top_xxx-small" />
+                                                    <p class="slds-float_left slds-m-left_xx-small ta-color-grey"> {!asset.accountName} </p>
+                                                </lightning:layoutItem>
+                                            </lightning:layout>
+                                        </div>
+                                    </lightning:layoutItem>
+                                </aura:iteration>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </aura:if>
+
+                <aura:if isTrue="{!v.step == 'details'}">
+                    <lightning:layout multipleRows="true">
+
+                        <lightning:layoutItem size="6" class="slds-m-bottom_medium">
+                            <lightning:layout multipleRows="true"> 
+                                <lightning:layoutItem size="12" class="slds-form-element__label">
+                                    {!$Label.c.TA_Name}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-value-container">
+                                    {!v.selectedAsset.name ? v.selectedAsset.name : '...'}
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="6" class="slds-m-bottom_medium">
+                            <lightning:layout multipleRows="true"> 
+                                <lightning:layoutItem size="12" class="slds-form-element__label">
+                                    {!$Label.c.TA_Product}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-value-container">
+                                    {!v.selectedAsset.productName ? v.selectedAsset.productName : '...'}
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="6" class="slds-m-bottom_medium">
+                            <lightning:layout multipleRows="true"> 
+                                <lightning:layoutItem size="12" class="slds-form-element__label">
+                                    {!$Label.c.TA_ProductType}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-value-container">
+                                    {!v.selectedAsset.type ? v.selectedAsset.type : '...'}
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="6" class="slds-m-bottom_medium">
+                            <lightning:layout multipleRows="true"> 
+                                <lightning:layoutItem size="12" class="slds-form-element__label">
+                                    {!$Label.c.TA_ProductSubtype}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-value-container">
+                                    {!v.selectedAsset.subType ? v.selectedAsset.subType : '...'}
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="6" class="slds-m-bottom_medium">
+                            <lightning:layout multipleRows="true"> 
+                                <lightning:layoutItem size="12" class="slds-form-element__label">
+                                    {!$Label.c.TA_SerialNumber}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-value-container">
+                                    {!v.selectedAsset.serialNumber ? v.selectedAsset.serialNumber : '...'}
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="6" class="slds-m-bottom_medium">
+                            <lightning:layout multipleRows="true"> 
+                                <lightning:layoutItem size="12" class="slds-form-element__label">
+                                    {!$Label.c.TA_Type}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-value-container">
+                                    {!v.selectedAsset.assetType ? v.selectedAsset.assetType : '...'}
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="6" class="slds-m-bottom_medium">
+                            <lightning:layout multipleRows="true"> 
+                                <lightning:layoutItem size="12" class="slds-form-element__label">
+                                    {!$Label.c.TA_Ownership}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-value-container">
+                                    {!v.selectedAsset.assetOwnership ? v.selectedAsset.assetOwnership : '...'}
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="6" class="slds-m-bottom_medium">
+                            <lightning:layout multipleRows="true"> 
+                                <lightning:layoutItem size="12" class="slds-form-element__label">
+                                    {!$Label.c.TA_ModelOrPartNumber}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-value-container">
+                                    {!v.selectedAsset.modelOrPartNumber ? v.selectedAsset.modelOrPartNumber : '...'}
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                            <lightning:layout multipleRows="true"> 
+                                <lightning:layoutItem size="12" class="slds-form-element__label">
+                                    {!$Label.c.TA_Address}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-value-container">
+                                    {!v.selectedAsset.addressName ? v.selectedAsset.addressName : '...'}
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <!-- DISPLAY MAP -->
+                        <aura:if isTrue="{!v.mapMarkers.length}">
+                            <lightning:layoutItem size="12" class="slds-m-bottom_small slds-m-top_small">
+                                <lightning:map mapMarkers="{!v.mapMarkers}"
+                                    zoomLevel="15"
+                                    showFooter="false"/>
+                            </lightning:layoutItem>
+                        </aura:if> 
+                        
+                    </lightning:layout>
+                </aura:if>  
+                
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

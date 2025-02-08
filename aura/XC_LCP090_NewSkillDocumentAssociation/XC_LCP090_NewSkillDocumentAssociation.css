@@ -1,0 +1,20 @@
+.THIS.container {
+    background-color:#ffffff;
+    height: auto;
+
+    text-align: center;
+    padding-left:20px;
+}
+.THIS.slds-scrollable--y { 
+    overflow: visible; 
+}
+.THIS.slds-scrollable_y { 
+    overflow: visible; 
+}
+.THIS.abbass {
+    padding-top: 10%;
+}
+
+.THIS .space {
+    padding-top: 3%;
+}

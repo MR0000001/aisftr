@@ -1,0 +1,18 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickAction" access="global" controller= "XC_LCC152_CustomerRequestsUnsubscribe" >
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <force:recordData 
+        aura:id="recordLoader" 
+        recordId="{!v.recordId}" 
+        layoutType="FULL" 
+        mode="EDIT"
+        targetRecord="{!v.record}"
+        targetFields="{!v.componentRecord}"
+        targetError="{!v.recordError}" />   
+      <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div class="spinnerHolder">
+            <lightning:spinner alternativeText="Loading" size="large" variant="brand" />
+        </div>   
+    </aura:if>
+</aura:component>

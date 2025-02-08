@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AuraDefinitionBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>51.0</apiVersion>
+    <description>Select the address of Supplier in order to send the address in the PO to logistic Partner .The Logistic Partner will then collect the materials directly from the address passed in the purchase order.</description>
+</AuraDefinitionBundle>

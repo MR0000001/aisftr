@@ -1,0 +1,71 @@
+<!--
+* @author Monica Cutillo, Giulio Proia
+* @date Creation 24/09/2018
+* @description XC_LCP015_RecordEditForm – Show ed editable form
+-->
+<aura:component controller="XC_LCC015_RecordEditForm" implements="force:appHostable,flexipage:availableForAllPageTypes">
+<aura:attribute name="recordId"       type="String"/>
+<aura:Attribute name="IdFromMobile"   type="String"/>
+<aura:attribute name="disabled"       type="Boolean" default="true" access="private" />
+<aura:attribute name="fields"         type="String[]"/>
+<aura:attribute name="title"          type="String"/>
+<aura:attribute name="typeObject"     type="String" default=""/>
+<aura:attribute name="fieldsSet"      type="String" default="Id"/>
+<aura:attribute name="setReadOnly"    type="Boolean" default="true"/>
+<aura:attribute name="validationOK"   type="Boolean" default="false"/>
+<aura:attribute name="showCheckbox" type="Boolean" default="false" />
+
+<aura:attribute name="isOpen"         type="boolean"  default="false"/>
+<aura:attribute name="fieldLabelMap"  type="Object"   />
+<aura:attribute name="successMessage" type="String"   default="{!$Label.c.XC_CL_Success}"/>
+<lightning:navigation aura:id="navService"/>
+<aura:handler   name="init"           value="{!this}" action="{!c.doInit}"/>
+<aura:handler   name="change"         value="{!v.setReadOnly}" action="{!c.setReadOnlyForInput}"/>
+
+<aura:if isTrue="{!v.isOpen}">
+    <c:XC_LCP020_ToastForMobile successMessage="Address correctly updated!" />
+</aura:if>
+<div class="container" >
+    
+<lightning:accordion aura:id="accordion" allowMultipleSectionsOpen = "true">
+    
+    
+    <lightning:accordionSection name="A" label="{!$Label.c.XC_CL_Address}"  >
+        
+        <aura:set attribute="body">
+    <lightning:card variant="Narrow" title="" >
+                <lightning:layout horizontalAlign="end">
+                    <lightning:layoutItem padding="around-small">
+                        <aura:if isTrue="{!v.validationOK}">
+                            <lightning:icon iconName="action:approval" alternativeText="Approved" />&nbsp;&nbsp;
+                        </aura:if>
+                        <lightning:button disabled="{!!v.disabled}" variant="brand" name="edit" label="{!$Label.c.XC_CL_EditButton}" onclick="{! c.handleEditClick }"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+        <lightning:recordEditForm recordId="{!v.recordId}" objectApiName="{!v.typeObject}" aura:id="editForm"                           onsubmit="{!c.onSubmit}">
+            <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                {!v.body} 
+            </lightning:layout>
+            
+            <aura:if isTrue="{!!v.disabled}">
+                <lightning:layout horizontalAlign="end">
+                    <lightning:layoutItem padding="around-small">
+                         <aura:if isTrue="{!v.showCheckbox}">
+                    <lightning:input type="checkbox" label="Save without validating" name="input1" onchange="{!c.saveNoValid}"/><br></br>
+                </aura:if>
+                        <lightning:buttonGroup>
+                            <lightning:button disabled="{!v.disabled}" name="cancel" label="{!$Label.c.XC_CL_CancelButton}" onclick="{! c.handleCancelClick }"  />
+                            <lightning:button disabled="{!!v.validationOK}" variant="brand" name="save" label="{!$Label.c.XC_CL_SaveButton}" type="submit" onClick="{!c.onSubmit}"/>
+                            <lightning:button disabled="{!v.disabled}"  label="{!$Label.c.XC_CL_Address_Validate}"  onclick="{!c.onValidate}"/>
+                        </lightning:buttonGroup>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </aura:if>
+        </lightning:recordEditForm>
+    </lightning:card>
+    </aura:set>
+    </lightning:accordionSection>
+ </lightning:accordion >
+
+</div>
+</aura:component>

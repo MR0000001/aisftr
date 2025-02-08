@@ -1,0 +1,72 @@
+<!--
+* @author  Marco Ottaviano mottaviano@deloitte.it
+* @date Creation 16/06/2020
+* @date Modification 
+* @description XC_LCP0194_ChangeCommercialOffer
+-->
+
+<aura:component controller="XC_LCC194_ChangeCommercialOffer"
+    implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader,forceCommunity:availableForAllPageTypes"
+    access="global">
+
+
+    <ltng:require scripts="{!join(',',
+    $Resource.XC_STR_CometD + '/cometd.js',
+    $Resource.gl_jquery + '/jquery-1.10.2.min.js', 
+    $Resource.XC_STR_CometD + '/json2.js', 
+    $Resource.XC_STR_CometD + '/jquery_cometd.js', 
+    $Resource.XC_STR_CometD + '/cometdReplayExtension.js', 
+    $Resource.XC_STR_CometD + '/cometdCustom.js')}" afterScriptsLoaded="{!c.doInit}"></ltng:require>
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="cmpOrigin" type="String" default="QuickAction" />
+    <aura:attribute name="availableForRt" type="String" default="Order" />
+    <aura:attribute name="availableForLE" type="String" default="EnelXItalia" />
+    <aura:attribute name="availableForStatuses" type="String" default="In Progress,To be validated"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="showCard" type="Boolean" default="false" />
+    <aura:attribute name="sessionId" type="String" />
+    <aura:attribute name="isPerformingChange" type="Boolean" default="false" />
+
+
+    <aura:registerEvent name="changeOfferEvent" type="c:XC_LCE020_OrderCommChangeEvt" />
+    <!-- <aura:handler event="NE:Bit2win_Event_ApplyPenalty" action="{!c.manageCheckoutEvt}"/> -->
+    <!-- <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> -->
+    <!-- <aura:handler name="render" value="{!this}" action="{!c.doInit}" /> -->
+
+
+    <!-- <lightning:notificationsLibrary aura:id="notifLib" /> -->
+
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner alternativeText="Loading" size="large" variant="brand"
+            style="background-color: rgb(255, 255, 255)" />
+    </aura:if>
+
+    <aura:if isTrue="{!v.showCard}">
+        <!-- CARD SHOWED ON CART SECTION OF THE ORDER RP -->
+        <lightning:card variant="narrow" class="slds-card_boundary" iconName="standard:webcart"
+            title="{!$Label.c.XC_CL_LCP194_ChangeCommOfferHead}">
+            <div class="slds-p-around_small">
+                <!-- <aura:if isTrue="{!v.isPerformingChange}">
+                    <div class="slds-p-around_small slds-align_absolute-center">
+                        <lightning:formattedText value="{!$Label.c.XC_CL_LCP183_ChangeOfferInProgress}" />
+                    </div>
+                    <aura:set attribute="else"> -->
+                        {!$Label.c.XC_CL_LCP194_ChangeCommOfferText}
+                        <div class="slds-p-around_small">
+                            <span class="slds-p-around_small">
+                            <lightning:button variant="brand" name="submitBtn"
+                                label="{!$Label.c.XC_CL_LCP194_ChangeCommOfferHead}" onclick="{!c.updateConf}" disabled="{!v.isPerformingChange}"/>
+                            </span>
+                            <span class="slds-p-around_small">
+                                <lightning:button name="cancelBtn" label="{!$Label.c.XC_CL_CancelButton}" onclick="{!c.closeCartConf}"/>
+                            </span>
+                        </div>
+                    <!-- </aura:set>
+                </aura:if> -->
+
+            </div>
+        </lightning:card>
+    </aura:if>
+
+</aura:component>

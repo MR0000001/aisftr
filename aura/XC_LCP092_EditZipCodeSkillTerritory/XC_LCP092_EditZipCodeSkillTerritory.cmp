@@ -1,0 +1,143 @@
+<!--
+* @author LO lorenzo.orlanducci@nttdata.com 
+&& RC r.cossiga@deloitte.it && RP roberta.porrega@nttdata.com
+* @date Creation 11/02/2019
+* @date Modification dd/mm/yyyy
+* @description component for override edit Zip Code Skill Territory 
+-->
+<aura:component  controller="XC_LCC092_EditZipCodeSkillTerritory"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:actionOverride,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:hasSObjectName,lightning:availableForFlowScreens,force:lightningQuickActionWithoutHeader" access="global" >
+    
+  
+    <!-- components attributes -->
+    <aura:attribute name="recordId" type="String" /> 
+    <aura:attribute name="selectedZipCode" type="String" /> 
+    <aura:attribute name="selectedProvince" type="String" /> 
+    <aura:attribute name="oldSkill" type="String" /> 
+    <aura:attribute name="servTerrId" type="String" /> 
+    <aura:attribute name="selectedZipCodeRoot" type="String" /> 
+    <aura:attribute name="selectedProvinceRoot" type="String" />
+    <aura:attribute name="selectedSkill" type="String" />
+    <aura:attribute name="selectedRootSkill" type="String" />
+    <aura:attribute name="disabledProvince" type="Boolean" /> 
+    <aura:attribute name="disabledZipCode" type="Boolean" /> 
+    <aura:attribute name="concatenateId" type="String" />  
+    <aura:attribute name="country" type="String" /> 
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+    <aura:attribute name="seeSkills" type="Boolean" default="false" />
+    <aura:attribute name="provinceOptions" type="List" />
+    <aura:attribute name="skillOptions" type="List" />
+    <aura:attribute name="zipOptions" type="List" /> 
+    <aura:attribute name="isRoot" type="Boolean" /> 
+    <aura:attribute name="existingZipCode" type="String" /> 
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <lightning:navigation aura:id="navService"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/> 
+
+
+    
+    <aura:if isTrue="{!v.spinnerControl}">
+      <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+          <lightning:spinner aura:id="mySpinner" />
+      </div>
+    </aura:if>
+    <aura:if isTrue="{!v.isRoot}">
+    <div class="container" >
+        <div class="slds-text-align_left">
+            <lightning:layoutItem>
+                <div>
+                    <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="12" padding="horizontal-small">
+                        <c:strike_picklist value="{!v.selectedProvince}"
+                                           label="{!$Label.c.XC_CL_Province}"
+                                           placeholder="{!$Label.c.XC_CL_SelectProvince}"
+                                           errorMessage="Invalid input"
+                                           searchable="true"
+                                           disabled = "true">
+                            <aura:iteration items="{!v.provinceOptions}" var="option">
+                                <c:strike_option label="{!option.label}" value="{!option.value}"/>
+                            </aura:iteration>
+                        </c:strike_picklist>
+                        <div class="space">
+  								<c:strike_picklist value="{!v.selectedZipCode}"
+                                               label="{!$Label.c.XC_CL_ZipCode}"  
+                                               placeholder="{!$Label.c.XC_CL_SelectZipCode}"
+                                               errorMessage="Invalid input"
+                                               searchable="true"
+                                               disabled = "true">
+                                <aura:iteration items="{!v.zipOptions}" var="option">
+                                    <c:strike_option label="{!option.label}" value="{!option.value}"/>
+                                </aura:iteration>
+                            </c:strike_picklist>
+                        </div>
+                        <div class="space">
+                          <aura:if isTrue="{!v.seeSkills}">
+                            <c:strike_multiSelectPicklist  value="{!v.selectedSkill}"
+                                                label="{!$Label.c.XC_CL_SkillList}"
+                                                placeholder="{!$Label.c.XC_CL_SelectAnOption}"
+                                                errorMessage="Invalid input">   
+                             <aura:iteration items="{!v.skillOptions}" var="option">
+                                <c:strike_option label="{!option.label}" value="{!option.value}"/>
+                            </aura:iteration>
+                               </c:strike_multiSelectPicklist>  
+                           </aura:if>                      
+                        </div>
+                    </lightning:layoutItem>
+                </div>
+            </lightning:layoutItem>
+        </div>
+    </div>
+  </aura:if>
+
+  <aura:if isTrue="{!!v.isRoot}">
+   <div class="container" >
+        <div class="slds-text-align_left">
+            <lightning:layoutItem>
+                <div>
+                    <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="12" padding="horizontal-small">
+                        <c:strike_picklist value="{!v.selectedProvinceRoot}"
+                                           label="{!$Label.c.XC_CL_Province}"
+                                           placeholder="{!$Label.c.XC_CL_SelectProvince}"
+                                           errorMessage="Invalid input"
+                                           searchable="true"
+                                           disabled = "true">
+                            <aura:iteration items="{!v.provinceOptions}" var="option">
+                                <c:strike_option label="{!option.label}" value="{!option.value}"/>
+                            </aura:iteration>
+                        </c:strike_picklist>
+                        <div class="space">
+                            <c:strike_picklist value="{!v.selectedZipCodeRoot}"
+                                               label="{!$Label.c.XC_CL_ZipCode}"  
+                                               placeholder="{!$Label.c.XC_CL_SelectZipCode}"
+                                               errorMessage="Invalid input"
+                                               disabled = "true">
+                                <aura:iteration items="{!v.zipOptions}" var="option">
+                                    <c:strike_option label="{!option.label}" value="{!option.value}"/>
+                                </aura:iteration>
+                            </c:strike_picklist>
+                        </div>
+                        <div class="space">
+                          <aura:if isTrue="{!v.seeSkills}">
+                            <c:strike_multiSelectPicklist  value="{!v.selectedRootSkill}"
+                                                label="{!$Label.c.XC_CL_SkillList}"
+                                                placeholder="{!$Label.c.XC_CL_SelectAnOption}"
+                                                errorMessage="Invalid input">   
+                             <aura:iteration items="{!v.skillOptions}" var="option">
+                                <c:strike_option label="{!option.label}" value="{!option.value}"/>
+                            </aura:iteration>
+                               </c:strike_multiSelectPicklist>  
+                          </aura:if>                      
+                        </div>
+                    </lightning:layoutItem>
+                </div>
+            </lightning:layoutItem>
+        </div>
+    </div>
+     </aura:if>
+    <div class="modal-footer slds-modal__footer slds-size_1-of-1">
+        <div class="forceChangeRecordTypeFooter">
+            <lightning:button  label="{!$Label.c.XC_CL_CancelButton}" title="Cancel" onclick="{! c.cancel}"/>
+            <lightning:button variant="brand" label="{!$Label.c.XC_CL_ConfirmButton}" title="Submit" onclick="{! c.confirm}" />      
+        </div>
+    </div>
+</aura:component>

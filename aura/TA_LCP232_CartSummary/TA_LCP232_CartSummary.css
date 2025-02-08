@@ -1,0 +1,311 @@
+.THIS .ta-edit-attribute {
+    padding: 0.5vh 1vw 0 0;
+    width: 5.5vw;
+}
+
+.THIS .ta-modal-info-body {
+    max-height: 65vh;
+    padding: 0vh 4vw 2vh 4vw;
+}
+
+.THIS .slds-form-element__label {
+    display: none;
+}
+
+/* .THIS .ta-cart-icon {
+    position: relative;
+    width: 7vw;
+    float: right;
+}
+
+.THIS .ta-cart-counter {
+    background: #ff006e;
+    color: white;
+    font-size: 3.3vw;
+    font-weight: 800;
+    padding: 0.4vw;
+    border-radius: 50%;
+    position: absolute;
+    text-align: center;
+    width: 5vw;
+    height: 5vw;
+    right: -3vw;
+    top: -2.5vw;
+}
+
+.THIS .ta-cart-modal-info-title {
+    font-size: 4vw;
+    font-weight: 800;
+}
+
+.THIS .ta-cart-modal-info-description {
+    font-size: 3.3vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-cart-modal-info-body {
+    padding: 0vw 5vw 5vw 5vw !important;
+    height: 65vh !important;
+    overflow-y: auto !important;
+}
+
+/* .THIS .ta-cart-modal-info-container {
+    position: absolute;
+    margin: 5vw 10vw 10vw 10vw;
+    z-index: -1;
+    background: white;
+    top: 80vw;
+    border-radius: 5vw;
+    box-shadow: 0 0vw 1vw 0vw black;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-cart-modal-header {
+    border-top-left-radius: 5vw;
+    border-top-right-radius: 5vw;
+    padding: 5vw;
+}
+
+/* .THIS .ta-modal-header-button {
+    height: inherit;
+    width: 5vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-cart-modal-footer {
+    background: rgba(70, 30, 125, 0.2);
+    border-bottom-left-radius: 5vw;
+    border-bottom-right-radius: 5vw;
+    padding: 5vw;
+}
+
+/* .THIS .ta-cart-modal-body {
+    padding: 3vh;
+    height: 30vh;
+    overflow-y: auto;
+}
+
+.THIS .ta-animation-pop-in {
+    animation: pop-in 0.5s;
+    -webkit-animation-name: pop-in 0.5s;
+    animation-name: pop-in 0.5s;
+}
+
+@keyframes pop-in {
+    0% {
+      -webkit-transform: scale3d(0,0,0);
+      transform: scale3d(0,0,0);
+      opacity: 0;
+    }
+  
+    20% {
+      opacity: 1;
+    }
+  
+    40% {
+      -webkit-animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);
+      animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);  
+    }
+  
+    60% {
+      -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+      animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+      -webkit-transform: scale3d(1.08,1.08,1.08);
+      transform: scale3d(1.08,1.08,1.08);
+    }
+  
+    80% {
+      -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+      animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+    }
+  
+    100% {
+      -webkit-animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+      animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+      -webkit-transform: scale3d(1,1,1);
+      transform: scale3d(1,1,1);
+    }
+} */
+
+/* CUSTOM-TAG */
+.THIS.ta-cart-modal-bg {
+    z-index: 4;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(70, 30, 125, 0.8);
+    height: 100vh;
+    width: 100vw;
+}  
+
+/* CUSTOM-TAG */
+.THIS .ta-modal-container {
+    position: absolute;
+    margin: 5vw 0vw 10vw 0vw;
+    z-index: -1;
+    background: white;
+    top: 9vh;
+    border-radius: 5vw;
+    box-shadow: 0 0vw 1vw 0vw black;
+}
+
+/*
+.THIS .ta-cart-modal-box {
+    background: transparent;
+    border-bottom: 0.3vw solid rgba(70, 30, 125, 1);
+    padding-top: 6vw;
+}
+
+.THIS .ta-border-bottom-purple {
+    border-top: 0.3vw solid rgb(70, 30, 125);
+}
+
+.THIS .ta-cart-title {
+    font-size: 3.3vw;
+    color: black;
+    font-weight: 800;
+}
+
+.THIS .ta-cart-description {
+    font-size: 3.3vw;
+    color: rgb(0, 0, 0, 0.7);
+    font-weight: 300;
+}
+
+.THIS .ta-cart-price {
+    color:  rgba(70, 30, 125, 1);
+    font-weight: 800;
+    font-size: 4vw;
+} 
+.THIS .ta-cart-price-discount {
+    color: #ff006e;
+    text-decoration: line-through;
+    font-size: 4vw;
+} 
+
+.THIS .ta-cart-quantity {
+    font-size: 3.3vw;
+    color: white;
+    font-weight: 800;
+    padding: .8vw;
+    background: #ff006e;
+    border-radius: 50%;
+    width: 6vw;
+    height: 6vw;
+    text-align: center;
+    float: right;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-cart-service-icon-close {
+    width: 3.5vw;
+    height: 3.5vw;
+    margin-left: 1vw;
+}
+
+/* .THIS .ta-cart-service-icon-text {
+    font-size: 3.3vw;
+    font-weight: 300;
+    color: #ff006e;
+}
+
+.THIS .ta-cart-item-box-remove {
+    border: .2vw solid #ff006e;
+    border-radius: 2.5vw;
+    padding: 1.8vw;
+    width: 31vw;
+    background: transparent;
+}
+
+.THIS .ta-cart-amount {
+    font-size: 4vw;
+    font-weight: 800;
+    color: rgba(70, 30, 125, 1);
+    text-transform: uppercase;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-cart-payment {
+    font-size: 3.3vw;
+    font-weight: 800;
+    color: white;
+    text-transform: uppercase;
+    background: rgba(70, 30, 125, .9);
+    border-radius: 2.5vw;
+    width: 45vw;
+    text-align: center;
+    padding: 1vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-no-selected-items {
+    color: #ff006e;
+    font-weight: 300;
+    text-align: center;
+    margin: 65vw 0vw;
+    font-size: 4vw;
+    text-transform: uppercase;
+}
+
+/* .THIS .ta-icon-close-size {
+    width: 5vw;
+} */
+
+/* CUSTOM-TAG TABLET */
+@media only screen and (min-width: 601px) {
+    /*.THIS .ta-cart-icon {
+        position: relative;
+        width: 5vw;
+        float: right;
+    }
+
+    .THIS .ta-cart-counter {
+        background: #ff006e;
+        color: white;
+        font-size: 2.5vw;
+        font-weight: 800;
+        padding: 0vw;
+        border-radius: 50%;
+        position: absolute;
+        text-align: center;
+        width: 3.5vw;
+        height: 3.5vw;
+        right: -2vw;
+        top: -1.5vw;
+    }
+
+    .THIS .ta-cart-quantity {
+        font-size: 2.5vw;
+        color: white;
+        font-weight: 800;
+        padding: .1vw;
+        background: #ff006e;
+        border-radius: 50%;
+        width: 3.5vw;
+        height: 3.5vw;
+        text-align: center;
+        float: right;
+    }*/
+
+    /* CUSTOM-TAG */
+    .THIS .ta-modal-container {
+        position: absolute;
+        margin: 0vw;
+        z-index: -1;
+        background: white;
+        top: 12vh;
+        border-radius: 5vw;
+        box-shadow: 0 0vw 1vw 0vw black;
+    }
+
+    /* CUSTOM-TAG */
+    .THIS.ta-cart-modal-bg {
+        z-index: 5;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: rgba(70, 30, 125, 0.8);
+        height: 100vh;
+        width: 100vw;
+    } 
+}

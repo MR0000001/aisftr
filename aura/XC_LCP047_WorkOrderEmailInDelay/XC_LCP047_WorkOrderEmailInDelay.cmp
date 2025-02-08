@@ -1,0 +1,15 @@
+<!-- component -->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasSObjectName,lightning:availableForFlowScreens" access="global" >
+<!-- components attributes -->
+<aura:attribute name="recordId" type="String"  />
+<aura:attribute name="customerInteraction" type="Map" default = "  {    		
+                                              customerType : 'WorkOrder_DelayTravel',
+         									  workorderId : '',
+         									  skipComunication : false
+                                              }  " />
+<lightning:notificationsLibrary aura:id="notifLib"/>
+
+    <c:XC_LCP046_WorkOrderEmail customerInteraction="{!v.customerInteraction}" recordId="{!v.recordId}" />
+    
+ 
+</aura:component>

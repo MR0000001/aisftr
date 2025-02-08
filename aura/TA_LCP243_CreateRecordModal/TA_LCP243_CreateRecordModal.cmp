@@ -1,0 +1,122 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                controller="TA_LCC243_CreateRecordModal"
+                access="global">
+
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="public" name="parentId" type="String" />
+
+    <aura:attribute access="public" name="custom" type="Object"/>
+    <aura:attribute access="public" name="showFormModal" type="Boolean" />
+    <aura:attribute access="public" name="recordTypes" type="List"/>
+    <aura:attribute access="public" name="formRecordTypeId" type="String"/>
+    <aura:attribute access="public" name="rtNameSelected" type="String"/>
+    <aura:attribute access="public" name="isInitialized" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="showComponent" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="sections" type="List" default="[]"/>
+    <aura:attribute access="public" name="predefinedValues" type="List" />
+    <aura:attribute access="public" name="recordSubmit" type="Object"/>
+    <aura:attribute access="public" name="recordId" type="String"/>
+    <aura:attribute access="public" name="objectName" type="String" />
+    <aura:attribute access="public" name="buttonType" type="String" />
+    <aura:attribute access="public" name="checkLegalEntityRT" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="modalTitleRT" type="String" default="{!$Label.c.TA_WorkOrderLineItem_Title}"/>
+    <aura:attribute access="public" name="modalTitleRecord" type="String" default="{!$Label.c.TA_EditWorkOrderLineItem}"/>
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt" />
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt" />
+    <aura:registerEvent name="updateFieldsEvt" type="c:TA_LCE214_UpdateFields" />
+    <aura:registerEvent name="refreshEvt" type="c:TA_LCE224_Refresh"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <c:tA_LWC001_getObjDetails objRecordTypeId="{!v.formRecordTypeId}"
+                                   objApiName="{!v.objectName}"
+                                   onobjectDataRecive="{!c.handleResponseLayout}"/>
+        <aura:if isTrue="{!v.recordTypes.length>0}">
+            <lightning:layout multipleRows="true" class="{!if(v.showComponent, 'slds-show ta-modal-bg', 'slds-hide')}">
+                <lightning:layoutItem size="12" class="ta-modal-container">
+                    <lightning:layoutItem size="12">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="10" class="ta-modal-header-title-purple slds-text-align_left">
+                                {!v.modalTitleRT}
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="2" class="slds-text-align_right slds-m-bottom_large">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/close.svg'}" onclick="{!c.handleManageShowComponent}" class="ta-icon-close" />
+                            </lightning:layoutItem>
+                        </lightning:layout>
+
+                        <lightning:select class="slds-m-top_small" value="{!v.formRecordTypeId}" name="picklist-recordtypes" onchange="{!c.handleChangeRecordTypeId}">
+                            <aura:iteration items="{!v.recordTypes}" var="rt">
+                                <option value="{!rt.recordTypeId}">{!rt.name}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </lightning:layoutItem>
+
+                    <lightning:layoutItem size="12" class="slds-m-top_small">
+                        <aura:if isTrue="{!and(v.formRecordTypeId != null, v.sections.length > 0)}">
+                            <lightning:layout multipleRows="true" class="slds-p-bottom_medium">
+                                <lightning:layoutItem size="12">
+                                    <lightning:button class="ta-button-primary ta-right-button slds-m-top_medium" label="{!$Label.c.XC_CL_New}" onclick="{!c.handleManageShowFormModal}"/>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </aura:if>
+                    </lightning:layoutItem>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </aura:if>
+    </aura:if>
+
+    <!-- FORM MODAL -->
+    <lightning:layout multipleRows="true" class="{!if(v.showFormModal, 'slds-show ta-modal-bg', 'slds-hide')}">
+        <lightning:layoutItem size="12" class="ta-modal-container">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="10" class="ta-modal-header-title-purple slds-text-align_left"> {!v.modalTitleRecord} </lightning:layoutItem>
+                <lightning:layoutItem size="2" class="slds-text-align_right slds-m-bottom_large">
+                    <img src="{!$Resource.TA_Icons + '/xc-icons/close.svg'}" onclick="{!c.handleManageShowFormModal}" class="ta-icon-close" />
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="ta-modal-body">
+                    <lightning:recordEditForm objectApiName="{!v.objectName}"
+                                              recordId="{!if(and(v.recordId != null,v.buttonType == 'edit'), v.recordId, null)}"
+                                              recordTypeId="{!v.formRecordTypeId}"
+                                              onsuccess="{!c.handleSuccess}"
+                                              onerror="{!c.handleError}"
+                                              onsubmit="{!c.handleSubmitForm}"
+                                              aura:id="recordForm">
+                        <lightning:layout multipleRows="true">
+                            <div id="div-scroll"></div>
+                            <aura:iteration items="{!v.sections}" var="section">
+                                <lightning:layoutItem size="12">
+                                    <h3 class="ta-color-purple"> {!section.heading} </h3>
+                                </lightning:layoutItem>
+                                <aura:iteration items="{!section.fields}" var="field">
+                                    <lightning:layoutItem size="12">
+                                        <lightning:inputField class="{!if(field.hide, 'slds-hide', '')}" fieldName="{!field.apiName}" required="{!field.required}" disabled="{!field.readonly}" value="{!field.value}"/>
+                                    </lightning:layoutItem>
+                                </aura:iteration>
+                            </aura:iteration>
+                        </lightning:layout>
+                        <lightning:layout multipleRows="true" class="slds-p-bottom_medium ta-edit-form-button-container-modal">
+                            <lightning:layoutItem size="6" class="slds-text-align_left slds-p-right_small">
+                                <lightning:button class="ta-button-closing slds-m-top_medium" label="{!$Label.c.TA_Cancel}" onclick="{!c.handleManageShowFormModal}"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="6" class="slds-text-align_right slds-p-left_small">
+                                <lightning:button class="slds-m-top_medium" type="submit" name="insert" label="{!$Label.c.TA_Save}" />
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:recordEditForm>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

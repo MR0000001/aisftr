@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event used to toggle the spinner">
+    <aura:attribute name="sourceComponent"  type="String" default=""/>
+    <aura:attribute name="toggleSpinner"    type="Boolean" default="false"/>
+</aura:event>

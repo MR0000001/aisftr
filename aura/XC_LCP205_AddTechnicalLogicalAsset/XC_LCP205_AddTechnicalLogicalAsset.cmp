@@ -1,0 +1,110 @@
+<aura:component controller="XC_LCC205_AddTechnialLogicalAsset" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride" access="global" >
+	<!--Attribute-->
+    <aura:attribute name="recordId" type="String" /> 
+	<aura:attribute name="data" type="Object" access="global"  />
+    <aura:attribute name="data2" type="Object" access="global"  />
+    <aura:attribute name="dataNetwork" type="Object" access="global"/> <!-- DeAv 07.07.2022 - NR2330 -->
+    <aura:attribute name="columns" type="Object"/>
+    <aura:attribute name="columns2" type="Object"/>
+    <aura:attribute name="selectedRowsCount" type="Integer" />
+    <aura:attribute name="maxRowSelection" type="Integer" default="1"/>
+	<aura:attribute name="selectedRows" type="List" />
+    <aura:attribute name="selectedRows2" type="List" />
+    <aura:attribute name="filter" type="String" />
+    <aura:attribute name ="choosenSubtype" type="String" />
+    <aura:attribute name="businessLineValue" type="String"/>
+    <aura:attribute name="isLogical" type="Boolean" default="false"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false" /> 
+    <aura:attribute name="showNewComponent" type="Boolean" default="false"/>
+    <aura:attribute name="showForceWorkOrder" type="Boolean" default="false" />
+    <aura:attribute name="showCaseForceWorkOrder" type="Boolean" default="false" />
+	 <aura:attribute name="disableButton" type="Boolean" default="false" />
+    <aura:attribute name="showAllNetwork" type="Boolean" default="false"/> <!-- DeAv 07.07.2022 - NR2330 -->
+    <aura:attribute name="isNetwork" type="Boolean" default="false"/> <!-- DeAv 07.07.2022 - NR2330 -->
+	 <aura:attribute name="submitAsset" type="String"/>
+   <!--
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>-->
+   
+    <!--Events-->
+     <!--Events-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/> 
+    <aura:if isTrue="{!v.showNewComponent}">
+        <lightning:input name="search" label="Search by Name" placeholder="type here..." onchange= "{!c.filteredSearch}" value="{!v.filter}"/>
+    </aura:if>
+   <br></br>
+    <lightning:layout class="slds-page-header slds-page-header-object-home">
+     
+        <form>  
+           <div style="height: 250px" >
+                <h1>{!$Label.c.XC_CL_Case_SelectTechnicalAsset}</h1>
+                <br></br>
+        			<lightning:datatable 
+                        aura:id ="datatableIDTechinicalAsset"
+						data="{!v.data}"
+            			columns="{! v.columns }"
+            			keyField="id"
+                        maxRowSelection="{! v.maxRowSelection }"
+                        selectedRows="{! v.selectedRows }"  
+                        onrowselection = "{!c.checkSelection}"  />         		
+    		</div>
+           <br/> 
+           <br></br>
+                  			<div style="height: 250px" >
+                <br></br>
+    <aura:if isTrue="{!v.showNewComponent}">
+                <h1>{!$Label.c.XC_CL_Case_SelectLogicalAsset}</h1>
+               <br></br>
+        			<lightning:datatable 
+                        aura:id ="datatableIDLogicalAsset"
+						data="{!v.data2}"
+            			columns="{! v.columns2 }"
+            			keyField="id"
+                        maxRowSelection="{! v.maxRowSelection }"
+                        selectedRows="{! v.selectedRows2 }"             
+            			onrowselection= "{!c.checkSelection2}" />
+    </aura:if>
+    		</div>   
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+            <aura:if isTrue="{!v.isLogical}">
+                <lightning:recordEditForm objectApiName="Case">
+                    <lightning:messages />
+                    <lightning:inputField aura:id="BusinessLine" fieldName="XC_BusinessLine__c" value = "{!v.businessLineValue}" disabled = "true" />
+                    <lightning:inputField aura:id="SubType" fieldName="XC_AssetSubType__c" required="true" value= "{!v.choosenSubtype}" />
+                </lightning:recordEditForm>
+            </aura:if>
+            <aura:if isTrue="{!v.showForceWorkOrder}">
+                <h1>{!$Label.c.XC_CL_Case_ForceWoWithoutContract}</h1>
+                <ui:inputCheckbox aura:id="checkbox" label="Force Work Order Creation" change="{!c.onCheck}"/>
+            </aura:if>
+			<br></br>
+            <!-- DeAv 07.07.2022 - NR2330 START -->
+            <aura:if isTrue="{!v.showAllNetwork}">
+                <div style="height: 250px" >
+                    <h1>{!$Label.c.XC_CL_AssetAllNetworks}</h1>
+                    <br></br>
+                        <lightning:datatable 
+                            aura:id         = "datatableIDAllNetworks"
+                            data            = "{!v.dataNetwork}"
+                            columns         = "{!v.columns2}"
+                            keyField        = "id"
+                            maxRowSelection = "{!v.maxRowSelection}"
+                            selectedRows    = "{!v.selectedRows}"
+                            onrowselection  = "{!c.checkSelectionNetwork}"/>		
+                </div>
+            </aura:if>
+            <!-- DeAv 07.07.2022 - NR2330 END -->
+        
+      <ui:button  aura:id="button" buttonTitle="Click to see what you put into the field"  
+                label="{!v.submitAsset}"  press="{!c.submit}" disabled= "{!v.disableButton}"/>        
+       </form>
+    </lightning:layout> 
+    <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner alternativeText="Loading" size="large" />
+        </aura:if>
+</aura:component>

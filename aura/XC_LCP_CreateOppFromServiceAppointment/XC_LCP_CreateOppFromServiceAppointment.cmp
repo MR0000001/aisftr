@@ -1,0 +1,19 @@
+<aura:component      
+    controller= "XC_LCC_CreateOppFromServiceAppointment" 
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride" 
+    access="global">
+
+    <aura:Attribute name="recordId" type="String"/>
+    <aura:Attribute name="accountId" type="String"/>
+    <aura:Attribute name="serviceId" type="String"/>
+    <aura:Attribute name="caseId" type="String"/>
+    <aura:Attribute name="workOrderId" type="String"/>
+    <aura:attribute name="viewOpp" type="Boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    
+    <aura:if isTrue="{!v.viewOpp}">
+ 	<c:XC_LCP028_CreateOppFromContact recordId="{!v.accountId}" caseId="{!v.caseId}" workOrderId="{!v.workOrderId}" serviceId="{!v.serviceId}"/>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,25 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global" controller="Gii_LCC014_Doxee" >
+
+    <aura:attribute name="company" type="String" access="public" default="ENDESAX-B2C"/>
+       
+    <aura:attribute name="username" type="String" access="public" />    
+    <aura:attribute name="objectType" type="String" access="public" />   
+    <aura:attribute name="jsonFull" type="boolean" default="false" />  
+
+    <!--Setting in Lightning App Builder-->
+    <aura:attribute name="widthPar" type="String" />
+    <aura:attribute name="heightPar" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <!--{!v.json}-->
+    <aura:attribute name="json" type="String"  default="" access="public"/>
+    
+    <!--Setting in Lightning App Builder-->    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:if isTrue="{!v.jsonFull}">
+    	<force:canvasapp developerName="XC_Doxee_ConnectedApp" width="{!v.widthPar}" height="{!v.heightPar}" parameters="{!v.json}" /> 
+    </aura:if>
+    
+    
+	
+</aura:component>

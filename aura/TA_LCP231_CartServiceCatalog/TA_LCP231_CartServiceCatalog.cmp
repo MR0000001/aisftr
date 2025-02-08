@@ -1,0 +1,196 @@
+<aura:component controller="TA_LCC226_CartContainer"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable"
+                access="global">
+
+    <aura:attribute access="public" name="b2winResponse" type="Object" />
+    <aura:attribute access="public" name="b2winCurrentBundleElement" type="Object" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="public" name="services" type="List" />
+    <aura:attribute access="private" name="showAddCartModal" type="Boolean" default="false" />
+    <aura:attribute access="private" name="deliveryMethod" type="String" />
+    <aura:attribute access="private" name="serviceSelected" type="Object" />
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false" />
+    <aura:attribute access="private" name="currentAction" type="String"/>
+    <aura:attribute access="private" name="totalQuantity" type="Integer" default="0"/>
+    <aura:attribute access="private" name="workOrder" type="Object"/>
+
+    <ltng:require styles="{!join(',',
+                            $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:handler event="c:TA_LCE226_CartStep" action="{!c.handleManageB2WResponse}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="11" class="slds-p-right_small slds-p-left-small">
+                        <h3 class="ta-color-white"> {!v.b2winCurrentBundleElement.fields.name} </h3>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="1">
+                        <c:TA_LCP232_CartSummary workOrder="{!v.workOrder}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12">
+                <lightning:layout multipleRows="true">
+                    <aura:iteration items="{!v.services}" var="service">
+                        <lightning:layoutItem size="12" class="slds-p-bottom_small">
+                            <lightning:layout multipleRows="true" class="ta-service-container slds-m-top_large">
+                                <lightning:layoutItem size="6">
+                                    <lightning:layout multipleRows="true">
+                                        <lightning:layoutItem size="12" class="slds-text-align_left">
+                                            <p class="ta-color-white ta-word-break ta-font-weight-800"> {!service.fields.categoryname} </p>
+                                        </lightning:layoutItem>
+
+                                        <aura:if isTrue="{!service.fields.maxqty == 1}">
+                                            <aura:if isTrue="{!or(service.fields.isCart, service.fields.isAdded)}">
+                                                <lightning:layoutItem size="12" class="{!if(service.fields.isCart, 'slds-text-align_left ta-service-box slds-m-top_small', 'slds-text-align_left ta-service-box-added slds-m-top_small')}">
+                                                    <span id="{!service.fields.id}" name="{!if(service.fields.isCart, 'no-action', 'remove')}" onclick="{!c.handleRemoveService}">
+                                                        <p class="slds-float_left ta-color-white"> {!if(service.fields.isCart, $Label.c.TA_ServiceIncluded, $Label.c.TA_RemoveServiceAdded)}</p>
+                                                        <img src="{!$Resource.TA_Icons + '/xc-icons/' + if(service.fields.isCart, 'check-white.svg', 'close-white.svg')}" class="{!if(service.fields.isCart, 'ta-service-icon slds-float_left','ta-service-icon-close slds-float_right')}"/>
+                                                    </span>
+                                                </lightning:layoutItem>
+                                                <aura:set attribute="else">
+                                                    <lightning:layoutItem size="12" class="slds-text-align_left ta-service-box-atc slds-m-top_small">
+                                                        <span id="{!service.id}" onclick="{!c.handleManageAddCartModal}">
+                                                            <p class="slds-float_left ta-color-white"> {!$Label.c.TA_ServiceCatalogAddToCart} </p>
+                                                            <img src="{!$Resource.TA_Icons + '/xc-icons/cart-white.svg'}" class="ta-service-icon-atc slds-float_left"/>
+                                                        </span>
+                                                    </lightning:layoutItem>
+                                                </aura:set>
+                                            </aura:if>
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{!or(service.fields.isCart, service.fields.isAdded)}">
+                                                    <lightning:layoutItem size="12" class="{!if(service.fields.isCart, 'slds-text-align_left ta-service-box slds-m-top_small', 'slds-text-align_left ta-service-box-added slds-m-top_small')}">
+                                                        <span id="{!service.fields.id}" name="{!if(service.fields.isCart, 'no-action', 'remove')}" onclick="{!c.handleRemoveService}">
+                                                            <p class="slds-float_left ta-color-white slds-float_left"> {!if(service.fields.isCart, $Label.c.TA_ServiceIncluded, $Label.c.TA_RemoveServiceAdded)}</p>
+                                                            <img src="{!$Resource.TA_Icons + '/xc-icons/' + if(service.fields.isCart, 'check-white.svg', 'close-white.svg')}" class="{!if(service.fields.isCart, 'ta-service-icon slds-float_left','ta-service-icon-close slds-float_right')}"/>
+                                                        </span>
+                                                    </lightning:layoutItem>
+                                                    <aura:set attribute="else">
+                                                        <lightning:layoutItem size="12" class="slds-text-align_left slds-m-top_large">
+                                                            <lightning:layout multipleRows="true">
+                                                                <lightning:layoutItem size="3" class="slds-p-right_x-small ta-margin-right">
+                                                                    <aura:if isTrue="{!service.fields.qty == 0}">
+                                                                        <p class="ta-quantity-operator-disabled"> - </p>
+                                                                        <aura:set attribute="else">
+                                                                            <p class="ta-quantity-operator" id="{!service.fields.id}" name="remove" onclick="{!c.handleManageQuantity}"> - </p>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </lightning:layoutItem>
+                                                                <lightning:layoutItem size="2">
+                                                                    <p class="ta-quantity-editable-2"> {!service.fields.qty} </p>
+                                                                </lightning:layoutItem>
+                                                                <lightning:layoutItem size="3" class="slds-p-left_x-small">
+                                                                    <aura:if isTrue="{!service.maxQtyReached}">
+                                                                        <p class="ta-quantity-operator-disabled"> + </p>
+                                                                        <aura:set attribute="else">
+                                                                            <p class="ta-quantity-operator" id="{!service.fields.id}" name="add" onclick="{!c.handleManageQuantity}"> + </p>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </lightning:layoutItem>
+                                                                <lightning:layoutItem size="12" class="{!service.fields.qty > 0 ? 'ta-service-box-atc slds-m-top_small slds-m-bottom_small' : 'ta-service-box-atc-2-disabled slds-m-top_small slds-m-bottom_small'}">
+                                                                    <span id="{!service.fields.id}" onclick="{!c.handleManageAddCartModal}">
+                                                                        <p class="slds-float_left ta-color-white"> {!$Label.c.TA_ServiceCatalogAddToCart} </p>
+                                                                        <img src="{!$Resource.TA_Icons + '/xc-icons/cart-white.svg'}" class="ta-service-icon-atc slds-float_left"/>
+                                                                    </span>
+                                                                </lightning:layoutItem>
+                                                            </lightning:layout>
+                                                        </lightning:layoutItem>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </aura:set>
+                                        </aura:if>
+                                    </lightning:layout>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="6">
+                                    <lightning:layout multipleRows="true">
+                                        <lightning:layoutItem size="12" class="slds-text-align_right">
+                                            <p class="ta-word-break ta-color-white-opacity-60"> {!service.fields.productname} </p>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="12" class="slds-text-align_right ta-service-price slds-m-top_small">
+                                            <aura:if isTrue="{!service.fields.baseonetimefee != 0}">
+                                                <aura:if isTrue="{!service.fields.priceToDiscount != null}">
+                                                    <span class="ta-cart-price-discount"> {!service.fields.priceToDiscount} € </span>
+                                                </aura:if>
+                                                <span class="slds-float_right slds-m-left_medium"> {!service.fields.baseonetimefee} € </span>
+                                                <aura:set attribute="else">
+                                                    <aura:if isTrue="{!service.fields.recurringchargeov != 0}">
+                                                        {!service.fields.recurringchargeov} € / {!service.fields.recurringchargefrequency}
+                                                        <aura:set attribute="else">
+                                                            0 €
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </aura:set>
+                                            </aura:if>
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </aura:iteration>
+                </lightning:layout>
+            </lightning:layoutItem>
+        </lightning:layout>
+
+        <aura:if isTrue="{!v.showAddCartModal}">
+            <div class="ta-modal-bg">
+                <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                    <lightning:layoutItem size="12" class="ta-modal-header">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="11" />
+                            <lightning:layoutItem size="1" class="ta-modal-header-button">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleManageAddCartModal}"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <lightning:layoutItem size="12" class="ta-modal-info-body slds-text-align_center">
+                        <lightning:layout multipleRows="true">
+                            <aura:iteration items="{!v.serviceSelected.listOfAttributes}" var="attribute">
+                                <aura:if isTrue="{!and(attribute.fields.hidden == 'false', or(attribute.listOfDomains.length > 0, and(attribute.fields.readonly, attribute.fields.DefaultValue != '')))}">
+                                    <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                        <lightning:layout multipleRows="true">
+                                            <lightning:layoutItem size="12" class="slds-m-bottom_xx-small ta-modal-info-title">
+                                                {!attribute.fields.name}
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" class="slds-m-bottom_xx-small">
+                                                <aura:if isTrue="{!attribute.fields.readonly}">
+                                                    <p> {!attribute.fields.value} </p>
+                                                    <aura:set attribute="else">
+                                                        <lightning:select value="{!attribute.fields.value}">
+                                                            <aura:if isTrue="{!attribute.fields.DefaultValue == ''}">
+                                                                <option value="{!attribute.fields.DefaultValue}">{!attribute.fields.DefaultValue}</option>
+                                                            </aura:if>
+                                                            <aura:iteration items="{!attribute.listOfDomains}" var="domain">
+                                                                <option value="{!domain.fields.value}">{!domain.fields.label}</option>
+                                                            </aura:iteration>
+                                                        </lightning:select>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                    </lightning:layoutItem>
+                                </aura:if>
+                            </aura:iteration>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <lightning:layoutItem size="12" class="ta-modal-footer">
+                        <lightning:button class="ta-button-primary-modal" label="{!$Label.c.TA_MainProductInsert}" onclick="{!c.handleAddToCart}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+        </aura:if>
+    </aura:if>
+</aura:component>

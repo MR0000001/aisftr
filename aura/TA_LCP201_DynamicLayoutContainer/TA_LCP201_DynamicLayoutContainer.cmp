@@ -1,0 +1,31 @@
+<aura:component controller="TA_LCC201_DynamicLayoutContainer"
+    implements="force:hasSObjectName,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global"
+    extends="c:TA_LCP209_BaseWizard" >
+
+    <!-- ATTRIBUTES RETRIEVED FROM COMMUNITY BUILDER -->
+    <aura:attribute access="public" name="recordId" type="String" default="{!recordId}" />
+    <aura:attribute access="public" name="sObjectName" type="String" default="{!sObjectName}" />
+    <aura:attribute access="public" name="componentsInitStateList" type="List"  default="[]" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}" />
+    <aura:handler name="sendInitStateEvt" event="c:TA_LCE220_SendInitStateEvt" action="{!c.handleCatchReceiveInitStateEvt}" />
+    <aura:registerEvent name="generalInfoToButtonSection" type="c:TA_LCE201_GeneralInfoToButtonSection" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <div class="ta-container slds-m-bottom_xx-large">
+        <!-- GENERATE DYNAMICALLY EACH COMPONENT CONFIGURETED -->
+        <aura:html aura:id="dynamicCmp" tag="div"></aura:html>
+    </div>
+</aura:component>

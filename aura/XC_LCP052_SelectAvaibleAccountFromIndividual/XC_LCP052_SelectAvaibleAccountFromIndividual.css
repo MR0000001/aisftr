@@ -1,0 +1,25 @@
+.THIS .sl {
+		height:100%;
+        width:100%;
+        background-color:white;
+      
+}
+.THIS .st {
+    background-color:white;
+}
+
+.THIS .slpadding {
+		padding-top:4%;
+}
+
+.THIS .slpadding2 {
+		padding-top:8%;
+}
+
+.THIS .customRequired{
+    font-weight: 400; } .THIS .customRequired:before{    
+    content: "*";
+    margin: 0 0.125rem 0 0.125rem;
+    color: rgb(194, 57, 52);
+    float: left; } .THIS .none{
+    display:none; }

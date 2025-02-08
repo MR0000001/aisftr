@@ -1,0 +1,26 @@
+<!--
+* @author Monica Cutillo
+* @date Creation 03/10/2018
+* @description XC_LCP022_TabNavigationManager – Abstract component to manage tab and sub tab opening
+-->
+<aura:component extensible="true" 
+                controller="XC_LCC002_NewLead"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride" 
+                access="global" abstract="true" >
+    <aura:attribute name="tabLabel"             type="String"   default=""  required="true" />
+    <aura:attribute name="tabIcon"              type="String"   default=""  required="true" />
+    <aura:attribute name="tabTitle"             type="String"   default=""  required="true" />
+    <aura:attribute name="targetPageReference"  type="Object"   default=""  required="true" />
+    <aura:attribute name="isConsoleNavigation"  type="Boolean"  default="false"/>
+    <aura:attribute name="needsCreateComponent" type="Boolean" default="true"/>
+    <aura:attribute name="isMobile"             type="Boolean"  default="false" />
+    <aura:attribute name="openSubTab"           type="Boolean"  default="false" />
+    
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <lightning:navigation aura:id="navService"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+    
+    <div class="c-container">{!v.body}</div>
+
+</aura:component>

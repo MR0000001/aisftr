@@ -1,0 +1,208 @@
+<aura:component controller="TA_LCC220_LeadConversion"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global">
+
+    <aura:attribute access="public" name="fieldSet" 		type="String" />
+    <aura:attribute access="public" name="workOrderId" 		type="String" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" 			type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" 	type="String" />
+    <aura:attribute access="public" name="address" 			type="Map" default="{
+        country : '',
+        streetType : '',
+        address : '',
+        addressCode : '',
+        streetNumber : '',
+        door : '',
+        postalCode : '',
+        stair : '',
+        floor : '',
+        city : '',
+        cityCode : '',
+        province : '',
+        provinceCode : '',
+        category : '',
+        municipality : '',
+        streetTypeText : '',
+        gas : '',
+        electric : '',
+        lead: '',
+        account: '',
+        region: '',
+        validate : false,
+        validatedCups : false,
+        clarifType : '',
+        clarifValue : '',
+        note: ''
+    }"/>
+
+    <aura:attribute access="private" name="general" type="Object"/>
+    <aura:attribute access="private" name="custom" type="Object"/>
+    <aura:attribute access="private" name="title" type="String"/>
+    <aura:attribute access="private" name="description" type="String"/>
+    <aura:attribute access="private" name="customerCardBg" type="String"/>
+    <aura:attribute access="private" name="infoBag" type="Object" default="{}" />
+    <aura:attribute access="private" name="infoBagWithDBValues" type="Object" default="{}" />
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="modalParams" type="Object" />
+    <aura:attribute access="private" name="showModal" type="Boolean" default="true" />
+    <aura:attribute access="private" name="disableFields" type="Boolean" default="true" />
+    <aura:attribute access="private" name="editOrSaveLabel" type="String" default="Edit" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:handler name="modalEvt" event="c:TA_LCE208_Modal" action="{!c.handleModalEvent}"/>
+    <aura:handler name="XC_LCE013_SetAddressObject" event="c:XC_LCE013_SetAddressObject" action="{!c.handleAddressValidationEvent}"/>
+
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/>
+    <aura:registerEvent name="leadConversionEvt" type="c:TA_LCE223_LeadConversion"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <aura:if isTrue="{!v.showModal}">
+            <div class="ta-modal-bg">
+                <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                    <lightning:layoutItem size="12" class="slds-text-align_center ta-height-100">
+                        <lightning:layout multipleRows="true" class="ta-height-100">
+                            <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large">
+                                <aura:if isTrue="{!v.infoBag.modalParams.title != ''}">
+                                    <h3 class="ta-color-black">{!v.infoBag.modalParams.title}</h3>
+                                </aura:if>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large">
+                                <aura:if isTrue="{!v.infoBag.modalParams.description != ''}">
+                                    <p class="ta-color-black">{!v.infoBag.modalParams.description}</p>
+                                </aura:if>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_xx-large">
+                                <aura:if isTrue="{!v.infoBag.modalParams.imgPath != ''}">
+                                    <img src="{!$Resource.TA_Images + v.infoBag.modalParams.imgPath}"/>
+                                </aura:if>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="12" class="slds-text-align_center">
+                                        <lightning:button class="ta-button-primary"
+                                                        label="{!$Label.c.TA_LeadConversionOk}"
+                                                        name="{!$Label.c.TA_LeadConversionOk}"
+                                                        onclick="{!c.handleCloseModal}"/>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+        </aura:if>
+
+        <div class="slds-m-around_small" style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover;
+            background-position: ' + v.general.bgPosition + '; background-color:' + v.general.bgColor + '; box-shadow: 0vw 1vw 2vw -0.8vw black; background-blend-mode: lighten; border-radius: 2vw; margin: 6vw 3vw 3vw 3vw;'}">
+            <lightning:layout multipleRows="true" class="ta-lead-conversion-container">
+                <lightning:layoutItem size="10">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_xx-small">
+                            <h3 class="ta-color-white"> {!v.title} </h3>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <p class="ta-color-white-opacity-60"> {!v.description} </p>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="2" class="slds-text-align_right ta-height">
+                    <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}" class="slds-m-top_small ta-icon"/>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="slds-m-bottom_xx-small ta-border-top-white">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12">
+                            <c:XC_LCP_Address aura:id="addressCmp"
+                                          address="{!v.address}"
+                                          source="002"
+                                          addressToUpdate="true"
+                                          parentRecordType="{!v.infoBag.lookupObjectRecordTypeDeveloperName}"
+                                          recordId="{!v.infoBag.lookupId}"></c:XC_LCP_Address>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="12" class="ta-border-top-white">
+                            <lightning:layout multipleRows="true">
+                                <aura:iteration items="{!v.infoBag.fieldStructureList}" var="field">        
+                                    <aura:if isTrue="{!field.isDisplayed}">
+                                        <aura:if isTrue="{!v.disableFields}">
+
+                                            <!-- FIELD READONLY -->
+                                            <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                                <lightning:layout multipleRows="true">
+                                                    <lightning:layoutItem size="12">
+                                                        <div class="slds-float_left slds-form-element__label"> {!field.label} </div>
+                                                        <aura:if isTrue="{!and(field.mode == 'edit', !v.objWrapper.massEdit)}">
+                                                            <span onclick="{!c.handleManageButtons}" id="{!field.apiName}" name="single-edit">
+                                                                <img src="{!$Resource.TA_Icons + '/xc-icons/edit-white.svg'}"/>
+                                                            </span>
+                                                        </aura:if>
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem size="12">
+                                                        <p class="ta-color-white"> {!field.value} </p>
+                                                    </lightning:layoutItem>
+                                                </lightning:layout>
+                                            </lightning:layoutItem>
+
+                                            <aura:set attribute="else">
+                                                <!-- FIELD PICKLIST -->
+                                                <aura:if isTrue="{!field.type == 'PICKLIST'}">
+                                                    <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                                        <lightning:select required="{!field.required}"
+                                                                        value="{!field.value}" label="{!field.label}" 
+                                                                        name="{!field.apiName}">
+                                                            <aura:iteration items="{!field.availableValues}" var="availableValue">
+                                                                <option value="{!availableValue.value}">{!availableValue.label}</option>
+                                                            </aura:iteration>
+                                                        </lightning:select>
+                                                    </lightning:layoutItem>
+                                                </aura:if>
+
+                                                <!-- FIELD TEXT OR EMAIL OR NUMBER OR DATE -->
+                                                <aura:if isTrue="{!or(field.type == 'STRING', or(field.type == 'EMAIL', 
+                                                                or(field.type == 'NUMBER', or(field.type == 'DATE', field.type == 'DATETIME'))))}">
+                                                    <lightning:input class="slds-m-top_medium" type="{!if(field.type == 'EMAIL', 'email',
+                                                                                                    if(field.type == 'NUMBER', 'number',
+                                                                                                    if(or(field.type == 'DATE',field.type == 'DATETIME'), 'date', 'text')))}" required="{!field.required}"
+                                                                    label="{!field.label}" name="{!field.apiName}" value="{!field.value}"/>
+                                                </aura:if>
+
+                                                <!-- FIELD TEXTAREA -->
+                                                <aura:if isTrue="{!field.type == 'TEXTAREA'}">
+                                                    <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                                        <lightning:textarea required="{!field.required}" name="{!field.apiName}"
+                                                                            label="{!field.label}" value="{!field.value}"/>
+                                                    </lightning:layoutItem>
+                                                </aura:if>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:if>
+                                </aura:iteration>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="6" class="slds-text-align_left slds-m-top_large">
+                    <aura:if isTrue="{!not(v.disableFields)}">
+                        <span name="cancel" class="ta-accordion-header-button" onclick="{!c.handleManageButtons}">
+                            {!$Label.c.TA_LeadConversionCancel}
+                        </span>
+                    </aura:if>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="6" class="slds-text-align_right slds-m-top_large">
+                    <span name="{!v.editOrSaveLabel}" class="ta-accordion-header-button" onclick="{!c.handleManageButtons}">
+                        {!v.editOrSaveLabel}
+                    </span>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,134 @@
+<aura:component controller="XC_LCC003_ContactSection"
+    implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasRecordId">
+    <aura:attribute name="documentOptions" type="List" />
+    <aura:attribute name="languageOptions" type="List" />
+    <aura:attribute name="showLanguage" type="Boolean" default="false" />
+    <aura:attribute name="showDate" type="Boolean" default="false" />
+    <aura:attribute name="showDocumentType" type="Boolean" default="true"/>
+    <aura:attribute name="docCountryOK" type="Boolean" default="true" />
+    <aura:attribute name="accountType" type="String" />
+    <aura:attribute name="userCountry" type="String" />
+    <aura:attribute name="newSection" type="Map" default="    	{    		
+                                                          FirstName: '',     		
+                                                          LastName : '',   
+                                                          DocumentCountry : '', 
+                                                          DocumentType : '',    		
+                                                          DocumentID : '',
+                                                          Email : '',
+                                                          Mobile : '',                                                       
+                                                          Phone : '',
+                                                          PreferredLanguage : '' 
+                                                          
+                                                          }" />
+
+    <aura:attribute name="requiredField" type="Map" default=" {    		
+                                                              FirstName: true,     		
+                                                              LastName : true,   
+                                                              DocumentCountry : false, 
+                                                              DocumentType : false,    		
+                                                              DocumentID : false ,
+                                                              Email : false
+                                                              }" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <lightning:recordEditForm objectApiName="Contact" onload="{!c.onloadContactSec}">  
+        <!-- the messages component is for error messages -->
+        <!--lightning:messages /-->
+        <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+
+            <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                largeDeviceSize="6" padding="horizontal-small">
+                <lightning:inputField value="{!v.newSection.FirstName}" required="{!v.requiredField.FirstName}" fieldName="FirstName" />
+            </lightning:layoutItem>
+
+            <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                largeDeviceSize="6" padding="horizontal-small">
+                <lightning:inputField value="{!v.newSection.LastName}" fieldName="LastName" />
+            </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                largeDeviceSize="6" padding="horizontal-small">
+
+                <lightning:inputField label="{!$Label.c.XC_CL_Contact_PhonePrefix}" fieldName="XC_PhonePrefix__c"
+                    value="{!v.newSection.PhonePrefix}"  />
+                <lightning:inputField label="{!$Label.c.XC_CL_Contact_MobilePrefix}" fieldName="XC_MobilePrefix__c"
+                    value="{!v.newSection.MobilePrefix}" />
+
+
+            </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                largeDeviceSize="6" padding="horizontal-small">
+
+
+                <lightning:inputField label="{!$Label.c.XC_CL_Contact_Phone}" value="{!v.newSection.ContactPhone}"
+                    fieldName="XC_ContactPhone__c" />
+
+                <lightning:inputField label="{!$Label.c.XC_CL_Contact_Mobile}" value="{!v.newSection.ContactMobile}"
+                    fieldName="XC_ContactMobile__c" />
+
+            </lightning:layoutItem>
+
+            <aura:if isTrue="{!v.showLanguage}">
+                <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                    largeDeviceSize="6" padding="horizontal-small">
+
+                    <lightning:inputField value="{!v.newSection.PreferredLanguage}"
+                        fieldName="XC_Preferredlanguageofcontact__c" />
+                    <!--
+                <c:strike_picklist 
+                    value="{!v.newSection.PreferredLanguage}"
+                    label="{!$Label.c.XC_CL_PreferredLanguage}" 
+                    placeholder="{!$Label.c.XC_CL_CPAB_Select}"
+                    errorMessage="{!$Label.c.XC_CL_InvalidInput}">                                     
+                    <aura:iteration items="{!v.languageOptions}" var="option">
+                        <c:strike_option label="{!option.label}" value="{!option.value}"/>
+                    </aura:iteration>
+                </c:strike_picklist>    -->
+                </lightning:layoutItem>
+            </aura:if>
+
+            <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                largeDeviceSize="6" padding="horizontal-small" alignmentBump="top">
+
+                <lightning:inputField fieldName="Email" name="input1" value="{!v.newSection.Email}"
+                    placeholder="{!$Label.c.XC_CL_TypeHere}" required="{!v.requiredField.Email}"/>
+
+            </lightning:layoutItem>
+            <aura:if isTrue="{!v.showDocumentType}">
+                <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                    largeDeviceSize="6" padding="horizontal-small" alignmentBump="top">
+
+                    <lightning:inputField value="{!v.newSection.DocumentCountry}" required="{!v.requiredField.DocumentCountry}" fieldName="XC_ContactDocumentCountry__c"
+                        onchange="{!c.sblockDoc}" />
+
+                    <lightning:inputField value="{!v.newSection.DocumentType}" required="{!v.requiredField.DocumentType}" fieldName="XC_ContactDocumentType__c"
+                        onchange="{!c.checkIfNIE}" disabled="{!v.docCountryOK}" />
+
+                    
+
+
+                </lightning:layoutItem>
+            </aura:if>
+            <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                largeDeviceSize="6" padding="horizontal-small" alignmentBump="top">
+
+                <lightning:inputField value="{!v.newSection.Nationality}" fieldName="XC_Nationality__c" />
+                <lightning:inputField value="{!v.newSection.DocumentID}" required="{!v.requiredField.DocumentID}" fieldName="XC_ContactDocumentNumber__c"
+                    disabled="{!v.docCountryOK}" />
+
+
+
+            </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                largeDeviceSize="6" padding="horizontal-small" alignmentBump="top">
+            </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                largeDeviceSize="6" padding="horizontal-small" alignmentBump="top">
+                <aura:if isTrue="{!v.showDate}">
+                    <lightning:inputField value="{!v.newSection.ReleaseDate}" fieldName="XC_ContactDocReleaseDate__c" />
+                    <lightning:inputField value="{!v.newSection.ExpirationDate}"
+                        fieldName="XC_ContactDocExpirationDate__c" />
+                </aura:if>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </lightning:recordEditForm>
+</aura:component>

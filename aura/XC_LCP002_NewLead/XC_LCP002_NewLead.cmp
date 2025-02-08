@@ -1,0 +1,269 @@
+<aura:component extends="c:XC_LCP022_TabNavigationManager" controller="XC_LCC002_NewLead"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable"
+    access="global">
+
+    <!-- ATTRIBUTES -->
+    <aura:attribute name="techConfiguration" type="Object" default="[]" />
+    <aura:attribute name="fieldMap" type="String" />
+    <aura:attribute name="userCountry" type="String" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+    <aura:attribute name="isMobile" type="boolean" default="false" />
+    <aura:attribute name="isCondominium" type="Boolean" default="false" />
+    <aura:attribute name="isSmallBusiness" type="Boolean" default="false" />
+    <aura:attribute name="isSystemAdmin" type="Boolean" default="false" />
+    <aura:attribute name="showAddress" type="Boolean" default="false" />
+    <aura:attribute name="showDocument" type="Boolean" default="true" />
+    <aura:attribute name="leadRecord" type="Lead" />
+    <aura:attribute name="initFinished" type="Boolean" default="false" />
+    <aura:attribute name="assignLeadCheckBox" type="Boolean" default="true" />
+    <aura:attribute name="disableCheckBox" type="Boolean" default="true" />
+    <aura:attribute name="insertAddressClicked" type="Boolean" default="true" />
+    <aura:attribute name="setDependent" type="Boolean" default="true" />
+    <aura:attribute name="recordTypeToReturn" type="String" />
+    <aura:attribute name="picklistValue" type="String" />
+    <aura:attribute name="rchannel" type="String" />
+    <aura:attribute name="numberAppoggio" type="String" />
+    <aura:attribute name="exDateAppoggio" type="String" />
+    <aura:attribute name="rDateAppoggio" type="String" />
+    <aura:attribute name="condominiumName" type="String" />
+    <aura:attribute name="companyName" type="String" />
+    <aura:attribute name="socialPersonaId" type="String" />
+    <aura:attribute name="body0" type="Object[]" />
+    <aura:attribute name="body1" type="Object[]" />
+    <aura:attribute name="body2" type="Object[]" />
+    <aura:attribute name="body3" type="Object[]" />
+    <aura:attribute name="body4" type="Object[]" />
+    <aura:attribute name="body5" type="Object[]" />
+    <aura:attribute name="body6" type="Object[]" />
+    <aura:attribute name="body7" type="Object[]" />
+    <aura:attribute name="bodyConsents" type="Object[]" />
+    <aura:attribute name="fieldToControl" type="Object" />
+    <aura:attribute name="canInsert" type="Boolean" default="false" />
+    <aura:attribute name="requiredFields" type="String[]" default="[]" />
+    <aura:attribute name="fieldLabelMap" type="Object" />
+    <aura:attribute name="isCommunity" type="Boolean" default="false" />
+    <aura:attribute name="withoutValidate" type="Boolean" default="false" />
+    <aura:attribute name="showDate" type="Boolean" default="false" />
+    <aura:attribute name="alreadyPush" type="Boolean" default="true" />
+    <aura:attribute name="leadTitle" type="String" default="Lead" />
+    <aura:attribute name="leadRTName" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="releaseDate" type="String" />
+    <aura:attribute name="expDate" type="String" />
+    <aura:attribute name="fakeCompany" type="String" default="company" />
+    <aura:attribute name="controlNumber" type="String" />
+    <aura:attribute name="isSFMLead" type="Boolean" default="false"/>
+    <aura:attribute name="showCampaignSection" type="Boolean" default="false"/>
+    <aura:attribute name="showAddressButton" type="Boolean" default="true"/>
+    <!-- Insert address -->
+    <aura:set attribute="tabIcon" value="action:email" />
+    <aura:attribute name="changeIcon" type="Boolean" default="false" />
+    <aura:attribute name="checkValue" type="List" />
+    <aura:attribute name="addressFromEvent" type="Map" />
+    <aura:attribute name="consentsLE" type="List" />
+    <aura:attribute name="robinsonCustomer" type="Boolean" />
+    <aura:attribute name="thirdPartiesCheck" type="String" />
+    <aura:attribute name="thirdPartiesVersion" type="String" />
+    <aura:attribute name="pageReference" type="Object" />
+    <aura:attribute name="saveConsentsWrapper" type="Object" />
+    <aura:attribute name="parentRecordId" type="String" />
+    <!-- PHONE FROM CTI -->
+    <aura:attribute name="ctiInteractionPhone" type="String" />
+    <aura:attribute name="ctiInteractionPhonePref" type="String" />
+
+
+    <!-- Toast message -->
+    <aura:attribute name="showToastMessage" type="Boolean" default="false" />
+    <aura:attribute name="isSmallBu" type="Boolean" default="false" />
+    <aura:attribute name="messageToast" type="String" default="" />
+    <aura:attribute name="type" type="String" default="" />
+    <aura:attribute name="addressMandatoryFields" type="List" />
+
+    <!-- HANDLER -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />  
+    <aura:handler event="c:XC_LCE013_SetAddressObject" name="XC_LCE013_SetAddressObject" action="{!c.handleComponentEvent}" />
+    <aura:handler event="c:XC_LCE014_SetAddressOpenable" action="{!c.setAddressOpenable}" />
+    <aura:handler event="c:XC_LCE_SetLEConsentsObject" action="{!c.handleLEConsentsEvent}" />
+    <aura:handler name="saveConsents" event="c:XC_LCE163_SaveConsents" action="{!c.handleSaveConsentsEvent}" />
+    <!-- <aura:handler name="change" value="{!v.requiredFields}" action="{!c.controlMandatoryFields}" /> -->
+    <!-- <aura:handler name="change" value="{!v.canInsert}" action="{!c.canInsertField}" /> -->
+
+    <lightning:navigation aura:id="navService" />
+    <lightning:workspaceAPI aura:id="workspace" />
+    <!-- BODY -->
+    <div class="body">
+        <aura:if isTrue="false">
+            <!--isTrue="{!v.showToastMessage}">-->
+            <c:XC_LCP002_ToastMessage message="{!v.messageToast}" type="{!v.type}" />
+        </aura:if>
+        <aura:if isTrue="{!v.initFinished}">
+            <lightning:card class="slds-align_absolute-center slds-p-around--table-cell-spacing slds-size--6-of-6">
+                <div class="slds-p-around--medium">
+                    <!-- PN 20190523 added recordTypeId to drive picklist values-->
+                    <lightning:recordEditForm recordTypeId="{!v.recordTypeToReturn}" aura:id="recordUpdateForm"
+                        objectApiName="Lead" onsubmit="{!c.onSubmit}">
+                        <ui:scrollerWrapper class="scrollerSize">
+
+                            <aura:if isTrue="{!v.isCondominium}">
+                                <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                    largeDeviceSize="6" padding="around-small">
+                                    <lightning:input name="input1" label="Condominium Name"
+                                        value="{!v.condominiumName}" />
+                                </lightning:layoutItem>
+
+                            </aura:if>
+                            <aura:if isTrue="{!v.isSmallBusiness}">
+                                <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                    largeDeviceSize="6" padding="around-small">
+                                    <lightning:input name="input1" label="Company Name" value="{!v.companyName}" />
+                                </lightning:layoutItem>
+                                <!--<aura:set attribute="else">
+                                    <lightning:inputField name="input1" fieldName="Company" value="{!v.fakeCompany}"
+                                        class="slds-hidden" />
+                                </aura:set>-->
+                            </aura:if>
+
+                            <c:XC_LCP002_SectionHeader position="MIDDLE" titleName="{!v.leadTitle}" />
+                            <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                                <aura:if isTrue="{!v.setDependent}">
+                                    {!v.body1}
+                                </aura:if>
+                            </lightning:layout>
+
+
+                            <aura:if isTrue="{!(v.leadRTName!='XC_GLO_Lead_Residential')}">
+                                <c:XC_LCP002_SectionHeader position="MIDDLE"
+                                    titleName="{!$Label.c.XC_CL_ContactInformation}" />
+                                <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                                    {!v.body6}
+                                </lightning:layout>
+                            </aura:if>
+
+                            <aura:if isTrue="{!(v.leadRTName=='XC_GLO_Lead_Residential')}">
+                                <c:XC_LCP002_SectionHeader position="MIDDLE"
+                                    titleName="{!$Label.c.XC_CL_DocumentInformation}" />
+                                <!--<label class="slds-checkbox_toggle slds-grid">
+                                    <span class="slds-form-element__label slds-m-bottom_none">&nbsp;&nbsp;&nbsp;
+                                        {!$Label.c.XC_CL_ShowDocument}</span>
+                                    <input name="checkbox-toggle-6" type="checkbox" aria-describedby="checkbox-toggle-6"
+                                        onchange="{!c.setDocOn}" />
+                                    <span id="checkbox-toggle-6" class="slds-checkbox_faux_container"
+                                        aria-live="assertive">
+                                        <span class="slds-checkbox_faux"></span>
+                                        <div class="slds-checkbox_on"></div>
+                                        <span class="slds-checkbox_off"></span>
+                                    </span>
+                                </label>
+                                <aura:if isTrue="{!v.showDocument}">-->
+                                    <lightning:layout horizontalAlign="spread" verticalAlign="center"
+                                        multipleRows="true">
+                                        {!v.body2}
+                                        <aura:if isTrue="{!v.showDate}">
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="releaseDate"
+                                                    fieldName="XC_NIE_expedition_date__c" value="{!v.releaseDate}" />
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="expDate"
+                                                    fieldName="XC_NIE_expiration_date__c" value="{!v.expDate}" />
+                                            </lightning:layoutItem>
+                                        </aura:if>
+                                    </lightning:layout>
+                                <!--</aura:if>-->
+
+                            </aura:if>
+
+                            <c:XC_LCP002_SectionHeader position="MIDDLE"
+                                titleName="{!$Label.c.XC_CL_LeadAddressSection}" />
+                                <aura:if isTrue="{!v.showAddressButton}">
+                                    <label class="slds-checkbox_toggle slds-grid">
+                                        <span class="slds-form-element__label slds-m-bottom_none">&nbsp;&nbsp;&nbsp;
+                                            {!$Label.c.XC_CL_ShowAddress}</span>
+                                        <input name="checkbox-toggle-6" type="checkbox" aura:id="ad" id="c"
+                                            aria-describedby="checkbox-toggle-6" onchange="{!c.setAddressOn}" />
+                                        <span id="checkbox-toggle-6" class="slds-checkbox_faux_container" aria-live="assertive">
+                                            <span class="slds-checkbox_faux"></span>
+                                            <div class="slds-checkbox_on"></div>
+                                            <span class="slds-checkbox_off"></span>
+                                        </span>
+                                    </label>
+                                </aura:if>
+                            <aura:if isTrue="{!v.showAddress}">
+                                <c:XC_LCP_Address source="002" parentRecordType="{!v.leadRTName}"/>
+                            </aura:if>
+
+
+                            <c:XC_LCP002_SectionHeader position="MIDDLE"
+                                titleName="{!$Label.c.XC_CL_LeadOpportunityInfo}" />
+                            <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                                {!v.body3}
+                            </lightning:layout>
+
+
+                            <c:XC_LCP002_SectionHeader position="BOTTOM" titleName="{!$Label.c.XC_CL_LeadSource}" />
+                            <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                                {!v.body4}
+                            </lightning:layout>
+                            <aura:if isTrue="{!v.showCampaignSection}">
+                                <c:XC_LCP002_SectionHeader position="BOTTOM" titleName="{!$Label.c.XC_CL_LeadCampaign}" />
+                                <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                                    {!v.body7}
+                                </lightning:layout>
+                            </aura:if>
+                            <aura:if isTrue="{!!v.isSFMLead}">
+                                <c:XC_LCP002_SectionHeader position="MIDDLE"
+                                    titleName="{!$Label.c.XC_CL_LegalEntityConsents}" />
+                                <!--<c:XC_LCP110_LegalEntityDynamicTable relatedObject="Lead"/>-->
+
+                                <BR />
+                                {!v.bodyConsents}
+                            </aura:if>
+                            <!--<c:XC_LCP163_CreateConsents recordId="{!v.recordId}" objectType="Lead" sObjectData="{!v.leadRecord}" />
+                               <c:XC_LCP002_SectionHeader position="BOTTOM" titleName="{!$Label.c.XC_CL_LeadContents}" />
+                            <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                                {!v.body5} 
+                            </lightning:layout>                        
+                        -->
+                        </ui:scrollerWrapper>
+                        <br></br><br></br><br></br><br></br>
+                        <div>
+                            <div class="forceChangeRecordTypeFooter slds-float--right slds-m-around--medium">
+                                <lightning:button aura:id="submit" label="{!$Label.c.XC_CL_SaveButton}" variant="brand"
+                                    type="submit" onClick="{!c.onSubmit}" />
+                            </div>
+                            <aura:if isTrue="{!not(v.isSFMLead)}">
+                                <div class="forceChangeRecordTypeFooter slds-float--left slds-m-around--medium">
+                                    <lightning:input type="checkbox" name="assignLeadName"
+                                        label="{!$Label.c.XC_CL_AssignmentRule}" value="{!v.assignLeadCheckBox}"
+                                        checked="true" aura:id="assignLead" disabled="{!v.disableCheckBox}"
+                                        class="slds-p-vertical_small" onchange="{!c.assignLeadChecked}" />
+                                </div>
+                            </aura:if>
+                        </div>
+                    </lightning:recordEditForm>
+
+                    <aura:if isTrue="{!v.isCommunity}">
+                        <div class="forceChangeRecordTypeFooter slds-float--right slds-m-around--medium">
+                            <ui:button label="{!$Label.c.XC_CL_CPAB_Cancel}" press="{!c.goBackInCommunity}" />
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!!v.isCommunity}">
+                        <div class="forceChangeRecordTypeFooter slds-float--right slds-m-around--medium">
+                            <ui:button label="{!$Label.c.XC_CL_CPAB_Cancel}" press="{!c.goBack}" />
+                        </div>
+                    </aura:if>
+
+                </div>
+            </lightning:card>
+
+        </aura:if>
+        <aura:if isTrue="{!v.spinnerControl}">
+            <div aura:id="masterSpinner">
+                <lightning:spinner aura:id="mySpinner" />
+            </div>
+        </aura:if>
+    </div>
+
+</aura:component>

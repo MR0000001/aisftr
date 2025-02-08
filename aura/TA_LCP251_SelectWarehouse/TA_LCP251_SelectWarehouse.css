@@ -1,0 +1,50 @@
+.THIS .slds-input, .THIS .slds-select, .THIS .slds-input:focus, .THIS .slds-input:active, .THIS .slds-faux-input {
+    background-color: #ece8f2 !important;
+    border: 1px solid #ece8f2 !important;
+    border-radius: 5vw !important;
+    color: #461e7d !important;
+    height: 8vw;
+}
+.THIS .slds-form-element__label{
+    color: var(--lwc-colorTextLabel,rgba(0, 0, 0, 0.6)) !important;
+}
+
+.THIS .ta-modal-header {
+    padding: 5vw 5vw 3vw 5vw;
+}
+
+.THIS .ta-large-modal-container {
+    position: absolute;
+    top: 10vh;
+    left: 10vw;
+    right: 10vw;
+    background: white;
+    border-radius: 5vw;
+    box-shadow: 0 0vw 1vw 0vw black;
+}
+
+.THIS .ta-large-modal-body {
+    padding: 3vw;
+    max-height: 55vh;
+    overflow-y: auto;
+}
+
+.THIS .ta-card-container {
+    padding: 3vw;
+    border: 0.2vw solid;
+    border-radius: 4vw;
+    margin-bottom: 2vh;
+}
+
+.THIS .ta-card-label {
+    padding-right: 1vw
+}
+
+.THIS .ta-card-value {
+    color: rgb(70, 30, 125);
+}
+
+.THIS .ta-card-selected {
+    border: 0.2vw solid rgb(70, 30 , 125);
+    box-shadow: 0vw 0vw 2vw rgb(70 30 125);
+}

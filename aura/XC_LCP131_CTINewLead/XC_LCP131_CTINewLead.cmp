@@ -1,0 +1,108 @@
+<aura:component controller="XC_LCC129_CTIMultipleMatch"
+    implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    <aura:attribute name="sobjecttype" type="String" />
+    <aura:attribute name="rtvalueId" type="String" default="" />
+    <aura:attribute name="rtOpts" type="List" />
+    
+    <aura:attribute name="interactionPhonePrefix" type="String" />	
+
+    <aura:attribute name="interactionRecord" type="Object" />
+    <aura:attribute name="recordError" type="String" />
+    <aura:attribute name="interactionPhone" type="String" />
+    <aura:attribute name="showScriptModal" type="Boolean" default="false" />
+    <aura:attribute name="hasContact" type="Boolean" default="false"/>
+    <aura:handler event="c:XC_LCE019_CloseChildComponent" name="XC_LCE019_CloseChildComponent"
+    action="{!c.closeChildComponent}" />
+
+    <force:recordData aura:id="recordLoader" recordId="{!v.recordId}" targetFields="{!v.interactionRecord}"
+        targetError="{!v.recordError}" fields="Name,XC_Phone__c,XC_ContactId__c,XC_LeadId__c,XC_HasMultipleMatch__c,XC_InteractionStatus__c,XC_Connection_ID__c,XC_Customer_Phone_Prefix__c"
+         layoutType="FULL" mode="EDIT" />  
+
+    <!-- Handler on change of field values -->
+    <aura:handler name="change" value="{!v.interactionRecord}" action="{!c.init}"/>
+
+    <div class="c-container">
+        <lightning:card variant="Narrow" title="{!$Label.c.XC_CL_CTINewLead_Header}" iconName="standard:agent_session">
+            <aura:set attribute="actions">
+                <lightning:button label="{!$Label.c.XC_CL_CTINewLeadBTN}" iconName="standard:lead" onclick="{!c.createLead}" />
+                <lightning:button label="{!$Label.c.XC_CL_CTINewLeadAccBTN}" iconName="standard:account" onclick="{!c.createAccount}" />
+                <aura:if isTrue="{!v.hasContact}">
+                        <lightning:button label="{!$Label.c.XC_CL_NewOpty}" iconName="standard:opportunity" onclick="{!c.createOpportunity}" />
+                </aura:if>
+                <!-- TODO ADD BUTTON FOR SHOW SCRIPTS -->
+                <!-- <lightning:button label="{!$Label.c.XC_CL_CTIShowScriptBTN}" onclick="{!c.showScriptModal}"/> -->
+            </aura:set>
+        </lightning:card>
+    </div>
+
+    <!-- <c:XC_LCP173_CTIShowAgentScript openModal="{!v.showScriptModal}"/> -->
+
+
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="Modalbox" class="slds-modal">
+        <div class="slds-modal__container">
+
+            <div class="modal-header slds-modal__header">
+                <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close"
+                    onclick="{!c.handleCancel}">
+                    X
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 class="title slds-text-heading__medium">
+                    <lightning:icon iconName="{! if(v.sobjecttype=='Lead','standard:lead','standard:account')}"
+                        alternativeText="Approved" />
+                    {!$Label.c.XC_CL_CTINewLead_RTChoose}
+                </h2>
+            </div>
+            <div class="scrollable slds-modal__content slds-p-around__medium" style="height:150px;">
+                <div class="changeRecordTypeRow">
+                    <fieldset class="slds-form-element">
+
+                        <div class="slds-align_absolute-center">
+                            <lightning:radioGroup name="radioGroup" options="{! v.rtOpts }" value="{! v.rtvalueId }"
+                                type="radio" />
+                        </div>
+
+                    </fieldset>
+                </div>
+            </div>
+            <div class="modal-footer slds-modal__footer">
+                <div class="forceChangeRecordTypeFooter">
+                    <!-- AGGIUNTA BOTTONI -->
+                    <lightning:button variant="brand"
+                        label="{! $Label.c.XC_CL_CTINewLeadCreateBTN + ' '  + v.sobjecttype}"
+                        onclick="{!c.createModalRecord}" />
+                    <lightning:button variant="neutral" label="{!$Label.c.XC_CL_CTINewLeadCancelBTN}"
+                        onclick="{!c.handleCancel}" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OPPORTUNITY MODAL BOX -->
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="OptyModalBox" class="slds-modal">
+        <div class="slds-modal__container">
+
+            <div class="modal-header slds-modal__header">
+                <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close"
+                    onclick="{!c.handleCancelOpty}">
+                    X
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 class="title slds-text-heading__medium">
+                    <lightning:icon iconName="action:new_opportunity" alternativeText="Approved" />
+                    <span class="slds-p-left_small">{!$Label.c.XC_CL_NewOpty}</span></h2>
+            </div>
+            <div class="scrollable slds-modal__content slds-p-around__medium" style="height:250px;">
+                <div class="slds-p-around_small">
+                    {!v.body}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+
+
+</aura:component>

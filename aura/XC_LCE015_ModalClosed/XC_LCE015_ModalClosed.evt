@@ -1,0 +1,9 @@
+<!--
+* @author Monica Cutillo
+* @date Creation 12/03/2019
+* @date Modification dd/mm/yyyy
+* @description XC_LCE015_ModalClosed - Event fired when a modal window in closed
+-->
+<aura:event type="APPLICATION" description="Event template" >
+	<aura:attribute name="modalName"   type="String"/>
+</aura:event>

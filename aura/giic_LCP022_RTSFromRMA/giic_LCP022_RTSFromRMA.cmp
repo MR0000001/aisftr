@@ -1,0 +1,242 @@
+<aura:component controller="Giic_LCC022_RTSFromRMA" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,force:hasSObjectName" access="global">
+	<aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="initialLoad" type="Boolean" default="true" description="attribute to check if it is initialLoad"/>	
+	<aura:attribute name="mapDispIdToQuantity" type="Map" default="{}"/>
+    <aura:attribute name="cmpTitle" type="String" default="Return to Supplier"/>
+    <aura:attribute name="currentDispSelected" type="gii__RMADisposition__c"  /> 
+	<aura:attribute name="sobjectType" type="String" default="{!v.sObjectName}"/>
+    <aura:attribute name="draftValues" type="gii__RMADisposition__c" default="[]"/>
+    <aura:attribute name="countSelectedRow" type="Integer" default="0"/>
+    <aura:attribute name="linesFromServer" type="gii__RMADisposition__c" default="[]"/>
+    <aura:attribute name="mapRetToDisposition" type="Map" default="{}"/>
+    <aura:attribute name="columns" type="List"/> 
+    <aura:attribute name="reasonsList" type="List"/> 
+ 
+    <aura:attribute name="errors" type="Object" default="[]"/>
+    <aura:attribute name="error" type="String" default=""/> 
+    <aura:attribute name="mapDispLine1" type="String" default=""/> 
+    <aura:attribute name="mapDispLine" type="Map" default="{}"/> 
+     <aura:attribute name="idToDispositionLine" type="Map" default="{}"/> 
+
+
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />   
+	    
+	
+    <!-- RTS Configuration Data -->
+	<!-- attribute to switch radio button RTS, reason and Purchase Order 100% based on Central or Local WH on RMA-->
+    <aura:attribute name="CentralWarehouseRMA" type ="Boolean" default ="false"/>
+    
+    <aura:attribute name="RTSOnWarehouse" type="string" default="" />
+    <aura:attribute name="FinalPORmaWH" type="string" default="" />
+    <aura:attribute name="FinalTORmaWH" type="string" default="" />
+    <aura:attribute name="warehouseRMA" type="String" default=""/> 
+    <aura:attribute name="warehouseParent" type="String" default=""/> 
+    <aura:attribute name="warehouseFrom" type="String" default=""/>
+    <aura:attribute name="wareHouseAccount" type="String" default=""/> 
+    <aura:attribute name="ShipFromPoTo" type="string" default="" />
+    
+    <aura:attribute name="POonCentralWarehouse" type="boolean" default="false" />
+    <aura:attribute name="POonWarehouse" type="string" default="None" />
+    <aura:attribute name="reason" type="string" default="" />
+    
+    <aura:attribute name="actualRow" type="Integer"  /> 
+    <aura:attribute name="lineSelected" type="Boolean" default="false" /> 
+    <aura:attribute  name="DispositionLineList" type="List"/>
+    
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <!-- to store Disposition line on grid -->
+    <aura:attribute name="data" type="List"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" /> 
+	
+    <!-- radio button for RMA on LW to choice destination WH RTS -->
+    <aura:attribute name="RTSOnWH" type="List" default="[
+                                {'label': 'Local Warehouse', 'value': 'Local'},
+                                {'label': 'Central Warehouse', 'value': 'Central'}
+                                ]"/>
+
+    <!-- radio button for RMA on LW to create PO on destination WH choiced -->
+    <aura:attribute name="POOnWH" type="List" default="[
+    	{'label': 'Local Warehouse', 'value': 'LW'},
+    	{'label': 'Central Warehouse', 'value': 'CW'},
+        {'label': 'None', 'value': 'None'}                                             
+                                                     
+   		 ]"/>
+    
+     <!-- radio button for RMA on CW to create PO on CW -->
+     <aura:attribute name="POOnCW" type="List" default="[
+                                {'label': 'Yes', 'value': 'true'},
+                                {'label': 'No', 'value': 'false'}
+                                ]"/>
+    
+     <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner aura:id="mySpinner" />
+     </aura:if>		
+     <div class="c-container">
+	 
+        <div class="slds-box slds-theme_shade">
+    		<div class="slds-text-heading_medium">
+                 <lightning:icon iconName="standard:return_order" alternativeText="Approved" />&nbsp;
+           
+                <b> Return to Supplier</b>
+               
+            </div>
+     	</div>
+        <lightning:layout verticalAlign="center" horizontalAlign="center" >
+              <lightning:layoutItem size = "3" padding="around-small">
+                    <div class="custom-box2">
+                        <lightning:card variant="Narrow" iconName="standard:record_update">
+                            <aura:set attribute="title">
+                                <h4>Select RTS configuration data</h4>
+                            </aura:set>
+                        </lightning:card>
+                    </div>
+                </lightning:layoutItem>
+               <lightning:layoutItem size = "6" padding="around-small">
+                    <div class="custom-box2">
+                        <lightning:card variant="Narrow" iconName="custom:custom83">
+                            <aura:set attribute="title">
+                                <h4>Select Disposition Lines, put value on "QUANTITY TO RETURN" and press Save</h4>
+                            </aura:set>
+                        </lightning:card>
+                    </div>
+                </lightning:layoutItem>
+                <lightning:layoutItem size = "3" padding="around-small">
+                    <div class="custom-box2">
+                        <lightning:card variant="Narrow" iconName="custom:custom83">
+                            <aura:set attribute="title">
+                                <h4>Press button Start RTS</h4>
+                            </aura:set>
+                        </lightning:card>
+                    </div>
+                </lightning:layoutItem>
+         </lightning:layout>     
+    </div>    
+    <br></br>
+     <lightning:tabset>
+           <lightning:tab label="RTS Configuration" iconName="utility:edit">
+               <aura:if isTrue="{!v.CentralWarehouseRMA}">
+               		<div class="slds-box">	
+               			<lightning:layout>
+                            <div class="slds-box">
+                    	        <lightning:radioGroup name="radioGroup1"
+                                                label="Purchase Order 100% discount on Central WH"
+                                                options="{!v.POOnCW}"
+                                                value="{!v.POonCentralWarehouse}"
+                                                type="radio"
+                                                onchange="{!c.POonCW}"/>
+                                                
+                                <lightning:layout>                 
+                                    <div class="slds-p-around_medium lgc-bg">
+                                        <!-- values always must be loaded from server -->
+                                        <lightning:select name="selectReason1" label="Reason RTS" required="true" onchange="{!c.onChangeReason}">
+                                            <option value="">Choose one...</option>
+                                            <aura:iteration items="{!v.reasonsList}" var="r">
+            									<option value="{!r}" text="{!r}"></option>
+        									</aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                 
+               					</lightning:layout>
+                         </div>
+               			</lightning:layout>
+                   
+               		</div>
+               <aura:set attribute="else">
+               
+               	<div class="slds-box">	
+               		<lightning:layout>
+                    
+           		 	 <div class="slds-p-around_medium lgc-bg">
+                        
+                    	 <div class="slds-box">
+                    	        <lightning:radioGroup name="radioGroup"
+                                                label="Return to Supplier on"
+                                                options="{!v.RTSOnWH}"
+                                                value="{!v.RTSOnWarehouse}"
+                                                type="radio"
+                                                onchange="{!c.RTSOnWH}"/>
+                                <lightning:layout>                 
+                                    <div class="slds-p-around_medium lgc-bg">
+                                        <!-- values always must be loaded from server -->
+                                        <lightning:select name="selectReason" label="Reason RTS" required="true" onchange ="{!c.onChangeReason}">
+                                            <option value="">Choose one...</option>
+                                             <aura:iteration items="{!v.reasonsList}" var="r">
+            									<option value="{!r}" text="{!r}"></option>
+        									</aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                 
+               					</lightning:layout>
+                         </div>
+                   </div> 
+                  
+                    <lightning:layout>               
+                    	<div class="slds-p-around_medium lgc-bg">
+                        <div class="slds-box">
+                                                  
+                               <lightning:radioGroup name="CheckboxGroup"
+                                     label="Purchase Order 100% discount on"
+                                     options="{! v.POOnWH}"
+                                     value="{!v.POonWarehouse}"
+                                     onchange="{!c.POonWH}"/>
+                    	</div> 
+                      </div>       
+           			</lightning:layout>
+               </lightning:layout>   
+              
+              
+               </div>
+                   </aura:set>    
+               </aura:if>
+               <br></br>
+               <div class="slds-text-align_right">
+                   <div class="slds-box">	
+                        <lightning:button variant="neutral" 
+                                                label="{!$Label.c.XC_CL_Cancel}"
+                                                title="Cancel"
+                                                 onclick="{! c.closeModal }"/>
+                   </div>
+               </div>     
+         	</lightning:tab>
+              <lightning:tab label="Disposition Lines" iconName="utility:table">
+                  <lightning:datatable aura:id="DispositionTable"
+                        columns="{!v.columns}"
+                        data="{!v.data}"
+                        keyField="Id"
+                        errors="{! v.errors }"
+                        draftValues="{!v.draftValues}"
+            			onsave="{! c.handleSaveLine }"
+                       	onrowselection="{!c.selectDisposition}"
+                        />  
+                  <br></br>              
+          		 <div class="slds-box">
+                    <lightning:layout>
+            			<lightning:layoutItem size = "12" padding="around-small">
+                   			<div class="slds-text-align_right">
+                 				<lightning:buttonGroup>
+                 					<lightning:button variant="neutral" 
+                              				label="{!$Label.c.XC_CL_Cancel}"
+                              				title="Cancel"
+                             				 onclick="{! c.closeModal }"/>
+            
+            						<lightning:button variant="brand" 
+                              				label="Save"
+                              				title="save"
+                              				disabled="{!v.sblokSubmit}"
+                              				onclick="{! c.startReceipt }"/>  
+                				</lightning:buttonGroup>
+                			</div>
+                        </lightning:layoutItem>
+                  	</lightning:layout>
+         					 
+                
+        
+         		</div>
+             
+              </lightning:tab>
+        </lightning:tabset>
+         
+    
+</aura:component>

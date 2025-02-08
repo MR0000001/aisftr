@@ -1,0 +1,27 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride" access="global" >
+    
+	<aura:attribute name="showModal" type="boolean" default="false"/>
+	<ltng:require styles="{!$Resource.XC_STR004_CompWidth100}"/> 
+
+    <div class="c-container">
+
+		<div class="buttonstyle" style="text-align:right">
+			<lightning:button label="{!$Label.c.XC_CL_New}" title="New" onclick="{! c.showModal }"/>
+		</div>
+
+		<aura:if isTrue="{!v.showModal}">
+			<c:strike_modal
+				title="{!$Label.c.XC_CL_NewAccount}"
+				primaryButtonLabel="{!$Label.c.XC_CL_SaveButton}"
+				secondaryButtonLabel="{!$Label.c.XC_CL_CPAB_Cancel}"
+				showHeader="true"
+				showFooter="false"
+				showClose="true"
+				showModal="true"
+				size="large">
+				<c:XC_LCP003_RedirectAccount isCommunity="true"/> 
+		</c:strike_modal>
+	</aura:if>
+
+    </div>
+</aura:component>

@@ -1,0 +1,52 @@
+<!--
+* @author Monica Cutillo
+* @date Creation 06/11/2018
+* @description XC_LCP034_EditOrderPracticeNumber – Used to edit the Order Practice Number 
+* for the Financial Approval Process
+-->
+<aura:component controller="XC_LCC034_EditOrderPracticeNumber" implements="lightning:actionOverride,force:appHostable,force:lightningQuickActionWithoutHeader,lightning:actionOverride,force:hasRecordId,flexipage:availableForAllPageTypes" access="global" >
+    <aura:attribute name="recordId" type="String"/>
+    <aura:Attribute name="IdFromMobile" type="String"/>
+    <aura:Attribute name="disabled" type="Boolean" default="true"/>
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:attribute name="showModal" type="Boolean" default="true"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+
+    <lightning:card variant="Narrow">
+        <div class="modal-header slds-modal__header slds-size_1-of-1">
+            <h4 class="title slds-text-heading--medium" >{!$Label.c.XC_CL_Order_EditPracticeNumber}</h4>
+        </div>
+
+        <aura:if isTrue="{!v.spinnerControl}" >
+            <div aura:id="masterSpinner"  class="slds-is-relative">
+                <lightning:spinner aura:id="mySpinner"/>
+            </div>
+        </aura:if>
+    
+        <aura:if isTrue="{!v.showModal}" >  
+            <lightning:recordEditForm recordId="{!v.recordId}" objectApiName="NE__Order__c" aura:id="editForm" onsubmit="{!c.doSubmit}" >
+                <lightning:inputField fieldName="XC_PracticeNumber__c" aura:id="partNum" onchange="{!c.doCheckValueNotEmpty}" />
+                <lightning:layout horizontalAlign="end">
+                    <lightning:layoutItem padding="around-small">
+                        <lightning:buttonGroup>
+                            <lightning:button label="{!$Label.c.XC_CL_Cancel}" onclick="{! c.doClose }" />
+                            <lightning:button variant="brand" label="{!$Label.c.XC_CL_SaveButton}" type="submit" onClick="{!c.doSubmit}" disabled="{!v.disabled}" />
+                        </lightning:buttonGroup>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:recordEditForm>
+        <aura:set attribute="else">
+            <lightning:layout horizontalAlign="end">
+                <lightning:layoutItem padding="around-small">
+                    <lightning:buttonGroup>
+                        <lightning:button label="{!$Label.c.XC_CL_Cancel}" onclick="{! c.doClose }" />
+                    </lightning:buttonGroup>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </aura:set>
+        </aura:if>
+
+    </lightning:card>
+</aura:component>

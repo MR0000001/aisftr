@@ -1,0 +1,82 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 12-18-2020
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   12-18-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId">
+
+    <aura:attribute name="optyRecord" type="Object" />
+    <aura:attribute name="recordError" type="String" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="true" />
+    <aura:attribute name="showButtons" type="Boolean" default="false" />
+    <aura:attribute name="openModal" type="Boolean" default="false"/>
+    <aura:attribute name="openOrderCmp" type="Boolean" default="false"/>
+    <aura:attribute name="orderOptions" type="Object"/>
+    <lightning:navigation aura:id="navService" />
+
+    <!-- XC_AMP_WorkOrder__c,XC_AMP_WorkOrder__r.Status,XC_AMP__Order__r.XC_Status__c,XC_AMP_ChildOpportunity__c,XC_RelatedOpportunity__c-->
+    <force:recordData aura:id="recordLoader" recordId="{!v.recordId}" targetFields="{!v.optyRecord}"
+        targetError="{!v.recordError}"
+        fields="AccountId,XC_RelatedOpportunity__c,StageName,XC_AMP_ChildOpportunity__c,XC_AMP_WorkOrder__c,XC_AMP_WorkOrder__r.Status,XC_AMP_WorkOrder__r.XC_Result__c" 
+        mode="EDIT" recordUpdated="{!c.init}" />
+
+    <div class="c-container">
+        <aura:if isTrue="{!v.spinnerControl}">
+            <div class="slds-is-relative slds-p-around_small">
+              <lightning:spinner aura:id="mySpinner" variant="brand" size="large" style="background-color: rgba(0, 0, 0, 0)"/>
+            </div>
+          </aura:if>
+
+        <aura:if isTrue="{!v.showButtons}">
+            <div class="slds-p-around_small slds-is-relative" align="center">
+                <lightning:buttonGroup>
+                    <aura:if
+                        isTrue="{!v.optyRecord.StageName == 'Draft'}">
+                        <div class="slds-p-around_small">
+                            <lightning:button label="{!$Label.c.XC_CL_EditOrder}" variant="brand" onclick="{!c.editDraftOrder}"/>
+                        </div>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!and(empty(v.optyRecord.XC_RelatedOpportunity__c),empty(v.optyRecord.XC_AMP_ChildOpportunity__c))}">
+                                <div class="slds-p-around_small">
+                                    <lightning:button label="{!$Label.c.XC_CL_ConfirmJuicepackOrderBtn}" variant="brand"
+                                        disabled="{!!and(v.optyRecord.XC_AMP_WorkOrder__r.Status=='Completed',v.optyRecord.XC_AMP_WorkOrder__r.XC_Result__c!='KO',!empty(v.optyRecord.XC_AMP_WorkOrder__r.XC_Result__c))}" onclick="{!c.completeChildOrder}"/>
+                                </div>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </lightning:buttonGroup>
+            </div>
+        </aura:if>
+    </div>
+
+    <aura:if isTrue="{!v.openModal}">
+        <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="ExtModal" class="slds-modal">
+            <div class="slds-modal__container">
+                <div class="modal-header slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeOrderModal}">
+                        X
+                        <span class="slds-assistive-text">{!$Label.c.XC_CL_Close}</span>
+                    </button>
+                    <h2 class="title slds-text-heading__medium slds-text-title_caps">
+                        <lightning:icon iconName="standard:work_order" /><span class="slds-p-left_small slds-text-title_caps">{!$Label.c.XC_CL_EditOrder}</span></h2>
+                </div>
+                <div class="slds-modal__content slds-p-around__medium">
+                    <div class="slds-p-around_small">
+                        <aura:if isTrue="{!v.openOrderCmp}">
+                            <c:XC_AMP_LCP002_OrderMainViewBuilder createdAccountId="{!v.optyRecord.AccountId}" parentOpportunityId="{!v.recordId}" options="{!v.orderOptions}"/>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer slds-modal__footer"></div>
+        </div>
+        <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+    </aura:if>
+
+</aura:component>

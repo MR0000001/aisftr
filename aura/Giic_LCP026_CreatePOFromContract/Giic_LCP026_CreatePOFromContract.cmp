@@ -1,0 +1,116 @@
+<aura:component controller="Giic_LCC026_CreatePOFromContract" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false" /> 
+    <aura:attribute name="showLookup" type="Boolean" default="false" /> 
+    
+    <aura:attribute name="isModalOpen" type="Boolean" default="false" /> 
+    <aura:attribute name="numberOfProduct" type="Integer" />
+    <aura:attribute name="warehouseId" type="String" default=""/>
+    <aura:attribute name="priceBookId" type="String" default=""/>
+    <aura:attribute name="contractObject" type="String" default=""/>
+    <aura:attribute name="filter1" type="String" default = ""/>
+    <aura:attribute name="legalEntity" type="String" default=""/>
+    <aura:attribute name="contractNumber" type="String" default=""/>
+    <lightning:navigation aura:id="navService"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    
+    
+    
+    
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" /> 
+    <div class="c-container">
+	 
+        <div class="slds-box slds-theme_shade">
+    <div class="slds-text-heading_large">
+         <lightning:icon iconName="standard:partner_fund_allocation" alternativeText="Approved" />&nbsp;
+          
+        <b> New Purchase Order  </b>
+        
+            </div>
+ </div> 
+        
+        <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner aura:id="mySpinner" />
+        </aura:if>
+        
+        
+         <div class="slds-theme_shade"><b>&nbsp; This Purchase order will be related to the Contract {!v.contractNumber}.</b></div>
+         <aura:if isTrue="{!!v.isModalOpen}">
+         <lightning:layout>
+             <lightning:layoutItem size="4" padding="around-small">
+             </lightning:layoutItem>
+          
+      
+               <lightning:layoutItem size="4" padding="around-small">
+                   
+                 <aura:if isTrue="{!v.showLookup}">
+                      	<c:strike_lookup
+    			label="Choose a Warehouse"
+    			object="gii__Warehouse__c"
+    			searchField="Name"
+    			placeholder="Select an option"
+    			iconName="custom:custom24"
+    			order="Name"
+    			filter="{!v.filter1}"
+    			limit="8"
+                required="true"
+    			value="{!v.warehouseId}"
+    			loadingMessage="Loading..."
+    			errorMessage="Invalid input"/>
+                   </aura:if>
+             </lightning:layoutItem>
+             
+             
+              <lightning:layoutItem size="4" padding="around-small">
+             </lightning:layoutItem>
+        </lightning:layout>
+        </aura:if>
+        
+         <aura:if isTrue="{!v.isModalOpen}">
+               <lightning:layout>
+             <lightning:layoutItem size="4" padding="around-small">
+             </lightning:layoutItem>
+          
+      
+               <lightning:layoutItem size="4" padding="around-small">
+        <section role="dialog" tabindex="-1" aria-label="Meaningful description of the modal content" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+<div class="slds-modal__container">
+<header class="slds-modal__header slds-modal__header_empty">
+<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+
+<span class="slds-assistive-text">Close</span>
+</button>
+</header>
+    <div style="text-align:center">
+<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+<p> <b>A Purchase Order with {!v.numberOfProduct} product will be created. Are you sure?</b></p>
+</div>
+<footer class="slds-modal__footer">
+    <div style="text-align:center">
+            <lightning:button label="Yes" variant="brand"  title="Yes" disabled="{!v.savePermitted}" onclick="{!c.handleYes}"/>
+            <lightning:button label="No" title="No" onclick="{!c.handleNo}"/>
+    </div>
+</footer>
+    </div>
+</div>
+</section>
+                   <div class="slds-backdrop slds-backdrop_open"></div>
+                   </lightning:layoutItem>
+                    <lightning:layoutItem size="4" padding="around-small">
+             </lightning:layoutItem>
+             </lightning:layout>
+</aura:if>
+        
+ <aura:if isTrue="{!!v.isModalOpen}">        
+        <div style="text-align:right">
+           <br></br><br></br>
+            <lightning:buttonGroup>
+            <lightning:button label="Save" variant="brand"  title="Save" disabled="{!v.savePermitted}" onclick="{!c.handleSave}"/>
+            <lightning:button label="Cancel" title="Cancel" onclick="{!c.handleCancel}"/>
+            </lightning:buttonGroup>
+        </div>
+        </aura:if>
+    </div>
+</aura:component>

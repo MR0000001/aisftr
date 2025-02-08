@@ -1,0 +1,48 @@
+<!--
+* @author Nicola Mariniello nmariniello@deloitte.it - Luisana Rocco lrocco@deloitte.it
+* @date Creation 06/11/2018
+* @date Modification dd/mm/yyyy
+* @description Component to refuse Work order
+-->
+
+<aura:component controller="XC_LCC035_RefuseWorkOrder" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="recordId" type="String"/>  
+    <aura:attribute name="record" type="Object" />
+    <aura:attribute name="componentRecord" type="Object" />
+    <aura:attribute name="recordError" type="String" />
+    <aura:attribute name="insertRefusingReason" type="Boolean" default="false"/>
+    <aura:attribute name="newReason" type="String"  default =""/>
+    
+
+    <force:recordData 
+        aura:id="recordLoader" 
+        recordId="{!v.recordId}" 
+        layoutType="FULL" 
+        mode="EDIT"
+        targetRecord="{!v.record}"
+        targetFields="{!v.componentRecord}"
+        targetError="{!v.recordError}"/>
+
+
+    <lightning:card footer="Card Footer" title="{!$Label.c.XC_CL_WorkOrder_RefuseTitle}">
+        <aura:set attribute="footer">
+            <br/>
+            {!$Label.c.XC_CL_WorkOrder_RefuseBody} <br/>
+            
+            <aura:if isTrue="{!not(v.insertRefusingReason)}">
+                <br/>
+                <lightning:button variant="brand" label="{!$Label.c.XC_CL_YesButton}" onclick="{!c.updateWorkOrder}"/>
+                &nbsp; &nbsp; 
+                <lightning:button variant="brand" label="No" onclick="{!c.noButton}"/>
+
+                <aura:set attribute='else'>
+                    <lightning:input value="{!v.newReason}" placeholder="{!$Label.c.XC_CL_InsertRefusingReason}" /> <br/>
+                    <lightning:button variant="brand" label="{!$Label.c.XC_CL_SaveButton}" onclick="{!c.doChanges}"/>
+                </aura:set>
+
+            </aura:if>
+        </aura:set>
+    </lightning:card>
+
+</aura:component>

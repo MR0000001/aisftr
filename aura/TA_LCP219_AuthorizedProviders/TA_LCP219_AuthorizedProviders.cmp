@@ -1,0 +1,60 @@
+<aura:component controller="TA_LCC219_AuthorizedProvidersCnt"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global">
+
+    <aura:attribute access="public" name="fieldSet" 	type="String" />
+    <aura:attribute access="public" name="workOrder" 	type="Object" />
+
+    <aura:attribute access="private" name="general"	 		type="Object" />
+    <aura:attribute access="private" name="custom" 			type="Object" />
+    <aura:attribute access="private" name="title" 			type="String" />
+    <aura:attribute access="private" name="description" 	type="String" />
+    <aura:attribute access="private" name="customerCardBg" 	type="String" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt" />
+
+    <div class="slds-m-around_small" style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover;
+            background-position: bottom; background-color: #461e7d; box-shadow: 0vw 1vw 2vw -0.8vw black; background-blend-mode: lighten; border-radius: 2vw;'}">
+        <lightning:layout multipleRows="true" class="ta-partners-container">
+            <lightning:layoutItem size="12">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" class="slds-m-bottom_xx-small">
+                        <h3 class="ta-color-white"> {!v.title} </h3>
+                    </lightning:layoutItem>
+                    <aura:if isTrue="{!v.description != null}">
+                        <lightning:layoutItem size="12">
+                            <p class="ta-color-grey"> {!v.description} </p>
+                        </lightning:layoutItem>
+                    </aura:if>
+
+                    <aura:iteration items="{!v.custom.field}" var="field">
+                        <lightning:layoutItem size="6" class="ta-section-button">
+                            <lightning:layout multipleRows="true" class="ta-cards">
+                                <lightning:layoutItem size="12">
+                                    <aura:if isTrue="{!field.pathImg != ''}">
+                                        <img src="{!$Resource.TA_Images + field.pathImg}" class="slds-m-around_small slds-m-bottom_large ta-icon-resize"/>
+                                        <aura:set attribute="else">
+                                            <img src="{!$Resource.TA_Icons + '/xc-icons/user-white.svg'}" class="slds-m-around_small slds-m-bottom_large ta-icon-resize"/>
+                                        </aura:set>
+                                    </aura:if>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-cards-text-s">
+                                    {!field.title}
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="ta-cards-text-b">
+                                    {!field.value}
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </aura:iteration>
+                </lightning:layout>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

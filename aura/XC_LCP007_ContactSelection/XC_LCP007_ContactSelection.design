@@ -1,0 +1,4 @@
+<design:component>
+	<design:attribute name="contactId" label="Contact Id"/>
+    <design:attribute name="accountId" label="Account Id"/>
+</design:component>

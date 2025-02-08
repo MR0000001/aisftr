@@ -1,0 +1,83 @@
+<apex:page showHeader="false" showChat="false" sidebar="false" applyBodyTag="false" applyHtmlTag="false" docType="html-5.0"
+           standardController="WorkOrder" extensions="XC_VFC007_ActivityPlanSchema" >
+
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <head> 
+            <apex:includeScript value="{!URLFOR($Resource.XC_STR001_nomnoml, '/lodash.min.js')}"/>
+            <apex:includeScript value="{!URLFOR($Resource.XC_STR001_nomnoml, '/dagre.min.js')}"/> 
+            <apex:includeScript value="{!URLFOR($Resource.XC_STR001_nomnoml, '/nomnoml.js')}"/> 
+        </head>
+        <style type="text/css">
+            body {
+                text-align: center;
+                padding: 1vw; 
+            }
+        </style>
+        <body>
+            <canvas id="target-canvas"></canvas>
+                <script>              
+                    (function(){
+                        
+                        var listSteps = JSON.parse("{!JSENCODE(jSONlistSteps)}");
+                        
+                        console.log(listSteps);
+                        var f = {
+                            code : 'code',
+                            name : 'name',
+                            mandatoryPrevSteps : 'mandatoryPreviousSteps',
+                            status : 'status'
+                        };  
+                        
+                        var source = '';
+                        source += '#lineWidth: 1 \n'; 
+                        source += '#.completed: fill=#96fc71 visual=roundrect \n';
+                        var mapCode = {}; 
+                        var listMandatory = [];
+                        for(var i in listSteps){
+                            var step = listSteps[i];
+                            mapCode[step[f.code]] = step;
+                        }
+                        //console.log(mapCode);
+                        for(var i in listSteps){
+                            var step = listSteps[i];
+                            var mandatorySteps = step[f.mandatoryPrevSteps];
+                            if(mandatorySteps && mandatorySteps!=''){   
+                                var mandatoryList = mandatorySteps.split(',');
+                                for(var j in mandatoryList){
+                                    var mandatoryStep = mandatoryList[j]; 
+                                    source = addToSource(source, checkGreen(mapCode[mandatoryStep]),checkGreen(step));
+                                    listMandatory.push(mandatoryStep);
+                                }                                
+                            } else { 
+                                source = addToSource(source, '<start> s', checkGreen(step));
+                            }
+                        }    
+                        var setMandatory = new Set(listMandatory); 
+                        for(var k in listSteps){
+                            var step = listSteps[k];                        
+                            if(!setMandatory.has(step[f.code])){
+                                source = addToSource(source, checkGreen(step), '<end> e ');
+                            }                        
+                        } 
+                        //console.log(source);
+                        
+                        var canvas = document.getElementById('target-canvas');
+                        nomnoml.draw(canvas, source);
+                
+                
+                        function addToSource(source, start, end){ 
+                            return source + '[' + start + '] -> [' + end + ']\n';
+                        }
+                
+                        function checkGreen(step){ 
+                            var s = step[f.name];
+                            var completedLabel = '{!$Label.XC_CL_WorkOrderLineItem_Closed}'; 
+                            if(step[f.status] && step[f.status]==completedLabel) s = '<completed> ' + s; 
+                            return s;
+                        }
+                    })();
+             
+                </script>
+        </body>
+    </html>
+</apex:page>

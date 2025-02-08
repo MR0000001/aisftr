@@ -1,0 +1,290 @@
+<!--
+* @author Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.com 
+* @date Creation 06/12/2018
+* @date Modification dd/mm/yyyy
+* @description XC_LCP052_SelectAvaibleAccountFromIndividual – Allows to select an account before create an Opportunity
+-->
+<aura:component
+        extends = "c:XC_LCP022_TabNavigationManager"
+        controller="XC_LCC052_SelectAvaibleAccountFromIndiv"
+        implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasSObjectName,lightning:availableForFlowScreens,lightning:isUrlAddressable,lightning:hasPageReference,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="recordTypeId" type="String" />
+    <aura:attribute name="sourceObjType" type="String" />
+    <aura:attribute name="showContactOpt" type="Boolean" default="false" />
+    <aura:attribute name="stageName" type="String" />
+    <aura:attribute name="legalEntityValue" type="String" default=""/>
+    <aura:attribute name="listOfLegalEntities" type="String[]"/>
+    <aura:attribute name="showLE" type="Boolean" default="false" />
+    <aura:attribute name="addressValue" type="String" />
+    <aura:attribute name="addressValueResidential" type="String" />
+    <aura:attribute name="showAddressResidential" type="Boolean" default="false" />
+    <aura:attribute name="title" type="String" default="{!$Label.c.XC_CL_Contact_ChooseAnAccount}"/>
+    <aura:attribute name="titleOpp" type="String" default="{!$Label.c.XC_CL_Opportunity_Setting}"/>
+    <aura:attribute name="workOrderId" type="String" />
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="serviceId" type="String" default=""/><!--763-->
+    <aura:attribute name="closeDate" type="Date" />
+    <aura:attribute name="categoryValue" type="String" />
+    <aura:attribute name="catalogCategoryValue" type="String" />
+    <aura:attribute name="catalogValue" type="String" />
+    <aura:attribute name="catalogCondition" type="String" default=""/>
+    <aura:attribute name="assetName" type="String" />
+    <aura:attribute name="forAsset" type="Boolean" default="false" />
+    <aura:attribute name="forOpportunity" type="Boolean" default="false" />
+    <aura:attribute name="showFooter" type="Boolean" default="true" />
+    <aura:attribute name="disabledSubmit" type="Boolean" default="true" />
+    <aura:attribute name="disableOpportunity" type="Boolean" default="true" />
+    <aura:attribute name="addressDisabled" type="Boolean" default="true" />
+    <aura:attribute name="disabledCatalogueCategory" type="Boolean" default="true" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="categoryOptions" type="List" />
+    <aura:attribute name="addressOptions" type="List" />
+    <aura:attribute name="contactOptions" type="List" />
+    <aura:attribute name="description" type="String" />
+    <aura:attribute name="modelValue" type="String" />
+    <aura:attribute name="catalogFilter" type="String" />
+
+    <aura:attribute name="accountid" type="String" />
+    <aura:attribute name="productCategory" type="String" />
+    <aura:attribute name="addressid" type="String" />
+    <aura:attribute name="contactValue" type="String" />
+    <aura:attribute name="showNewAddress" type="Boolean" default="false" />
+    <aura:attribute name="addressCreated" type="Boolean" default="false" />
+    <aura:attribute name="manageAddress" type="Boolean" default="false" />
+    <aura:attribute name="isResidentialAddress" type="Boolean" default="false" />
+    <aura:attribute name="sedelegale" type="Boolean" default="false"/> <!--CR758-->
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.catalogCategoryValue}" action="{!c.change}"/>
+    <aura:handler name="change" value="{!v.catalogValue}" action="{!c.change}"/>
+    <aura:handler name="change" value="{!v.contactValue}" action="{!c.changeOpportunityData}"/>
+    <aura:handler name="change" value="{!v.productCategory}" action="{!c.changeOpportunityData}"/>
+    <aura:handler name="change" value="{!v.addressValue}" action="{!c.changeOpportunityData}"/>
+    <aura:handler event="c:XC_LCE004_closeNewAddress" name="XC_LCE004_closeNewAddress" action="{!c.closeNewAddress}"/>
+    <aura:attribute name = "isSFMObject" type="Boolean" default="false"/>
+    <!-- PRODUCT TYPE AND SUBTYPE LISTS -->
+    <aura:attribute name="productTypeOpts" type="List"/>
+    <aura:attribute name="productSubTypeOpts" type="List"/>
+    <aura:attribute name="productSubTypeDependency" type="Map"/>
+    <aura:attribute name="productTypeValue" type="String"/>
+    <aura:attribute name="productSubTypeValue" type="String"/>
+    <aura:attribute name="subTypeDisabled" type="Boolean" default="true" />
+    <aura:attribute name="showSedeLegale" type="Boolean" default="false" /> <!--CR758-->
+    <aura:attribute name="searchForSedeLegale" type="Boolean" default="false" /> <!--CR758-->
+
+    <lightning:navigation aura:id="navService"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler event="c:XC_LCE015_ModalClosed" action="{!c.handleModalClosedEvent}"/>
+    <aura:registerEvent name="XC_LCE019_CloseChildComponent" type="c:XC_LCE019_CloseChildComponent" />
+
+
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" />
+    <div class="c-container">
+
+        <c:strike_modal
+                title=""
+                primaryButtonLabel="Ok"
+                secondaryButtonLabel="Cancel"
+                showHeader="false"
+                showFooter="false"
+                showClose="false"
+                showModal="true">
+
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="2" >
+                    <div class="custom-box"></div>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="8" >
+
+                    <aura:if isTrue="{!v.showNewAddress}">
+                        <c:XC_LCP_Address recordId="{!v.categoryValue}" source="052"/>
+                    </aura:if>
+
+                    <aura:if isTrue="{!and(!v.forAsset,v.forOpportunity)}">
+
+                        <aura:if isTrue="{!!v.showNewAddress}">
+
+                            <header class="slds-modal__header">
+                                <h1 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.titleOpp}</h1>
+                            </header>
+
+                            <div class="slpadding2"></div>
+
+                            <aura:if isTrue="{!!v.manageAddress}">
+
+                                <lightning:combobox name="ChooseAccount" label="{!$Label.c.XC_CL_Contact_ChooseAccount}" placeholder="{!$Label.c.XC_CL_Contact_ChooseAnAccount}" value="{!v.categoryValue }" options="{! v.categoryOptions }" disabled="true" variant='label-inline' />
+
+                                <aura:if isTrue="{!v.showContactOpt}">
+                                    <lightning:combobox aura:id="ChooseContact" name="ChooseContact" label="{!$Label.c.XC_CL_Contact}" placeholder="{!$Label.c.XC_CL_Contact_ChooseAContact}" value="{! v.contactValue }" options="{! v.contactOptions }" disabled="false" variant='label-inline' required="true"/>
+                                </aura:if>
+
+                                <aura:if isTrue="{!v.showLE}">
+                                    <div class="slds-form_horizontal">
+                                        <lightning:select name="select" label="Choose Legal Entity" required="true" value="{!v.legalEntityValue}" variant="label-inline">
+                                            <aura:iteration items="{!v.listOfLegalEntities}" var="legalEntity">
+                                                <option text="{!legalEntity.label}" value="{!legalEntity.id}" selected="{!legalEntity.selected}"></option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                </aura:if>
+
+                                <lightning:recordEditForm objectApiName="Opportunity" onload="{!c.showRequiredFields}" recordTypeId="{!v.recordTypeId}">
+                                    <lightning:inputField aura:id="productCategory" fieldName="XC_ProductCategoryOfInterest__c" value="{!v.productCategory}" class="customRequired none"/>             
+                                </lightning:recordEditForm>
+
+                            </aura:if>
+
+                            <lightning:combobox aura:id="ChooseAddress" name="ChooseAddress" label="{!$Label.c.XC_CL_Address}" placeholder="{!$Label.c.XC_CL_ChooseAddress}" value="{! v.addressValue }" options="{! v.addressOptions }" disabled="false" variant='label-inline' required="true"/>
+                            
+                            <!-- Start CR758-->
+                            <aura:if isTrue="{!v.showSedeLegale}">
+                                <span class="slds-form-element__label">Sede Legale</span>
+                                <lightning:input type="checkbox" name="sedelegale" aura:id="sedelegale" onchange="{!c.searchForSedeLegale}" />
+							</aura:if>                                
+							<!-- End CR758-->
+                            
+                            <div class="slds-float_right" style="/*padding-left: 33%;*/">
+                                <lightning:button variant="neutral" label="{!$Label.c.XC_CL_NewAddress}" title="New Address" disabled="false" onclick="{! c.createAddress }"/>
+                            </div>
+                            <aura:if isTrue="{!v.showAddressResidential}">
+                                <div style ="padding-top : 4%;">
+                                    <lightning:combobox aura:id="ChooseAddressResidential" name="ChooseAddress" label="Residential Address" placeholder="{!$Label.c.XC_CL_ChooseAddress}" value="{! v.addressValueResidential }" options="{! v.addressOptions }" disabled="false" variant='label-inline' required="true"/>    
+                                    <div class="slds-float_right" style="/*padding-left: 33%;*/">
+                                        <lightning:button variant="neutral" label="{!$Label.c.XC_CL_NewAddress}" title="New Address" disabled="false" onclick="{! c.createResidentialAddress }"/>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            
+                            <div class="slpadding2"></div>
+                            <aura:if isTrue="{!v.showFooter}">
+                                <footer class="slds-modal__footer">
+                                    <lightning:button variant="neutral"
+                                                      label="{!$Label.c.XC_CL_CancelButton}"
+                                                      title="Cancel"
+                                                      onclick="{! c.closeModal }"/>
+
+                                    <lightning:button variant="brand"
+                                                      label="{!$Label.c.XC_CL_ConfirmButton}"
+                                                      title="Submit"
+                                                      disabled="{! v.disableOpportunity}"
+                                                      onclick="{!c.onConfirm}"/> 
+                                                      <!--disabled="{!or((v.productCategory==''),(v.addressValue==undefined), !and((v.showContactOpt),(v.contactValue==undefined)))}"-->
+
+                                </footer>
+                            </aura:if>
+
+                        </aura:if>
+                    </aura:if>
+
+                    <aura:if isTrue="{!v.forAsset}">
+                        <div class="st">
+                            <header class="slds-modal__header">
+                                <h1 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.title}</h1>
+                            </header>
+
+                            <lightning:layout multipleRows="true">
+
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="12" >
+
+                                    <lightning:input name="assetName" label="Name" placeholder="{!$Label.c.XC_CL_AssetName}" required="true" value="{! v.assetName }"/>
+
+                                    <lightning:combobox name="ChooseAccount" label="{!$Label.c.XC_CL_Contact_ChooseAccount}" placeholder="{!$Label.c.XC_CL_Contact_ChooseAnAccount}" value="{! v.categoryValue }" required="true"
+                                                        options="{! v.categoryOptions }" onchange="{!c.sblockAddress }"/>
+
+                                    <lightning:combobox name="ChooseAddress" label="{!$Label.c.XC_CL_ChooseAddress}" placeholder="{!$Label.c.XC_CL_ChooseAnAddress}" value="{! v.addressValue }" required="true"
+                                                        options="{! v.addressOptions }" disabled="{!v.addressDisabled}"/>
+
+                                </lightning:layoutItem>
+                                
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="12" >
+                                    <c:strike_lookup
+                                            label="{!$Label.c.XC_CL_Catalog}"
+                                            object="NE__Catalog__c"
+                                            value="{!v.catalogValue}"
+                                            searchField="Name"
+                                            placeholder="{!$Label.c.XC_CL_DigitAndSelectOptionMessage}"
+                                            order="Name"
+                                            limit="15"
+                                            searchingMessage="{!$Label.c.XC_CL_Searching}"
+                                            noResultsMessage="{!$Label.c.XC_CL_NoResultsFound}"
+                                            loadingMessage="{!$Label.c.XC_CL_Loading}"
+                                            errorMessage="{!$Label.c.XC_CL_InvalidInput}"
+                                            required="true"/>
+                                </lightning:layoutItem>
+                                <aura:if isTrue="{!v.showSpinner}">
+                                    <div class="exampleHolder">
+                                        <lightning:spinner alternativeText="Loading" size="medium" />
+                                    </div>
+                                </aura:if>
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="12" >
+                                    <c:strike_lookup
+                                            label="{!$Label.c.XC_CL_Catalog_Category}"
+                                            object="NE__Catalog_Category__c"
+                                            value="{!v.catalogCategoryValue}"
+                                            searchField="Name"
+                                            placeholder="{!$Label.c.XC_CL_DigitAndSelectOptionMessage}"
+                                            order="Name"
+                                            limit="15"
+                                            searchingMessage="{!$Label.c.XC_CL_Searching}"
+                                            noResultsMessage="{!$Label.c.XC_CL_NoResultsFound}"
+                                            loadingMessage="{!$Label.c.XC_CL_Loading}"
+                                            errorMessage="{!$Label.c.XC_CL_InvalidInput}"
+                                            required="true"
+                                            disabled="{!v.disabledCatalogueCategory}"
+                                            filter="{!v.catalogFilter}"/>
+                                </lightning:layoutItem>
+
+                                <!-- F.I. added new fields product type and subtype -->
+                                <!-- PRODUCT TYPE -->
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="12">
+                                    <lightning:combobox name="productType" label="{!$Label.c.XC_CL_ProductTypeAsset}" placeholder="{!$Label.c.XC_CL_ProductTypeAssetPH}" options="{!v.productTypeOpts}" required="true" value="{!v.productTypeValue}" onchange="{!c.prodTypeChange}"/>
+                                </lightning:layoutItem>
+
+                                <!-- PRODUCT SUBTYPE -->
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="12">
+                                    <lightning:combobox name="productSubType" label="{!$Label.c.XC_CL_ProductSubTypeAsset}" placeholder="{!$Label.c.XC_CL_ProductSubTypeAssetPH}" options="{!v.productSubTypeOpts}" required="true" value="{!v.productSubTypeValue}"  readonly="{!v.subTypeDisabled}"/>
+                                </lightning:layoutItem>
+
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="12" >
+                                    <lightning:textarea
+                                            name="Model"
+                                            label="{!$Label.c.XC_CL_Asset_Model}"
+                                            placeholder="{!$Label.c.XC_CL_Asset_DigitModel}"
+                                            value="{!v.modelValue}"
+                                            maxlength="255" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="12" >
+                                    <lightning:textarea
+                                            name="Description"
+                                            label="{!$Label.c.XC_CL_Description}"
+                                            placeholder="{!$Label.c.XC_CL_DigitDescription}"
+                                            value="{!v.description}"
+                                            maxlength="32000" />
+                                </lightning:layoutItem>
+
+                            </lightning:layout>
+                        </div>
+
+                        <div class="slpadding"></div>
+                        <footer class="slds-modal__footer">
+                            <lightning:buttonGroup>
+                                <lightning:button variant="neutral"
+                                                  label="{!$Label.c.XC_CL_CancelButton}"
+                                                  title="Cancel"
+                                                  onclick="{! c.closeModal }"/>
+                                <lightning:button variant="brand"
+                                                  label="{!$Label.c.XC_CL_Save}"
+                                                  title="Submit"
+                                                  disabled="{!v.disabledSubmit}"
+                                                  onclick="{! c.createAsset }"/>
+                            </lightning:buttonGroup>
+                        </footer>
+
+                    </aura:if>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </c:strike_modal>
+    </div>
+</aura:component>

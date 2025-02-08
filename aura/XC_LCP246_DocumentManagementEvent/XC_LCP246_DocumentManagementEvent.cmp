@@ -1,0 +1,24 @@
+<!--
+  @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+  @date 24/03/2021
+  @description XC_LCP246_DocumentManagementEvent - Component to manage event for received document
+-->
+
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global">
+
+    <aura:attribute name="sessionId" type="String"/>
+    <aura:attribute name="orderId" type="String"/>
+    <aura:attribute name="documentReceived" type="Integer" default="0"/>
+    <ltng:require   scripts="{!join(',',
+                        $Resource.XC_STR_CometD + '/cometd.js',
+                        $Resource.gl_jquery + '/jquery-1.10.2.min.js', 
+                        $Resource.XC_STR_CometD + '/json2.js', 
+                        $Resource.XC_STR_CometD + '/jquery_cometd.js', 
+                        $Resource.XC_STR_CometD + '/cometdReplayExtension.js', 
+                        $Resource.XC_STR_CometD + '/cometdCustom.js')}" 
+                    afterScriptsLoaded="{!c.init}"/>
+
+    <aura:registerEvent name="sendDocument" type="c:XC_LCE246_Event"/>
+    <aura:handler name="change" value="{!v.documentReceived}" action="{!c.createEventDocumentOk}"/>
+
+</aura:component>

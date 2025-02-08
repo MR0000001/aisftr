@@ -1,0 +1,38 @@
+<aura:component >
+    
+    <!-- ATTRIBUTES -->
+    <aura:attribute name="position" type="String" default="" description="" />
+    <aura:attribute name="titleName" type="String" default="" description=""/>
+    
+    <!-- BODY -->
+    <aura:if isTrue="{!v.position == 'TOP'}" >
+        <div class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container slds-m-bottom--card-wrapper-spacing">
+            <div class="slds-media">
+                <div class="slds-media__body">
+                    <span class="test-id__section-header-title section-header-title slds-p-horizontal--small slds-truncate slds-m-top--card-wrapper-spacing" data-aura-rendered-by="804:732;a">{!v.titleName}</span>
+                </div>
+            </div>
+        </div>
+    </aura:if> 
+    
+    <aura:if isTrue="{!v.position == 'MIDDLE'}" >
+            <div class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container slds-m-top--card-wrapper-spacing slds-m-bottom--card-wrapper-spacing slds-m-top_small">
+                <div class="slds-media">
+                    <div class="slds-media__body">
+                        <span class="test-id__section-header-title section-header-title slds-p-horizontal--small slds-truncate" data-aura-rendered-by="804:732;a">{!v.titleName}</span>
+                    </div>
+                </div>
+            </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.position == 'BOTTOM'}" >   
+        <div class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container slds-m-bottom--card-wrapper-spacing slds-m-top--card-wrapper-spacing slds-m-top_small">
+            <div class="slds-media">
+                <div class="slds-media__body">
+                    <span class="test-id__section-header-title section-header-title slds-p-horizontal--small slds-truncate" data-aura-rendered-by="804:732;a">{!v.titleName}</span>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+</aura:component>

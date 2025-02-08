@@ -1,0 +1,22 @@
+<!--
+* @author Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.com 
+* @date Creation 06/12/2018
+* @date Modification dd/mm/yyyy
+* @description XC_LCP070_NewLeadForSocialPersona – Allows to create a new lead from social persona details page
+-->
+
+<aura:component 
+                
+                controller="XC_LCC070_NewLeadForSocialPersona"
+implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:hasSObjectName,lightning:availableForFlowScreens,force:lightningQuickActionWithoutHeader" access="global" >
+
+    <aura:attribute name="recordId" type="String" />
+    <lightning:navigation aura:id="navService"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <div style="text-align: right; padding-right:30px;background-color: white"><br></br>
+	<lightning:button label="New Lead" title="Neutral action" onclick="{! c.checkPossibilityToCreate }"/>&nbsp;&nbsp;
+        <lightning:icon iconName="action:new_lead" size="small" alternativeText="sss"/><br></br><br></br>
+    </div>
+    
+</aura:component>

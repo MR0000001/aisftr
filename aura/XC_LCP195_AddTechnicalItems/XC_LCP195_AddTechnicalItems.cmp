@@ -1,0 +1,252 @@
+<aura:component controller ="XC_LCC195_AddTechnicalItems" 
+                implements="force:lightningQuickActionWithoutHeader,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global" >
+	<ltng:require styles="{!$Resource.XC_NE_PopupCss}" />
+    <aura:attribute name="record" type="Object" description="The record object to be displayed"/>
+	<aura:attribute name="orderItemRecord" type="Object" description="A simplified view record object to be displayed"/>
+	<aura:attribute name="recordError" type="String" description="An error message bound to force:recordData"/>
+	<aura:attribute name="whichButton" type="String" default=""/>
+	 
+    <force:recordData aura:id="record"
+                      layoutType="FULL"
+                      recordId="{!v.recordId}"
+                      targetError="{!v.recordError}"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.orderItemRecord}"  
+					  mode="VIEW"/>
+					  
+	<aura:attribute name="data" type="Object"/>
+	<aura:attribute name="columns" type="List"/>
+	<aura:attribute name="recordId" type="String"/>
+	<aura:attribute name="woliSegment" type="String"/>
+	<aura:attribute name="woliLegalEntity" type="String"/>
+    <aura:attribute name="woliRecordId" type="String" access="global"/> <!-- woliId if send to glovia start from Product Required -->
+    <aura:attribute name="contestStartCI" type ="boolean" default ="true" access="global"/><!-- woliId if send to glovia start from Product Required -->
+    <aura:attribute name="wbeElement" type ="String" default ="" access="global"/><!-- woliId if send to glovia start from Product Required -->
+	<aura:attribute name="costCenter" type ="String" default ="" access="global"/><!-- woliId if send to glovia start from Product Required -->
+	<aura:attribute name="workOrderId" type ="String" default ="" access="global"/><!-- woliId if send to glovia start from Product Required -->
+	
+    <aura:attribute name="rtWoli" type ="string" access="global"/><!-- woliId if send to glovia start from Product Required -->
+	
+	<aura:attribute name="pageNumber" type="Integer" default="1"/>
+	<aura:attribute name="pageSize" type="Integer" default="15"/>
+	<aura:attribute name="isLastPage" type="Boolean" default="false"/>
+	<aura:attribute name="resultSize" type="Integer" default="0"/> 
+	<aura:attribute name="selection" type="List" description="attribute to hold selected all rows"/>
+    <aura:attribute name="checkExistPrice" type="List" description="attribute to hold id exist price"/>
+	<aura:attribute name="hasPageChanged" type="Boolean" default="false" description="attribute to check if the page has changed or not"/>
+	<aura:attribute name="initialLoad" type="Boolean" default="true" description="attribute to check if it is initialLoad"/>	
+	<aura:attribute name="updatedRecord" type="Object[]" description="This attribute will hold the update records from data table"/>
+    
+    <aura:attribute name="selected" type="List"/>
+    
+	<aura:attribute name="families" type="List"/>
+	<aura:attribute name="country" type="String"/>
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+	<aura:attribute name="showFlagForMaterials" type="boolean" default="false"/>
+	<aura:attribute name="showMaterials" type="boolean" default="false"/>
+	<aura:attribute name="showAvailable" type="boolean" default="false"/>
+	<aura:attribute name="noItemFound" type="boolean" default="false"/>
+    <aura:attribute name="noSavePrice" type="Boolean" default="false"/>
+    <aura:attribute name="flagDisableCatFilter" type="Boolean" default="true"/>
+    <aura:attribute name="draftValues" type="Object" default="[]"/>
+    <aura:attribute name="catalogItem" type="Object" description=""/>
+    <aura:attribute name="contractId" type="String" description="Contract Id"/>
+    <aura:attribute name="manualMapPrice" type="Object" default="[]"/>
+    <aura:attribute name="ReadExistPrice" type="Object" default="[]"/>
+    <aura:attribute name="filterList" type="List" />
+    <aura:attribute name="selectedRowsDetails" type="Object" />
+    <!--Meghana Begin-->
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="uploadModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="searchcheck" type="boolean" default="true"/>
+    <aura:attribute name="filetype" type="List" default="['.csv']" />
+    <aura:attribute name="uploadedcsv" type="List"/>
+    <aura:attribute name="SelectProd" type="List" description="attribute to hold products"/>
+    <aura:attribute name="SelectProd2" type="List" description="attribute to hold products"/>
+    <aura:attribute name="selProd" type="List" description="attribute to hold products"/>
+    <aura:attribute name="ProdRes" type="List" description="attribute to hold products"/>
+    <aura:attribute name="quant" type="List" description="attribute to hold quantity"/>
+    <aura:attribute name="TemplateURL" type="String" description="Template csv url"/>
+    <aura:attribute name="showcolumns" type="List"/>
+    <aura:attribute name="len" type="Integer" default="0"/>
+    <!--Meghana End-->
+    
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init"   action="{!c.doInit}" value="{!this}"/>
+    <aura:handler name="change" value="{!v.showMaterials}" action="{!c.handleChangeShowMaterials}"/>
+
+	<!-- You must define keyField as 'Id' to save the record back in Salesforce 'onsave' attribute will executed when user clicks on save button -->
+	
+	<lightning:card title="{!$Label.c.XC_CL_AddTechnicalItem}">
+        <aura:if isTrue="{!v.spinner}"> 
+            <div class="slds-spinner_container">
+                <div class="slds-spinner--brand slds-spinner slds-spinner--medium slds-is-relative" role="alert">
+                    <span class="slds-assistive-text">{!$Label.c.XC_CL_Loading}</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </aura:if>
+       
+		<lightning:layout multipleRows="true" horizontalAlign="center">
+            <lightning:layoutItem padding="around-small" size="12">
+                <lightning:button class="slds-button slds-button_brand" label="{!$Label.c.XC_CL_SaveMaterialSelectedButton}"  onclick="{!c.addTechItems}"/>
+                <lightning:button class="slds-button slds-button_brand" label="{!$Label.c.XC_CL_CancelButton}"  onclick="{!c.cancelDialog}"/>
+                <!--Meghana Begin-->
+                <lightning:button class="slds-button slds-button_brand" label="{!$Label.c.Caricamento_Massivo}"  onclick="{!c.uploadCSV}"/>
+                <!--Meghana End-->
+            </lightning:layoutItem>
+            <div class="slds-grid">
+                <div class="slds-col slds-var-p-around_medium slds-size_1-of-6">
+					<lightning:input  name="Product2Name" aura:id="Product2Name" label="{!$Label.c.XC_CL_Name}" />
+                </div>
+                <div class="slds-col slds-var-p-around_medium slds-size_1-of-6">
+                    <lightning:input  name="SapCode" aura:id="SapCode" label="{!$Label.c.XC_CL_ProductCode}" />
+                </div>
+                <div class="slds-col slds-var-p-around_medium slds-size_1-of-6">
+                    <lightning:input  name="TypeName" aura:id="TypeName" label="{!$Label.c.XC_CL_Type}" />
+                </div>
+                <div class="slds-col slds-var-p-around_medium slds-size_1-of-6">
+                    <lightning:input  name="PositionName" aura:id="PositionName" label="{!$Label.c.XC_ServicePosition}"/>
+                </div>
+                <aura:if isTrue="{!v.showFlagForMaterials}">
+                    <div class="slds-col slds-var-p-around_medium slds-size_1-of-6">
+                        <label class="slds-checkbox__label" for="checkbox-unique-id-72">
+                            <span class="slds-checkbox_faux"></span>
+                            <span class="slds-form-element__label">&nbsp;{!$Label.c.XC_CL_ShowMaterials}</span>
+                        </label>
+                        <lightning:input type="checkbox" name="flagForMaterials" aura:id="flagForMaterials" checked="{!v.showMaterials}" />
+                    </div>
+                </aura:if>
+                <div class="slds-col slds-var-p-around_medium slds-size_1-of-6">
+                    <label class="slds-checkbox__label" for="FlagApplyFilter">
+                        <span class="slds-checkbox_faux"></span>
+                        <span class="slds-form-element__label">&nbsp;{!$Label.c.XC_DisableCategoryFilter}</span>
+                    </label>
+                    <lightning:input type="checkbox" name="FlagApplyFilter" aura:id="FlagApplyFilter" onchange="{!c.checkCategoryFilter}"/>
+                </div>
+                <div class="slds-col slds-var-p-around_medium slds-size_1-of-6">
+                    <label class="slds-checkbox__label" for="FlagApplyFilter">
+                        <span class="slds-checkbox_faux"></span>
+                        <span class="slds-form-element__label">{!$Label.c.XC_NotAvailableMaterial}</span>
+                    </label>
+                    <lightning:input type="checkbox" name="NotAvailable" aura:id="NotAvailable" onchange="{!c.checkAvailabeMaterials}"/>
+                </div>
+
+
+            </div>
+            <div class="slds-form-element slds-size_1-of-1 slds-grid">
+                    <div class="slds-var-p-around_medium slds-form-element slds-size_1-of-5">
+                        <lightning:button class="slds-button slds-button_brand" label="{!$Label.c.XC_CL_DoSearch}"  onclick="{!c.doSearch}"/>
+                    </div>
+                <!--Meghana Begin--> 
+                    <div class="slds-var-p-around_medium slds-form-element slds-size_1-of-3">
+                        <lightning:button class="slds-button slds-button_brand" label="{!$Label.c.Show_Selected_Items}"  onclick="{!c.showSelected}"/>
+                    </div>
+                <!--Meghana End-->
+            </div>
+            <aura:if isTrue="{!v.noItemFound}">
+                <lightning:layoutItem padding="around-small" size="12">
+                    <div style="width:100% !important;" class="slds-notification slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+                        <h1>{!$Label.c.XC_CL_ProvideSearchCriteria}</h1>
+                    </div>
+                </lightning:layoutItem>
+                <aura:set attribute="else">		                   
+                    <lightning:layoutItem padding="around-small" size="12">
+                       <lightning:datatable
+                            aura:id="product2DataTable"
+                            columns="{!v.columns}"
+                            data="{!v.data}"
+                            keyField="glBookEntryId"
+                            expandedRows="{! v.gridExpandedRows }"
+                            hideCheckboxColumn="false"
+                            selectedRows = "{!v.selection}"
+                            onrowaction="{!c.onRowActionSelect}" 
+                            draftValues="{! v.draftValues }"  
+                            onsave="{! c.handleSaveEdition }"
+                            onrowselection ="{!c.onRowSelection}"/>               
+                    </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <lightning:button label="{!$Label.c.XC_CL_PrevMess}" 
+                                          iconName="utility:chevronleft" 
+                                          iconPosition="left"
+                                          onclick="{!c.onPrev}" 
+                                          disabled="{!v.pageNumber == 1}"/>
+                        <span class="slds-var-p-horizontal_small">
+                            {!format($Label.c.XC_CL_PageShowingRecFromTo, v.pageNumber, ((v.pageNumber-1)*v.pageSize), ((v.pageNumber-1)*v.pageSize+v.resultSize))}
+                            <!-- Page {!v.pageNumber} | Showing records from {! ((v.pageNumber-1)*v.pageSize)+' to '+((v.pageNumber-1)*v.pageSize+v.resultSize)} -->
+                        </span>
+                        <lightning:button label="{!$Label.c.XC_CL_NextMess}" 
+                                          iconName="utility:chevronright" 
+                                          iconPosition="right" 
+                                          disabled="{!v.isLastPage}" 
+                                          onclick="{!c.onNext}"/>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small" size="12">
+                        	<lightning:button class="slds-button slds-button_brand" label="{!$Label.c.XC_CL_SaveMaterialSelectedButton}"  onclick="{!c.addTechItems}"/>
+                    		<lightning:button class="slds-button slds-button_brand" label="{!$Label.c.XC_CL_CancelButton}"  onclick="{!c.cancelDialog}"/>
+                    </lightning:layoutItem>
+                       
+                </aura:set>
+            </aura:if>
+		</lightning:layout>
+        <!-- Meghana-->
+        <aura:if isTrue="{!v.isModalOpen}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning:datatable
+                                            aura:id="ShowSelectedDataTable"
+                                            columns="{!v.showcolumns}"
+                                            data="{!v.SelectProd}"
+                                            keyField="glBookEntryId"
+                                            expandedRows="{! v.gridExpandedRows }"
+                                            hideCheckboxColumn="true"
+                                            draftValues="{! v.manualMapPrice}"
+                                            suppressBottomBar="true"
+                                            editable="false"/>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="Close"
+                                          title="Close"
+                                          onclick="{! c.closeModel }"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+        <aura:if isTrue="{!v.uploadModalOpen}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning:layout class="slds-align_absolute-center">
+                            <lightning:layoutItem size="5" class="slds-p-around_medium">
+                                <h2 id="modal-heading-01" class="slds-text-heading_medium">Caricamento Massivo</h2>
+                                <p  class="slds-p-top_large"><lightning:formattedUrl value="{!v.TemplateURL}" tooltip="z" label="{!$Label.c.Template_CSV}" target="_blank" /></p>
+                
+                                <p  class="slds-p-around_medium"><lightning:fileUpload label="" multiple="false"   
+                                                accept="{!v.filetype}" recordId="{!v.recordId}"   
+                                                onuploadfinished="{!c.UploadFinished}" /></p>
+                                <lightning:button class="slds-button slds-button_brand" label="{!$Label.c.Salva}"
+                                    aura:id="savebuttonid" onclick="{!c.saveCSV}"  disabled="true"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="Close"
+                                          title="Close"
+                                          onclick="{! c.closeModel }"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+	</lightning:card>
+</aura:component>

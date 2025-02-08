@@ -1,0 +1,184 @@
+<!--
+* @author Lorenzo Orlanducci lorenzo.orlanducci@nttdata.com 
+* @date Creation 30/01/2019
+* @date Modification dd/mm/yyyy
+* @description component for disconnect asset on Case record page
+-->
+<aura:component controller="XC_LCC073_DisconnectAsset"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,lightning:isUrlAddressable,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasSObjectName,lightning:availableForFlowScreens"
+    access="global">
+    <!-- components attributes -->
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="assetId" type="String" />
+    <!--aura:attribute name="congaURL" type="String" /-->
+    <!--<aura:attribute name="showCongaLegalText" type="Boolean" default="false" / -->
+    <aura:attribute name="foundPenality" type="Boolean" default="false" />
+    <aura:attribute name="penaltyValue" type="String" />
+    <aura:attribute name="penaltyMessage" type="String" />
+    <aura:attribute name="refundValue" type="String" />
+    <aura:attribute name="contractNumber" type="String" />
+    <aura:attribute name="contrStartD" type="String" />
+    <aura:attribute name="contrEndD" type="String" />
+    <aura:attribute name="legalText" type="String" />
+    <aura:attribute name="showLegalText" type="Boolean" default="false" />
+    <aura:attribute name="title" type="String" />
+    <aura:attribute name="firstSpinner" type="Boolean" default="false" />
+    <aura:attribute name="secondSpinner" type="Boolean" default="true" />
+    <aura:attribute name="disegnPick" type="Boolean" default="false" />
+    <aura:attribute name="disegnComplaintPick" type="Boolean" default="false" />
+    <aura:attribute name="disabledSubmit" type="Boolean" default="true" />
+    <aura:attribute name="subtype" type="String" />
+    <aura:attribute name="skipOrderCreation" type="Boolean" default="false" />
+    <aura:attribute name="complaintOptions" type="List" />
+    <aura:attribute name="complaintCalculatedData" type="Map" />
+    <aura:attribute name="showScriptComponent" type="Boolean" default="false" />
+
+    <lightning:notificationsLibrary aura:id="notifLib" />
+    <lightning:navigation aura:id="navService" />
+    <lightning:workspaceAPI aura:id="workspace2" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="strike_evt_modalPrimaryButtonClicked" event="c:strike_evt"
+        action="{!c.handlePrimaryButtonClick}" />
+    <aura:handler name="strike_evt_modalSecondaryButtonClicked" event="c:strike_evt"
+        action="{!c.handleSecondaryButtonClick}" />
+
+    <div class="main">
+        <!--style="background-color:white;padding-left:5px;padding-right:5px" -->
+
+        <div class="modal-header slds-modal__header slds-size_1-of-1">
+            <h4 class="title slds-text-heading--medium">
+                <lightning:icon iconName="standard:apex_plugin" /><span
+                    class="slds-p-left_small">{!$Label.c.XC_CL_CaseDisconnectAsset}</span></h4>
+        </div><br></br>
+
+        <lightning:recordEditForm objectApiName="NE__Order__c">
+            <!-- the messages component is for error messages -->
+            <lightning:messages />
+
+            <aura:if isTrue="{!v.disegnPick}">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6">
+                        <lightning:inputField aura:id="type" value="Disconnection" fieldName="NE__Type__c"
+                            disabled="true" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6">
+                        <lightning:inputField aura:id="subtype" disabled="true" value="{!v.subtype}"
+                            fieldName="XC_Subtype__c" onchange="{!c.checkNotBlank}" />
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </aura:if>
+        </lightning:recordEditForm>
+
+        <aura:if isTrue="{!v.disegnComplaintPick}">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="6">
+                    <div class="slds-form_horizontal">
+                        <lightning:combobox aura:id="subtype" name="subtype" label="{!$Label.c.XC_CL_Complaint}"
+                            value="{!v.subtype}" options="{! v.complaintOptions }"
+                            onchange="{! c.onComplaintOptionChange }" />
+                        <!--c.checkNotBlank-->
+                    </div>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </aura:if>
+
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6">
+                <div class="slds-form_horizontal">
+                    <lightning:input name="penaltyValue" label="{!$Label.c.XC_CL_Penalty}" value="{!v.penaltyValue}"
+                        disabled="true" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6">
+                <div class="slds-form_horizontal">
+                    <lightning:input name="refundValue" label="{!$Label.c.XC_CL_Refund}" value="{!v.refundValue}"
+                        disabled="true" />
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6">
+                <div class="slds-form_horizontal">
+                    <lightning:input name="contractNumber" label="{!$Label.c.XC_CL_ContractNumber}"
+                        value="{!v.contractNumber}" disabled="true" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6">
+                <div class="slds-form_horizontal">
+                    <lightning:input name="contrStartD" label="{!$Label.c.XC_CL_Contract_StartDate}"
+                        value="{!v.contrStartD}" disabled="true" />
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6">
+                <div class="slds-form_horizontal">
+                    &nbsp;
+                    <!--<aura:if isTrue="{!v.showLegalText}">
+                        <lightning:textarea name="legalText" class="tallTextArea" disabled="true" value="{!v.legalText}" label="{!$Label.c.XC_CL_LegalText}" />
+                    </aura:if>
+                    <aura:set attribute="else">
+                        &nbsp;
+                    </aura:set>-->
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6">
+                <div class="slds-form_horizontal">
+                    <lightning:input name="contrEndD" label="{!$Label.c.XC_CL_Contract_EndDate}" value="{!v.contrEndD}"
+                        disabled="true" />
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+
+        <!--<aura:if isTrue="{!v.showCongaLegalText}" >
+        <!- -<div class="slds-modal__content slds-p-around_medium" style="height: 100%">- ->
+        <div class="c-container">
+            <iframe src="{!v.congaURL}" width="100%" height="600px;" frameBorder="0" scrolling="yes" allowtransparency="true" />
+        </div>
+    </aura:if>-->
+
+        <aura:if isTrue="{!v.firstSpinner}">
+            <div
+                style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+                <lightning:spinner aura:id="mySpinner" />
+            </div>
+        </aura:if>
+
+        <aura:if isTrue="{!v.foundPenality}">
+            <div>
+                <aura:if isTrue="{!v.secondSpinner}">
+                    <div
+                        style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+                        <lightning:spinner aura:id="mySpinner2" />
+                    </div>
+                </aura:if>
+
+                <c:strike_modal title="Confirmation" primaryButtonLabel="{!$Label.c.XC_CL_OK}"
+                    secondaryButtonLabel="{!$Label.c.XC_CL_CancelButton}" showHeader="true" showFooter="true"
+                    showClose="true" showModal="true">
+                    <p>{!v.penaltyMessage}. Are you sure?</p>
+                </c:strike_modal>
+            </div>
+        </aura:if>
+
+
+        <div class="abbass">
+        </div>
+        <div class="modal-footer slds-modal__footer slds-size_1-of-1">
+            <aura:if isTrue="{!v.showLegalText}">
+                <lightning:button label="{!$Label.c.XC_CL_LegalTextButton}" title="CongaLegalText"
+                    onclick="{! c.callLegalText }" />
+            </aura:if>
+            <aura:if isTrue="{!v.showScriptComponent}">
+                <c:XC_LCP173_CTIShowAgentScriptContainer recordId="{!v.recordId}" showCard="false"
+                    showRecControls="true" sObjectName="{!v.sObjectName}" />
+            </aura:if>
+            <lightning:button label="{!$Label.c.XC_CL_CancelButton}" title="Cancel"
+                onclick="{! c.handleSecondaryButtonClick}" />
+            <lightning:button variant="brand" label="{!$Label.c.XC_CL_ConfirmButton}" title="Submit" onclick="{! c.dis}"
+                disabled="{!v.disabledSubmit}" />
+        </div>
+
+    </div>
+
+</aura:component>

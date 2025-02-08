@@ -1,0 +1,111 @@
+<aura:component  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride" access="global" >
+    
+    <!-- ATTRIBUTES -->
+    <aura:attribute name="techConfiguration" type="Object" default="[]"/>
+    <aura:attribute name="fieldMap" type="String"/>
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+    <aura:attribute name="leadRecord" type="Contact" />
+    <aura:attribute name="initFinished" type="Boolean" default="false" />
+    <aura:attribute name="assignLeadCheckBox" type="Boolean" default="false" />
+    <aura:attribute name="recordTypeToReturn" type="String" />
+    <aura:attribute name="body0" type="Object[]" />
+    
+    <aura:attribute name="fieldToControl" type="Object" />
+    <aura:attribute name="canInsert" type="Boolean" default="false" />
+    <aura:attribute name="requiredFields" type="String[]" default="[]"/>
+    <aura:attribute name="fieldLabelMap" type="Object" />
+    <aura:attribute name="isCommunity" type="Boolean" default="false" />
+    <aura:attribute name="recordId" type="String" />
+
+    <!-- Toast message -->
+    <aura:attribute name="showToastMessage" type="Boolean" default="false"/>
+    <aura:attribute name="messageToast" type="String" default=""/>
+    <aura:attribute name="type" type="String" default=""/>
+	<!-- RECORD ID  -->
+    <aura:attribute name="record" type="Object" />
+    <aura:attribute name="componentRecord" type="Object" />
+    <aura:attribute name="recordError" type="String" />
+
+
+    <force:recordData 
+        aura:id="recordLoader" 
+        recordId="{!v.recordId}" 
+        layoutType="FULL" 
+        mode="EDIT"
+        targetRecord="{!v.record}"
+        targetFields="{!v.componentRecord}"
+        targetError="{!v.recordError}" />   
+
+    <!-- HANDLER -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler name="change" value="{!v.requiredFields}" action="{!c.controlMandatoryFields}" />
+    <aura:handler name="change" value="{!v.canInsert}" action="{!c.canInsertField}" />
+
+    <!-- BODY -->
+    <div class="body">
+
+    <aura:if isTrue="false"><!--isTrue="{!v.showToastMessage}">-->
+        <c:XC_LCP002_ToastMessage message="{!v.messageToast}" type="{!v.type}"/>
+    </aura:if>
+
+    <aura:if isTrue="{!v.initFinished}" >
+        <lightning:card class="slds-align_absolute-center slds-p-around--table-cell-spacing slds-size--5-of-6">
+            <div class="slds-p-around--medium"> 
+                
+                <lightning:recordEditForm aura:id="recordUpdateForm" objectApiName="Contact" onsubmit="{!c.onSubmit}">
+                    <ui:scrollerWrapper class="scrollerSize">
+      
+                        <c:XC_LCP002_SectionHeader position="TOP" titleName=""/>
+                        
+                          <lightning:layout>
+        <lightning:layoutitem size="5" padding="around-small">
+            <lightning:input 
+                name="name"
+                label="First Name"
+                type="text" 
+                value="{!v.componentRecord.FirstName}"/>
+        </lightning:layoutitem>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <lightning:layoutitem size="5" padding="around-small">  
+        <lightning:input 
+                name="name"
+                label="Last Name"
+                required="true"             
+                type="text" 
+                value="{!v.componentRecord.LastName}"/>
+        </lightning:layoutitem>
+                        </lightning:layout>    
+
+                        <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                            {!v.body0}
+                        </lightning:layout>
+
+                       
+
+                    </ui:scrollerWrapper>
+                    <div> 
+                        <div class="forceChangeRecordTypeFooter slds-float--right slds-m-around--medium">
+                            <lightning:button aura:id="submit" label="Save" variant="brand" type="submit" onClick="{!c.onSubmit}" />          
+                        </div>
+                       
+                    </div>	
+                </lightning:recordEditForm>
+
+                
+                
+                    <div class="forceChangeRecordTypeFooter slds-float--right slds-m-around--medium">
+                        <ui:button label="Close" press="{!c.goBack}"/>          
+                    </div>
+              
+                
+            </div>
+        </lightning:card>
+    </aura:if>
+    <aura:if isTrue="{!v.spinnerControl}" >
+        <div aura:id="masterSpinner">
+            <lightning:spinner aura:id="mySpinner"/>
+        </div>
+    </aura:if>
+    </div>
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+</aura:component>

@@ -1,0 +1,120 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId"
+    controller="TA_LCC244_CreditAssignmentView" access="global">
+
+    <!-- ADDED P.E. Management TO AUTOFRESH -->
+    <!-- <ltng:require scripts="{!join(',',
+    $Resource.XC_STR_CometD + '/cometd.js',
+    $Resource.gl_jquery + '/jquery-1.10.2.min.js', 
+    $Resource.XC_STR_CometD + '/json2.js', 
+    $Resource.XC_STR_CometD + '/jquery_cometd.js', 
+    $Resource.XC_STR_CometD + '/cometdReplayExtension.js', 
+    $Resource.XC_STR_CometD + '/cometdCustom.js')}" 
+    afterScriptsLoaded="{!c.doInit}"></ltng:require> -->
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }" />
+    <aura:handler event="c:XC_LCE020_OrderCommChangeEvt" action="{!c.manageCommChangeEvt}" />
+    <aura:handler event="c:XC_LCE021_CreditTransferDataEvent" name="XC_LCE021_CreditTransferDataEvent" action="{!c.handleAdditionalFieldEvent}"/>
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/> 
+    <aura:registerEvent name="validationEvt" type="c:TA_LCE199_Validation"/>
+
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="cmpName" type="String" />
+    <aura:attribute access="public" name="general" type="Object" />
+    <aura:attribute access="public" name="custom" type="Object" />
+    <aura:attribute access="public" name="title" type="String" default="Riqualificazione Energetica 65%"/>
+    <aura:attribute access="public" name="customerCardBg" type="String" />
+    <aura:attribute access="public" name="workOrderId" type="String" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute name="orderItems" type="List" />
+    <aura:attribute name="showItems" type="Boolean" default="false" />
+    <aura:attribute name="availableForLE" type="String" default="EnelXItalia" />
+    <aura:attribute name="availableForRT" type="String" default="Order" />
+    <aura:attribute name="legalEntity" type="String" />
+    <aura:attribute name="orderStatus" type="String" />
+    <aura:attribute name="orderRT" type="String" />
+    <aura:attribute name="showComponent" type="Boolean" default="false" />
+    <aura:attribute name="isFromCTI" type="Boolean" default="false" />
+    <aura:attribute name="isChangingOffer" type="Boolean" default="false" />
+    <aura:attribute name="sessionId" type="String" />
+    <aura:attribute name="evtChannel" type="String" default="/event/XC_OrderEvent__e"/>
+    <aura:attribute name ="showSpinner" type="Boolean" default="false"/>
+
+    <!-- <lightning:empApi aura:id="empApi"/> -->
+
+
+    <aura:if isTrue="{!v.showComponent}">
+        <div style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover;
+                    background-position:' + v.general.bgPosition + '; background-color: ' + v.general.bgColor + '; box-shadow: 0vw 1vw 2vw -0.8vw black; background-blend-mode: lighten; border-radius: 2.5vw; margin: 6vw 3vw 3vw 3vw; padding: 5vw;'}">
+        <!--<lightning:card class="slds-card_boundary" variant="narrow" iconName="custom:custom14"
+            title="{!$Label.c.XC_CL_LCP183_header}">-->
+            
+            
+                <!--<lightning:layoutItem size="12">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="10">
+                            <lightning:layout multipleRows="true">
+
+                                <lightning:layoutItem size="12">
+                                    <h3>{!v.title}</h3>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="2">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}" class="slds-float_right ta-accordion-header-icon" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>-->
+
+            <aura:set attribute="actions">
+                <lightning:buttonIcon iconName="utility:refresh" alternativeText="refresh"
+                title="{!$Label.c.XC_CL_RefreshButton}"
+                onclick="{!c.refreshView}" />
+            </aura:set>
+            
+            <!-- IF A COMMERCIAL CHANGE IS IN PROGRESS SHOWS A SPINNER -->
+            <aura:if isTrue="{!v.isChangingOffer}">
+                <div class="slds-p-around_small slds-is-relative" style="height:200px;">
+                    <lightning:spinner aura:id="mySpinner" variant="brand" size="large"/>
+                </div>
+                <div class="slds-p-around_small slds-align_absolute-center">
+                    <p class="ta-color-white-opacity-60"> {!$Label.c.XC_CL_LCP183_ChangeOfferInProgress} </p>
+                </div>
+                <aura:set attribute="else">
+
+                    <aura:if isTrue="{!v.showSpinner}">
+                        <div class="slds-p-around_small slds-is-relative" style="height:200px;">
+                            <lightning:spinner aura:id="mySpinner" variant="brand" size="large"/>
+                        </div>
+                    </aura:if>
+
+                    <aura:if isTrue="{!v.showItems}">
+                        <!--<div class="slds-p-around_small">
+                            <lightning:formattedText value="{!$Label.c.XC_CL_LCP183_InfoMessage}" />
+                        </div>-->
+                        <aura:iteration items="{!v.orderItems}" var="oi">
+                            <c:TA_LCP245_CreditAssignmentViewChild recordId="{!oi.recordId}" incentiveItem="{!oi}"
+                                orderStatus="{!v.orderStatus}" isFromCTI="{!v.isFromCTI}" generalAttributes="{!v.general}" />
+                        </aura:iteration>
+                        <aura:set attribute="else">
+                            <p class="ta-color-white-opacity-60"> {!$Label.c.XC_CL_LCP183_NoProductAvailable} </p>
+                        </aura:set>
+                        <div class="ta-accordion-header-button slds-m-top_medium" onclick="{!c.refreshView}"> {!$Label.c.XC_CL_RefreshButton} </div>
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+        <!--</lightning:card>-->
+        </div>
+    </aura:if>
+
+</aura:component>

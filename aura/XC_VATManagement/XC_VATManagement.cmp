@@ -1,0 +1,81 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:LightningQuickAction,forceCommunity:availableForAllPageTypes,force:hasRecordId"
+    controller="XC_VATManagementController" access="global">
+
+    <aura:attribute name="mapaOIs" type="Map" default="{}" />
+    <aura:attribute name="tiposImpuestos" type="Map" default="{}" />
+    
+    <aura:attribute name="ois" type="List" default="[]" />
+    <aura:attribute name="oisPadres" type="List" default="[]" />
+    <aura:attribute name="oisHijos" type="List" default="[]" />
+    <aura:attribute name="wrappers" type="List" default="[]" />
+
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+
+    <aura:attribute name="listaMapa" type="List" />
+
+    <aura:attribute name="orderRecord" type="Object"/>
+    <aura:attribute name="recordLoadError" type="String"/>
+
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!--<aura:iteration items="{!v.wrappers}" var="wrapper" indexVar="sNo">
+        <p>Padre: {!wrapper.padre.Name}</p>
+        <aura:iteration items="{!wrapper.hijos}" var="hijo">
+            {!hijo.Name} 
+        </aura:iteration>
+    </aura:iteration>-->
+    <force:recordData aura:id="recordLoader"
+    recordId="{!v.recordId}"
+    fields="Name,XC_Segment__c,XC_LegalEntity__c"
+    targetFields="{!v.orderRecord}"
+    targetError="{!v.recordLoadError}"
+    />
+
+    <aura:if isTrue="{!and(v.orderRecord.XC_Segment__c != 'B2C', v.orderRecord.XC_LegalEntity__c == 'EndesaX')}">
+        <div class="slds-align_absolute-center">
+            <aura:if isTrue="{!v.showSpinner }">
+                <lightning:spinner aura:id="mySpinner" variant="brand" size="large" />
+            </aura:if>
+        </div>
+        
+        <p>{!$Label.c.XC_Click_Save_Taxes_To_Finish}</p>
+        <lightning:accordion>
+            <aura:iteration items="{!v.wrappers}" var="wrapper" indexVar="wrapperIndex">
+                <lightning:accordionSection name="{!wrapper.fullName}" label="{!wrapper.fullName}">
+                    <aura:set attribute="body">
+                        <div aura:id="myDiv">
+                            <aura:iteration items="{!wrapper.hijos}" var="hijo" indexVar="hijosIndex">
+                                <lightning:recordEditForm aura:id="myForm" objectApiName="NE__OrderItem__c"
+                                    recordId="{!hijo.Id}" onsuccess="{!c.onsuccess}" onerror="{!c.onerror}">
+                                    <!--<lightning:messages />-->
+                                    <lightning:inputField fieldName="Name" value="{!hijo.Name}" />
+                                    <lightning:inputField fieldName="NE__ProdName__c" value="{!hijo.NE__ProdName__c}" />
+                                    <!--<lightning:inputField fieldName="XC_Tax_Type__c" value="{!wrapper.impuesto}"
+                                        disabled="true" />-->
+                                    <lightning:inputField fieldName="XC_Tax_Type__c" value="{!hijo.XC_Tax_Type__c}"
+                                    disabled="true" />
+                                    <lightning:inputField fieldName="XC_Tax_Subtype__c" value="{!hijo.XC_Tax_Subtype__c}"/>
+                                    <lightning:inputField fieldName="XC_Exemptions__c" value="{!hijo.XC_Exemptions__c}" />
+                                    <lightning:inputField fieldName="XC_Not_Subject__c" value="{!hijo.XC_Not_Subject__c}" />
+                                    <lightning:inputField fieldName="XC_Sujeto_Pasivo_ISP__c"
+                                        value="{!hijo.XC_Sujeto_Pasivo_ISP__c}" />
+                                    <lightning:button aura:id="submitButton" class="slds-m-top_small"
+                                        variant="brand" type="submit" name="update" label="{!$Label.c.XC_Update_Tax}" />
+                                </lightning:recordEditForm>
+                            </aura:iteration>
+                            <!--<lightning:button class="slds-m-top_small" variant="brand" name="save" label="Save" onclick="{!c.guardar}" />-->
+                        </div>
+                    </aura:set>
+                </lightning:accordionSection>
+            </aura:iteration>
+        </lightning:accordion>
+        <lightning:button class="slds-m-top_small" variant="brand" name="save" label="{!$Label.c.XC_Save_Taxes}" onclick="{!c.guardar}" />
+        <aura:set attribute="else">
+            <p>{!$Label.c.XC_Select_Tax_Not_Apply_B2C}</p>
+        </aura:set>
+    </aura:if>
+</aura:component>

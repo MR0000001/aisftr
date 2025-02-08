@@ -1,0 +1,61 @@
+<!--
+* @author Simone Trenta - strenta@deloitte.it
+* @date Creation 16/10/2019
+* @date Modification 
+* @description XC_LCP0164
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable" 
+    controller="XC_LCC164_ResendCI" access="global">
+
+    <aura:attribute name="recordId" type="Id" />
+
+    <aura:attribute name="loading" type="Boolean" default="true"/> 
+    <aura:attribute name="emailOptions" type="List" default="[]"/>
+    <aura:attribute name="emailValue" type="String" default=""/>
+    <aura:attribute name="typingEmail" type="String" default=""/>
+    <aura:attribute name="newEmailCheckboxSelected" type="Boolean" default="false"/> 
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+
+    <lightning:card variant="Narrow" title="{!$Label.c.XC_CL_ResendNotification}" iconName="standard:email">
+        <aura:set attribute="footer">
+            <br></br>
+        </aura:set>
+    </lightning:card>
+
+    <aura:if isTrue="{! v.loading }">
+        <lightning:spinner alternativeText="Loading" size="large" style="background-color: rgba(0, 0, 0, 0)"/>
+    </aura:if>
+
+    <table class="slds-table">
+        <thead>
+            <tr>
+                <th scope="col"/>
+                <th scope="col"><span class="slds-truncate">{!$Label.c.XC_CL_ChooseEmail}</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.emailOptions}" var="em">
+                <tr>
+                    <td> <ui:inputRadio aura:id="oldEmail" label="{!em.value}" labelClass="labelHidden" name='others' value="true" change="{!c.setEmail}"/> </td>
+                    <td> {!em.value} </td>
+                </tr>
+            </aura:iteration>
+            <tr>
+                <td> <ui:inputRadio aura:id="newEmail" name='others' value="{!v.newEmailCheckboxSelected}" change="{!c.setEmail}"/> </td>
+                <td> <lightning:input aura:id="newEmailinputField" type="email" variant="label-hidden" placeholder="{!$Label.c.XC_CL_EnterEmail}" 
+                    value="{!v.typingEmail}" required="{!v.newEmailCheckboxSelected}" disabled="{!!v.newEmailCheckboxSelected}"/> </td>
+            </tr>
+        </tbody>
+    </table>
+    <br/>
+    <br/>
+    
+    <lightning:layout horizontalAlign="end">
+        <lightning:button variant="neutral" label="{!$Label.c.XC_CL_Cancel}" title="Cancel" onclick="{!c.cancel}" />
+        <lightning:button variant="brand" label="Send" title="{!$Label.c.XC_CL_Send}" onclick="{!c.send}" />	 
+    </lightning:layout>
+    
+
+</aura:component>

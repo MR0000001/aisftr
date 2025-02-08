@@ -1,0 +1,19 @@
+<aura:component controller="XC_AMP_LCC021_RedirectSimplifiedSales"
+                implements="force:hasRecordId,force:appHostable,force:lightningQuickActionWithoutHeader,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" 
+                access="global">
+
+    <aura:attribute name="spinnerControl" type="Boolean" default="true" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <lightning:navigation aura:id="navService" />
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    {!v.body}
+
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div class="slds-is-relative">
+            <lightning:spinner aura:id="mySpinner" variant="brand" />
+        </div>
+    </aura:if>
+
+</aura:component>

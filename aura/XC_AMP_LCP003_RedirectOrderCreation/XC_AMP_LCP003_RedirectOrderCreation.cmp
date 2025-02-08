@@ -1,0 +1,58 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 12-21-2020
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   12-04-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component controller="XC_AMP_LCC003_RedirectOrderCreation"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId">
+
+    <aura:attribute name="spinnerControl" type="Boolean" default="true" />
+    <aura:attribute name="selectedAccountRT" type="String" />
+    <aura:attribute name="listRT" type="List" />
+    <aura:attribute name="showModalSelection" type="Boolean" default="false" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <lightning:navigation aura:id="navService" />
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    {!v.body}
+
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div class="slds-is-relative">
+            <lightning:spinner aura:id="mySpinner" variant="brand" />
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showModalSelection}">
+        <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="ExtModal" class="slds-modal">
+            <div class="slds-modal__container">
+                <div class="modal-header slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModal}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="title slds-text-heading__medium slds-text-title_caps">
+                        <lightning:icon iconName="standard:account" /><span class="slds-p-left_small slds-text-title_caps">{!$Label.c.XC_CL_AMP_LCP003_Header}</span></h2>
+                </div>
+                <div class="slds-modal__content slds-p-around__medium">
+                    <div class="slds-p-around_small">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="12" padding="around-small">
+                                <lightning:radioGroup name="radioGroup" label="{!$Label.c.XC_CL_AMP_CustomerType}" options="{!v.listRT}"
+                                    value="{!v.selectedAccountRT}" type="radio" onchange="{!c.onTypeSelect}"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer slds-modal__footer"></div>
+        </div>
+        <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+    </aura:if>
+
+</aura:component>

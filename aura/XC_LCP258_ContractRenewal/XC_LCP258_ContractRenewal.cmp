@@ -1,0 +1,108 @@
+<!--
+* @author Eleni Tsiolaki - etsiolaki@deloitte.gr
+* @date Creation 07/10/2021
+* @date Modification dd/mm/yyyy
+* @description Component to manage the Contract Management: Renewal - Change end date
+-->
+<aura:component controller= "XC_LCC258_ContractRenewal" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasSObjectName,lightning:availableForFlowScreens" access="global" >
+
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="contractNumber" type="String"/>
+    <aura:attribute name="startDate" type="Date"/>
+	<aura:attribute name="endDateMin" type="Date"/> <!--CR772-elisa.caldini@accenture.com-28.04.2022-->																								   
+    <aura:attribute name="endDate" type="Date"/>
+    <aura:attribute name="contractZone" type="String"/>
+    <aura:attribute name="businessLine" type="String"/>
+    <aura:attribute name="legalEntity" type="String"/>
+
+    <aura:attribute name="businessLines" type="List" />
+    <aura:attribute name="legaliEntities" type="List" />
+    <aura:attribute name="zones" type="List" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="disableSearch" type="Boolean" default="true"/>
+    <aura:attribute name="disableAdjustment" type="Boolean" default="true"/>
+    
+    <aura:attribute name="searchPressed" type="Boolean" default="false"/>
+
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="assetIds" type="List"/>
+    <aura:attribute name="orderItemIds" type="List"/>
+    <aura:attribute name="orderItemContractMap" type="Map"/>
+
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="selectedContracts" type="List"/>
+    <aura:attribute name="draftValues" type="Object" default="[]"/>
+    <aura:attribute name="draftValueMap" type="Map" default="{}"/>
+    
+    <div>
+        <aura:if isTrue="{! !v.searchPressed}">
+            <div style="height:300px">
+				<!--CR772-elisa.caldini@accenture.com-28.04.2022 modified size input field from 4 to 3 and delete horizontal Align and verticalAlign -->
+                <!--lightning:layout verticalAlign="center" horizontalAlign="center"  multipleRows="true"!--> 
+                <lightning:layout   multipleRows="true">
+                        <lightning:layoutItem padding="around-small" flexibility="auto" size="3">
+                            <lightning:input name="contractNumber" label="Contract Number"  value="{! v.contractNumber}" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem padding="around-small" flexibility="auto" size="3">
+                            <lightning:input name="startDate" type="date" label="Contract Start Date" value="{! v.startDate}" onchange="{!c.handleMandatoryInput}" /> <!--CR772-elisa.caldini@accenture.com-28.04.2022- add action handleMandatoryInput-->
+                        </lightning:layoutItem>
+                         <!--START-CR772-elisa.caldini@accenture.com-28.04.2022-->
+                        <lightning:layoutItem padding="around-small" flexibility="auto" size="3">
+                            <lightning:input name="endDateMin" type="date" label="Contract End Date Min" required="true" value="{! v.endDateMin}" onchange="{!c.handleMandatoryInput}"/>
+                        </lightning:layoutItem>
+                        <!--END-CR772-elisa.caldini@accenture.com-28.04.2022-->
+                        <!--CR772-elisa.caldini@accenture.com-28.04.2022- rename label to Contract End Date Max -->
+                        <lightning:layoutItem padding="around-small" flexibility="auto" size="3">
+                            <lightning:input name="endDate" type="date" label="Contract End Date Max" required="true" value="{! v.endDate}" onchange="{!c.handleMandatoryInput}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem padding="around-small" flexibility="auto" size="3">																																		
+                            <lightning:combobox name="contractZone" label="Contract Zone" value="{! v.contractZone }" required="true" options="{! v.zones }" onchange="{!c.handleMandatoryInput}" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem padding="around-small" flexibility="auto" size="3">
+                            <lightning:combobox name="businessLine" label="Business Line" value="{! v.businessLine }" options="{! v.businessLines }" disabled="true"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem padding="around-small" flexibility="auto" size="3">
+                            <lightning:combobox name="legalEntity" label="Legal Entity" value="{! v.legalEntity }" options="{! v.legaliEntities }" disabled="true"/>
+                        </lightning:layoutItem>
+                </lightning:layout>
+                <div class="slds-clearfix" style="margin-bottom:30px;">
+                    <lightning:button variant="brand" class="slds-float_right" label="{!$Label.c.XC_CL_Search}" title="Search" onclick="{! c.handleSearch}" disabled="{!v.disableSearch}" />
+                </div>
+            </div>
+        <aura:set attribute="else">
+            <aura:if isTrue="{!empty(v.data)}">
+                <div class="slds-align_absolute-center" style="height:200px">
+                    {!$Label.c.XC_NoRecordsFound}
+                </div>
+            <aura:set attribute="else">
+                <div>
+                    <lightning:datatable data="{! v.data}" 
+                    columns="{! v.columns}" 
+                    draftValues="{! v.draftValues}"
+                    keyField="Id"
+                    onrowselection="{! c.handleSelect}"
+                    oncellchange = "{!c.handleEditCell}"
+                    suppressBottomBar="true" />
+                </div>
+                <div class="slds-align_absolute-center" style="height:200px">
+                    <lightning:button variant="brand" label="{!$Label.c.XC_Apply_Renewal}" title="Apply Adjustment" onclick="{! c.handleAdjust}" disabled="{!v.disableAdjustment}"/>
+                </div>
+            </aura:set>
+            </aura:if>
+        </aura:set>
+        </aura:if>
+    </div>
+
+    <aura:if isTrue="{!v.showSpinner}">
+        <div
+            style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" variant="brand"/>
+            <span class="slds-assistive-text">{!$Label.c.XC_CL_Loading}</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>
+    </aura:if>
+
+    
+</aura:component>

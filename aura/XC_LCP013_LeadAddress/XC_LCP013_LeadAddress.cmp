@@ -1,0 +1,28 @@
+<!--
+* @author Monica Cutillo, Giulio Proia, Francesco Bongiovanni
+* @date Creation 21/09/2018
+* @date Modification 24/09/2018
+* @description XC_LCP013_LeadAddress – Show Lead Address detail, with possibility to edit data
+-->
+
+<aura:component controller= "XC_LCC013_LeadAddress" implements="forceCommunity:availableForAllPageTypes,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId">
+	<aura:Attribute name="recordId" type="String"/>
+    <aura:Attribute name="IdFromMobile" type="String"/>
+	<aura:Attribute name="object" type="String" default="Lead"/>
+	<aura:Attribute name="title" type="String" default="{!$Label.c.XC_CL_Address}"/>
+	<aura:Attribute name="fieldsMap" type="Map"/>
+	<aura:Attribute name="addressToUpdate" type="Boolean" default="true" />
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+ 
+	<lightning:card variant="Narrow" title="" >
+		<aura:if isTrue="{!v.fieldsMap}">
+			<lightning:accordion aura:id="accordion" allowMultipleSectionsOpen = "true">
+				<lightning:accordionSection name="A" label="{!$Label.c.XC_CL_Address}">	
+					{!v.body}
+				</lightning:accordionSection>
+			</lightning:accordion>
+		</aura:if>	
+	</lightning:card>
+
+</aura:component>

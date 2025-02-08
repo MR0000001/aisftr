@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Event to handle the change selected country for an address">
+    <aura:attribute name="country" type="String" />
+</aura:event>

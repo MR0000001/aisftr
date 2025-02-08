@@ -1,0 +1,97 @@
+<aura:component implements="flexipage:availableForRecordHome" access="global">
+    
+    <aura:attribute name="serialOk" type="Boolean" default="false"/>
+    <aura:attribute name="forSearch" type="Boolean" default="false"/>
+    <aura:attribute name="showDragAndDropBox" type="Boolean" default="true"/>
+    <aura:attribute name="showError" type="Boolean" default="false"/>  
+    <aura:attribute name="errorMessage" type="String" default=""/>
+    <aura:attribute name="purchaseOrderLineId" type="String" />
+    <aura:attribute name="allData" type="Map" />
+    <aura:attribute name="totalLotMap" type="Map" default="{}"/>
+    
+    <aura:attribute name="numberOfSerialToShow" type="Integer" default="1"/>
+    <aura:attribute name="serialNumberList" type="List" />
+    <aura:attribute name="mapPolIdToQuantity" type="Map" default="{}" />
+    
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler event="c:Giic_LCE018_ShootMapFromCsv" action="{!c.setMapFromCsv}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    <br></br>
+    
+     <lightning:layout multipleRows="true">
+          <lightning:layoutItem size="12" padding="around-small">
+              <div class="slds-text-align_center">
+              <b> Insert lot numbers or upload  </b> &nbsp; <lightning:icon iconName="doctype:csv" alternativeText="Approved" title="Approved" />
+              </div>
+              </lightning:layoutItem>
+    </lightning:layout>    
+         <lightning:layout multipleRows="true">
+         
+        
+           <lightning:layoutItem  size="12" padding="around-medium">
+                 <div class="slds-text-align_center">
+          <aura:if isTrue="{!v.showError}">
+              <div class="demo-only" style="padding:0.5rem;background:#cc0000">
+                  <div class="slds-text-color_inverse"><b>Warning: {!v.errorMessage} </b></div>
+              </div>
+               <aura:set attribute="else">
+                   
+            
+            
+            <lightning:button variant="brand" 
+                              label="Save Lots"
+                              title="save"
+                              iconName="utility:save"
+                              iconPosition="right"
+                              disabled="false"
+                              onclick="{! c.sendReceipt }"/>
+                   
+              </aura:set>
+        </aura:if>
+               </div>
+        </lightning:layoutItem>
+    </lightning:layout>      
+        
+        
+      <lightning:layout multipleRows="true">
+          <lightning:layoutItem size="6" padding="around-small">
+              
+    <lightning:layout multipleRows="true">
+        
+            <aura:iteration items="{!v.serialNumberList}" var="item" indexVar="key">
+            <lightning:layoutItem size="6" padding="around-small" >Lot number #{!key+1}
+                 <lightning:input name="ser" disabled="{!v.serialOk}" value="{!item.value}" label="" />
+            </lightning:layoutItem>
+                <lightning:layoutItem size="4" padding="around-small" >Quantity:
+                 <lightning:input type="number" name="ser" disabled="{!v.serialOk}" value="{!item.quantity}" label="" />
+            </lightning:layoutItem>
+        </aura:iteration>
+        
+        
+        </lightning:layout>
+              &nbsp;&nbsp;
+               <lightning:button 
+                              label="Clear"
+                              variant="brand-outline"
+                              title="clear"
+                              iconName="utility:delete"
+                              iconPosition="right"
+                              disabled="false"
+                              onclick="{! c.clearSerials }"/>
+              
+        
+          </lightning:layoutItem>
+          
+         <lightning:layoutItem size="6" padding="around-small">
+             <aura:if isTrue="{!v.showDragAndDropBox}">
+    <c:Giic_LCP025_UploadLotCSV purchaseOrderLineId="{!v.purchaseOrderLineId}" maxSerialNumbersAllowed="{!v.numberOfSerialToShow}"></c:Giic_LCP025_UploadLotCSV>
+          <aura:set attribute="else">
+              <br></br><br></br>
+              <lightning:icon iconName="action:back" alternativeText="Approved" title="Approved" /><br></br><br></br><br></br>
+              <b> Please check if all lot numbers are correct and click the 'Save Lots' button </b>&nbsp;<lightning:icon iconName="utility:save" alternativeText="Approved" title="Approved" />
+          </aura:set>
+             </aura:if>
+             </lightning:layoutItem>
+    </lightning:layout>
+    
+</aura:component>

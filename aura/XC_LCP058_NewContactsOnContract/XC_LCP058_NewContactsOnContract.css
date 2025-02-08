@@ -1,0 +1,10 @@
+.THIS .abbass {
+    padding-top:8%
+}
+.THIS.slds-modal__container{
+    max-width: 150px !important;
+    width:150px !important;
+    max-height: 300px !important;
+    height:100% !important;
+
+}

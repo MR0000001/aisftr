@@ -1,0 +1,45 @@
+<aura:component controller="TA_LCC200_AppointmentCalendar"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global"
+    extends="c:TA_LCP209_BaseWizard">
+
+    <aura:attribute access="public" name="infoBag" type="Object" />
+    <aura:attribute access="public" name="dailyAppointments" type="List" default="[]" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <ltng:require styles="{!join(',',
+                                $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                                $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                                $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css',
+                                $Resource.TA_SR_FullCalendar + '/packages/core/main.min.css',
+                                $Resource.TA_SR_FullCalendar + '/packages/daygrid/main.min.css'
+                            )}"
+                  scripts="{!join(',',
+                                $Resource.TA_SR_jQuery,
+                                $Resource.TA_SR_FullCalendar + '/packages/core/main.js',
+                                $Resource.TA_SR_FullCalendar + '/packages/core/locales-all.js',
+                                $Resource.TA_SR_FullCalendar + '/packages/interaction/main.min.js',
+                                $Resource.TA_SR_FullCalendar + '/packages/daygrid/main.min.js'
+                            )}"
+                  afterScriptsLoaded="{!c.handleInitialize}" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <div id="calendar" class="slds-m-bottom_small ta-calendar-box" />
+
+        <div class="ta-box slds-text-align_center">
+            <img src="{!$Resource.TA_Icons + '/xc-icons/XC_Refresh.svg'}" id="buttonRefresh" class="ta-icon-refresh" onclick="{!c.handleInitializeRefresh}" />
+        </div>
+
+        <div class="ta-appointment-container">
+            <c:TA_LCP206_AppointmentPreview serviceAppointmentList="{!v.dailyAppointments}" processType="{!v.processType}" getInitInfoBag="false" />
+        </div>
+    </aura:if>
+</aura:component>

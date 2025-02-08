@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event to fire operations on a Row" >
+    <aura:attribute name="operation" type="String" description="Operation type" />
+    <aura:attribute name="indexVar" type="Integer" description="Row index identifier" />
+</aura:event>

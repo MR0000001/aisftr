@@ -1,0 +1,152 @@
+<!--
+  @File Name          : XC_LCP184_B2WNextStep.cmp
+  @Description        : 
+  @Author             : Francesco Imperioli - fimperioli@deloitte.it
+  @Group              : 
+  @Last Modified By   : Francesco Imperioli - fimperioli@deloitte.it
+  @Last Modified On   : 9/6/2020, 12:04:51
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    9/4/2020   Francesco Imperioli - fimperioli@deloitte.it     Initial Version
+-->
+<aura:component controller="XC_LCC184_B2WNextStep"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader">
+
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" />
+    <aura:attribute name="quoteSelected" type="Boolean" default="false" />
+    <aura:attribute name="orderSelected" type="Boolean" default="false" />
+    <aura:attribute name="openModal" type="Boolean" default="true" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="openBackDrop" type="Boolean" default="false" />
+    <aura:attribute name="rtSelected" type="String" />
+    <aura:attribute name="disableNextButton" type="Boolean" default="false"/>
+
+    <!-- CONDITIONAL VIEW BASED ON LE -->
+    <aura:attribute name="showQuote" type="Boolean" default="false" />
+    <aura:attribute name="autoConvert" type="Boolean" default="false" />
+
+    <aura:attribute name="showCapexError" type="Boolean" default="false"/>
+    <aura:attribute name="showCapexErrorMsg" type="String" default=""/>
+
+    <lightning:workspaceAPI aura:id="workspace" />
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }" />
+
+    <aura:registerEvent name="XC_LCE019_CloseChildComponent" type="c:XC_LCE019_CloseChildComponent" />
+
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="ExtModal" class="slds-modal">
+        <div class="slds-modal__container">
+
+            <div class="modal-header slds-modal__header">
+                <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close"
+                    onclick="{!c.closeFirstModal}">
+                    X
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 class="title slds-text-heading__medium">
+                    <lightning:icon iconName="action:new_opportunity" size="x-small" /><span
+                        class="slds-p-left_small">{!$Label.c.XC_CL_LCP184_Header}</span></h2>
+            </div>
+            <div class="slds-modal__content slds-p-around__medium">
+                <!-- <lightning:card variant="Narrow" title="Next Step" class="slds-card_boundary"> -->
+                <!-- BOX QUOTE -->
+                <lightning:layout verticalAlign="center" horizontalAlign="center">
+
+                    <aura:if isTrue="{!v.showQuote}">
+
+                        <lightning:layoutItem padding="around-medium">
+                            <div class="custom-box slds-p-around_medium">
+                                <lightning:card variant="Narrow" title="{!$Label.c.XC_CL_LCP184_QuoteBTN}"
+                                    iconName="standard:buyer_account" class="slds-card_boundary">
+                                    <aura:set attribute="actions">
+                                        <aura:if isTrue="{!v.quoteSelected}">
+                                            <lightning:buttonIcon iconName="utility:undo" alternativeText="Undo"
+                                                onclick="{!c.undoSelection}" />
+                                        </aura:if>
+                                    </aura:set>
+                                    <lightning:layout multipleRows="true">
+                                        <lightning:layoutItem size="12" smallDeviceSize="12" largeDeviceSize="12"
+                                            mediumDeviceSize="12" padding="around-small">
+                                            <div class="slds-box">
+                                                <lightning:formattedText value="{!$Label.c.XC_CL_LCP184_QuoteInfo}" />
+                                            </div>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="12" smallDeviceSize="12" largeDeviceSize="12"
+                                            mediumDeviceSize="12" padding="around-small">
+                                            <lightning:button variant="brand" label="{!$Label.c.XC_CL_LCP184_QuoteBTN}"
+                                                disabled="{!v.orderSelected}" onclick="{!c.quoteClick}" />
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </lightning:card>
+                            </div>
+                        </lightning:layoutItem>
+
+                    </aura:if>
+                    <!-- BOX ORDER -->
+                    <aura:if isTrue="{!and(v.showSpinner,not(v.autoConvert))}">
+                        <div class="slds-is-relative spinner-bckg">
+                            <lightning:spinner alternativeText="Loading" size="medium" variant="brand" />
+                        </div>
+                    </aura:if>
+                    <lightning:layoutItem padding="around-medium">
+
+                        <div class="custom-box slds-p-around_medium">
+                            <lightning:card variant="Narrow" title="{!$Label.c.XC_LCP184_OrderBTN}"
+                                iconName="standard:fulfillment_order" class="slds-card_boundary">
+                                <aura:set attribute="actions">
+                                    <aura:if isTrue="{!v.orderSelected}">
+                                        <lightning:buttonIcon iconName="utility:undo" alternativeText="Undo"
+                                            onclick="{!c.undoSelection}" />
+                                    </aura:if>
+                                </aura:set>
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="12" smallDeviceSize="12" largeDeviceSize="12"
+                                        mediumDeviceSize="12" padding="around-small">
+                                        <aura:if isTrue="{!and(v.showSpinner,v.autoConvert)}">
+                                            <div class="slds-is-relative spinner-bckg">
+                                                <lightning:spinner alternativeText="Loading" size="medium" variant="brand" />
+                                            </div>
+                                        </aura:if>
+                                        <div class="slds-box">
+                                            <lightning:formattedText value="{!$Label.c.XC_CL_LCP184_OrderInfo}" />
+                                        </div>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="12" smallDeviceSize="12" largeDeviceSize="12"
+                                        mediumDeviceSize="12" padding="around-small">
+                                        <lightning:button variant="brand" label="{!$Label.c.XC_LCP184_OrderBTN}"
+                                            disabled="{!or(v.quoteSelected,v.autoConvert)}" onclick="{!c.orderClick}" />
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </lightning:card>
+                        </div>
+                    </lightning:layoutItem>
+                </lightning:layout>
+
+                <aura:if isTrue="{!v.showCapexError}">
+                    <div class="slds-align_absolute-center" style="color:red">
+                        <p><b>{!v.showCapexErrorMsg}</b></p>
+                    </div>
+                </aura:if>
+            </div>
+
+            
+            
+            <div class="modal-footer slds-modal__footer">
+                <div>
+                    <lightning:button variant="neutral" label="{!$Label.c.XC_CL_CancelButton}"
+                        onclick="{!c.closeFirstModal}" />
+                    <aura:if isTrue="{!v.disableNextButton}">
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_LCP184_GoToBtn}"
+                            disabled="true" />
+                        <aura:set attribute="else">
+                            <lightning:button aura:id="nextStepOrderBtn" variant="brand"
+                                label="{!$Label.c.XC_CL_LCP184_GoToBtn}" onclick="{!c.processNextStep}"
+                                disabled="{!or(not(or(v.quoteSelected,v.orderSelected)),v.autoConvert)}" />
+                        </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+
+</aura:component>

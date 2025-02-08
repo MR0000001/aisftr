@@ -1,0 +1,79 @@
+<aura:component controller="TA_LCC218_DynamicRemind"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+
+    <aura:attribute access="public" name="workOrderId" type="String" />
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="workTypeCategory" type="String" />
+    <aura:attribute access="public" name="language" type="String" />
+    <aura:attribute access="public" name="mapAccordionLabel" type="Map" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="customerCardBg" type="String" />
+    <aura:attribute access="private" name="general" type="Object" />
+    <aura:attribute access="private" name="custom" type="Object" />
+    <aura:attribute access="private" name="objWrapper" type="Object" />
+    <aura:attribute access="private" name="fieldValue" type="List" />
+    <aura:attribute access="private" name="title" type="String" />
+    <aura:attribute access="private" name="description" type="String" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" 	type="c:TA_LCE213_StartSpinnerEvt" />
+    <aura:registerEvent name="sendInitStateEvt" 	type="c:TA_LCE220_SendInitStateEvt" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <lightning:layout multipleRows="true" class="slds-m-top_large slds-m-left_small slds-m-right_small">
+        <div class="slds-col slds-size_12-of-12 ta-box-shadow ta-accordion-header ta-accordion-open"
+            style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover; box-shadow: 0vw 1vw 2vw -0.8vw black;
+                       background-position: bottom; background-color: ' + v.general.bgColor + ';background-blend-mode: lighten;'}">
+
+            <!-- HEADER -->
+            <lightning:layoutItem size="12" class="ta-border-bottom-white slds-p-bottom_medium">
+                <h3> {!v.title} </h3>
+            </lightning:layoutItem>
+
+            <!-- ACCORDIONS -->
+            <lightning:layoutItem size="12">
+                <aura:iteration items="{!v.custom.fields}" var="field">
+                    <lightning:layout multipleRows="true" class="ta-accordion-container">
+                        <aura:if isTrue="{!field.idAccordion != null}">
+                            <div class="slds-size_12-of-12" name="{!field.idAccordion}" onclick="{!c.handleManageAccordion}">
+                                <lightning:layoutItem size="12">
+                                    <lightning:layout multipleRows="true">
+
+                                        <lightning:layoutItem size="11" class="slds-has-flexi-truncate">
+                                            <p class="ta-font-weight-800"> {!field.nameAccordion} </p> 
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="1">
+                                            <aura:if isTrue="{!field.showAccordion == 'true'}">
+                                                <img src="{!$Resource.TA_Icons + '/xc-icons/arrow-up-white.png' }"/>
+                                                <aura:set attribute="else">
+                                                    <img src="{!$Resource.TA_Icons + '/xc-icons/arrow-down-white.svg' }"/>
+                                                </aura:set>
+                                            </aura:if>
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </lightning:layoutItem>
+                            </div>
+
+                            <aura:if isTrue="{!field.showAccordion == 'true'}">
+                                <lightning:layoutItem size="12" class="ta-accordion-body">
+                                    <p> {!field.valueAccordion} </p>
+                                </lightning:layoutItem>
+                            </aura:if>
+                        </aura:if>
+                    </lightning:layout>
+                </aura:iteration>
+            </lightning:layoutItem>
+        </div>
+    </lightning:layout>
+</aura:component>

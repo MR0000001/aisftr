@@ -1,0 +1,45 @@
+<aura:component controller="XC_LCC005_AccountDataAccordion"
+    implements="force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:hasSObjectName,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+    <aura:attribute name="activeSections" type="List" default="['B']" /> <!-- ,'C' -->
+    <aura:attribute name="activeSectionName" type="String" default="['B']" />
+    <aura:attribute name="sobjecttype" type="String" default="{!v.sObjectName}" />
+    <aura:attribute name="identityNumber" type="String" />
+    <aura:attribute name="accountCommodityObj" type="Object" />
+    <aura:attribute name="contractCommodityObj" type="Object" />
+    <aura:attribute name="caseCommodityObj" type="Object" />
+    <aura:attribute name="invoiceCommodityObj" type="Object" />
+    <aura:attribute name="commodityGlobalMessage" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+
+
+    <aura:attribute name="body0" type="Object[]" />
+    <lightning:notificationsLibrary aura:id="notifLib" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler event="c:XC_LCE014_SaveSectionValue" action="{!c.handleSaveSectionEvent}" />
+
+
+    <div class="demo-only" style="padding:0.5rem;background:grey">
+        <div class="slds-text-color_inverse">{!$Label.c.XC_CL_360View}</div>
+
+    </div>
+    <br />
+    <aura:if isTrue="{!v.accountCommodityObj.accountsResulWrappers.length>0}">
+        <aura:if isTrue="{!v.caseCommodityObj!= null}">
+        <c:XC_LCP130_AccountCommodityDataBox accountCommodityObj="{!v.accountCommodityObj}"
+            caseCommodityObj="{!v.caseCommodityObj}" contractCommodityObj="{!v.contractCommodityObj}"
+            commodityGlobalMessage="{!v.commodityGlobalMessage}" recordId="{!v.recordId}"
+            sobjecttype="{!v.sobjecttype}" />
+        </aura:if>
+    </aura:if>
+    <!--aura:iteration var="accountCommodity" items="{!v.accountCommodityObj.accountsResulWrappers}"-->
+
+    <!--c:XC_LCP130_AccountCommodityDataBox accountCommodityObj="{!v.accountCommodityObj}"
+        commodityGlobalMessage="{!v.commodityGlobalMessage}" recordId="{!v.recordId}" sobjecttype="{!v.sobjecttype}" /-->
+    <!--c:XC_LCP005_AccountCommodityCard commodityAccData="{!accountCommodity}"
+            contractCommodityObj="{!contractCommodityObj}" /-->
+    <!--/aura:iteration-->
+
+
+</aura:component>

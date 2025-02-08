@@ -1,0 +1,86 @@
+({
+	doInit : function(component, event, helper) {
+		component.set("v.contactId","");
+        component.set("v.accountId","");
+        /*var actionContactList = component.get("c.getContactsList");
+        
+        actionContactList.setParams({
+            documentType : component.get("v.documentType"),
+            documentNumber : component.get("v.documentNumber"),
+            email : component.get("v.email")
+        });
+        
+        actionContactList.setCallback(this, function(response) {
+            component.set("v.contacts", response.getReturnValue());
+            for (var i = 0; i < response.getReturnValue().length; i++){
+                checkBox.push(false);
+            } 
+            component.set("v.flags", checkBox);
+
+        });
+        $A.enqueueAction(actionContactList);*/
+    
+	},
+    
+    handleSearchContact  : function(component, event, helper){
+    	var checkBox = [];
+        var actionContactList = component.get("c.getContactsList");
+        
+        actionContactList.setParams({
+            documentType : component.get("v.documentType"),
+            documentNumber : component.get("v.documentNumber"),
+            email : component.get("v.email")
+        });
+        
+        actionContactList.setCallback(this, function(response) {
+            component.set("v.contacts", response.getReturnValue());
+            for (var i = 0; i < response.getReturnValue().length; i++){
+                checkBox.push(false);
+            } 
+            component.set("v.flags", checkBox);
+
+        });
+        $A.enqueueAction(actionContactList);
+    },
+    
+    onCheckContactSelection :  function (component, event, helper) {
+        
+        var id = event.getSource().get("v.text");
+        var flags = component.get("v.flags");
+        var contacts = component.get("v.contacts");
+        var actualSelection = event.getSource().get("v.value");
+        
+        //Gets the checkbox group based on the checkbox id
+		var availableCheckboxes = component.find('rowSelection');
+        var resetCheckboxValue  = false;
+        if (Array.isArray(availableCheckboxes)) {
+            //If more than one checkbox available then individually resets each checkbox
+            availableCheckboxes.forEach(function(checkbox) {
+            checkbox.set('v.value', resetCheckboxValue);
+            }); 
+        } else {
+            //if only one checkbox available then it will be unchecked
+            availableCheckboxes.set('v.value', resetCheckboxValue);
+        }
+        
+        for(var i = 0;i< flags.length ; i++){
+            flags[i] = false;
+        }
+		console.log(contacts[id]);
+        if(actualSelection){
+    		flags[id] = actualSelection;
+            component.set("v.contactId", contacts[id].Id);
+            component.set("v.accountId", contacts[id].AccountId);
+		}else{ 
+            component.set("v.contactId","");
+            component.set("v.accountId","");
+            flags[id] = false;
+ 		}
+        
+ 		component.set("v.flags",flags);
+        console.log(component.get("v.contactId"));
+        console.log(component.get("v.accountId"));
+        event.getSource().set("v.value",actualSelection);
+	
+     }
+})

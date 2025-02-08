@@ -1,0 +1,89 @@
+<!-- Lightning Component to display a record -->
+<aura:component controller = "XC_LCC250_CreditCheckCaseSection"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+
+<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+<aura:attribute access="public" name="IdentityNumber" type="String"/>
+<aura:attribute access="public" name="IdentityNumberLabel" type="String"/>
+<aura:attribute access="public" name="ContactDocumentNumber" type="String"/>
+<aura:attribute access="public" name="contactDocumentNumberLabel" type="String"/>
+<aura:attribute access="public" name="XC_RevenueFullLife_Label" type="String"/>
+<aura:attribute access="public" name="XC_CapexFullLife_Label" type="String"/>
+<aura:attribute access="public" name="XC_RevenueFullLife_Value" type="String"/>
+<aura:attribute access="public" name="XC_CapexFullLife_Value" type="String"/>
+<aura:attribute access="public" name="XC_ResultCVP_Label" type="String"/>
+<aura:attribute access="public" name="XC_ExecutionDateCVP_Label" type="String"/>
+<aura:attribute access="public" name="ResultCVP_Value" type="String"/>
+<aura:attribute access="public" name="DateCVP_Value" type="String"/>
+<aura:attribute name="listBillingModel" type="List"/>
+<aura:attribute access="public" name="billingModel" type="String"/>
+
+    <!-- 
+        Using lightning:recordViewForm tag record Id and objectApiName is required to fetch record.
+        For custom objects, do check you have __c in the api name
+     -->
+        <lightning:recordViewForm recordId="{!v.recordId}" objectApiName="Case">
+        <!-- Using lightning:card tag with a title -->
+        <lightning:card title="{!$Label.c.XC_CL_CreditCheckDetails}" iconName="utility:money">
+            <!-- lightning:card body section starts -->
+            <p class="slds-p-horizontal_small">
+                <!-- Forming a grid of two equal columns -->
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_1-of-2">
+             <lightning:layoutItem padding="around-small">
+                <div class="header-column">
+                    <p class="field-title" title="IdentityNumber">{!v.IdentityNumberLabel}</p>
+                    <p>{!v.IdentityNumber}</p>
+                </div>                                          
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small">
+                <div class="header-column">
+                    <p class="field-title" title="ContactDocumentNumber">{!v.contactDocumentNumberLabel}</p>
+                    <p>{!v.ContactDocumentNumber}</p>
+                </div>                                          
+            </lightning:layoutItem> 
+            <lightning:layoutItem padding="around-small">
+                <div class="header-column">
+                    <p class="field-title" title="RevenueFullLive">{!v.XC_RevenueFullLife_Label}</p>
+                    <p>{!v.XC_RevenueFullLife_Value}</p>
+                </div>                                          
+            </lightning:layoutItem> 
+            <lightning:layoutItem padding="around-small">
+                <div class="header-column">
+                    <p class="field-title" title="CapexFullLife">{!v.XC_ResultCVP_Label}</p>
+                    <p>{!v.ResultCVP_Value}</p>
+                </div>                                          
+            </lightning:layoutItem>  
+            <lightning:layoutItem padding="around-small">
+                <div class="header-column">
+                    <p class="field-title" title="CapexFullLife">{!v.XC_ExecutionDateCVP_Label}</p>
+                    <p>{!v.DateCVP_Value}</p>
+                </div>                                          
+            </lightning:layoutItem>  
+                        <lightning:recordEditForm objectApiName="Case" recordId="{!v.recordId}">
+                        <lightning:messages />
+                        <div class="slds-var-p-around_small">                                                            
+                                <lightning:inputField aura:id="finInstitute" fieldName="XC_CreditNote__c" disabled ="false" 
+                                     />                                                          
+                        </div>
+                    </lightning:recordEditForm>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2"> 
+      <aura:iteration items="{!v.listBillingModel}" var="type">
+        <!-- Everything in between these iteration tags is created for each list element. -->           
+            <lightning:layoutItem padding="around-small">
+                <div class="header-column">
+                    <p class="field-title" title="billingModel">{!$Label.c.XC_CL_ConfigurationItem}</p>
+                    <p>{!type}</p>
+                </div>                                          
+            </lightning:layoutItem>
+      </aura:iteration>   
+                     </div>
+                </div>
+            </p>
+        </lightning:card>        
+    </lightning:recordViewForm>  
+      
+    
+</aura:component>

@@ -1,0 +1,384 @@
+@media only screen and (max-width: 600px) {
+    /* CUSTOM-TAG */
+    .THIS .ta-appointment-card {  
+        animation: 1s fadeIn;
+        animation-fill-mode: forwards;
+        border-bottom-right-radius: 5vw;
+        border-top-right-radius: 5vw;
+        width: 100%;
+        height: 100%;
+        box-shadow: 0vw 1vw 2vw -0.8vw black;
+    }
+
+    .THIS .ta-bg-color-darkorange {
+        background-color: darkorange;
+    }
+
+    .THIS .ta-bg-color-purple {
+        background-color:#461e7d;
+    }
+
+    .THIS .ta-bg-color-green {
+        background-color:#00c983;
+    }
+    
+    .THIS .ta-bg-color-blue {
+        background-color: #0070d2;
+    }
+}
+
+/* .THIS .fc-view-container td {
+    border: none;
+    border-radius: 20%;
+}
+.THIS .fc-view-container th {
+    border: none;
+    padding-bottom: 5%;
+}
+.THIS .fc-view-container .fc-head {
+    text-transform: uppercase;
+    font-size: 12px;
+}
+.THIS .xc-event-point {
+    color: rgb(70, 30, 125);
+    text-align: center;
+    margin-bottom: 0.5%;
+    z-index: -9999;
+}
+.THIS .fc-event {
+    background-color: unset;
+    border: none;
+}
+.THIS .fc-content-skeleton .fc-day-number {
+    float: none !important;
+}
+.THIS .fc-content-skeleton .fc-day-top {
+    text-align: center;
+} */
+/*Bordo e margine delle card*/
+/* .THIS .slds-card {
+    border: 1.5px solid rgb(70, 30, 125) !important;
+    margin-bottom: 3%;
+} */
+
+/* @keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        visibility: visible;
+        opacity: 1;
+    }
+}
+
+.THIS .fc-day-top{
+    padding-top: 5% !important;
+} */
+/*Altezza pallino all'interno della casella data*/
+/* .THIS .fc-day-grid-event{
+    margin-top: -3% !important;
+} */
+/*Modal di visualizzazione 2+ pallini su una stessa casella data*/
+/* .THIS .fc-more-popover{
+    visibility: hidden;
+} */
+
+/* .THIS .fc-event-container {
+    pointer-events: none;
+} */
+
+/*.THIS .xc-text-1-black-bold {
+    font-family: Montserrat;
+    line-height: 115%;
+    font-size: 16px;
+    font-weight: 900;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #303030;
+}
+
+.THIS .xc-text-1-black {
+    font-family: Montserrat;
+    line-height: 115%;
+    font-size: 16px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #303030;
+}
+
+.THIS .xc-text-2-white-bold{
+    font-family: Montserrat;
+    line-height: 115%;
+    font-size: 12px;
+    font-weight: 900;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    text-align: center;
+    color: #ffffff;
+}
+
+.THIS .xc-text-2-grey {
+    font-family: Montserrat;
+    line-height: 115%;
+    font-size: 12px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #4a4a4a;
+}
+
+.THIS .xc-text-2-purple {
+    font-family: Montserrat;
+    line-height: 115%;
+    font-size: 12px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #461e7d;
+}
+
+.THIS .xc-text-2-black {
+    font-family: Montserrat;
+    line-height: 115%;
+    font-size: 12px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #303030;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-box-label {
+    border-radius: 1.5vw;
+    padding: .5vw;
+    width: 35vw;
+    text-align: center;
+}
+
+.THIS .ta-box-label-2 {
+    border-radius: 1.5vw;
+    padding: .5vw;
+    width: 60vw;
+    text-align: center;
+}
+
+/* .THIS .ta-bg-green {
+    background-color: #00c983;
+}
+
+.THIS .ta-bg-purple {
+    background-color: #461e7d;
+}
+
+.THIS .fc-button-primary {
+    color: #461e7d;
+    background-color: #ece8f2;
+    border-color: #ece8f2;
+    font-family: Montserrat;
+}
+
+.THIS .fc-toolbar h2 {
+    font-size: 1.4em;
+    margin: 0;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #303030;
+}
+
+.THIS .fc-dayGrid-view .fc-day-number, .THIS .fc-dayGrid-view .fc-week-number {
+    padding: 2px;
+    color: #303030;
+    font-family: Montserrat;
+}
+
+.THIS .fc-day-header {
+    font-family: Montserrat;
+    color: #461e7d;
+}
+
+.THIS .ta-icon-size-small {
+    width: 7vw;
+}
+
+.THIS .ta-icon-size-medium {
+    width: 12px;
+}
+
+.THIS .selectedDate{
+    background-color: #170a29 !important;
+}
+
+.THIS .fc-today, .THIS .fc-unthemed td.fc-today {
+    background: #391967;
+    z-index: -1;
+}
+
+.THIS .fc-button-primary {
+    color: #461e7d;
+    background-color: white;
+    border-color: white;
+    font-family: Montserrat;
+}
+
+.THIS .fc-dayGrid-view .fc-day-number, .THIS .fc-dayGrid-view .fc-week-number {
+    padding: 2px;
+    color: white;
+    font-family: Montserrat;
+}
+
+.THIS .fc-day-header {
+    font-family: Montserrat;
+    color: white;
+}
+
+.THIS .xc-event-point {
+    color:white;
+    text-align: center;
+    margin-bottom: 0.5%;
+    z-index: -9999;
+}
+
+.THIS .fc-toolbar h2 {
+    color: white;
+}
+
+ .THIS .fc-day-grid, .THIS .fc-day-grid-container, .THIS .fc-body {
+    padding-bottom: 20px;
+}
+
+.THIS .fc-day-grid-container {
+    overflow: hidden !important;
+}
+
+.THIS .xc-calendar-box {
+    background: #461e7d;
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    left: 0;
+    top: 0;
+    padding: 6vw;
+    border-bottom-left-radius: 10vw;
+    border-bottom-right-radius: 10vw;
+    box-shadow: 0 5vw 5vw -5vw black;
+}
+
+.THIS .xc-content-box {
+    position: absolute;
+    top: 470px;
+    left: 0;
+    width: 100%;
+    padding: 5vw;
+}
+
+.THIS .ta-bar-green {
+    background-color: #00c983;
+    border-top-left-radius: 5vw;
+    border-bottom-left-radius: 5vw;
+    width: 10px;
+    height: 100%;
+    margin-right: 3vw;
+}
+
+.THIS .ta-bar-purple {
+    background-color: #461e7d;
+    border-top-left-radius: 5vw;
+    border-bottom-left-radius: 5vw;
+    width: 10px;
+    height: 100%;
+    margin-right: 3vw;
+} */
+
+/* .THIS h3 {
+    font-family: Montserrat;
+    font-size: 4vw;
+    font-weight: 800;
+    font-stretch: normal;
+    font-style: normal;
+    letter-spacing: normal;
+}
+
+.THIS p {
+    font-family: Montserrat;
+    font-size: 3.3vw !important;
+    font-weight: 300;
+    font-stretch: normal;
+    font-style: normal;
+    letter-spacing: normal;
+} */
+
+/* .THIS .ta-color-black {
+    color:#303030;
+}
+
+.THIS .ta-color-purple {
+    color:#461e7d;
+}
+
+
+.THIS .ta-color-white {
+    color: white;
+}
+
+.THIS .ta-color-grey {
+    color: grey;
+}
+
+.THIS .ta-color-white-opacity-60 {
+    color: rgb(255, 255, 255, 0.6);
+}
+
+.THIS .ta-font-weight-800 {
+    font-weight: 800;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-appointment-bg {
+    background-color: #ece8f2;
+    border-top-right-radius: 5vw;
+    border-bottom-right-radius: 5vw;
+    height: 100%;
+    /*box-shadow: 0vw 1vw 2vw -0.8vw black;*/
+}
+
+/* .THIS .ta-bar-orange {
+    background-color: darkorange;
+    border-top-left-radius: 5vw;
+    border-bottom-left-radius: 5vw;
+    width: 10px;
+    height: 100%;
+    margin-right: 3vw;
+}
+
+.THIS .ta-bg-orange {
+    background-color: darkorange;
+} */
+
+/* CUSTOM-TAG TABLET */
+@media screen and (min-width: 601px) {
+    .THIS .ta-icon-size-small {
+        margin-top: 1vw;
+        margin-right: 1vw;
+    }
+
+    .THIS .ta-appointment-card {
+        margin-bottom: 6vw !important;
+    }
+}
+
+.THIS .ta-icon-size-medium-2 {
+    width: 4vw !important;
+}

@@ -1,0 +1,403 @@
+<!--
+    @description giic_MergePurchaseOrder - Component to merge Purchase Order
+    @date Mod 07/09/2021 - Salvatore Agrillo - salvatore.agrillo@nttdata.com
+-->
+
+<aura:component controller="Giic_PurchaseOrderMergeController" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,lightning:isUrlAddressable" 
+                access="global">
+
+    <aura:attribute name="pMasterWrapperlist" type="list"/>	
+    <aura:attribute name="pWrapperlist"  type="list"/>
+    <aura:attribute name="pageSize" type="Integer" default="5"/>
+    <aura:attribute name="masterlistSize" type="Integer"/>
+    <aura:attribute name="startPosn" type="Integer" default="0"/>
+    <aura:attribute name="endPosn" type="Integer"/>
+    <aura:attribute type="String" name="sortField" />
+    <aura:attribute name="isAsc" type="boolean" default="true" description="boolean flag for pass sorting condition to apex class"/> 
+    <aura:attribute name="sortAsc" type="boolean"  />
+    <aura:attribute name="name" type="boolean" default="true"/>
+    <aura:attribute name="supplier" type="boolean" default="true"/>
+    <aura:attribute name="warehouse" type="boolean" default="true"/>
+    <aura:attribute name="orderDate" type="boolean" default="true"/>
+    <aura:attribute name="priceBook" type="boolean" default="true"/>
+    <aura:attribute name="orderStatus" type="boolean" default="true"/>
+    <aura:attribute name="type" type="boolean" default="true"/>
+    <aura:attribute name="owner" type="boolean" default="true"/>
+    <aura:attribute name="isButtonActive" type="Boolean" default="false"/>
+    <aura:attribute name="isButtonActiveMergeCluster" type="Boolean" default="false"/>
+    <aura:attribute Name="selItem" type="object"  access="public"/> 
+    <aura:attribute Name="suppliername" type="object"  access="public"/>
+    <aura:attribute name="selectedTabsoft" type="string" default="poname"/>
+    <aura:attribute name="arrowDirection" type="string" default="arrowup"/>
+    <aura:attribute name="loaded" type="Boolean" default="false" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:attribute name="filterCluster" type="String" default="All"/>
+    <aura:attribute name="countClusterElements" type="String" default="--"/>
+    <aura:attribute name="mapRowNumber" type="Object"/>
+    <aura:attribute name="listClusterSelected" type="List"/>
+    <aura:attribute name="showConfirmMerge" type="Boolean" default="false"/>
+
+    <lightning:notificationsLibrary aura:id="notifLib"/>    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <div class="slds">
+
+        <!-- Title -->
+        <div class="wk_static">
+            <div class="slds-page-header" role="banner">
+                <div class="slds-grid">
+                    <div class="slds-col slds-has-flexi-truncate">
+                        <div class="slds-media slds-media--center slds-no-space slds-grow">
+                            <div class="slds-media__figure">
+                                <lightning:icon iconName="standard:account" size="small" alternativeText="Indicates approval"/> 
+                            </div>
+                            <div class="slds-media__body">
+                                <h1 class="slds-page-header__title slds-m-right--small slds-align-middle" title="Accounts">Purchase Order Merge</h1>
+                            </div>
+                            <div class="slds-media__figure slds-media__figure--reverse slds-truncate">
+                                
+                            </div>
+                        </div>                    
+                    </div>                
+                </div>
+            </div>
+        </div>  
+    
+
+        <!-- Buttons and filters: -->
+        <div class="slds-m-around_medium" > 
+            <div class="exampleHolder">
+                <aura:if isTrue="{! v.loaded }">
+                        <lightning:spinner alternativeText="Loading" variant="brand"/>
+                </aura:if>
+            </div>
+            <!--<lightning:layout>
+                    <lightning:layoutItem size="5" padding="around-small">
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="4" padding="around-small">
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <lightning:button onclick="{!c.mergeAll}"
+                                          variant="destructive-text"
+                                          label="Merge All"
+                                          /> 
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="3" padding="around-small">
+                    </lightning:layoutItem>
+            </lightning:layout>-->   
+            <br></br>
+            <lightning:layout class="slds-align_absolute-center">
+                <lightning:layoutItem size="3" class="slds-p-horizontal_small">
+                    <c:giic_CustomLookUp    objectName="gii__Warehouse__c"
+                                            field_API_text="name"
+                                            field_API_val="Id"
+                                            limit="4"
+                                            field_API_search="Name"
+                                            lookupIcon="standard:gii__Warehouse__c" 
+                                            selItem="{!v.selItem}" 
+                                            placeholder="Enter space after text to search Warehouse"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="3" class="slds-p-horizontal_small">
+                    <c:giic_CustomLookUp    objectName="Account"
+                                            field_API_text="name"
+                                            field_API_val="Id"
+                                            limit="4"
+                                            field_API_search="Name"
+                                            lookupIcon="standard:Account" 
+                                            selItem="{!v.suppliername}" 
+                                            placeholder="Enter space after text to search Account"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout>
+                <div class="slds-align_absolute-center" >    
+                    <lightning:layoutItem padding="around-small">
+                        <lightning:button onclick="{!c.Search}"
+                                          variant="brand"
+                                          label="Search"
+                                          disabled="{!empty(v.selItem||v.suppliername)}"/> 
+                    </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small">
+                        <lightning:button onclick="{!c.Refresh}"
+                                          variant="brand"
+                                          label="Refresh"/> 
+                    </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small">
+                        <lightning:button onclick="{!c.Cancel}"
+                                          variant="brand"
+                                          label="Cancel"/> 
+                    </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small">
+                        <lightning:button onclick="{!c.Merge}"
+                                          variant="brand"
+                                          label="Merge Selected"
+                                          disabled="{!!v.isButtonActive}"/> 
+                    </lightning:layoutItem>
+                </div>
+            </lightning:layout>
+        </div>   
+
+
+        <!-- Cluster Menu: -->
+        <lightning:layout class="slds-align_absolute-center borderCluster marginBottom" multipleRows="true">
+            <lightning:layoutItem size="12" class="slds-align_absolute-center">
+                <lightning:helptext content="Each row will be marked with a color: you can associate the color for the same warehouse, same supplier, same pricebook, same cig and cup. If you select one or more rows with the same color, you can merge all the rows with the same color (without selecting them) with the appropriate Merge Cluster button."/>
+                <b> Cluster Menu</b><br></br>
+            </lightning:layoutItem>
+            <!--<lightning:layoutItem size="12" class="slds-align_absolute-center marginBottom marginTop">
+                <lightning:buttonGroup>
+                    <lightning:button aura:id="canSelectWarehouse" label="|  Warehouse  |" onclick="{!c.onFilterCluster}" class="buttonDeselect"/>
+                    <lightning:button aura:id="canSelectSupplier" label="|  Supplier  |" onclick="{!c.onFilterCluster}" class="buttonDeselect"/>
+                    <lightning:button aura:id="canSelectPricebook" label="|  Pricebook  |" onclick="{!c.onFilterCluster}" class="buttonDeselect"/>
+                    <lightning:button aura:id="canSelectAll" label="|  All  |" onclick="{!c.onFilterCluster}" class="buttonSelect"/>
+                </lightning:buttonGroup>
+            </lightning:layoutItem>-->
+            <lightning:layoutItem size="12" class="slds-align_absolute-center">
+                <lightning:button onclick="{!c.mergeCluster}" variant="brand" label="Merge Cluster" disabled="{!!v.isButtonActiveMergeCluster}"/> 
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" class="slds-align_absolute-center marginBottom">
+                Cluster elements: {!v.countClusterElements}
+            </lightning:layoutItem>
+            <aura:if isTrue="{!v.showConfirmMerge}">
+                <lightning:layoutItem size="12" class="slds-align_absolute-center marginTop marginBottom">
+                    <b>Are you sure to merge {!v.countClusterElements} elements?</b>
+                </lightning:layoutItem>
+                <lightning:layout class="slds-align_absolute-center marginBottom" multipleRows="false">
+                    <lightning:layoutItem size="6" class="slds-align_absolute-center marginBottom">
+                        <lightning:button onclick="{!c.backMergeOperation}" variant="destructive" label="No"/> 
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="6" class="slds-align_absolute-center marginBottom">
+                        <lightning:button onclick="{!c.goMergeOperation}" variant="success" label="Yes"/> 
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </aura:if>
+        </lightning:layout>
+
+
+        <!-- Table: -->
+        <div>
+            <form class="slds-form--stacked">
+                <div class="slds-col--padded">
+                    <table class="slds-table slds-table--striped slds-table--bordered slds-table--fixed-layout slds-table--resizable-cols slds-max-medium-table--stacked-horizontal" role="grid">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <!--td><ui:inputCheckbox  aura:id="selectall" change="{!c.onSelectAll}"/></td-->
+                                <!-- Header: -->
+                                <th style="width:3%;">
+                                    <div style="padding-left:7px;" class="slds-p-vertical_x-small">
+                                    <lightning:input type="checkbox" name="options" aura:id="selectall" onchange="{!c.onSelectAll}"/>
+                                    </div>
+                                </th>
+                                 
+                                <!-- Columns: --> 
+                                <th class="slds-text-title--caps " title="Cluster" scope="col" style="width: 5%;" >
+                                    <div class="slds-align_absolute-center">
+                                        Cluster
+                                    </div>
+                                </th>
+
+                                <th class="slds-text-title--caps " title="Name" scope="col" onclick="{!c.sortField}">
+                                    <div class="slds-align_absolute-center">
+                                        Name
+                                        <span>  
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowup', v.selectedTabsoft == 'Name')}">
+                                                <lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>                                        
+                                            <aura:if  isTrue="{!and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Name')}">
+                                                <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                        </span>
+                                    </div>
+                                </th>        
+
+                                <th class="slds-text-title--caps " scope="col" title="gii__SupplierName__c" onclick="{!c.sortField}">
+                                    <div class="slds-truncate slds-align_absolute-center " title="Supplier">
+                                        Supplier
+                                        <span>  
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowup', v.selectedTabsoft == 'gii__SupplierName__c')}">
+                                                <lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                            <aura:if  isTrue="{!and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'gii__SupplierName__c')}">
+                                                <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                        </span>
+                                    </div>
+                                </th>
+
+                                <th class="slds-text-title--caps" scope="col" title="gii__ShipTo__r.Name" onclick="{!c.sortField}">
+                                    <div class="slds-truncate slds-align_absolute-center" title="warehouse">
+                                        Warehouse
+                                        <span>  
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowup', v.selectedTabsoft == 'gii__ShipTo__r.Name')}">
+                                                <lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'gii__ShipTo__r.Name')}">
+                                                <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                        </span>
+                                    </div>
+                                </th>
+                       
+                                <th class="slds-text-title--caps" scope="col" title="gii__PriceBookName__c" onclick="{!c.sortField}">
+                                    <div class="slds-truncate slds-align_absolute-center" title="priceBook">
+                                        Pricebook
+                                        <span>  
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowup', v.selectedTabsoft == 'gii__PriceBookName__c')}">
+                                                <lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'gii__PriceBookName__c')}">
+                                                <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                        </span>
+                                    </div>
+                                </th> 
+                                
+                                 <th class="slds-text-title--caps " title="giic_CIG__c" scope="col" onclick="{!c.sortField}">
+                                    <div class="slds-align_absolute-center">
+                                        CIG
+                                        <span>  
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowup', v.selectedTabsoft == 'giic_CIG__c')}">
+                                                <lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>                                        
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'giic_CIG__c')}">
+                                                <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                        </span>
+                                    </div>
+                                </th>      
+
+                                <th class="slds-text-title--caps " title="giic_CUP__c" scope="col" onclick="{!c.sortField}">
+                                    <div class="slds-align_absolute-center">
+                                        CUP
+                                        <span>  
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowup', v.selectedTabsoft == 'giic_CUP__c')}">
+                                                <lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>                                        
+                                            <aura:if  isTrue="{!and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'giic_CUP__c')}">
+                                                <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                        </span>
+                                    </div>
+                                </th>
+
+                                <th class="slds-text-title--caps" scope="col" title="gii__OrderDate__c" onclick="{!c.sortField}">
+                                    <div class="slds-truncate slds-align_absolute-center" title="orderDate">
+                                        Order Date
+                                        <span>  
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowup', v.selectedTabsoft == 'gii__OrderDate__c')}">
+                                                <lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'gii__OrderDate__c')}">
+                                                <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                        </span>
+                                    </div>
+                                </th> 
+
+                                <th class="slds-text-title--caps" scope="col" title="giic_Status__c" onclick="{!c.sortField}">
+                                    <div class="slds-truncate slds-align_absolute-center" title="orderStatus">
+                                        Status
+                                        <span>  
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowup', v.selectedTabsoft == 'giic_Status__c')}">
+                                                <lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                            <aura:if isTrue="{!and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'giic_Status__c')}">
+                                                <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                            </aura:if>
+                                        </span>
+                                    </div>
+                                </th>         
+                            </tr>
+                        </thead>
+
+                        <!-- Values table: -->
+                        <tbody>
+                            <aura:iteration items="{!v.pWrapperlist}" var="con">
+                                <tr class="slds-hint-parent"> 
+                                    <th>
+                                        <div class="slds-align_absolute-center">
+                                            <lightning:input name="{!con.codeCluster}" type="checkbox" checked="{!con.isSelected}" onchange="{!c.onCheck}"/>
+                                        </div>
+                                    </th>
+                                    <!--<th scope="row" >
+                                            <div class="slds-form-element">
+                                                <div class="slds-form-element__control">
+                                                    <label class="slds-checkbox">
+                                                        <ui:inputCheckbox text="{!con.cwrapperpo.Id}"
+                                                                          value="{!con.isChecked}"
+                                                                          change="{!c.onCheck}"/>
+                                                        <span class="slds-checkbox_faux"></span>
+                                                        <span class="slds-form-element__label text"></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </th>-->
+                                    
+                                    <th scope="row"  class="slds-cell-edit" data-label="Cluster" style="{!con.cluster}">                                       
+                                        <div class="slds-truncate slds-align_absolute-center "></div>
+                                    </th>
+
+                                    <th scope="row"  class="slds-cell-edit" data-label="Name">
+                                        <!-- <td data-label="Name" >-->
+                                        <div class="slds-truncate slds-align_absolute-center" >
+                                            <a href="javascript:void(0);" onclick="{!c.doView}">
+                                                <span class="slds-truncate" id="{!con.cwrapperpo.Id}">{!con.poName}</span>
+                                            </a>
+                                        </div>
+                                    </th>       
+
+                                    <th scope="row"  class="slds-cell-edit" data-label="{!con.gii__SupplierName__c}">                                       
+                                        <div class="slds-truncate slds-align_absolute-center " >{!con.supplier}</div>
+                                    </th>
+
+                                    <th scope="row"  class="slds-cell-edit" data-label="{!con.gii__ShipToName__c}">                                        
+                                        <div class="slds-truncate  slds-align_absolute-center" >{!con.warehouse}</div>
+                                    </th> 
+
+                                    <th scope="row"  class="slds-cell-edit" data-label="{!con.gii__ShipToName__c}">                                        
+                                        <div class="slds-truncate slds-align_absolute-center" >{!con.priceBook}</div>
+                                    </th>
+
+                                     <th scope="row"  class="slds-cell-edit" data-label="{!con.gii__ShipToName__c}">                                        
+                                        <div class="slds-truncate  slds-align_absolute-center" >{!con.cig}</div>
+                                    </th>
+
+                                    <th scope="row"  class="slds-cell-edit" data-label="{!con.gii__ShipToName__c}">                                        
+                                        <div class="slds-truncate slds-align_absolute-center" >{!con.cup}</div>
+                                    </th>
+
+                                    <th scope="row"  class="slds-cell-edit" data-label="{!con.gii__ShipToName__c}">                                        
+                                        <div class="slds-truncate slds-align_absolute-center" >{!con.orderDate}</div>
+                                    </th>
+
+                                    <th scope="row"  class="slds-cell-edit" data-label="{!con.gii__ShipToName__c}">                                        
+                                        <div class="slds-truncate slds-align_absolute-center" >{!con.orderStatus}</div>
+                                    </th>                                    
+                                </tr>
+                            </aura:iteration>                       
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+
+
+        <!-- Button for pages: -->
+        <div class="slds-box_border">
+            <div class="slds-p-vertical_small slds-align_absolute-center">
+                <lightning:button variant="brand" label="First" disabled="{!v.startPosn == 0}" onclick="{!c.First}"/>
+                <lightning:button variant="brand" label="Previous" disabled="{!v.startPosn == 0}" onclick="{!c.previous}"/>
+                <lightning:button variant="brand" label="Next" disabled="{!v.endPosn >= v.pMasterWrapperlist.length-1}" onclick="{!c.next}"/>
+                <lightning:button variant="brand" label="Last" disabled="{!v.endPosn >= v.pMasterWrapperlist.length-1}" onclick="{!c.Last}"/>
+            </div>
+        </div>
+
+        <!-- Spinner -->
+        <aura:if isTrue="{!v.spinnerControl}">
+            <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: rgb(112 110 107 / 47%);">
+                <div class="loader">Loading...</div>
+            </div>   
+        </aura:if>
+    </div>
+
+
+</aura:component>

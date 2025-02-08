@@ -1,0 +1,19 @@
+<!--
+* @author Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.it 
+* @date Creation 10/09/2019
+* @date Modification 08/04/2019 Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.it
+* @description XC_LCP153_SelectAddressFromBpli – Component for show All Available Address
+-->
+
+<aura:component controller="XC_LCC153_SelectAddressFromBpli"
+               implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:actionOverride,lightning:isUrlAddressable" access="global" >
+    
+  <aura:attribute name="recordId" type="String"/>
+  <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="showAddress" type="Boolean" default="false"/>
+  <aura:handler name="init" value="{!this}" action="{!c.init}" />
+	
+    <aura:if isTrue="{!v.showAddress}" >
+     <c:XC_LCP101_SelectAddress accountId="{!v.accountId}" title="Change Billing Address" billingProfLineItem="{!v.recordId}"></c:XC_LCP101_SelectAddress>
+    </aura:if>
+</aura:component>

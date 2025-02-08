@@ -1,0 +1,37 @@
+<aura:component controller ="XC_LCC079_RemovePreferences" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="record" type="Object" />
+    <aura:attribute name="componentRecord" type="Object" />
+    <aura:attribute name="recordError" type="String" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:attribute name="showModal" type="Boolean" default="false"/>
+
+    <force:recordData 
+        aura:id="recordLoader" 
+        recordId="{!v.recordId}" 
+        layoutType="FULL" 
+        mode="EDIT"
+        targetRecord="{!v.record}"
+        targetFields="{!v.componentRecord}"
+        targetError="{!v.recordError}" />   
+      <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+      <lightning:notificationsLibrary aura:id="notifLib"/>
+
+     <aura:if isTrue="{!v.spinnerControl}" >
+        <div aura:id="masterSpinner" style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner"/>
+        </div>
+    </aura:if>
+    
+	<aura:if isTrue="{!v.showModal}" >      
+        <div class="demo-only" style="height: 4rem;">
+            <div class="slds-notify_container slds-is-relative">
+                <div class="slds-notify slds-notify_toast slds-theme_error" role="status">
+                    <span class="slds-assistive-text">info</span>
+                    <span class="slds-icon_container slds-icon-utility-info slds-m-right_small slds-no-flex slds-align-top" title="Description of icon when needed"></span>
+                </div>
+            </div>
+        </div>
+    </aura:if> 	
+</aura:component>

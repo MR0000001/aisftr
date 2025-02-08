@@ -1,0 +1,103 @@
+<aura:component controller="TA_LCC213_BookAppointment"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+
+    <aura:attribute access="public" name="workOrderId" type="String"/>
+    <aura:attribute access="public" name="fieldSet" type="String"/>
+    <aura:attribute access="public" name="cmpName" type="String"/>
+    <aura:attribute access="public" name="showBookAppointmentModal" type="Boolean" default="false"/>
+
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="general" type="String"/>
+    <aura:attribute access="private" name="custom" type="String"/>
+    <aura:attribute access="private" name="title" type="String"/>
+    <aura:attribute access="private" name="description" type="String"/>
+    <aura:attribute access="private" name="customerCardBg" type="String"/>
+    <aura:attribute access="private" name="showCalendarModal" type="Boolean" default="true"/>
+    <aura:attribute access="private" name="showChoiceModal" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="bookNow" type="Boolean" default="false"/>
+
+    <ltng:require 	styles="{!join(',',
+                                $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                                $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                                $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css',
+                                $Resource.TA_SR_FullCalendar + '/packages/core/main.min.css',
+                                $Resource.TA_SR_FullCalendar + '/packages/daygrid/main.min.css'
+                            )}"
+                	scripts="{!join(',',
+                                $Resource.TA_SR_jQuery,
+                                $Resource.TA_SR_FullCalendar + '/packages/core/main.js',
+                                $Resource.TA_SR_FullCalendar + '/packages/interaction/main.min.js',
+                                $Resource.TA_SR_FullCalendar + '/packages/daygrid/main.min.js'
+                            )}"
+                	afterScriptsLoaded="{!c.handleInitialize}"/>
+
+    <aura:handler event="c:TA_LCE216_ModalManagement" action="{!c.handleModalManagement}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/>
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <div class="ta-box-custom-margin" style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover; border-radius: 2.5vw; box-shadow: 0vw 1vw 2vw -0.8vw black;
+                        background-position: ' + v.general.bgPosition + '; background-color: ' + v.general.bgColor + ';background-blend-mode: lighten;
+                        padding: 5vw;'}" onclick="{!c.handleShowChoiceModal}">
+            <lightning:layout multipleRows="true">
+                <aura:if isTrue="{!v.general.defaultTitle}">
+                    <lightning:layoutItem size="12">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="10">
+                                <lightning:layout multipleRows="true">
+
+                                    <!-- ACCORDION HEADER SECTION NAME-->
+                                    <lightning:layoutItem size="12" class="slds-truncate ta-color-white">
+                                        <h3> {!v.title} </h3>
+                                    </lightning:layoutItem>
+
+                                </lightning:layout>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="2" class="slds-text-align_right ta-height">
+
+                                <!-- ACCORDION HEADER ICON -->
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}"
+                                        class="slds-float_right xc-accordion-header-icon ta-icon"/>
+
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+                </aura:if>
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showChoiceModal}">
+        <div class="ta-modal-bg" id="showChoiceModal">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="slds-text-align_center ta-height-100">
+                    <lightning:layout multipleRows="true" class="ta-height-100">
+                        <lightning:layoutItem size="12" class="slds-text-align_right slds-m-bottom_large">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close.svg'}" onclick="{!c.handleCloseModal}" class="ta-icon-close"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large">
+                            <h3 class="ta-color-black">{!$Label.c.TA_WhenScheduleVisit}</h3>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-text-align_center">
+                            <lightning:button class="ta-button-primary-modal"
+                                            label="{!$Label.c.TA_BookAppointmentToday}"
+                                            onclick="{!c.handleScheduleToday}"/>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="12" class="slds-text-align_center slds-m-top_medium">
+                            <lightning:button class="ta-button-primary-modal"
+                                            label="{!$Label.c.TA_BookAppointmentSelectDay}"
+                                            onclick="{!c.handleScheduleOtherDay}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showBookAppointmentModal}">
+        <c:TA_LCP224_BookAppointmentModal bookNow="{!v.bookNow}" workOrderId="{!v.workOrderId}" showCalendarModal="{!v.showCalendarModal}" calendarName="calendarBookAppointmentCard" reschedule="false"/>
+    </aura:if>
+</aura:component>

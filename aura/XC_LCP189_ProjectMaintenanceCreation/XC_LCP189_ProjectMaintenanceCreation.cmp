@@ -1,0 +1,35 @@
+<aura:component  controller="XC_LCC189_PPM_ContractMaintenanceService" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride" access="global"  >
+<!--Attribute-->
+    <aura:attribute name="recordId" type="String" /> 
+	<aura:attribute name="data" type="Object" access="global"  />
+    <aura:attribute name="columns" type="Object"/>
+    <aura:attribute name="selectedRowsCount" type="Integer" />
+    <aura:attribute name="maxRowSelection" type="Integer" default="1"/>
+	<aura:attribute name="selectedRows" type="List" />
+   <!--
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>-->
+   
+    <!--Events-->
+   <aura:handler name="init" value="{! this }" action="{! c.init }"/> 
+   <lightning:layout class="slds-page-header slds-page-header-object-home">
+        <form>  
+           <div style="height: 250px" >
+                <h1>Select a Project Template of your Interest </h1>
+               <br></br>
+        			<lightning:datatable 
+                        aura:id ="datatableID"
+						data="{!v.data}"
+            			columns="{! v.columns }"
+            			keyField="id"
+                        maxRowSelection="{! v.maxRowSelection }"
+                        selectedRows="{! v.selectedRows }"    />         
+            			
+    		</div>
+           <br/> 
+            <br></br>
+			<br></br>
+      <ui:button  aura:id="button" buttonTitle="Click to see what you put into the field"  
+                 label="Create Project" press="{!c.submit}"/>        
+       </form>
+    </lightning:layout>  	
+</aura:component>

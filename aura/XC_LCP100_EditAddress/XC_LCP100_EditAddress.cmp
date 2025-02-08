@@ -1,0 +1,37 @@
+<!--
+* @author Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.it & Sara Miozza - sara.miozza@nttdata.com
+* @date Creation 05/04/2019
+* @date Modification 08/04/2019 Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.it
+* @description XC_LCP100_EditAddress – Component for show checkbox on address Edit Page 
+-->
+<aura:component  implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable" >
+     <lightning:navigation aura:id="navService"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <lightning:workspaceAPI aura:id="workspace" />
+    <div class="stile">
+        <br></br>
+     <lightning:recordEditForm
+                               				  recordId="{!v.recordId}"
+                                              objectApiName="XC_Address__c"
+                                              onsuccess="{!c.handleSuccess}"
+                                              >
+                        
+                        <!-- the messages component is for error messages -->
+                        <lightning:messages />
+                        <lightning:layout multipleRows="true">
+                
+                        
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+      					
+     <!-- CheckBox section  -->
+                        <lightning:inputField aura:id="installationAddress" fieldName="XC_InstallationAddress__c"  />
+                        <lightning:inputField aura:id="deliveryAddress" fieldName="XC_DeliveryAddress__c"  />
+                        <lightning:inputField aura:id="billingAddress" fieldName="XC_BillingAddress__c"  />
+                            </lightning:layoutItem>
+         </lightning:layout>
+         <div class="slds-m-top_medium">
+                <lightning:button  variant="brand" type="submit" name="save" label="Save" />
+            </div>
+    </lightning:recordEditForm>
+	</div>
+</aura:component>

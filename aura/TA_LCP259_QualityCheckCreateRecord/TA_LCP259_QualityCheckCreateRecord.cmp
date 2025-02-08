@@ -1,0 +1,215 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"            
+                access="global"
+                controller="TA_LCC259_QualityCheckCreateRecord">
+    
+    <aura:attribute     access="public"     name="fieldSet"                         type="String"       />
+    <aura:attribute     access="public"     name="showToastMessage"                 type="Boolean"      />
+    <aura:attribute     access="public"     name="isError"                          type="Boolean"      />
+    <aura:attribute     access="public"     name="toastMessage"                     type="String"       />
+    <aura:attribute     access="public"     name="workOrderId"                      type="String"       />
+
+    <aura:attribute     access="private"    name="general"                          type="Object"       />
+    <aura:attribute     access="private"    name="custom"                           type="Object"       />
+    <aura:attribute     access="private"    name="title"                            type="String"       />
+    <aura:attribute     access="private"    name="customerCardBg"                   type="String"       />
+    <aura:attribute     access="private"    name="objType"                          type="String"       required="true" default="XC_B2BG_QualityCheck__c"   />
+    <aura:attribute     access="private"    name="formRecordTypeId"                 type="String"       />
+    <aura:attribute     access="private"    name="recordTypeList"                   type="Object[]"     />
+    <aura:attribute     access="private"    name="recordSubmit"                     type="Object"       />
+    <aura:attribute     access="private"    name="isInitialized"                    type="Boolean"      default="false" />
+    <aura:attribute     access="private"    name="showQualityCheckModal"            type="Boolean"      default="false" />
+    <aura:attribute     access="private"    name="showQualityCheckValidationModal"  type="Boolean"      default="false" /> 
+    <aura:attribute     access="private"    name="hseqModalTitle"                   type="String"/>
+
+    <aura:attribute     access="private"    name="records"                          type="List"/>
+    <aura:attribute     access="private"    name="predefinedValues"                 type="List" />
+    <aura:attribute     access="private"    name="sections"                         type="List"         default="[]"/>
+    <aura:attribute     access="private"    name="recordSubmitChange"               type="Boolean"      default="false" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:handler name="change" value="{!v.recordSubmit}" action="{!c.handleChangeRecordSubmit}"/>
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt" />
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/> <!--BGO 23062022 spinner fix -->
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{! v.isInitialized }">
+
+        <div style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover; border-radius: 2.5vw;
+        background-position: ' + v.general.bgPosition + '; background-color:' + v.general.bgColor + '; box-shadow: 0vw 1vw 2vw -0.8vw black;
+        background-blend-mode: lighten; margin: 6vw 3vw 3vw 3vw; padding: 5vw;'}">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="10">
+                    <lightning:layoutItem size="12" class="slds-m-bottom_small"> 
+                        <h3 class="ta-color-white"> {!v.title} </h3>
+                    </lightning:layoutItem>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="2">
+                    <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}" class="slds-float_right ta-accordion-header-icon" />
+                </lightning:layoutItem>
+            
+                <lightning:layoutItem size="12">
+                    <aura:if isTrue="{!v.recordSubmitChange}">
+                        <c:tA_LWC001_getObjDetails objRecordTypeId="{!v.formRecordTypeId}" 
+                                                    objApiName="{!v.objType}" 
+                                                    onobjectDataRecive="{!c.handleResponseLayout}"/>
+                        <aura:set attribute="else">
+                            <c:tA_LWC001_getObjDetails objRecordTypeId="{!v.formRecordTypeId}" 
+                                                        objApiName="{!v.objType}" 
+                                                        onobjectDataRecive="{!c.handleResponseLayout}"/>
+                        </aura:set>
+                    </aura:if>
+
+                    <aura:if isTrue="{! not(empty(v.recordTypeList)) }">
+                        <lightning:select aura:id="qcrecordtype" class="slds-m-top_small ta-select-font-size" value="{!v.formRecordTypeId}" name="recordTypeSelect" >
+                            <aura:iteration items="{!v.recordTypeList}" var="rt">
+                                <option value="{!rt.recordTypeId}">{!rt.name}</option>
+                            </aura:iteration>
+                        </lightning:select>
+
+                        <div class="ta-accordion-header-button slds-text-align_center" name="new" onclick="{!c.handleManageActions}">
+                            {!$Label.c.TA_AddNew} {!' ' + v.title}
+                        </div>
+                    </aura:if>
+
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="slds-m-top_small">   
+                    <aura:if isTrue="{! not(empty(v.records)) }">
+                        
+                        <aura:iteration items="{!v.records}" var="record">  
+                            <lightning:layout multipleRows="true" class="slds-m-bottom_medium ta-border-padding-top-white">
+                                <lightning:layoutItem size="12">
+                                    <h3 class="ta-color-white-opacity-60"> {!record.name} </h3> 
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <p class="ta-color-white-opacity-60 ta-subtitle"> {!record.recordTypeName} </p> 
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <p class="ta-color-white-opacity-60 ta-subtitle"> {!$Label.c.TA_DocumentSignatureStatus + ': ' + record.status} </p> 
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" class="slds-m-top_small">
+                                    <div class="ta-accordion-header-button slds-float_left slds-text-align_center" id="{!record.id}" name="edit" onclick="{!c.handleManageActions}">
+                                        <aura:if isTrue="{!record.readOnly}">
+                                            {!$Label.c.TA_DCR_View}
+                                            <aura:set attribute="else">
+                                                {!$Label.c.TA_DCR_Edit}
+                                            </aura:set>
+                                        </aura:if>
+                                    </div>
+                                    <div class="ta-accordion-header-button slds-float_left slds-text-align_center slds-m-left_small" id="{!record.id}" name="delete" onclick="{!c.handleManageActions}">
+                                        {!$Label.c.TA_DCR_Delete}
+                                    </div>
+                                    <aura:if isTrue="{!!record.readOnly}">
+                                        <div class="ta-accordion-header-button slds-float_right slds-text-align_center" id="{!record.id}" name="validate" onclick="{!c.handleManageActions}">
+                                            {!$Label.c.TA_QualityCheckValidation}
+                                        </div>
+                                    </aura:if>
+                                </lightning:layoutItem>    
+                            </lightning:layout>
+                        </aura:iteration> 
+                    </aura:if>
+                </lightning:layoutItem>
+
+                    
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showQualityCheckModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" class="slds-m-bottom_xx-small slds-text-title_bold">
+                            {!$Label.c.TA_CreateQualityCheck}
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleCloseModalCloseService}" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-body">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="ta-field-input">
+                            <lightning:recordEditForm objectApiName="{!v.objType}" 
+                                              recordId="{!if(v.recordSubmit != null, v.recordSubmit.id, '')}" 
+                                              recordTypeId="{!if(v.recordSubmit != null, v.recordSubmit.recordTypeId, v.formRecordTypeId)}"  
+                                              onsuccess="{!c.handleFormSuccess}"
+                                              onsubmit="{!c.handleSubmitForm}"
+                                              onerror="{!c.handleFormError}"
+                                              aura:id="recordForm">
+                                <lightning:layout multipleRows="true">
+                                    <div id="div-scroll"></div>
+                                    <aura:iteration items="{!v.sections}" var="section">
+                                        <lightning:layoutItem size="12">
+                                            <h3> {!section.heading} </h3>
+                                        </lightning:layoutItem>
+                                        <aura:iteration items="{!section.fields}" var="field">
+                                            <lightning:layoutItem size="12">
+                                                <aura:if isTrue="{! field.apiName == 'XC_Contract__c' }">
+                                                   
+                                                    <c:TA_LCP260_CustomLookupStd value="{!field.value}" objectName="Contract" fieldName="XC_ContractSAP__c" label="Contract" iconName="standard:contract" placeholder="" parentFieldAPIName="accountId" relatedRecordParentId="{!field.relatedValue}" />
+
+                                                    <lightning:inputField class="slds-hide" fieldName="{!field.apiName}" required="{!field.required}" disabled="{!field.readonly}" value="{!field.value}"/>
+                                                    
+                                                    <aura:set attribute="else">
+                                                        <lightning:inputField class="{!if(field.hide, 'slds-hide', if(field.isQuestion, 'ta-select-question',''))}" fieldName="{!field.apiName}" required="{!field.required}" disabled="{!field.readonly}" value="{!field.value}"/>
+                                                    </aura:set>
+                                                    
+                                                </aura:if>
+                                            </lightning:layoutItem>
+                                        </aura:iteration>    
+                                    </aura:iteration>            
+                                </lightning:layout>
+                                <lightning:layout multipleRows="true" class="slds-p-bottom_medium">
+                                    <lightning:layoutItem size="6" class="slds-text-align_left slds-p-right_small">
+                                        <lightning:button class="ta-button-closing slds-m-top_medium" label="{!$Label.c.TA_Cancel}" onclick="{!c.handleManageShowFormModal}"/>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="6" class="slds-text-align_right slds-p-left_small">
+                                        <lightning:button class="slds-m-top_medium" type="submit" name="insert" label="{!$Label.c.TA_Save}" />
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </lightning:recordEditForm>
+
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>   
+    </aura:if>
+
+    <!-- START ENXCRM-151 HSEQ FLOW bgo -->
+    <aura:if isTrue="{!v.showQualityCheckValidationModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" />
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleCloseModalQualityCheckValidation}" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-body">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_xx-small slds-text-title_bold">
+                            {!v.hseqModalTitle}
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:flow aura:id="flowData" onstatuschange="{!c.handleStatusChange}" />
+            </lightning:layout>
+        </div>
+    </aura:if>
+    <!-- END ENXCRM-151 HSEQ FLOW bgo -->
+
+</aura:component>

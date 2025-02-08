@@ -1,0 +1,5 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,flexipage:availableForAllPageTypes,force:appHostable,force:hasSObjectName,force:hasRecordId" access="global">
+    <aura:handler event="NE:Bit2win_Event_CartEvent" 		action="{!c.afterCheckout}" />
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <ltng:require styles="{!$Resource.CustomLightningCart}"/> 
+</aura:component>

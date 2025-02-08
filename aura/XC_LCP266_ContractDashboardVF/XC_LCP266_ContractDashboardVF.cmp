@@ -1,0 +1,77 @@
+<aura:component
+    implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+    <aura:dependency resource="markup://force:navigateToURL" type="EVENT"/>
+    <aura:attribute name="showLCP260" type="Boolean" default="true" />
+    <aura:attribute name="showLCP263" type="Boolean" default="false" />
+    <aura:attribute name="showLCP256" type="Boolean" default="false" />
+    <aura:attribute name="showLCP257" type="Boolean" default="false" />
+    <aura:attribute name="showLCP258" type="Boolean" default="false" />
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" />
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="LCP1111Modal"
+        class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+
+            <div class="modal-header slds-modal__header">            
+                <h2 class="title slds-text-heading__medium">
+                    <aura:if isTrue="{!v.showLCP260}">
+                        <lightning:icon iconName="action:new_opportunity" size="x-small" /><span
+                            class="slds-p-left_small">{!$Label.c.XC_CL_LCP260_Title}</span>
+                    </aura:if>
+                    <aura:if isTrue="{!v.showLCP263}">
+                        <lightning:icon iconName="action:new_opportunity" size="x-small" /><span
+                            class="slds-p-left_small">{!$Label.c.XC_CL_LCP263_Title}</span>
+                    </aura:if>
+                    <aura:if isTrue="{!v.showLCP256}">
+                        <lightning:icon iconName="action:new_opportunity" size="x-small" /><span
+                            class="slds-p-left_small">{!$Label.c.XC_CL_LCP256_Title}</span>
+                    </aura:if>
+                    <aura:if isTrue="{!v.showLCP257}">
+                        <lightning:icon iconName="action:new_opportunity" size="x-small" /><span
+                            class="slds-p-left_small">{!$Label.c.XC_CL_LCP257_Title}</span>
+                    </aura:if>
+                    <aura:if isTrue="{!v.showLCP258}">
+                        <lightning:icon iconName="action:new_opportunity" size="x-small" /><span
+                            class="slds-p-left_small">{!$Label.c.XC_CL_LCP258_Title}</span>
+                    </aura:if>
+                </h2>
+            </div>
+            <div class="slds-modal__content slds-p-around__medium">
+                <!-- BOX QUOTE -->
+                <lightning:layout verticalAlign="center" horizontalAlign="center">
+                    <aura:if isTrue="{!v.showLCP260}">
+                        <c:XC_LCP260_ContractAdjustmentOrRenewal showMyself="{!v.showLCP260}"
+                            showNext263="{!v.showLCP263}" showNext258="{!v.showLCP258}">
+                        </c:XC_LCP260_ContractAdjustmentOrRenewal>
+                    </aura:if>
+                    <aura:if isTrue="{!v.showLCP263}">
+                        <c:XC_LCP263_FeeAdjustment showMyself="{!v.showLCP263}" showNext256="{!v.showLCP256}"
+                            showNext257="{!v.showLCP257}"></c:XC_LCP263_FeeAdjustment>
+                    </aura:if>
+                    <aura:if isTrue="{!v.showLCP256}">
+                        <c:XC_LCP256_ContractPunctualFeeAdjustment></c:XC_LCP256_ContractPunctualFeeAdjustment>
+                    </aura:if>
+                    <aura:if isTrue="{!v.showLCP257}">
+                        <c:XC_LCP257_ContractMassiveFeeAdjustment></c:XC_LCP257_ContractMassiveFeeAdjustment>
+                    </aura:if>
+                    <aura:if isTrue="{!v.showLCP258}">
+                        <c:XC_LCP258_ContractRenewal></c:XC_LCP258_ContractRenewal>
+                    </aura:if>
+
+
+                </lightning:layout>
+            </div>
+            <div class="modal-footer slds-modal__footer">
+                <div>
+                    <aura:if isTrue="{!or(v.showLCP263,or(v.showLCP256,or(v.showLCP257,v.showLCP258)))}">
+                        <lightning:button variant="neutral" label="{!$Label.c.BackButton}"
+                            onclick="{!c.backButtonClick}" />
+                    </aura:if>
+                    <lightning:button variant="neutral" label="{!$Label.c.XC_CL_CancelButton}"
+                        onclick="{!c.closeModal}" />
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

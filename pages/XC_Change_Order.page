@@ -1,0 +1,23 @@
+<apex:page standardcontroller="Asset" showHeader="false" sidebar="false"> 
+<script>
+
+//3.10 RDF add button for new change order on std asset
+
+var __sfdcSessionId = '{!JSENCODE(GETSESSIONID())}';
+var id='{!JSENCODE(Asset.Id)}'; 
+var status='{!JSENCODE(Asset.NE__Status__c)}';
+var rootitem = '{!JSENCODE(Asset.NE__Root_Order_Item__c)}';
+
+if(status=='In Progress' || (rootitem!=null && rootitem!='')||status=='Disconnected')
+{
+    alert('{!$Label.ne__no_asset_op}');
+}else{
+    window.location = '/apex/NE__Bit2WinUtilityPage?Id=' + id;
+    
+    /*var Idorder = sforce.apex.execute("NE.JS_RemoteMethods","stdasset2order",{idasset:id,Type:"Change"});
+    if((Idorder !=null)&&(Idorder !=''))
+    window.location = '{!$Site.Prefix}'+'/'+Idorder;*/
+}
+
+</script>
+</apex:page>

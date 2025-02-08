@@ -1,0 +1,26 @@
+.THIS .searchButton{
+    position: absolute;
+    right: 7%;
+    top: 27%;
+}
+.THIS .searchButtonLoc{
+    position: absolute;
+    right: 13%;
+    top: 27%;
+}
+
+.THIS.actionBtn{
+    float:right;
+}
+
+.THIS.modalSection{
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.THIS .errorMsg{
+    text-align: center;
+    display: inline;
+    margin-right: 45%;
+    margin-left: -46%;
+    color: red;
+}

@@ -1,0 +1,8 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasRecordId" > 
+    <aura:attribute name="hideUpdateButton" type="Boolean" default="true"/>
+    <lightning:path aura:id="path" recordId="{!v.recordId}"
+        variant="linear"
+        hideUpdateButton="{!v.hideUpdateButton}"
+        onselect="{!c.handleSelect}"
+    />
+</aura:component>

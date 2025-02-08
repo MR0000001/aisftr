@@ -1,0 +1,399 @@
+<aura:component extends="c:XC_LCP022_TabNavigationManager" controller="XC_LCC003_NewAccount"
+                implements="lightning:isUrlAddressable,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride"
+                access="global">
+
+    <!-- ATTRIBUTES -->
+    <aura:attribute name="isSpain" type="Boolean" default="false" />
+    <aura:attribute name="sohoType" type="String" />
+    <aura:attribute name="bodyConsents" type="Object[]" />
+    <aura:attribute name="techConfiguration" type="Object" default="[]" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+    <aura:attribute name="isPartner" type="Boolean" default="false" />
+    <aura:attribute name="showReleaseDate" type="Boolean" default="false" />
+    <aura:attribute name="leadRecord" type="Lead" />
+    <aura:attribute name="isMobile" type="boolean" default="false" />
+    <aura:attribute name="isCondominium" type="Boolean" default="false" />
+    <aura:attribute name="changeIcon" type="Boolean" default="false" />
+    <aura:attribute name="isSmallBusiness" type="Boolean" default="false" />
+    <aura:attribute name="isGlobalB2B" type="Boolean" default="false" />
+    <aura:attribute name="isGlobalB2G" type="Boolean" default="false" />
+    <aura:attribute name="isSFMAccount" type="Boolean" default="false" />
+    <aura:attribute name="checkValue" type="List" />
+    <aura:attribute name="initFinished" type="Boolean" default="false" />
+    <aura:attribute name="assignLeadCheckBox" type="Boolean" default="false" />
+    <aura:attribute name="showAccountModal" type="Boolean" default="false" />
+    <aura:attribute name="recordTypeToReturn" type="String" />
+    <aura:attribute name="numberAppoggio" type="String" />
+    <aura:attribute name="exDateAppoggio" type="String" />
+    <aura:attribute name="rDateAppoggio" type="String" />
+    <aura:attribute name="picklistValue" type="String" />
+    <aura:attribute name="condominiumName" type="String" />
+    <aura:attribute name="userCountry" type="String" />
+    <aura:attribute name="companyName" type="String" />
+    <aura:attribute name="recordTypeName" type="String" />
+    <aura:attribute name="body1" type="Object[]" />
+    <aura:attribute name="body2" type="Object[]" />
+    <aura:attribute name="body3" type="Object[]" />
+    <aura:attribute name="body4" type="Object[]" />
+    <aura:attribute name="body5" type="Object[]" />
+    <aura:attribute name="requiredFields" type="String[]" />
+    <aura:attribute name="fieldLabelMap" type="Object" />
+    <aura:attribute name="fieldMap" type="String" />
+    <aura:attribute name="accountRecord" type="Object" />
+    <aura:attribute name="documentType" type="String" />
+    <aura:attribute name="releaseDate" type="String" />
+    <aura:attribute name="expDate" type="String" />
+    <aura:attribute name="documentId" type="String" />
+    <aura:attribute name="email" type="String" />
+    <aura:attribute name="errorMessage" type="String" />
+    <aura:set attribute="tabIcon" value="action:email" />
+    <aura:attribute name="showAddress" type="Boolean" default="false" />
+    <aura:attribute name="showDocument" type="Boolean" default="false" />
+    <aura:attribute name="addressFromEvent" type="Map" />
+    <aura:attribute name="existingAccId" type="String" />
+    <aura:attribute name="canInsert" type="Boolean" default="false" />
+    <aura:attribute name="confirmationByTheCustomer" type="Boolean" default="false" />
+    <aura:attribute name="showContact" type="Boolean" default="false" />
+    <aura:attribute name="consentsLE" type="List" />
+    <aura:attribute name="robinsonCustomer" type="Boolean" />
+    <aura:attribute name="thirdPartiesCheck" type="String" />
+    <aura:attribute name="thirdPartiesVersion" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="pageReference" type="Object" />
+    <aura:attribute name="saveConsentsWrapper" type="Object" />
+    <aura:attribute name="showCheckBoxAddress" type="Boolean" default="true"/>
+    <aura:attribute name="options" type="List" default="[]" />
+    <aura:attribute name="brandString" type="String" default="--None--" />
+    
+    <aura:attribute name="addressMandatoryFields" type="List" />
+    <!--[ BEGIN, arjun.raoh@accenture.com, 24/11/2021, Enel X - NR2041 - Energy Communities, FT3-2021 ]-->
+    <aura:attribute name="isEnergyCommunity" type="Boolean" default="false" />
+    <aura:attribute name="isEnergyCommunityMember" type="Boolean" default="false" />
+    <!--[ END, arjun.raoh@accenture.com, 24/11/2021, Enel X - NR2041 - Energy Communities, FT3-2021 ]-->
+
+    <!-- PHONE FROM CTI -->
+    <aura:attribute name="ctiInteractionPhone" type="String"/>
+    <aura:handler name="saveConsents" event="c:XC_LCE163_SaveConsents" action="{!c.handleSaveConsentsEvent}"/>
+    <aura:attribute name="ctiInteractionPhonePrefix" type="String"/> <!---->
+
+    <aura:handler event="c:XC_LCE013_SetAddressObject" name="XC_LCE013_SetAddressObject"
+                  action="{!c.handleComponentEvent}"/>
+    <aura:handler event="c:XC_LCE110_SetLegalEntityConsents" name="XC_LCE110_SetLegalEntityConsents"
+                  action="{!c.handleLEConsentsEventNEW}"/>
+
+    <aura:attribute name="isCommunity" type="Boolean" default="false"/>
+    <aura:attribute name="withoutValidate" type="Boolean" default="false"/>
+    <aura:attribute name="newSection" type="Map" default="    	{    		
+                                                          FirstName: '',     		
+                                                          LastName : '',   
+                                                          DocumentCountry : '',
+                                                          DocumentType : '',    		
+                                                          DocumentID : '',
+                                                          ExpirationDate : '',
+                                                          ReleaseDate : '',
+                                                          Email : '',
+                                                          ContactMobile : '',                                                       
+                                                          ContactPhone : '',
+                                                          PhonePrefix : '',
+                                                          MobilePrefix : '',
+                                                          PreferredLanguage : ''
+                                                          }" />
+    <!-- HANDLER -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler event="c:XC_LCE_SetLEConsentsObject" action="{!c.handleLEConsentsEvent}"/>
+    <!-- <aura:handler name="change" value="{!v.accountRecord}" action="{!c.init}" /> -->
+    <aura:handler name="strike_evt_modalPrimaryButtonClicked" event="c:strike_evt"
+                  action="{!c.redirectToExistingAcc}"/>
+
+
+    <lightning:navigation aura:id="navService"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <!-- BODY -->
+    <div class="body">
+
+        <aura:if isTrue="{!v.initFinished}">
+            <lightning:card class="slds-align_absolute-center slds-p-around--table-cell-spacing slds-size--6-of-6">
+                <div class="slds-p-around--medium">
+
+                    <lightning:recordEditForm recordTypeId="{!v.recordTypeToReturn}" class="recordEdit"
+                                              aura:id="recordUpdateForm" objectApiName="Account" onsubmit="{!c.onSubmit}">
+                        <ui:scrollerWrapper class="scrollerSize">
+                            <aura:if isTrue="{! v.recordTypeName == 'XC_Account_Partner'}">
+                                <c:XC_LCP002_SectionHeader position="TOP" titleName="{!$Label.c.XC_AccountType}"/>
+
+                                <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                                    {!v.body5}
+                                </lightning:layout>
+                                <br></br>
+                            </aura:if>
+
+
+                            <aura:if isTrue="{!!or(v.isSmallBusiness,v.isCondominium)}">
+                                <c:XC_LCP002_SectionHeader position="TOP"
+                                                           titleName="{!$Label.c.XC_CL_Account_PersonalInfo}"/>
+                            </aura:if>
+                            <aura:if isTrue="{!v.isSmallBusiness}">
+                                <c:XC_LCP002_SectionHeader position="TOP"
+                                                           titleName="{!$Label.c.XC_CL_SohoInformation}"/>
+                                <!--<lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5" largeDeviceSize="6" padding="around-small">
+                                <lightning:input name="input1" label="{!$Label.c.XC_CL_Account_CompanyName}" value="{!v.companyName}" required="true"/>
+                            </lightning:layoutItem>-->
+                            </aura:if>
+                            <aura:if isTrue="{!v.isCondominium}">
+                                <c:XC_LCP002_SectionHeader position="TOP"
+                                                           titleName="{!$Label.c.XC_CL_CondominiumInformation}"/>
+                            </aura:if>
+                            <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                                {!v.body1}
+                                <aura:if isTrue="{!v.showReleaseDate}">
+                                    <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                          largeDeviceSize="6" padding="around-small">
+                                        <lightning:inputField aura:id="releaseDate"
+                                                              fieldName="XC_NIE_expedition_date__c" value="{!v.releaseDate}" />
+                                    </lightning:layoutItem>
+
+                                </aura:if>
+                                <aura:if isTrue="{! v.recordTypeName == 'XC_Account_Partner'}">
+                                    <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                        largeDeviceSize="6" padding="horizontal-small">
+                                        <div class="slds-form_horizontal">
+                                            <lightning:combobox name="progress" label="{!$Label.c.XC_CL_Account_Brand}"
+                                                value="{!v.brandString}" options="{! v.options }" />
+                                        </div>
+                                    </lightning:layoutItem>
+                                </aura:if>
+
+                            </lightning:layout>
+
+                            <!--<aura:if isTrue="{!or(v.recordTypeName == 'XC_Account_Partner', v.isSmallBusiness) }" >-->
+                            <aura:if isTrue="{!v.showContact}">
+                                <c:XC_LCP002_SectionHeader position="BOTTOM" titleName="{!$Label.c.XC_CL_Contact}"/>
+                                <c:XC_LCP003_ContactSection newSection="{!v.newSection}" userCountry="{!v.userCountry}"
+                                    accountType="{!v.recordTypeName}" />
+                            </aura:if>
+
+                            <aura:if isTrue="{!(v.recordTypeName=='XC_GLO_Account_Residential')}">
+                                <c:XC_LCP002_SectionHeader position="MIDDLE"
+                                    titleName="{!$Label.c.XC_CL_DocumentInformation}" />
+                                <!-- <label class="slds-checkbox_toggle slds-grid">
+                                    <span class="slds-form-element__label slds-m-bottom_none">&nbsp;&nbsp;&nbsp;
+                                        {!$Label.c.XC_CL_ShowDocument}</span>
+                                    <input name="checkbox-toggle-6" type="checkbox" aria-describedby="checkbox-toggle-6"
+                                           onchange="{!c.setDocOn}"/>
+                                    <span id="checkbox-toggle-6" class="slds-checkbox_faux_container"
+                                          aria-live="assertive">
+                                        <span class="slds-checkbox_faux"></span>
+                                        <div class="slds-checkbox_on"></div>
+                                        <span class="slds-checkbox_off"></span>
+                                    </span>
+                                </label> -->
+                                <!--<aura:if isTrue="{!v.showDocument}">-->
+                                <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                                    {!v.body2}
+                                    <aura:if isTrue="{!v.showReleaseDate}">
+                                        <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                            largeDeviceSize="6" padding="around-small">
+                                            <lightning:inputField aura:id="releaseDate"
+                                                fieldName="XC_NIE_expedition_date__c" value="{!v.releaseDate}" />
+                                        </lightning:layoutItem>
+
+                                        <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                            largeDeviceSize="6" padding="around-small">
+                                            <lightning:inputField aura:id="expDate"
+                                                fieldName="XC_NIE_expiration_date__c" value="{!v.expDate}" />
+                                        </lightning:layoutItem>
+                                    </aura:if>
+                                </lightning:layout>
+                                <!--</aura:if>-->
+
+                            </aura:if>
+
+                            <c:XC_LCP002_SectionHeader position="MIDDLE"
+                                titleName="{!$Label.c.XC_CL_LeadAddressSection}" />
+                            <aura:if isTrue="{!v.showCheckBoxAddress}">
+                                <label class="slds-checkbox_toggle slds-grid">
+                                    <span class="slds-form-element__label slds-m-bottom_none">&nbsp;&nbsp;&nbsp;
+                                        {!$Label.c.XC_CL_ShowAddress}</span>
+                                    <input name="checkbox-toggle-6" type="checkbox" aura:id="ad" id="c"
+                                        aria-describedby="checkbox-toggle-6" onchange="{!c.setAddressOn}"/>
+                                    <span id="checkbox-toggle-6" class="slds-checkbox_faux_container" aria-live="assertive">
+                                        <span class="slds-checkbox_faux"></span>
+                                        <div class="slds-checkbox_on"></div>
+                                        <span class="slds-checkbox_off"></span>
+                                    </span>
+                                </label>
+                            </aura:if>
+                            <aura:if isTrue="{!v.showAddress}">
+                                <!--<c:XC_LCP165_NewAddressLoader source="003"/>-->
+                                <c:XC_LCP_Address source="003" parentRecordType="{!v.recordTypeName}"/>
+                            </aura:if>
+                            <!--[ BEGIN, arjun.raoh@accenture.com, 24/11/2021, Enel X - NR2041 - Energy Communities, FT3-2021 ]-->
+                            <aura:if isTrue="{!!v.isSpain}">
+                            <aura:if isTrue="{!v.isEnergyCommunity}">
+                                <c:XC_LCP002_SectionHeader position="MIDDLE"
+                                    titleName="{!$Label.c.XC_LCP003_EnergyCommunity}" />
+                                        <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                    largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="energyCommunities" fieldName="XC_Energy_Community__c"/>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                    largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="communityTypology"
+                                                    fieldName="XC_Community_Typology__c" />
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                    largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="noCommunityMemebers" fieldName="XC_Community_Members_Number__c" />
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                    largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="gseCode" fieldName="XC_GSE_Code__c" />
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                    largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="communityApprovalDate" fieldName="XC_Community_GSE_Approval_Date__c" />
+                                            </lightning:layoutItem>
+                                            <!--[ BEGIN, arjun.raoh@accenture.com, 05/01/2022, Enel X - NR2260 - Energy Communities, ENEL X - r12 ]-->
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="communityFoundationDate"
+                                                fieldName="XC_Energy_Community_Foundation_date__c"  />
+                                             </lightning:layoutItem>
+                                            <!--[ END, arjun.raoh@accenture.com, 05/01/2022, Enel X - NR2260 - Energy Communities, 	ENEL X - r12 ]-->                                            
+                                    </lightning:layout>
+                            </aura:if>
+                            </aura:if>
+                            <aura:if isTrue="{!!v.isSpain}">
+                           <aura:if isTrue="{!v.isEnergyCommunityMember}">
+                            <c:XC_LCP002_SectionHeader position="MIDDLE"
+                                    titleName="{!$Label.c.XC_LCP003_EnergyCommunityMember}" />
+                                        <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="memberTypology"
+                                                fieldName="XC_Member_Typology__c" />
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="parentAccountId"
+                                                fieldName="ParentId" />
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="customerNumberEnel"
+                                                fieldName="XC_CustomerNumber_EnelEnergia__c"  />
+                                            </lightning:layoutItem>
+                                            <!--[ BEGIN, arjun.raoh@accenture.com, 05/01/2022, Enel X - NR2260 - Energy Communities, ENEL X - r12 ]-->
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                    largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="tatumMemeberFee" fieldName="XC_Una_tantum_member_fee__c" />
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                    largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="annualMemeberFee" fieldName="XC_Annual_member_fee__c" />
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                    largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="annualMemebershipFeeDueDate" fieldName="XC_Annual_membership_fee_due_date__c" />
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                    largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="partSharingMonthly" fieldName="XC_Fix_part_sharing_monthly__c" />
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                    largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="partSharingMonthly" fieldName="XC_MISE_incentive__c" />
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                    largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="partSharingMonthly" fieldName="XC_Arera_incentive__c" />
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                    largeDeviceSize="6" padding="around-small">
+                                                <lightning:inputField aura:id="partSharingMonthly" fieldName="XC_Local_price_incentive__c" />
+                                            </lightning:layoutItem>
+                                            <!--[ END, arjun.raoh@accenture.com, 05/01/2022, Enel X - NR2260 - Energy Communities, 	ENEL X - r12 ]-->                                            
+                                            <!--[ BEGIN, arjun.raoh@accenture.com, 02/05/2022, NR2453 - Comunità Energetiche -->
+                                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                                largeDeviceSize="6" padding="around-small">
+                                                 <lightning:inputField aura:id="refundMethod" fieldName="XC_Refund_Method__c" />
+                                            </lightning:layoutItem>    
+                                            <!--[ END, arjun.raoh@accenture.com, 02/05/2022, NR2453 - Comunità Energetiche --> 
+                                        </lightning:layout>
+                                </aura:if>
+                            </aura:if>
+                            <!--[ END, arjun.raoh@accenture.com, 24/11/2021, Enel X - NR2041 - Energy Communities, FT3-2021 ]-->
+                            <aura:if isTrue="{!!v.isSFMAccount}">
+                                <c:XC_LCP002_SectionHeader position="MIDDLE"
+                                                        titleName="{!$Label.c.XC_CL_LegalEntityConsents}"/>
+                                <BR/>
+                                <!-- <c:XC_LCP110_LegalEntityDynamicTable relatedObject="Account" /> -->
+                                <aura:if
+                                        isTrue="{!and(v.confirmationByTheCustomer!=undefined,v.confirmationByTheCustomer!=null)}">
+                                    <ui:inputCheckbox aura:id="checkbox" label="{!$Label.c.XC_CL_ConfirmationByTheCustomer}"
+                                                    change="{!c.changeConfirmationByTheCustomer}"/>
+
+                                </aura:if>
+                                <aura:if isTrue="{!v.confirmationByTheCustomer}">
+                                    <BR/>
+                                    {!v.bodyConsents}
+                                </aura:if>
+                            </aura:if>
+                            <!-- <aura:if isTrue="{! v.recordTypeName == 'XC_Account_Prospect'}" >
+                            <c:XC_LCP002_SectionHeader position="MIDDLE" titleName="{!$Label.c.XC_CL_LeadOpportunityInfo}" /> 
+                            <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                                {!v.body3}  
+                            </lightning:layout>  
+                        </aura:if>-->
+
+
+                            <!--    <c:XC_LCP002_SectionHeader position="BOTTOM" titleName="{!$Label.c.XC_CL_LeadContents}" /> 
+                        <lightning:layout horizontalAlign="spread" verticalAlign="center" multipleRows="true">
+                            {!v.body4} 
+                        </lightning:layout>                                                       
+                        <br></br>
+                    -->
+
+                        </ui:scrollerWrapper>
+                        <br></br><br></br><br></br><br></br>
+                        <div>
+                            <div class="forceChangeRecordTypeFooter slds-float--right slds-m-around--medium">
+                                <lightning:button aura:id="submit" label="{!$Label.c.XC_CL_SaveButton}" variant="brand"
+                                                  type="submit" onClick="{!c.onSubmit}"/>
+                            </div>
+                            <!-- <div class="forceChangeRecordTypeFooter slds-float-left slds-m-around-medium">
+                     <lightning:input type="checkbox" name="assignLeadName" label="Assign using active assignment rule" value="{!v.assignLeadCheckBox}" aura:id="assignLead" class="slds-p-vertical_small" Checked="true" onchange="{!c.assignLeadChecked}" />
+                    </div> -->
+                        </div>
+                    </lightning:recordEditForm>                    
+                    <aura:if isTrue="{!v.isCommunity}">
+                        <div class="forceChangeRecordTypeFooter slds-float--right slds-m-around--medium">
+                            <ui:button label="{!$Label.c.XC_CL_CPAB_Cancel}" press="{!c.goBackInCommunity}"/>
+                        </div>
+                    </aura:if>                   
+
+                    <aura:if isTrue="{!!v.isCommunity}">
+                        <div class="forceChangeRecordTypeFooter slds-float--right slds-m-around--medium">
+                            <ui:button label="{!$Label.c.XC_CL_CPAB_Cancel}" press="{!c.goBack}"/>
+                        </div>
+                    </aura:if>
+                    
+                </div>
+            </lightning:card>
+        </aura:if>
+        <aura:if isTrue="{!v.spinnerControl}">
+						
+            <lightning:spinner aura:id="mySpinner" alternativeText="Loading"/>
+        </aura:if>
+        <c:strike_modal title="Error!" variant="error" showHeader="true" showFooter="false" showClose="true"
+                        showModal="{!v.showAccountModal}">
+            <div style="text-align:center">
+                {!v.errorMessage}<br></br><br></br>
+                <lightning:button label="Close" title="Close" onclick="{! c.goBack }"/>&nbsp;&nbsp;&nbsp;
+                <!--<lightning:button variant="brand" label="Ok" title="Ok" onclick="{! c.goOnExistingAccount }"/> -->
+            </div>
+        </c:strike_modal>
+
+    </div>
+</aura:component>

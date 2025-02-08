@@ -1,0 +1,47 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    controller="TA_LCC257_CustomRecordBanner"
+    access="global">
+
+    <aura:attribute access="public" name="recordId" type="String" />
+    <aura:attribute access="public" name="workOrder" type="Object" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="title" type="String" />
+    <aura:attribute access="private" name="description" type="String" />
+    <aura:attribute access="private" name="general" type="Object" />
+    <aura:attribute access="private" name="custom" type="Object" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <lightning:layout multipleRows="true" class="ta-record-banner-container">
+        <lightning:layoutItem size="12" class="ta-p-bottom-small">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="2" class="slds-text-align_center">
+                    <lightning:icon iconName="{!v.general.iconName}" class="ta-workorder-icon"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="10">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="ta-record-banner-title">
+                            {!v.title}
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="ta-record-banner-description">
+                            {!v.description}
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="12" class="ta-p-bottom-small">
+            <c:TA_LCP198_ProcessIndicator recordId="{!v.recordId}" />
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

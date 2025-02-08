@@ -1,0 +1,10 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickAction" access="global" controller= "XC_LCC159_CustomerNotReachable" >
+	<aura:attribute name="options" type="List" default="[
+    	{'label': 'Phone number incorrect', 'value': 'Phone number incorrect'},
+    	{'label': 'Phone number not informed', 'value': 'Phone number not informed'},
+    ]"/>
+    <aura:attribute name="selectedOptionValue" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <lightning:combobox name="value" label="Reason" value="{!v.selectedOptionValue}" placeholder="Select Reason" options="{! v.options }" />
+    <lightning:button variant="brand" label="Confirm" title="Brand action" onclick="{! c.handleClick }" />
+</aura:component>

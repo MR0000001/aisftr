@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    
+    <apiVersion>52.0</apiVersion>
+    
+    <description>Custom Lookup Component</description>
+    
+    <isExposed>true</isExposed>
+    
+
+    <targets>
+        
+        <target>lightning__AppPage</target>
+        
+        <target>lightning__FlowScreen</target>
+        
+    </targets>
+    
+
+    <targetConfigs>
+        
+        <targetConfig targets="lightning__FlowScreen">
+            
+            <property name="strRecordId" type="String" label="Selected SObject Id" description="Id of the selected record" role="inputOnly"/>
+            
+            <property name="strRecordName" type="String" label="Selected SObject Name" description="Name of the selected record" role="inputOnly"/>
+            
+            <property name="strObjectName" type="String" label="SObject Name" description="Name of the SObject for the lookup component" role="inputOnly"/>
+            
+            <property name="strLabel" type="String" label="Label" description="Label to display for the lookup control" role="inputOnly"/>
+            
+            <property name="strSearchClause" type="String" label="Search clause" description="Search clause to filter lookup results" role="inputOnly"/>
+            
+            <property name="strDisplayFields" type="String" label="Display Fields" description="Comma separated list of fields to preview on search results" role="inputOnly"/>
+            
+            <property name="strOutRecordId" type="String" label="Record Id" description="Id of the selected record" role="outputOnly"/>
+            
+            <property name="strOutRecordName" type="String" label="Record Name" description="Name of the selected record" role="outputOnly"/>
+            
+        </targetConfig>
+        
+    </targetConfigs>
+    
+
+    <masterLabel>Custom Lookup Component</masterLabel>
+    
+</LightningComponentBundle>

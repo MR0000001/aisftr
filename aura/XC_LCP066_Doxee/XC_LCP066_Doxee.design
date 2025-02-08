@@ -1,0 +1,4 @@
+<design:component label="XC_LCP066_Doxee">
+    <design:attribute name="widthPar" label="width" description="Width of Canvas" />
+    <design:attribute name="heightPar" label="height" description="Height of Canvas" />
+</design:component>

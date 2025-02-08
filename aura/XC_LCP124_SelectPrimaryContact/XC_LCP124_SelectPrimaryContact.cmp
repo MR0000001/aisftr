@@ -1,0 +1,80 @@
+<!--
+* @author Lorenzo Orlanducci lorenzo.orlanducci@nttdata.com 
+* @date Creation 13/07/2019
+* @date Modification dd/mm/yyyy
+* @description component for select primary contact
+-->
+<aura:component controller="XC_LCC124_SelectPrimaryContact" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,lightning:actionOverride"
+                access="global" >
+	<aura:attribute name="accountId" type="String" access="global"/>
+    <aura:attribute name="contactId" type="String" access="global"/>
+    <aura:attribute name="contacts" type="Contact[]" />
+    <aura:attribute name="flags" type="Boolean[]"/>  
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />    
+    <div class="slds-text-align_center">
+    <div class="slds-text-heading_large">{!$Label.c.XC_CL_SelectPrimaryContact}</div>
+    </div>
+    <aura:if isTrue="{!v.contacts.length == 0}">
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">       
+              <p>{!$Label.c.XC_CL_NoPrimaryContact}</p>           
+        </div>
+    	<aura:set attribute="else">
+            <div class="slds-modal__content slds-p-around--medium scrollable modalScrollerSize"
+        style="margin-top:20px;" >
+        <div class="slds-large slds-scrollable_y slds-scrollable_x scrollerSize" >
+        <table data-reactroot="" class="slds-table slds-table_bordered slds-table_cell-buffer">
+          <thead>
+                <tr class="slds-text-title_caps">
+                  <th scope="col">
+                  </th>
+                  <th scope="col">
+                      <div class="slds-truncate" title="Name">{!$Label.c.XC_CL_ContactName}</div>
+                  </th>
+                  <th scope="col">
+                    <div class="slds-truncate" title="Account">{!$Label.c.XC_CL_AccountLabel}</div>
+                  </th>
+                  <th scope="col">
+                    <div class="slds-truncate" title="Email">{!$Label.c.XC_CL_Email}</div>
+                  </th>
+    
+                </tr>
+          </thead>
+        <aura:if isTrue="{!v.showSpinner}" >
+        	<lightning:spinner alternativeText="Loading" size="large" />
+        </aura:if>  
+          <tbody>
+                <aura:iteration items="{!v.contacts}" var="contact" indexVar="index">
+                   <tr>
+                     <td>
+                        <ui:inputCheckbox aura:id="rowSelection" text="{!index}" change="{!c.onCheckContactSelection}"/>  
+                      </td>
+
+                      <td data-label="Name" >
+                        <div class="slds-truncate" title="{!contact.Name}">{!contact.Name}</div>
+                      </td>
+                      <td data-label="Account" class="slds-truncate" >
+                        <div class="slds-truncate slds-size_4-of-5" title="{!contact.Account.Name}">{!contact.Account.Name}</div>
+                      </td>
+                       <td data-label="Email" class="slds-truncate" >
+                        <div class="slds-truncate slds-size_4-of-5" title="{!contact.Email}">{!contact.Email}</div>
+                      </td>
+                    </tr>
+                </aura:iteration>
+          </tbody>
+        </table>
+        </div>
+    </div>
+            <div class="end"></div>
+            <footer class="slds-modal__footer">
+            <lightning:button label="{!$Label.c.XC_CL_Cancel}" title="Brand action" onclick="{! c.cancel }" />
+            <lightning:button label="{!$Label.c.XC_CL_SaveButton}" title="Brand action" variant="brand" onclick="{! c.savePrimary }" />
+            </footer>
+            
+        </aura:set>
+    </aura:if>
+
+</aura:component>

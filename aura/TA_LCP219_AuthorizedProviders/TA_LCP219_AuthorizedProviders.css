@@ -1,0 +1,57 @@
+@media only screen and (max-width: 600px) {
+    /* CUSTOM-TAG */
+    .THIS .ta-cards {
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.2);
+        margin: 0.5vw;
+        border: 0.1vw solid white;
+        border-radius: 1vw;
+        padding: 2vw;
+        height: 37vw;
+    }
+
+    /* CUSTOM-TAG */
+    .THIS .ta-cards-text-s{
+        color: white;
+        font-size: 2.5vw;
+        height: 3vw;
+    }
+
+    /* CUSTOM-TAG */
+    .THIS .ta-cards-text-b{
+        color: white;
+        font-size: 3.2vw;
+        margin-top: 1vw;
+        height: 13vw;
+    }
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-partners-container { 
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    border-radius: 2vw;
+    padding: 4vw;
+}
+
+/* .THIS .ta-title {
+    font-size: 4vw;
+    color: white;
+}
+
+.THIS .ta-description {
+    color: rgb(255, 255, 255, 0.6) !important;
+    font-size: 3.3vw;
+}
+
+.THIS .ta-img-m-around {
+    margin: 1vw;
+}
+
+.THIS .ta-icon-resize {
+    width: 10vw;
+    height: 10vw;
+}
+
+.THIS .ta-m-bottom {
+    margin-bottom: 5vw;
+} */

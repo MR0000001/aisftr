@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event used to communicate component init state">
+    <aura:attribute name="componentName"  type="String" default=""/>
+    <aura:attribute name="initState"    type="Boolean" default="false"/>
+</aura:event>

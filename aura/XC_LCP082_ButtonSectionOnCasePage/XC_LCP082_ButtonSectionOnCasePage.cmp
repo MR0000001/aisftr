@@ -1,0 +1,287 @@
+<!--
+* @author Lorenzo Orlanducci lorenzo.orlanducci@nttdata.com 
+* @date Creation 13/02/2019
+* @date Modification dd/mm/yyyy
+* @description component for button section on Case detail page
+-->
+
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference,force:hasSObjectName"
+    controller="XC_LCC068_Care_NewCaseByInsistence" access="global">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="pageReference" type="Object" />
+    <aura:attribute name="community" type="Boolean" default="false" />
+    <aura:attribute name="communitySpain" type="Boolean" default="false" />
+	 <aura:attribute name="isB2BGItaly" type="Boolean" default="false" />
+    <lightning:navigation aura:id="navService" />
+    <lightning:workspaceAPI aura:id="workspace" />
+    <aura:attribute name="isClosedWorkOrder" type="Boolean" />
+    <aura:attribute name="impFirst" type="Boolean" default="false" />
+    <aura:attribute name="impFirst2" type="Boolean" default="false" />
+    <aura:attribute name="showNewCase" type="Boolean" default="false" />
+    <aura:attribute name="showCreateQualityWO" type="Boolean" default="false" />
+    <aura:attribute name="showFooter" type="Boolean" default="true" />
+    <aura:attribute name="showTextArea" type="Boolean" default="false" />
+    <aura:attribute name="showConfirm" type="Boolean" default="false" />
+    <aura:attribute name="showOpportunity" type="Boolean" default="false" />
+    <aura:attribute name="showQualityWO" type="Boolean" default="false" />
+    <aura:attribute name="showAttachAssets" type="Boolean" default="false" />
+    <aura:attribute name="disabledSubmit" type="Boolean" default="true" />
+    <aura:attribute name="caseNumber" type="String" />
+    <aura:attribute name="caseRemarks" type="String" default="" />
+    <aura:attribute name="cancelValuesMap" type="Map" default="{'resolution':'','result':'','caseRemarks':''}" />
+    <aura:attribute name="resolutionMap" type="Object[]" />
+    <aura:attribute name="resultMap" type="Object[]" />
+    <aura:attribute name="count" type="Integer" default="0" />
+    <aura:attribute name="complaintRTCase" type="Boolean" default="false" />
+    <aura:attribute name="qualityCheckCase" type="Boolean" default="false" />
+    <aura:attribute name="showIndemnification" type="Boolean" default="false" />
+    <aura:attribute name="sameOwner" type="Boolean" default="false" />
+    <aura:attribute name="caseSubtype" type="String" default="" />
+    <aura:attribute name="caseRecord" type="Object" />
+    <aura:attribute name="caseRecordField" type="Object" />
+    <aura:attribute name="recordError" type="String" default="An error message bound to force:recordData" />
+    <aura:attribute name="showCreateRepairWOButton" type="Boolean" default="false" />
+    <aura:attribute name="showCreateRepairWOComp" type="Boolean" default="false" />
+    <aura:attribute name="confirmDisconnectModal" type="Boolean" default="false" />
+    <force:recordData aura:id="recordCaseView" layoutType="FULL" recordId="{!v.recordId}" targetError="{!v.recordError}"
+        targetRecord="{!v.caseRecord}" targetFields="{!v.caseRecordField}" mode="VIEW" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="strike_evt_modalPrimaryButtonClicked" event="c:strike_evt"
+        action="{!c.handlePrimaryButtonClick}" />
+    <aura:handler name="strike_evt_modalSecondaryButtonClicked" event="c:strike_evt"
+        action="{!c.handleSecondaryButtonClick}" />
+    <aura:handler name="strike_evt_modalCloseButtonClicked" event="c:strike_evt"
+        action="{!c.handleSecondaryButtonClick}" />
+    <aura:handler event="c:XC_LCE015_ModalClosed" action="{!c.handleModalClosedEvent}" />
+    <lightning:notificationsLibrary aura:id="notifLib" />
+    <div class="buttonstyle">
+        <aura:if isTrue="{!v.community}">
+            <aura:if isTrue="{!v.communitySpain}">
+                <lightning:buttonGroup>
+                    <aura:if isTrue="{!!(empty(v.caseRecordField.ParentId))}">
+                        <!--Buttons for compliance START-->
+                        <lightning:button variant="Neutral" label="{!$Label.c.XC_CL_BackCompliance_Case}"
+                            title="{!$Label.c.XC_CL_BackCompliance_Case}" onclick="{!c.backComplianceInvoke}" />
+                    </aura:if>
+                    <aura:if isTrue="{!(empty(v.caseRecordField.ParentId))}">
+                        <lightning:button variant="Neutral" label="{!$Label.c.XC_CL_DocumentVerification_Case}"
+                            title="{!$Label.c.XC_CL_DocumentVerification_Case}"
+                            onclick="{!c.documentVerificationInvoke}" />
+                    </aura:if>
+                </lightning:buttonGroup>
+                <aura:set attribute="else">
+                    <lightning:buttonGroup>
+                        <aura:if isTrue="{!(empty(v.caseRecordField.ParentId))}">
+                            <lightning:button variant="Neutral" label="{!$Label.c.XC_CL_DocumentVerification_Case}"
+                                title="{!$Label.c.XC_CL_DocumentVerification_Case}"
+                                onclick="{!c.documentVerificationInvoke}" />
+                        </aura:if>
+                    </lightning:buttonGroup>
+                </aura:set>
+            </aura:if>
+            <aura:set attribute="else">
+
+                <lightning:buttonGroup>
+                    <lightning:button variant="Neutral" label="{!$Label.c.XC_CL_CaseChangeOrder}" title="Change Order"
+                        onclick="{! c.newRequest }" />
+                    <lightning:button variant="Neutral" label="{!$Label.c.XC_CL_CaseDisconnectAsset}"
+                        title="Disconnect Asset" onclick="{! c.disconnect }" />
+                    <lightning:button variant="Neutral" label="{!$Label.c.XC_CL_InsistenceButton}"
+                        title="{!$Label.c.XC_CL_InsistenceButton}" onclick="{! c.newCompl }" />
+
+                    <lightning:buttonMenu alternativeText="Show menu" class="slds-button_last"
+                        onselect="{!c.handleClick}">
+                        <!--
+                    <lightning:menuItem   label="Suspend Subscription"  value="suspend"/> 
+                    <lightning:menuItem   label="Resume Subscription"   value="suspend"/>   -->
+                        <aura:if isTrue="{!v.showCreateRepairWOButton}">
+                            <lightning:menuItem label="{!$Label.c.XC_CL_ButtonCreateRepairWO}" value="createRepairWO" />
+                        </aura:if>
+                        <lightning:menuItem label="{!$Label.c.XC_CL_CancelButton}" value="showModal" />
+                        <lightning:menuItem label="{!$Label.c.XC_CL_Suspend}" value="suspendAction" />
+                        <lightning:menuItem label="{!$Label.c.XC_CL_NewChildCaseButton}" value="newCase" />
+                        <aura:if isTrue="{!v.isB2BGItaly}">
+						<lightning:menuItem label="{!$Label.c.XC_CL_CreateOpportunityButton}"
+                            value="showModalOpportunity" />
+						 </aura:if>
+                          <aura:if isTrue="{!v.isB2BGItaly}">						 
+                         <lightning:menuItem label="{!$Label.c.XC_CL_AttachAssets}" value="showModalAttachAssets" />
+						</aura:if>
+                        <aura:if isTrue="{!!(empty(v.caseRecordField.ParentId))}">
+                            <!--Buttons for compliance START-->
+                            <lightning:menuItem label="{!$Label.c.XC_CL_BackCompliance_Case}" value="backCompliance" />
+                        </aura:if>
+                        <aura:if isTrue="{!(empty(v.caseRecordField.ParentId))}">
+                            <lightning:menuItem label="{!$Label.c.XC_CL_DocumentVerification_Case}"
+                                value="documentVerification" />
+                        </aura:if>
+                        <!--Buttons for compliance END-->
+                        <aura:if isTrue="{!v.showCreateQualityWO}">
+                            <lightning:menuItem label="{!$Label.c.XC_CL_QualityCheckInspection}"
+                                value="createQualityWO" />
+                        </aura:if>
+                        <aura:if isTrue="{!v.complaintRTCase}">
+                            <lightning:menuItem label="{!$Label.c.XC_CL_Indemnification}" value="showIndemnification" />
+                        </aura:if>
+                        <aura:if isTrue="{!v.qualityCheckCase}">
+                            <lightning:menuItem label="{!$Label.c.XC_CL_NonconformityAnswer_Case}" value="qualityCheck" />
+                        </aura:if>
+					   <aura:if isTrue="{!v.isB2BGItaly}">	
+                        <lightning:menuItem label="{!$Label.c.XC_CL_RecalculateUrgency}" value="recalculateUrgency" />
+                        </aura:if>
+                    </lightning:buttonMenu>
+
+                </lightning:buttonGroup>
+            </aura:set>
+        </aura:if>
+    </div>
+    <!--use boolean attribute for Store true/false value,
+        make default to "false" so modal box are not display on the load of component. 
+        -->
+    <aura:attribute name="isOpen" type="boolean" default="false" />
+    <div class="slds-m-around_xx-large">
+
+        <aura:if isTrue="{!v.showOpportunity}">
+            <c:strike_modal title="{!$Label.c.XC_CL_CreateOpportunityButton}" 
+                primaryButtonLabel="{!$Label.c.XC_CL_OK}" secondaryButtonLabel="{!$Label.c.XC_CL_CancelButton}"
+                showHeader="false" showFooter="false" showClose="true" showModal="true">
+                <c:XC_LCP028_CreateOppFromContact recordId="{!v.recordId}" showOpportunity="{!v.showOpportunity}" />
+            </c:strike_modal>
+        </aura:if>
+
+        <aura:if isTrue="{!v.showNewCase}">
+            <c:strike_modal title="{!$Label.c.XC_CL_CreateCase}"
+                primaryButtonLabel="{!$Label.c.XC_CL_OK}" secondaryButtonLabel="{!$Label.c.XC_CL_CancelButton}" 
+                showHeader="false" showFooter="false" showClose="true" showModal="true">
+                <c:XC_LCP120_NewCase sobjecttype="Case" recordId="{!v.recordId}" />
+            </c:strike_modal>
+        </aura:if>
+
+        <aura:if isTrue="{!v.showAttachAssets}">
+            <c:strike_modal title="{!$Label.c.XC_CL_AttachAssets}" 
+                primaryButtonLabel="{!$Label.c.XC_CL_OK}" secondaryButtonLabel="{!$Label.c.XC_CL_CancelButton}" 
+                showHeader="false" showFooter="false" showClose="true" showModal="true">
+                <c:XC_LCP121_AssetSelectionOnCase recordId="{!v.recordId}" />
+            </c:strike_modal>
+        </aura:if>
+
+
+        <aura:if isTrue="{!v.showQualityWO}">
+            <c:XC_LCP123_QualityInspectionWorkOrder recordId="{!v.recordId}" />
+        </aura:if>
+        
+        <aura:if isTrue="{!v.showConfirm}">
+            <div class="parentDisabled">
+                <c:strike_modal title="{!$Label.c.XC_CL_Confirmation}" primaryButtonLabel="{!$Label.c.XC_CL_OK}"
+                    secondaryButtonLabel="{!$Label.c.XC_CL_CancelButton}" showHeader="true" showFooter="{!v.showFooter}"
+                    showClose="true" showModal="true">
+                    <aura:if isTrue="{!v.impFirst2}">
+                        <lightning:spinner aura:id="mySpinner2" variant="brand" size="large" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.showTextArea}">
+
+                        <lightning:select aura:id="resolution" name="resolution" label="{!$Label.c.XC_CL_Resolution}"
+                            value="{!v.cancelValuesMap.resolution}" onchange="{! c.checkNotBlank }" required="true">
+                            <aura:iteration var="resolutionVar" items="{!v.resolutionMap}">
+                                <option value="{!resolutionVar.value}">{!resolutionVar.label}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                        <br></br>
+                        <lightning:select aura:id="result" name="result" label="{!$Label.c.XC_CL_Result}"
+                            value="{!v.cancelValuesMap.result}" onchange="{! c.checkNotBlank }" required="true">
+                            <aura:iteration var="resultVar" items="{!v.resultMap}">
+                                <option value="{!resultVar.value}">{!resultVar.label}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                        <br></br>
+                        <lightning:input aura:id="caseRemarks" name="caseRemarks" label="{!$Label.c.XC_CL_CaseRemarks}"
+                            value="{!v.cancelValuesMap.caseRemarks}" onchange="{! c.checkNotBlank }" required="true" />
+
+                        <br></br><br></br>
+                        <div class="modal-footer slds-modal__footer slds-size_1-of-1">
+                            <lightning:button label="{!$Label.c.XC_CL_CancelButton}" title="Cancel"
+                                onclick="{! c.handleSecondaryButtonClick}" />
+                            <lightning:button variant="brand" label="{!$Label.c.XC_CL_SaveButton}" title="Submit"
+                                onclick="{! c.dis}" disabled="{!v.disabledSubmit}" />
+                        </div>
+
+                        <aura:set attribute="else">
+                            <p>{!$Label.c.XC_CL_AreYouSure}</p>
+                        </aura:set>
+                    </aura:if>
+                </c:strike_modal>
+            </div>
+        </aura:if>
+
+        <aura:if isTrue="{!v.impFirst}">
+            <lightning:spinner aura:id="mySpinner2" variant="brand" size="large" />
+        </aura:if>
+
+        <aura:if isTrue="{!v.isOpen}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.refreshModel }"
+                            alternativeText="close" variant="bare-inverse" class="slds-modal__close" />
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                            {!$Label.c.XC_CL_Notice}</h2> <!-- MCutillo 20190118 -->
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p>
+                            <b>{!format($Label.c.XC_CL_Warning_CaseClose, v.caseNumber)}</b> <!-- MCutillo 20190118 -->
+                        </p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral" label="{!$Label.c.XC_CL_Close}"
+                            title="{!$Label.c.XC_CL_Close}" onclick="{! c.refreshModel }" />
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <aura:if isTrue="{!v.showCreateRepairWOComp}">
+            <c:strike_modal title="Create Repair Work Order" showHeader="true" showFooter="false"
+                showClose="true" showModal="true">
+                <c:XC_LCP242_ButtonCreationRepairWO recordId="{!v.recordId}" />
+            </c:strike_modal>
+        </aura:if>
+
+    </div>
+
+    <aura:if isTrue="{!v.showIndemnification}">
+        <c:strike_modal title="Indemnification" primaryButtonLabel="{!$Label.c.XC_CL_Send}" secondaryButtonLabel="{!$Label.c.XC_CL_CancelButton}"
+            showHeader="false" showFooter="false" showClose="true" showModal="true">
+            <c:XC_LCP136_UpCompliantCaseOnIndemnification recordId="{!v.recordId}" />
+        </c:strike_modal>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.confirmDisconnectModal}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-confirm-disconnect" aria-modal="true"
+                 aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeConfirmDisconnectModel }"
+                                          alternativeText="close" variant="bare-inverse" class="slds-modal__close" />
+                    <h2 id="modal-confirm-disconnect" class="slds-text-heading_medium slds-hyphenate">
+                        {!$Label.c.XC_CL_Header_DisconnectAsset}</h2> 
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p>
+                        {!$Label.c.XC_CL_Warning_DisconnectAsset}
+                    </p>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="{!$Label.c.XC_CL_Close}"
+                                      title="{!$Label.c.XC_CL_Close}" onclick="{! c.closeConfirmDisconnectModel }" />
+                    <lightning:button variant="neutral" label="{!$Label.c.XC_CL_OK}"
+                                      title="{!$Label.c.XC_CL_OK}" onclick="{! c.continueConfirmDisconnectModel }" />
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+     </aura:if>
+
+</aura:component>

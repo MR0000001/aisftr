@@ -1,0 +1,16 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasSObjectName,lightning:availableForFlowScreens"
+				access="global"
+				controller="XC_LCC117_OptyNumberOfCalls">
+
+    <!-- components attributes -->
+	<aura:attribute name="recordId" type="String" />
+	<aura:attribute name="spinnerControl" type="Boolean" default="true" />
+	<lightning:notificationsLibrary aura:id="notifLib"/>
+
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	
+	<aura:if isTrue="{!v.spinnerControl}">
+		<lightning:spinner aura:id="mySpinner" />	 
+	</aura:if>
+
+</aura:component>

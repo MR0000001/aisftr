@@ -1,0 +1,10 @@
+<aura:component controller="Giic_WarehouseUtility" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,force:hasSObjectName" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="defaultValue" type="String" default="Updating..."/>
+    <aura:attribute name ="showSpinner" type="Boolean" default="false"/>
+      <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:if isTrue="{!v.showSpinner}">
+        	 <lightning:spinner aura:id="mySpinner" />
+    </aura:if>
+    <b>{!v.defaultValue}</b>
+</aura:component>

@@ -1,0 +1,101 @@
+.THIS .ta-modal-container {
+    top: 10vh;
+}
+
+.THIS .ta-category-picklist .slds-form-element__label {
+    display: none;
+}
+
+.THIS .ta-category-picklist .slds-form-element__control.slds-grow {
+    top: 0;
+    left: 0;
+}
+
+.THIS .ta-category-picklist .slds-form-element__control.slds-grow .slds-select_container {
+    margin: 0 8vw;
+}
+
+/* .THIS .ta-account-list-container {
+    max-height: 40vh;
+} */
+
+.THIS .ta-account-search .slds-form-element__label {
+    display: none;
+}
+
+.THIS .ta-account-search .slds-form-element__control.slds-grow {
+    top: 0;
+    left: 0;
+}
+
+.THIS .ta-account-search .slds-input:focus, .THIS .ta-account-search .slds-input:active {
+    box-shadow: none;
+}
+
+.THIS .ta-color-grey{
+    color: grey !important;
+}
+
+.THIS .ta-account-card {
+    margin-bottom: 5vw;
+    border-radius: 4vw;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.THIS .ta-account-card-selected{
+    margin-bottom: 5vw;
+    border: solid 0.7vw;
+    border-radius: 4vw;
+    border-color: rgb(70, 30, 125);
+    background-color: rgb(70, 30, 125, 0.2);
+}
+
+.THIS .slds-form-element__label {
+    color:rgb(70, 30, 125) !important;
+}
+
+.THIS .slds-input[name="searchParam"] {
+    background: rgba(0, 0, 0, .1) !important;
+}
+
+.THIS .ta-button-search {
+    border: 1px solid rgb(70, 30, 125)!important;
+    color: rgb(70, 30, 125)!important;
+    font-size: 3.3vw!important;
+    font-weight: 300!important;
+    border-radius: 2.5vw;
+    text-transform: uppercase!important;
+    padding: 0vw 2vw !important;
+    background: transparent!important;
+}
+
+.THIS .ta-button-primary-modal[disabled="true"] {
+    background: rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 0 0.5vw 0 rgb(0 0 0 / 10%);
+    color: rgba(0,0,0,.2) !important;
+}
+
+.THIS .ta-width {
+    width: 200% !important;
+}
+
+.THIS .ta-height-custom {
+    height: 45vh;
+}
+
+.THIS .ta-modal-container-2 {
+    height: 80vh !important;
+}
+
+.THIS .slds-input, .THIS .slds-select, .THIS .slds-input:focus, .THIS .slds-input:active {
+    background: #ece8f2 !important;
+}
+
+.THIS .slds-input:disabled, .THIS .slds-select[disabled], .THIS .slds-is-disabled {
+    background-color: white !important;
+    border: 1px solid rgba(1,1,1,0.1) !important;
+    opacity: 1 !important;
+    font-size: 3.3vw !important;
+    color: rgb(70, 30, 125) !important;
+    margin-top: 0vw !important;
+}

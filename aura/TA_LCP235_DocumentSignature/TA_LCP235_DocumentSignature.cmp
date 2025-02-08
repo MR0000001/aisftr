@@ -1,0 +1,297 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable"
+                access="global" 
+                controller="TA_LCC235_DocumentSignature">
+
+    <aura:attribute name="isCommunity" type="Boolean" default="false"/>
+    <aura:attribute name="sessionId" type="String"/>
+    <aura:attribute name="columns" type="List" default="['Nome dossier', 'Riconoscimento agente', 'Firma cliente', 'Stato']"/>
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="showModal" type="Boolean" default="false"/>
+    <aura:attribute name="iframeUrl" type="String"/>
+    <aura:attribute name="buttonLabel" type="String" default="Avvia"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="fieldSet" type="String"/>
+    <aura:attribute access="public" name="workOrderId" type="String"/>
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="private" name="orderId" type="String"/>
+    <aura:attribute access="private" name="general" type="Object"/>
+    <aura:attribute access="private" name="title" type="String"/>
+    <aura:attribute access="private" name="customerCardBg" type="String"/>
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="showDetails" type="Boolean" default="true"/>
+
+    <ltng:require 	styles="{!join(',',
+                            $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}"
+                    scripts="{!join(',',
+                            $Resource.XC_STR_CometD + '/cometd.js',
+                            $Resource.TA_SR_jQuery, 
+                            $Resource.XC_STR_CometD + '/json2.js',
+                            $Resource.XC_STR_CometD + '/jquery_cometd.js',
+                            $Resource.XC_STR_CometD + '/cometdReplayExtension.js',
+                            $Resource.XC_STR_CometD + '/cometdCustom.js')}"
+                    afterScriptsLoaded="{!c.handleInitialize}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/>
+    <aura:registerEvent name="validationEvt" type="c:TA_LCE199_Validation" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <div style="{!'background: url(' + v.customerCardBg +'); background-color: ' + v.general.bgColor + '; background-size: cover; border-radius: 2.5vw;
+        background-position: ' + v.general.bgPosition + '; box-shadow: 0vw 1vw 2vw -0.8vw black; background-blend-mode: lighten; margin: 6vw 3vw 3vw 3vw; padding: 5vw;'}">
+            
+            <lightning:layout multipleRows="true">
+                <!-- ACCORDION HEADER SECTION -->
+                <aura:if isTrue="{!v.general.defaultTitle}">
+                    <lightning:layoutItem size="12">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="10">
+                                <lightning:layout multipleRows="true">
+
+                                    <!-- ACCORDION HEADER SECTION NAME-->
+                                    <lightning:layoutItem size="12">
+                                        <h3 class="ta-color-white"> {!v.title} </h3>
+                                    </lightning:layoutItem>
+
+                                    <!-- ACCORDION HEADER BUTTON -->
+                                    <lightning:layoutItem size="12" class="slds-m-top_small">
+                                        <!-- <span name="{!v.general.defaultTitle}"  id="{!v.general.defaultTitle}" 
+                                              class="xc-accordion-header-button" onclick="{!c.handleManageAccordion}">
+                                            {!if(v.objWrapper.show == false, 'Show details', 'Close details')} 
+                                        </span> -->
+                                        <lightning:layout multipleRows="true">
+                                            <lightning:layoutItem size="3" class="slds-m-right_medium">
+                                                <span class="ta-accordion-header-button" onclick="{!c.refreshView}">
+                                                    {!$Label.c.XC_CL_RefreshButton}
+                                                </span>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="8">
+                                                <span class="ta-accordion-header-button" onclick="{!c.handleManageShowDetails}">
+                                                    {!if(v.showDetails, $Label.c.TA_CloseDetails, $Label.c.TA_ShowDetails)}
+                                                </span>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>                        
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="2">
+
+                                <!-- ACCORDION HEADER ICON -->
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}" 
+                                     class="slds-float_right ta-accordion-header-icon"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+                    <!-- <lightning:layoutItem size="12">
+                        <lightning:buttonIcon iconName="utility:refresh" alternativeText="refresh" title="{!$Label.c.XC_CL_RefreshButton}" onclick="{!c.refreshView}" />
+                    </lightning:layoutItem> -->
+                </aura:if>
+
+                <aura:if isTrue="{!v.showDetails}">
+                    <lightning:layoutItem size="12">
+                        <aura:if isTrue="{!v.data.length > 0}">
+                            <aura:iteration items="{!v.data}" var="row">
+                                <lightning:layout multipleRows="true" class="ta-border-top-white slds-p-top_large">
+                                    <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                        <p class="ta-color-white ta-font-weight-800"> {!row.XC_DocumentName__c} {!$Label.c.TA_DossierTest} </p>
+                                    </lightning:layoutItem>
+        
+                                    <!-- AGENT -->
+                                    <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                        <lightning:layout multipleRows="true">
+                                            <lightning:layoutItem size="8" class="ta-box-description">
+                                                <p class="ta-color-white-opacity-60 ta-font-weight-800"> {!$Label.c.TA_AgentRecognition} </p>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="4">
+                                                <aura:if isTrue="{!row.XC_Step__c == '1'}">
+                                                    <span class="ta-accordion-header-button" onclick="{!c.openUrl}" id="{!row.XC_UrlAgent__c}">
+                                                        {!v.buttonLabel}
+                                                    </span>
+                                                    <!-- <lightning:button label="{!v.buttonLabel}" onclick="{!c.openUrl}" value="{!row.XC_UrlAgent__c}"/> -->
+                                                    <aura:set attribute="else">
+                                                        <aura:if isTrue="{!row.XC_Step__c == '4'}">
+                                                            <img class="ta-box-icon" src="{!$Resource.TA_Icons + '/xc-icons/clock-white.svg'}"/>
+                                                            <!-- <lightning:icon size="x-small" iconName="action:close" alternativeText="deleted"/> -->
+                                                            <aura:set attribute="else">
+                                                                <img class="ta-box-icon" src="{!$Resource.TA_Icons + '/xc-icons/check-white.svg'}"/>
+                                                                <!-- <lightning:icon size="x-small" iconName="action:approval" /> -->
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                    </lightning:layoutItem>
+        
+                                    <!-- CUSTOMER -->
+                                    <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                        <lightning:layout multipleRows="true">
+                                            <lightning:layoutItem size="8" class="ta-box-description">
+                                                <p class="ta-color-white-opacity-60 ta-font-weight-800"> {!$Label.c.TA_CustomerSignature} </p>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="4">
+                                                <aura:if isTrue="{!row.XC_UrlCustomer__c &amp;&amp; row.XC_Step__c == '1'}">
+                                                    <img class="ta-box-icon" src="{!$Resource.TA_Icons + '/xc-icons/clock-white.svg'}"/>
+                                                    <!-- <lightning:icon size="x-small" iconName="action:defer" /> -->
+                                                </aura:if>
+        
+                                                <aura:if isTrue="{!row.XC_UrlCustomer__c &amp;&amp; row.XC_Step__c == '2'}">
+                                                    <span class="ta-accordion-header-button" onclick="{!c.openUrl}" id="{!row.XC_UrlCustomer__c}">
+                                                        {!v.buttonLabel}
+                                                    </span>
+                                                    <!-- <lightning:button label="{!v.buttonLabel}" onclick="{!c.openUrl}" value="{!row.XC_UrlCustomer__c}"/> -->
+                                                </aura:if>
+        
+                                                <aura:if isTrue="{!row.XC_UrlCustomer__c &amp;&amp; row.XC_Step__c == '3'}">
+                                                    <img class="ta-box-icon" src="{!$Resource.TA_Icons + '/xc-icons/check-white.svg'}"/>
+                                                    <!-- <lightning:icon size="x-small" iconName="action:approval" /> -->
+                                                </aura:if>
+        
+                                                <aura:if isTrue="{!row.XC_Step__c == '4'}">
+                                                    <img class="ta-box-icon" src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}"/>
+                                                    <!-- <lightning:icon size="x-small" iconName="action:close" alternativeText="deleted"/> -->
+                                                </aura:if>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                    </lightning:layoutItem>
+        
+                                    <!-- STATUS -->
+                                    <lightning:layoutItem size="12">
+                                        <lightning:layout multipleRows="true">
+                                            <lightning:layoutItem size="8">
+                                                <p class="ta-color-white-opacity-60 ta-font-weight-800"> {!$Label.c.TA_DocumentSignatureStatus} </p>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="4">
+                                                <aura:if isTrue = "{!row.XC_Step__c == '4'}">
+                                                    <img class="ta-box-icon" src="{!$Resource.TA_Icons + '/xc-icons/clock-white.svg'}"/>
+                                                    <!-- <lightning:icon size="x-small" iconName="action:close" alternativeText="deleted"/> -->
+                                                    <aura:set attribute="else">
+                                                        <img class="ta-box-icon" src="{!$Resource.TA_Icons + '/xc-icons/' + if(row.XC_Step__c == '3', 'check-white.svg', 'clock-white.svg')}"/>
+                                                        <!-- <lightning:icon size="x-small" iconName="{!row.XC_Step__c == '3' ? 'action:approval' : 'action:defer'}" /> -->
+                                                    </aura:set>
+                                                </aura:if>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </aura:iteration>
+                            <aura:set attribute="else">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                        <p class="ta-color-white-opacity-60"> {!$Label.c.TA_NoDocuments} </p>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </aura:set>
+                        </aura:if>
+                    </lightning:layoutItem>
+                </aura:if>
+            </lightning:layout>
+                
+                
+            <!-- <lightning:card title="Firma documenti digitali" iconName="custom:custom18" class="slds-card_boundary" variant="narrow">
+                <aura:set attribute="actions">
+                    <lightning:buttonIcon iconName="utility:refresh" alternativeText="refresh"
+                    title="{!$Label.c.XC_CL_RefreshButton}"
+                    onclick="{!c.refreshView}" />
+                </aura:set>
+                <aura:if isTrue="{!v.showSpinner}">
+                    <div class="slds-is-relative">
+                        <lightning:spinner variant="brand" size="medium"/>
+                    </div>
+                </aura:if>
+                <table class="slds-table slds-table_cell-buffer slds-no-row-hover">
+                    <thead>
+                        <tr>
+                            <aura:iteration var="col" items="{!v.columns}">
+                                <th class="slds-text-align_center">{!col}</th>
+                            </aura:iteration>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration var="row" items="{!v.data}">
+                            <tr>
+                                <td class="slds-text-align_center">{!row.XC_DocumentName__c}</td> 
+                                <td class="slds-text-align_center">
+                                    <aura:if isTrue="{!row.XC_UrlAgent__c &amp;&amp; row.XC_Step__c == '1'}">
+                                        <lightning:button label="{!v.buttonLabel}" onclick="{!c.openUrl}" value="{!row.XC_UrlAgent__c}"/>
+                                        <aura:set attribute="else">
+                                            <aura:if isTrue="{!row.XC_Step__c == '4'}">
+                                                <lightning:icon size="x-small" iconName="action:close" alternativeText="deleted"/>
+                                                <aura:set attribute="else">
+                                                    <lightning:icon size="x-small" iconName="action:approval" />
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:set>
+                                    </aura:if>
+                                </td>
+                                <td class="slds-text-align_center">
+                                    <aura:if isTrue="{!row.XC_UrlCustomer__c &amp;&amp; row.XC_Step__c == '1'}">
+                                        <lightning:icon size="x-small" iconName="action:defer" />
+                                    </aura:if>
+
+                                    <aura:if isTrue="{!row.XC_UrlCustomer__c &amp;&amp; row.XC_Step__c == '2'}">
+                                        <lightning:button label="{!v.buttonLabel}" onclick="{!c.openUrl}" value="{!row.XC_UrlCustomer__c}"/>
+                                    </aura:if>
+
+                                    <aura:if isTrue="{!row.XC_UrlCustomer__c &amp;&amp; row.XC_Step__c == '3'}">
+                                        <lightning:icon size="x-small" iconName="action:approval" />
+                                    </aura:if>
+
+                                    <aura:if isTrue="{!row.XC_Step__c == '4'}">
+                                        <lightning:icon size="x-small" iconName="action:close" alternativeText="deleted"/>
+                                    </aura:if>
+                                </td>
+                                <td class="slds-text-align_center">
+                                    <aura:if isTrue = "{!row.XC_Step__c == '4'}">
+                                        <lightning:icon size="x-small" iconName="action:close" alternativeText="deleted"/>
+                                        <aura:set attribute="else">
+                                            <lightning:icon size="x-small" iconName="{!row.XC_Step__c == '3' ? 'action:approval' : 'action:defer'}" />
+                                        </aura:set>
+                                    </aura:if>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </lightning:card> -->
+        </div>
+    </aura:if>
+
+    <!-- modal -->
+    <aura:if isTrue="{!v.showModal}">
+        <!-- <div class="ta-doc-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-doc-modal-container ta-animation-pop-in">           
+                <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large slds-m-top_large">
+                    <iframe src="{!v.iframeUrl}" style="height: 100%; width: 100%;"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-text-align_center">
+                    <lightning:button class="ta-button-closing" label="Close" onclick="{!c.switchModal}"/>    
+                </lightning:layoutItem>            
+            </lightning:layout>
+        </div> -->
+
+        <div aura:id="modal">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container" style="width: 100% !important; max-width: 90% !important">
+                    <header class="slds-modal__header">
+                        <h3 class="slds-text-heading_medium slds-hyphenate ta-color-purple">{!$Label.c.TA_DigitalSignature}</h3>
+                    </header>
+
+                    <div class="slds-modal__content slds-p-around_medium" style="height: 100%">
+                        <iframe src="{!v.iframeUrl}" style="height: 100%; width: 100%;"/>
+                    </div>
+
+                    <footer class="slds-modal__footer slds-text-align_center">
+                        <button class="ta-button-closing" onclick="{!c.switchModal}">{!$Label.c.TA_DocumentSignatureClose}</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+</aura:component>

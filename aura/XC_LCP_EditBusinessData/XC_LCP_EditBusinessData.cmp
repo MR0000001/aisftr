@@ -1,0 +1,208 @@
+<aura:component controller ="XC_LCC_EditBusinessData" 
+                implements="force:lightningQuickActionWithoutHeader,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" 
+                access="global" >
+    <ltng:require styles="{!$Resource.XC_NE_PopupCss}" />
+    <aura:attribute name="record" type="Object" description="The record object to be displayed"/>
+	<aura:attribute name="orderItemRecord" type="Object" description="A simplified view record object to be displayed"/>
+	<aura:attribute name="recordError" type="String" description="An error message bound to force:recordData"/>
+	<aura:attribute name="whichButton" type="String" default=""/>
+	 
+    <force:recordData aura:id="record"
+                      layoutType="FULL"
+                      recordId="{!v.recordId}"
+                      targetError="{!v.recordError}"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.orderItemRecord}"  
+					  mode="VIEW"/>
+					  
+	<aura:attribute name="data" type="Object"/>
+	<aura:attribute name="columns" type="List"/>
+	<aura:attribute name="recordId" type="String"/>
+	<aura:attribute name="woliSegment" type="String"/>
+	<aura:attribute name="woliLegalEntity" type="String"/>
+    <aura:attribute name="woliRecordId" type="String" access="global"/> <!-- woliId if send to glovia start from Product Required -->
+    <aura:attribute name="contestStartCI" type ="boolean" default ="true" access="global"/><!-- woliId if send to glovia start from Product Required -->
+    <aura:attribute name="wbeElement" type ="String" default ="" access="global"/><!-- woliId if send to glovia start from Product Required -->
+	<aura:attribute name="costCenter" type ="String" default ="" access="global"/><!-- woliId if send to glovia start from Product Required -->
+	<aura:attribute name="workOrderId" type ="String" default ="" access="global"/><!-- woliId if send to glovia start from Product Required -->
+	
+    <aura:attribute name="rtWoli" type ="string" access="global"/><!-- woliId if send to glovia start from Product Required -->
+	
+	<aura:attribute name="pageNumber" type="Integer" default="1"/>
+	<aura:attribute name="pageSize" type="Integer" default="15"/>
+	<aura:attribute name="isLastPage" type="Boolean" default="false"/>
+	<aura:attribute name="resultSize" type="Integer" default="0"/> 
+	<aura:attribute name="selection" type="List" description="attribute to hold selected all rows"/>
+    <aura:attribute name="checkExistPrice" type="List" description="attribute to hold id exist price"/>
+	<aura:attribute name="hasPageChanged" type="Boolean" default="false" description="attribute to check if the page has changed or not"/>
+	<aura:attribute name="initialLoad" type="Boolean" default="true" description="attribute to check if it is initialLoad"/>	
+	<aura:attribute name="updatedRecord" type="Object[]" description="This attribute will hold the update records from data table"/>
+    
+    <aura:attribute name="selected" type="List"/>
+    
+	<aura:attribute name="families" type="List"/>
+	<aura:attribute name="country" type="String"/>
+    <aura:attribute name="spinner" type="Boolean" default="false"/>
+	<aura:attribute name="showFlagForMaterials" type="boolean" default="false"/>
+	<aura:attribute name="showMaterials" type="boolean" default="false"/>
+	<aura:attribute name="showAvailable" type="boolean" default="false"/>
+	<aura:attribute name="noItemFound" type="boolean" default="false"/>
+    <aura:attribute name="noSavePrice" type="Boolean" default="false"/>
+    <aura:attribute name="flagDisableCatFilter" type="Boolean" default="true"/>
+    <aura:attribute name="draftValues" type="Object" default="[]"/>
+    <aura:attribute name="catalogItem" type="Object" description=""/>
+    <aura:attribute name="contractId" type="String" description="Contract Id"/>
+    <aura:attribute name="manualMapPrice" type="Object" default="[]"/>
+    <aura:attribute name="ReadExistPrice" type="Object" default="[]"/>
+    <aura:attribute name="filterList" type="List" />
+    <aura:attribute name="selectedRowsDetails" type="Object" />
+    
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="uploadModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="searchcheck" type="boolean" default="true"/>
+    <aura:attribute name="filetype" type="List" default="['.csv']" />
+    <aura:attribute name="uploadedcsv" type="List"/>
+    <aura:attribute name="SelectProd" type="List" description="attribute to hold products"/>
+    <aura:attribute name="ProdRes" type="List" description="attribute to hold products"/>
+    <aura:attribute name="TemplateURL" type="String" description="Template csv url"/>
+    <aura:attribute name="showcolumns" type="List"/>
+
+    <aura:attribute name="isSchedulaDisabled" type="Boolean" default="true"/>
+    <aura:attribute name="isAnnullaDisabled" type="Boolean" default="true"/>
+    <aura:attribute name="isRimuoviDisabled" type="Boolean" default="true"/>
+    <aura:attribute name="selectCheckbox" type="String" description="selected Checkbox"/>
+    <aura:attribute name="contrattoValues" type="Object[]" />
+    <aura:attribute name="isRowSelected" type="Boolean" default="true"/>
+    <aura:attribute name="defaultContratto" type="String" description="default Contratto"/>
+    <aura:attribute name="isDisabled" type="Boolean" default="true"/>
+    <aura:attribute name="fieldValue" type="String" default=""/> 
+    
+    
+    
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init"   action="{!c.doInit}" value="{!this}"/>
+    <aura:handler event="force:refreshView" action="{!c.getAsset}" />
+
+	<!-- You must define keyField as 'Id' to save the record back in Salesforce 'onsave' attribute will executed when user clicks on save button -->
+	
+	<lightning:card  class="slds-scrollable">
+       
+      
+		<lightning:layout multipleRows="true" >
+            <lightning:layoutItem padding="around-small" size="12">
+                <h2 id="modal-heading-01" class="slds-text-heading_small">Cruscotto Aggiornamento Riferimenti di Reperibilita Impresa</h2>
+                <lightning:input  name="Contratto" aura:id="Contratto" label="Contratto" onchange="{!c.activeCerca}" value="{!v.defaultContratto}"/>
+                <lightning:button class="slds-button slds-button_brand" aura:id="Cerca" label="Cerca"  disabled="true" onclick="{!c.getAsset}"/>
+                
+            </lightning:layoutItem>
+           
+
+                <aura:if isTrue="{!v.isModalOpen}">                
+                    <lightning:layoutItem padding="around-small" size="12">
+                        <h2 id="modal-heading-01" class="slds-text-heading_small">Elenco Reti</h2> 
+                        
+                        <lightning:datatable
+                            aura:id="product2DataTable"
+                            columns="{!v.columns}"
+                            data="{!v.data}"
+                            keyField="glBookEntryId"
+                            hideCheckboxColumn="false"
+                            onrowselection ="{!c.onRowSelection}"  
+                            />        
+                                  
+                    </lightning:layoutItem>
+                 </aura:if>   
+                  <aura:if isTrue="{!v.spinner}">
+                   <lightning:spinner alternativeText="Loading" size="large" />
+                  </aura:if>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem padding="around-small" size="12">
+                        <h2 id="modal-heading-01" padding="around-small" size="8" class="slds-text-heading_small">Inserimento Dati</h2>
+                        <div class="slds-grid">
+                            <!--comment-->
+                        <!--     <div class="slds-col slds-var-p-around_small slds-size_1-of-16">
+                                <lightning:input  name="Nuovo Contratto" aura:id="Nuovo Contratto" label="Nuovo Contratto" />
+                               <lightning:select aura:id="Nuovo Contratto" name="Nuovo Contratto" label="Nuovo Contratto" disabled="true" onchange="{!c.showConferma}" >
+                                     <option value=""></option>
+                                    <aura:iteration items="{!v.contrattoValues}" var="contratto">
+                                     <option value="{!contratto.XC_ContractSAP__c}">{!contratto.XC_ContractSAP__c}</option>
+                                       
+                                    </aura:iteration>
+                                </lightning:select> 
+                            </div>-->
+                            <!--new-->
+                            
+                           <div class="slds-col slds-var-p-around_small slds-size_1-of-8">
+                                <div aura:id="panelId"
+                                    class="slds-form-element slds-lookup slds-dropdown-trigger slds-dropdown-trigger_click">
+                                    <label id="nuovo_Contratto" tabindex="0" class="slds-form-element__label">Nuovo Contratto</label>
+                                    <ui:inputText aura:id="Nuovo Contratto" class="slds-input" value="{!v.fieldValue}" label=""
+                                        labelClass="slds-hide" keyup="{!c.onFieldKeyUp}" updateOn="keyup" />
+                                </div>
+                                <div
+                                    class="{!if(v.isDisabled,'slds-hide','slds-show slds-lookup__menu slds-dropdown slds-dropdown_fluid') }">
+                                    <ul class="slds-lookup__list">
+                                        <aura:iteration items="{!v.contrattoValues}" var="contratto" indexVar="optIndex">
+                                            <li onclick="{!c.onOptSelection}" data-record="{!optIndex}">
+                                                <span class="slds-lookup__item-action slds-media slds-media-center"
+                                                    role="option" aria-selected="true">
+                                                    <div class="slds-media__body">
+                                                        <span>
+                                                            <div class="slds-lookup__result-text">
+                                                                {!contratto.XC_ContractSAP__c}
+                                                            </div>
+                                                        </span>
+                                                    </div>
+                                                </span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+							<!--new-->
+                            <div class="slds-col slds-var-p-around_small slds-size_1-of-16">
+                                <lightning:input  name="Nuovo Numero di telefono" aura:id="Nuovo Numero di telefono" label="Nuovo Numero di telefono" disabled="true" onchange="{!c.showConferma}" />
+                            </div>
+                            <div class="slds-col slds-var-p-around_small slds-size_1-of-8">
+                                <lightning:input  name="Nuova Email" aura:id="Nuova Email" label="Nuova Email" disabled="true" onchange="{!c.showConferma}"/>
+                            </div>
+                            <div class="slds-col slds-var-p-around_small slds-size_1-of-16">
+                                <lightning:input  type="date" name="Data di Avvicendamento" aura:id="Data di Avvicendamento" label="Data di Avvicendamento" disabled="true" onchange="{!c.showConferma}"/>
+                            </div>
+
+                                <div class="slds-col slds-var-p-around_small slds-size_1-of-16">
+                                    <label class="slds-checkbox__label" for="flagForSchedula">
+                                        <span class="slds-checkbox_faux"></span>
+                                        <span class="slds-form-element__label">&nbsp;Schedula</span>
+                                    </label>
+                                    <lightning:input type="checkbox" name="Schedula" aura:id="flagForSchedulaId"  onchange="{!c.getSchedula}" disabled="{!v.isSchedulaDisabled}"/>
+                                </div>
+                                <div class="slds-col slds-var-p-around_small slds-size_1-of-16">
+                                    <label class="slds-checkbox__label" for="flagForAnnulaSchedulzione">
+                                        <span class="slds-checkbox_faux"></span>
+                                        <span class="slds-form-element__label">&nbsp;Annulla Schedulazione</span>
+                                    </label>
+                                    <lightning:input type="checkbox" name="Annulla Schedulazione" aura:id="flagForAnnullaSchedulazione" checked="" onchange="{!c.getAnnullaSchedula}" disabled="{!v.isAnnullaDisabled}"/>
+                                </div>
+                                <div class="slds-col slds-var-p-around_small slds-size_1-of-16">
+                                    <label class="slds-checkbox__label" for="flagForRimuoviContratto">
+                                        <span class="slds-checkbox_faux"></span>
+                                        <span class="slds-form-element__label">Rimuovi Contratto</span>
+                                    </label>
+                                    <lightning:input type="checkbox" name="Rimuovi Contratto" aura:id="flagForRimuoviContratto" checked="" onchange="{!c.getRimuoviContratto}" disabled="{!v.isRimuoviDisabled}" />
+                                </div>
+                        </div>
+                    </lightning:layoutItem>
+                    </lightning:layout>
+                          
+                    <lightning:layoutItem padding="around-small" size="12">
+                       
+                    		<lightning:button class="slds-button slds-button_brand" label="Conferma" aura:id="conferma" disabled="true" onclick="{!c.clickConferma}"  />
+                            
+                    </lightning:layoutItem>
+
+		</lightning:layout>
+	</lightning:card>  
+    
+</aura:component>

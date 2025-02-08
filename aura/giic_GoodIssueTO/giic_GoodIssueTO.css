@@ -1,0 +1,67 @@
+.THIS .searchButton{
+    position: absolute;
+    right: 7%;
+    top: 27%;  
+}
+.THIS .searchButtonLoc{
+    position: absolute;
+    right: 13%;
+    top: 27%;
+}
+.THIS .alto{
+    padding-bottom: 1px;
+}
+.THIS .piualto{
+    padding-bottom: 16px;
+}
+.THIS .slds-form_horizontal{
+    padding-top: 8px;
+}
+.THIS .custom-box {
+    height: 75px;
+    padding: 1rem;
+    border: 1px solid #d8dde6;
+    box-shadow: 0px 0px 20px 5px #899aa3;
+}
+
+.THIS .custom-box2 {
+
+padding: 10px;
+box-shadow: 5px 5px 10px 2px #333333;
+-webkit-box-shadow: 5px 5px 10px 2px #333333;
+-moz-box-shadow: 5px 5px 10px 2px #333333;
+}
+
+.THIS.actionBtn{
+    float:right;
+}
+
+.THIS.modalSection{
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.THIS .rosso{
+    color: #CC0000;
+    text-align: center;
+}
+
+.THIS .errorMsg{
+    text-align: center;
+    display: inline;
+    margin-right: 45%;
+    margin-left: -46%;
+    color: red;
+}
+
+.THIS .aa {
+  border: 1px solid #C2C2C2;
+}
+
+.THIS .maxColSize300 {
+    max-width: 300px;
+    white-space: pre-wrap;
+}
+.THIS .maxColSize200 {
+    max-width: 200px;
+    white-space: pre-wrap;
+}

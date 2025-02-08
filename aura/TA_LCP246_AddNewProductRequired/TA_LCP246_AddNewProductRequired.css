@@ -1,0 +1,11 @@
+.THIS .ta-modal-main-product-container {
+    top: 25vh;
+}
+
+.THIS .ta-modal-main-product-body {
+    height: 20vh;
+}
+
+.THIS .slds-form-element__label {
+    color: grey !important;
+}

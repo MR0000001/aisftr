@@ -1,0 +1,52 @@
+<!--
+* @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @date Creation 06/11/2019
+* @description XC_LCP170_NewDictamen – Component to create a new Dictamen for Work Order
+-->
+
+<aura:component controller ="XC_LCC170_NewDictamen" 
+                implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference" 
+                access="global" >
+
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:attribute name="errorWoStatus" type="Boolean" default="false"/>
+    <aura:attribute name="errorWoDictamen" type="Boolean" default="false"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="recordTypeSelected" type="Boolean" default="false"/>
+    <aura:attribute name="isRepair" type="Boolean" default="false"/>
+    <aura:attribute name="isLuz" type="Boolean" default="false"/>
+    <aura:attribute name="isGas" type="Boolean" default="false"/>
+    <aura:Attribute name="visibleRecordType" type="List"/> 
+    <aura:attribute name="recordTypeValue" type="String" default=""/>
+    <aura:attribute name="workOrder" type="WorkOrder"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <aura:if isTrue="{!(and(not(v.recordTypeSelected),and(not(v.errorWoStatus),not(v.errorWoDictamen))))}">
+        <div class="topborder">
+            <lightning:radioGroup aura:id="mygroup" name="r" options="{!v.visibleRecordType}" label="" value="{!v.recordTypeValue}"/>
+        </div>
+        <div class="topborder" style="text-align:right">
+            <lightning:button name="btn1" label="{!$Label.c.XC_CL_CreateDictamen}" class="slds-button slds-button_brand" onclick="{!c.createDictamen}" /> 
+        </div>      
+    </aura:if>
+
+    <aura:if isTrue="{!v.errorWoStatus}">
+        <div class="topborder">
+            <br></br><p>{!$Label.c.XC_CL_ErrorCreateDictamen}</p>
+        </div>  
+    </aura:if>
+
+    <aura:if isTrue="{!v.errorWoDictamen}">
+        <div class="topborder">
+            <br></br><p>{!$Label.c.XC_CL_DictamenExists}</p>
+        </div>  
+    </aura:if>
+
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div class="spinnerHolder">
+            <lightning:spinner style="background-color: rgba(0, 0, 0, 0);" alternativeText="Loading" size="large" variant="brand"/>
+        </div>   
+    </aura:if>
+
+</aura:component>

@@ -1,0 +1,30 @@
+/* .THIS .ta-title {
+    font-size: 4vw;
+    font-weight: 800;
+    color: white;
+    border-bottom: 0.3vw solid white;
+    padding-bottom: 4vw;
+    margin-bottom: 2vw;
+}
+
+.THIS .ta-picklist-label {
+    color: white;
+    margin-top: 1vw;
+} */
+
+/* .THIS .slds-select_container .slds-select {
+    padding-left: 4vw !important;
+    border-radius: 5vw !important;
+    background: #ece8f2 !important; 
+    color: rgb(70, 30, 125) !important;
+} */
+
+/* .THIS .slds-select_container:before, .THIS .slds-select_container:after {
+    right: 3.5vw !important;
+} */
+
+/* CUSTOM-TAG */
+.THIS .slds-form-element__label {
+    color: rgba(255, 255, 255, 0.5);
+    padding-bottom: 1.5vw;
+}

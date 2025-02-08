@@ -1,0 +1,119 @@
+<aura:component controller ="XC_LCC216_SelectWarehouse"
+    implements="forceCommunity:availableForAllPageTypes,lightning:hasPageReference,lightning:actionOverride,flexipage:availableForRecordHome,force:hasRecordId"
+    access="global">
+
+    <aura:attribute access="public" name="isInitialized" type="Boolean" default="false" />
+    <aura:attribute access="public" name="recordId" type="String" />
+
+    <aura:attribute access="private" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="private" name="isError" type="Boolean" />
+    <aura:attribute access="private" name="toastMessage" type="String" />
+    <aura:attribute access="private" name="isSearchView" type="Boolean" default="true" />
+    <aura:attribute access="private" name="warehouseLegalEntityFilter" type="Boolean" default="false" />
+    <aura:attribute access="private" name="parentRecordId" type="String" default="" />
+    <aura:attribute access="private" name="warehouseList" type="List" />
+    <aura:attribute access="private" name="selectedWarehouse" type="Integer" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <!-- <aura:handler name="init" action="{!c.doInit}" value="{!this}"/> -->
+    <aura:handler name="change" value="{!v.isInitialized}" action="{!c.handleIsInitializedChange}"/>
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" horizontalAlign="center" class="ta-large-modal-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" class="ta-modal-header-title slds-text-align_center">
+                            {!$Label.c.XC_CL_SelectWarehouse} <!-- TO DO CUSTOM LABEL -->
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleCloseModal}" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <aura:if isTrue="{!v.isSearchView}">
+                    <lightning:layoutItem size="12" class="ta-large-modal-body">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="12" class="slds-var-p-around_medium">
+                                <lightning:input aura:id="warehouseNameFilter"
+                                    name="warehouseNameFilter"
+                                    label="{!$Label.c.XC_CL_Name}" /> <!-- TO DO CUSTOM LABEL -->
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-var-p-around_medium">
+                                <lightning:input aura:id="warehouseCodeFilter"
+                                    name="warehouseCodeFilter"
+                                    label="{!$Label.c.XC_CL_WarehouseCode}" /> <!-- TO DO CUSTOM LABEL -->
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-var-p-around_medium">
+                                <lightning:input aura:id="warehouseCoverageFilter"
+                                    name="warehouseCoverageFilter"
+                                    label="{!$Label.c.XC_CL_WarehouseCoverage}" /> <!-- TO DO CUSTOM LABEL -->
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-var-p-around_medium">
+                                <lightning:input aura:id="warehouseLegalEntityFilter"
+                                    type="checkbox"
+                                    name="warehouseLegalEntityFilter"
+                                    label="{!$Label.c.XC_CL_DisableWarehouseLE}" /> <!-- TO DO CUSTOM LABEL -->
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <lightning:layoutItem size="12" class="ta-modal-footer-one-button">
+                        <lightning:button class="ta-button-primary-modal" label="Search" onclick="{!c.handleSearch}"/> <!-- TO DO CUSTOM LABEL -->
+                    </lightning:layoutItem>
+
+                    <aura:set attribute="else">
+                        <lightning:layoutItem size="12" class="ta-large-modal-body">
+                            <lightning:layout multipleRows="true">
+                                <aura:iteration items="{!v.warehouseList}" var="listView" indexVar="optIndex">
+                                    <div class="ta-card-container" id="{!listView.recordId}" onclick="{!c.handleSelectWarehouse}">
+                                        <lightning:layoutItem size="12" class="ta-card-field">
+                                            <span class="ta-card-label">{!$Label.c.XC_CL_Name}:</span>
+                                            <span class="ta-card-value">{!listView.warehouseName}</span>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="12" class="ta-card-field">
+                                            <span class="ta-card-label">{!$Label.c.XC_CL_WarehouseCode}:</span>
+                                            <span class="ta-card-value">{!listView.warehouseCode}</span>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="12" class="ta-card-field">
+                                            <span class="ta-card-label">{!$Label.c.XC_CL_LegalEntity}:</span>
+                                            <span class="ta-card-value">{!listView.legalEntity}</span>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="12" class="ta-card-field">
+                                            <span class="ta-card-label">{!$Label.c.XC_CL_WarehouseCoverage}:</span>
+                                            <span class="ta-card-value">{!if(listView.provinceCoverage!=null,'['+listView.provinceCoverage+']','')}</span>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="12" class="ta-card-field">
+                                            <span class="ta-card-label">{!$Label.c.XC_CL_Address}:</span>
+                                            <span class="ta-card-value">{!listView.wareHouseStreet+' '+listView.wareHouseCity+' '+listView.wareHouseZipPostalCode+' ('+listView.wareHouseStateProvince+')'+' '+listView.wareHouseCountry}</span>
+                                        </lightning:layoutItem>
+                                    </div>
+                                </aura:iteration>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="12" class="ta-modal-footer-two-button">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                    <lightning:button class="ta-button-closing-modal" label="Back" onclick="{!c.handleBackToSearch}"/> <!-- TO DO CUSTOM LABEL -->
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12">
+                                    <lightning:button class="ta-button-primary-modal" label="Save" onclick="{!c.handleSetWarehouse}"/> <!-- TO DO CUSTOM LABEL -->
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </aura:set>
+                </aura:if>
+            </lightning:layout>
+        </div>
+    </aura:if>
+</aura:component>

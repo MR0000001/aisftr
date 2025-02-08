@@ -1,0 +1,94 @@
+<!--
+  @File Name          : XC_LCP183_CreditAssignmentView.cmp
+  @Description        : 
+  @Author             : Francesco Imperioli - fimperioli@deloitte.it
+  @Group              : 
+  @Last Modified By   : Francesco Imperioli - fimperioli@deloitte.it
+  @Last Modified On   : 11-17-2020
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    7/4/2020   Francesco Imperioli - fimperioli@deloitte.it     Initial Version
+-->
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId"
+    controller="XC_LCC183_CreditAssignmentView" access="global">
+
+    <!-- ADDED P.E. Management TO AUTOFRESH -->
+    <!-- <ltng:require scripts="{!join(',',
+    $Resource.XC_STR_CometD + '/cometd.js',
+    $Resource.gl_jquery + '/jquery-1.10.2.min.js', 
+    $Resource.XC_STR_CometD + '/json2.js', 
+    $Resource.XC_STR_CometD + '/jquery_cometd.js', 
+    $Resource.XC_STR_CometD + '/cometdReplayExtension.js', 
+    $Resource.XC_STR_CometD + '/cometdCustom.js')}" 
+    afterScriptsLoaded="{!c.doInit}"></ltng:require> -->
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }" />
+    
+    <aura:handler event="c:XC_LCE020_OrderCommChangeEvt" action="{!c.manageCommChangeEvt}"/>
+    <aura:handler event="c:XC_LCE021_CreditTransferDataEvent" name="XC_LCE021_CreditTransferDataEvent" action="{!c.handleAdditionalFieldEvent}"/>
+
+    <aura:attribute name="orderItems" type="List" />
+    <aura:attribute name="showItems" type="Boolean" default="false" />
+    <aura:attribute name="availableForLE" type="String" default="EnelXItalia" />
+    <aura:attribute name="availableForRT" type="String" default="Order" />
+    <aura:attribute name="legalEntity" type="String" />
+    <aura:attribute name="orderStatus" type="String" />
+    <aura:attribute name="orderRT" type="String" />
+    <aura:attribute name="showComponent" type="Boolean" default="false" />
+    <aura:attribute name="isFromCTI" type="Boolean" default="false" />
+    <aura:attribute name="isChangingOffer" type="Boolean" default="false" />
+    <aura:attribute name="sessionId" type="String" />
+    <aura:attribute name="evtChannel" type="String" default="/event/XC_OrderEvent__e"/>
+    <aura:attribute name ="showSpinner" type="Boolean" default="false"/>
+
+    <!-- <lightning:empApi aura:id="empApi"/> -->
+
+
+    <aura:if isTrue="{!v.showComponent}">
+        <lightning:card class="slds-card_boundary" variant="narrow" iconName="custom:custom14"
+            title="{!$Label.c.XC_CL_LCP183_header}">
+
+            <aura:set attribute="actions">
+                <lightning:buttonIcon iconName="utility:refresh" alternativeText="refresh"
+                title="{!$Label.c.XC_CL_RefreshButton}"
+                onclick="{!c.refreshView}" />
+            </aura:set>
+            
+            <!-- IF A COMMERCIAL CHANGE IS IN PROGRESS SHOWS A SPINNER -->
+            <aura:if isTrue="{!v.isChangingOffer}">
+                <div class="slds-p-around_small slds-is-relative" style="height:200px;">
+                    <lightning:spinner aura:id="mySpinner" variant="brand" size="large"/>
+                </div>
+                <div class="slds-p-around_small slds-align_absolute-center">
+                    <lightning:formattedText value="{!$Label.c.XC_CL_LCP183_ChangeOfferInProgress}"/>
+                </div>
+                <aura:set attribute="else">
+
+                    <aura:if isTrue="{!v.showSpinner}">
+                        <div class="slds-p-around_small slds-is-relative" style="height:200px;">
+                            <lightning:spinner aura:id="mySpinner" variant="brand" size="large"/>
+                        </div>
+                    </aura:if>
+
+                    <aura:if isTrue="{!v.showItems}">
+                        <div class="slds-p-around_small">
+                            <lightning:formattedText value="{!$Label.c.XC_CL_LCP183_InfoMessage}" />
+                        </div>
+                        <aura:iteration items="{!v.orderItems}" var="oi">
+                            <div class="slds-p-around_small">
+                                <c:XC_LCP183_CreditAssignmentViewChild recordId="{!oi.recordId}" incentiveItem="{!oi}"
+                                    orderStatus="{!v.orderStatus}" isFromCTI="{!v.isFromCTI}" />
+                            </div>
+                        </aura:iteration>
+                        <aura:set attribute="else">
+                            <div class="slds-p-around_small">
+                                <lightning:formattedText value="{!$Label.c.XC_CL_LCP183_NoProductAvailable}" />
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+        </lightning:card>
+    </aura:if>
+
+</aura:component>

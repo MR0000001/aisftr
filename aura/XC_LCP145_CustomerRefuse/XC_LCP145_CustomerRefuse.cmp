@@ -1,0 +1,10 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickAction" access="global" controller= "XC_LCC145_CustomerRefuse" >
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div class="spinnerHolder">
+            <lightning:spinner alternativeText="Loading" size="large" variant="brand" />
+        </div>   
+    </aura:if>
+</aura:component>

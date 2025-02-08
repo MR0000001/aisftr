@@ -1,0 +1,84 @@
+@media only screen and (max-width: 600px) {
+    /* CUSTOM-TAG */
+    .THIS .ta-logo {
+        z-index: 9998 !important;
+        position: absolute;
+        height: 32vw;
+        width: 32vw;
+        margin-top: 45vh;
+        margin-left: 25vw;
+    }
+
+    /* CUSTOM-TAG */
+    .THIS .ta-logo-spin {
+        z-index: 9998 !important;
+        position: absolute;
+        height: 9vw;
+        width: 9vw;
+        margin-top: 46vh;
+        margin-left: 13vw;
+        -webkit-animation-name: spin;
+        -webkit-animation-duration: 3000ms;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-timing-function: linear;
+        -moz-animation-name: spin;
+        -moz-animation-duration: 3000ms;
+        -moz-animation-iteration-count: infinite;
+        -moz-animation-timing-function: linear;
+        -ms-animation-name: spin;
+        -ms-animation-duration: 3000ms;
+        -ms-animation-iteration-count: infinite;
+        -ms-animation-timing-function: linear;
+        animation-name: spin;
+        animation-duration: 3000ms;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+    }
+}
+
+/* CUSTOM-TAG */
+.THIS.ta-loading-spinner {
+    position: fixed !important;
+    z-index: 9999 !important;
+    background: rgba(70, 30, 125, 0.8);
+    height: 100vh;
+    width: 100vw;
+    left: 0;
+    top: 0;
+}
+
+/* @-ms-keyframes spin {
+    from {
+        -ms-transform: rotate(0deg);
+    }
+    to {
+        -ms-transform: rotate(360deg);
+    }
+}
+
+@-moz-keyframes spin {
+    from {
+        -moz-transform: rotate(0deg);
+    }
+    to {
+        -moz-transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes spin {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+} */

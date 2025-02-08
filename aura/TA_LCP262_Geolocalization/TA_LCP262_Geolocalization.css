@@ -1,0 +1,12 @@
+.THIS .ta-coordinates-label{
+    margin-top: 3vw;
+    margin-bottom: 3vw;
+}
+
+.THIS .ta-border-top-white {
+    margin-top: 6vw !important;
+}
+
+.THIS .slds-map iframe {
+    border-radius: 3vw;
+}

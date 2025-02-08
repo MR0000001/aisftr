@@ -1,0 +1,235 @@
+/* .THIS .ta-accordion-header {
+    color:white;
+    padding: 4vw 5vw 5vw 5vw;
+}
+
+.THIS .ta-accordion-open {
+    border-radius: 2vw;
+}
+
+.THIS .ta-accordion-close {
+    border-radius: 2vw;
+    box-shadow: 0vw 1vw 2vw -0.8vw black;
+}
+
+.THIS .ta-color-purple {
+    color: #461e7d;
+    font-weight: 800;
+}
+
+.THIS .ta-accordion-header-button {
+    font-size: 3.5vw;
+    font-weight: 100;
+    border: 1px solid white;
+    padding: 1vw 2vw 1vw 2vw;
+    border-radius: 2.5vw;
+    color: white;
+    background: transparent;
+    text-transform: capitalize;
+}
+
+.THIS .ta-accordion-header-icon {
+    width: 9vw;
+    margin-top: 2vw;
+}
+
+.THIS .ta-box-shadow {
+    box-shadow: 0vw 1vw 2vw -0.8vw black !important;
+    border-bottom-left-radius: 2vw;
+    border-bottom-right-radius: 2vw;
+}
+
+.THIS h3 {
+    font-family: Montserrat;
+    font-size: 4vw;
+    font-weight: 800;
+    font-stretch: normal;
+    font-style: normal;
+    letter-spacing: normal;
+}
+
+.THIS p {
+    font-family: Montserrat;
+    font-size: 3.3vw !important;
+    font-weight: 300;
+    font-stretch: normal;
+    font-style: normal;
+    letter-spacing: normal;
+} */
+
+/*.THIS .xc-color-grey {
+    font-size: 3.3vw !important;
+    text-transform: capitalize !important;
+    font-weight: 800 !important;
+    color: rgb(255, 255, 255, 0.6) !important;
+}*/
+
+/* .THIS .slds-input[readonly] {
+    font-size: 3.3vw !important;
+    font-weight: 300 !important;
+    color: white !important;
+}
+
+.THIS .slds-form-element__control.slds-grow {
+    top: 1vw ;
+    left: -.4vw;
+}
+
+.THIS .slds-input {
+    border-radius: 5vw !important;
+    background-color: rgb(255, 255, 255, 1) !important;
+    color: #461e7d !important;
+} */
+
+/* .THIS input[type="textarea"] {
+    margin-top: 2vw !important;
+    height: 40vw;
+    color: black !important;
+}
+
+.THIS input[type="textarea"][readonly] {
+    height: auto !important;
+}
+
+.THIS input[readonly] {
+    margin-top: 0vw !important;
+} */
+
+/* .THIS .ta-border-top-white {
+    margin-top: 7vw;
+    border-top: .5vw solid white;
+} */
+
+/*.THIS .xc-color-white {
+    color: white;
+}*/
+
+/*.THIS .xc-accordion-container {
+    animation: slide-in-top .5s;
+}*/
+
+/* @-webkit-keyframes slide-in-top {
+    0% {
+        -webkit-transform: translateY(-1000px);
+        transform: translateY(-1000px);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slide-in-top {
+    0% {
+        -webkit-transform: translateY(-1000px);
+        transform: translateY(-1000px);
+        opacity: 0;
+    }
+    100% {
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+        opacity: 1;
+    }
+} */
+
+/* .THIS textarea {
+    margin-top: 2vw;
+    color: black;
+    height: 25vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-unchecked {
+    border-radius: 2vw;
+    text-align: center;
+    border: 2px solid;
+    box-shadow: 0vw 1vw 2vw -0.8vw grey;
+    background-color: white !important;
+    margin-right: 2vw;
+    margin-left: 2vw;
+    padding: 2.5vw;
+    height: 25vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-checked {
+    border-radius: 2vw;
+    text-align: center;
+    background-color: white !important;
+    box-shadow: 0vw 1vw 2vw -0.8vw grey;
+    margin-right: 2vw;
+    margin-left: 2vw;
+    background-repeat: no-repeat;
+    padding: 2.5vw;
+    height: 25vw;
+}
+
+/*.THIS .xc-color-black {
+    color: black;
+}*/
+
+/* .THIS .slds-textarea:active {
+    color: black;
+}
+
+.THIS .slds-textarea:focus {
+    color: black;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-pencil-container {
+    margin-top: 0.3vh;
+}
+
+.THIS .ta-icon-redirect {
+    width: 4.5vw;
+}
+
+.THIS .ta-value-container {
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+/* CUSTOM-TAG TABLET */
+@media only screen and (min-width: 601px) {
+    .THIS .ta-unchecked {
+        border-radius: 2vw;
+        text-align: center;
+        border: 2px solid;
+        box-shadow: 0vw 1vw 2vw -0.8vw grey;
+        background-color: white !important;
+        margin-right: 2vw;
+        margin-left: 2vw;
+        padding: 2.5vw;
+        height: 16vw;
+    }
+
+    .THIS .ta-checked {
+        border-radius: 2vw;
+        text-align: center;
+        background-color: white !important;
+        box-shadow: 0vw 1vw 2vw -0.8vw grey;
+        margin-right: 2vw;
+        margin-left: 2vw;
+        background-repeat: no-repeat;
+        background-size: 7vw;
+        padding: 2.5vw;
+        height: 16vw;
+    }
+
+    .THIS .slds-input, .THIS .slds-select {
+        height: 6vw !important;
+    }
+
+    .THIS .slds-select_container {
+        margin: 0vw !important;
+    }
+
+    .THIS .ta-icon-redirect {
+        width: 3.5vw;
+    }
+}
+
+.THIS .ta-accordion-header-button { text-transform: none !important; }

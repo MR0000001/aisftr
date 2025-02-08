@@ -1,0 +1,128 @@
+<!--
+* @author Monica Cutillo - monica.cutillo@nttdata.com - Lorenzo Orlanducci lorenzo.orlanducci@nttdata.com
+* @date Creation 14/02/2019
+* @date Modification dd/mm/yyyy
+* @description XC_LCP083_ChangePaymentMethod – Component to change Payment Method for a Billing Profile
+-->
+<aura:component controller="XC_LCC078_ChangePaymentMethod"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader"
+    access="global">
+
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth70}" />
+
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="payment" type="String" />
+    <aura:attribute name="zuoraAccountId" type="String" />
+    <aura:attribute name="accountForSIA" type="String" />
+    <aura:attribute name="primaryContactId" type="String" />
+    <aura:attribute name="accountCountry" type="String" />
+    <aura:attribute name="paymentList" type="List" />
+    <aura:attribute name="cardType" type="List" />
+    <aura:attribute name="valueMap" type="Map" default="{}" />
+    <aura:attribute name="oldValue" type="String" />
+
+
+    <aura:attribute name="cardNumber" type="String" />
+    <aura:attribute name="month" type="List"
+        default="[{'label': '1', 'value': '1'},{'label': '2', 'value': '2'},{'label': '3', 'value': '3'}, {'label': '4', 'value': '4'}, {'label': '5', 'value': '5'}, {'label': '6', 'value': '6'}, {'label': '7', 'value': '7'}, {'label': '8', 'value': '8'},  {'label': '9', 'value': '9'},  {'label': '10', 'value': '10'}, {'label': '11', 'value': '11'},  {'label': '12', 'value': '12'}]" />
+    <aura:attribute name="year" type="List"
+        default="[{'label': '2018', 'value': '2018'},{'label': '2019', 'value': '2019'},{'label': '2020', 'value': '2020'},{'label': '2021', 'value': '2021'},{'label': '2022', 'value': '2022'},{'label': '2023', 'value': '2023'}]" />
+    <aura:attribute name="showCreditCard" type="boolean" default="false" />
+    <aura:attribute name="showSEPA" type="boolean" default="false" />
+    <aura:attribute name="disabledSubmit" type="Boolean" default="true" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+
+
+    <!-- FIMPERIOLI ADDED -->
+    <aura:attribute name="bplis" type="XC_BillingProfileLineItem__c[]" />
+    <aura:attribute name="bplisColumn" type="List" />
+    <aura:attribute name="mandateOpts" type="List" />
+    <aura:attribute name="mandateType" type="String" />
+    <aura:attribute name="debtorCode" type="String" />
+    <aura:attribute name="newMandateID" type="String"/>
+    <aura:attribute name="newMandateDate" type="String"/>
+
+
+    <!-- FOR COMMODITY -->
+    <aura:attribute name="electronicMethod" type="Boolean" default="true" />
+    <aura:attribute name="currentMethod" type="String" />
+    <aura:attribute name="cupsId" type="String" />
+    <aura:attribute name="contractId" type="String" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.payment}" action="{!c.checkValues}" />
+
+
+    <lightning:notificationsLibrary aura:id="notifLib" />
+    <div class="c-container">
+        <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner aura:id="mySpinner" />
+        </aura:if>
+
+        <div class="modal-header slds-modal__header slds-size_1-of-1">
+            <h4 class="title slds-text-heading--medium">
+                <lightning:icon iconName="custom:custom41" /><span
+                    class="slds-p-left_small">{!$Label.c.XC_CL_ChangePaymentMethod_Head}</span></h4>
+        </div>
+
+
+
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" padding="around-small">
+                <lightning:combobox aura:id="comboboxpayment" name="comboboxpayment"
+                    label="{!$Label.c.XC_CL_PaymentMethodType}" value="{!v.payment}" options="{!v.paymentList}"
+                    readonly="{!v.electronicMethod}" onchange="{!c.onChangeMOP}" />
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" padding="around-small">
+                <lightning:card title="{!$Label.c.XC_CL_ChangePaymentBPCardHead}" iconName="custom:custom93"
+                    class="slds-card_boundary">
+                    <lightning:datatable columns="{!v.bplisColumn}" data="{!v.bplis}" keyField="Id"
+                        hideCheckboxColumn="true" />
+                </lightning:card>
+            </lightning:layoutItem>
+        </lightning:layout>
+
+        <!-- INFO FOR COMMODITY -->
+        <aura:if isTrue="{!!v.electronicMethod}">
+            <lightning:card variant="narrow" iconName="standard:apex_plugin"
+                title="{!$Label.c.XC_CL_CommodityBillHeaderInfo}" class="slds-card_boundary">
+                <ul class="slds-list--dotted">
+                    <li>{!$Label.c.XC_CL_CurrentMethod} {!v.currentMethod}</li>
+                    <li>{!$Label.c.XC_CL_CommodityContract} {!v.contractId}</li>
+                    <li>{!$Label.c.XC_CL_CurrentCUPS} {!v.cupsId}</li>
+                </ul>
+            </lightning:card>
+        </aura:if>
+        <aura:if isTrue="{!v.showSEPA}">
+            <lightning:card variant="narrow" iconName="custom:custom66" title="{!$Label.c.XC_CL_ChangeDirectD_Head}"
+                class="slds-card_boundary">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" padding="around-small">
+                        <lightning:input aura:id="accountNumber" name="accountNumber"
+                            label="{!$Label.c.XC_CL_Account_Number}" value="{!v.valueMap.accountNumber}"
+                            onchange="{! c.checkValues }" required="true" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" padding="around-small">
+                        <lightning:input aura:id="bic" name="bic" label="BIC" value="{!v.valueMap.bic}"
+                            onchange="{! c.checkValues }" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" padding="around-small">
+                        <lightning:combobox aura:id="mandateT" name="mandateT" label="Mandate Type"
+                            options="{!v.mandateOpts}" value="{!v.mandateType}" required="true" />
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+        </aura:if>
+        <div aura:id="accountInfoDiv" id="accountInfoDiv">
+            <br></br><br></br>
+            <footer class="slds-modal__footer">
+                <lightning:button variant="neutral" label="{!$Label.c.XC_CL_Cancel}" title="No"
+                    onclick="{! c.closeModal }" />
+                <lightning:button variant="brand" label="{!$Label.c.XC_CL_ConfirmChangeMOP}"
+                    title="{!$Label.c.XC_CL_ConfirmChangeMOP}" disabled="{!v.disabledSubmit}" onclick="{! c.create }" />
+            </footer>
+        </div>
+    </div>
+
+</aura:component>

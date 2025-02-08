@@ -1,0 +1,155 @@
+<aura:component controller="TA_LCC226_CartContainer"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable"
+                access="global">
+
+    <aura:attribute access="private" name="openCartSummary" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="cartItems" type="List"/>
+    <aura:attribute access="private" name="counter" type="Integer" default="1"/>
+    <aura:attribute access="private" name="totalAmount" type="Integer"/>
+    <aura:attribute access="private" name="isEditEnabled" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="selectedCartItem" type="Object" />
+    <aura:attribute access="private" name="isEditAttributeModal" type="Boolean" default="false" />
+    <aura:attribute access="public" name="workOrder" type="Object"/>
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" /> 
+    <aura:handler event="c:TA_LCE224_Refresh" action="{!c.handleRefreshCart}" />
+    <aura:handler event="c:TA_LCE226_CartStep" action="{!c.handleManageB2WResponse}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="TA_LCE226_CartStep" type="c:TA_LCE226_CartStep"/>
+
+    <ltng:require styles="{!join(',',
+                            $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <div onclick="{!c.handleManageCartSummary}" class="slds-is-relative">
+        <img src="{!$Resource.TA_Icons + '/xc-icons/cart-white.svg'}" class="ta-cart-icon"/>
+        <aura:if isTrue="{!v.counter > 0}">
+            <div class="ta-cart-counter">
+                {!v.counter}
+            </div>
+        </aura:if>   
+    </div>
+    
+    <aura:if isTrue="{!v.openCartSummary}">
+        <div class="ta-cart-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-cart-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <!--<lightning:layoutItem size="5">
+                            <span class="" name="{!v.isEditEnabled ? 'save' : 'edit'}" onclick="{!c.handleManageEdit}">
+                                {!v.isEditEnabled ? 'Save' : 'Edit'}
+                            </span>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="6">
+                            <span class="" name="cancel" onclick="{!c.handleManageEdit}">
+                                {!v.isEditEnabled ? 'Cancel' : ''}
+                            </span>
+                        </lightning:layoutItem> -->
+                        <lightning:layoutItem size="11"/>
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleManageCartSummary}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <aura:if isTrue="{!not(v.isEditAttributeModal)}">
+                    <lightning:layoutItem size="12" class="ta-cart-modal-info-body slds-text-align_center">
+                        <aura:if isTrue="{!v.cartItems.length > 0}">
+                            <aura:iteration items="{!v.cartItems}" var="cartItem">
+                                <aura:if isTrue="{!cartItem.hidden != 'true'}">
+                                    <lightning:layout multipleRows="true" class="ta-border-bottom-purple slds-p-top_large">
+                                        <lightning:layoutItem size="6">
+                                            <lightning:layout multipleRows="true" class="slds-text-align_left slds-m-bottom_medium">
+                                                <lightning:layoutItem size="12" class="slds-m-bottom_medium"> <p class="ta-color-black ta-font-weight-800"> {!cartItem.fields.LicProductName} </p></lightning:layoutItem>
+                                                <aura:if isTrue="{!cartItem.fields.baserecurringcharge != 0}">
+                                                    <lightning:layoutItem size="12" class="ta-cart-payment">
+                                                        {!cartItem.fields.recurringchargefrequency}
+                                                    </lightning:layoutItem>
+                                                </aura:if>
+                                                <!--<lightning:layoutItem size="12" class="ta-cart-description">{!cartItem.fields.LicCategoryName}</lightning:layoutItem> -->
+                                            </lightning:layout>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="2" class="slds-text-align_left">
+                                            <aura:if isTrue="{!cartItem.discountApplied}">
+                                                <img class="ta-icon-close-size" src="{!$Resource.TA_Icons + '/xc-icons/discount-pink.png'}"/>
+                                            </aura:if>
+                                        </lightning:layoutItem>
+                                        
+                                        <lightning:layoutItem size="4">
+                                            <lightning:layout multipleRows="true" class="slds-text-align_right slds-m-bottom_medium">
+                                                <lightning:layoutItem size="12" class="slds-m-bottom_medium slds-text-align_right">
+                                                    <img id="{!cartItem.id}" class="ta-edit-attribute" src="{!$Resource.TA_Icons + '/xc-icons/edit-purple.svg'}" onclick="{!c.handleOpenEditAttribute}"/>
+                                                    <div class="ta-cart-quantity"> {!cartItem.fields.qty} </div>
+                                                </lightning:layoutItem>
+                                                <lightning:layoutItem size="12" class="ta-cart-price">
+                                                <aura:if isTrue="{!cartItem.isDiscounted}">
+                                                    <span class="ta-cart-price-discount"> {!cartItem.fields.totalbaseonetimefee} € </span>
+                                                </aura:if>
+                                                <h3 class="ta-color-purple slds-m-left_small"> {!cartItem.fields.totalonetimefeeov} € </h3></lightning:layoutItem>
+                                            </lightning:layout>
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </aura:if>
+                            </aura:iteration>
+                            <aura:set attribute="else">
+                                <div class="ta-no-selected-items"> {!$Label.c.TA_NoItemsInCart} </div>
+                            </aura:set>
+                        </aura:if>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" class="ta-cart-modal-footer">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="6" class="slds-text-align_left"> <h3 class="ta-color-purple"> {!$Label.c.TA_CartSummaryTotalAmount} </h3> </lightning:layoutItem>
+                            <lightning:layoutItem size="6" class="slds-text-align_right"> <h3 class="ta-color-purple"> {!v.totalAmount} € </h3> </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <aura:set attribute="else">
+                        <lightning:layoutItem size="12" class="ta-modal-info-body slds-text-align_center">
+                            <lightning:layout multipleRows="true">
+                                <aura:iteration items="{!v.selectedCartItem.listOfAttributes}" var="attribute">
+                                    <aura:if isTrue="{!and(attribute.fields.hidden == 'false', or(attribute.listOfDomains.length > 0, and(attribute.fields.readonly == 'true', attribute.fields.DefaultValue != '')))}">
+                                        <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                            <lightning:layout multipleRows="true">
+                                                <lightning:layoutItem size="12" class="slds-m-bottom_xx-small ta-modal-info-title">
+                                                    {!attribute.fields.name}
+                                                </lightning:layoutItem>
+                                                <lightning:layoutItem size="12" class="slds-m-bottom_xx-small">
+                                                    <aura:if isTrue="{!attribute.fields.readonly == 'true'}">
+                                                        <p>{!attribute.fields.value}</p>
+                                                        <aura:set attribute="else">
+                                                            <lightning:select value="{!attribute.fields.value}">
+                                                                <aura:if isTrue="{!attribute.fields.DefaultValue == ''}">
+                                                                    <option value="{!attribute.fields.DefaultValue}">{!attribute.fields.DefaultValue}</option>
+                                                                </aura:if>
+                                                                <aura:if isTrue="{!attribute.fields.type != 'Dynamic Lookup'}">
+                                                                    <aura:iteration items="{!attribute.listOfDomains}" var="domain">
+                                                                        <option value="{!domain.fields.value}">{!domain.fields.label}</option>
+                                                                    </aura:iteration>
+                                                                    <aura:set attribute="else">
+                                                                        <aura:iteration items="{!attribute.listOfDomains}" var="domain">
+                                                                            <option value="{!domain.Name}">{!domain.Name}</option>
+                                                                        </aura:iteration>
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </lightning:select>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </lightning:layoutItem>
+                                            </lightning:layout>
+                                        </lightning:layoutItem>
+                                    </aura:if>
+                                </aura:iteration>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="12" class="ta-modal-footer-one-button">
+                            <lightning:button class="ta-button-primary-modal" label="{!$Label.c.TA_Save}" onclick="{!c.handleSaveAttribute}"/>
+                        </lightning:layoutItem>
+                    </aura:set>
+                </aura:if>
+            </lightning:layout>
+        </div>
+    </aura:if>
+</aura:component>

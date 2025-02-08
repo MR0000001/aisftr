@@ -1,0 +1,133 @@
+<aura:component controller="XC_LCC253_DelegatedSignatureButton"  implements="force:lightningQuickActionWithoutHeader,force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable">
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="buttonDisabled" type="Boolean" default="true"/>
+    <aura:attribute name="preconditionsOK" type="Boolean" default="false"/>
+    <aura:attribute name="secondaryContactValues" type="List"/>
+    <aura:attribute name="secondaryContactValue" type="String"/>
+    <aura:attribute name="secondaryContactDocumentValues" type="List"/>
+    <aura:attribute name="secondaryContactDocumentValue" type="String"/>
+    <aura:attribute name="primaryContactDocumentValues" type="List"/>
+    <aura:attribute name="primaryContactDocumentValue" type="String"/>
+    <aura:attribute name="contactFromOpportunity" type="String"/>
+    <aura:attribute name="existingSecondaryContactDocument" type="Boolean" default="true"/>
+    <aura:attribute name="existingPrimaryContactDocument" type="Boolean" default="false"/>
+    <aura:attribute name="personalDocumentFieldSet" type="List"/>
+    <aura:attribute name="personalPrimaryDocumentFieldSet" type="List"/>
+    <aura:attribute name="documentExtraFields" type="List" />
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="contactRelationshipMap" type="Map"/>
+    <aura:attribute name="contactRelationshipType" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <lightning:notificationsLibrary aura:id="notifLib" />
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+
+    <aura:html tag="style">
+    .cuf-content {
+        padding: 0 0rem !important;
+    }
+    .slds-var-p-around_small{
+        padding: 20px !important;
+    }       
+    .slds-modal__content{
+        <!-- overflow-y:hidden !important; -->
+        height:unset !important;
+        max-height:unset !important;
+        padding-block: 0px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+    }
+    .slds-modal__container{
+        max-width: 60rem !important;
+    }
+    .slds-form-element_horizontal{
+        padding-right: 20px !important;
+        padding-left: 20px !important;
+    }
+    @media only screen and (min-width: 1300px) and (max-width: 1800px) {
+        .slds-large-size_6-of-12, .slds-large-size--6-of-12 {
+            width: 100% !important;
+        }
+    }
+    </aura:html>
+
+    <div class="slds-modal__content slds-p-around_small" id="modal-content-id-1">
+        <header class="slds-modal__header">
+            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{!$Label.c.XC_CL_DelegatedSignature}</h2>
+        </header>
+        <div style="padding-bottom: 10px; padding-top:10px">
+            <lightning:combobox aura:id="secondaryContact" label="{!$Label.c.XC_CL_SecondaryContact}" style="padding-inline: 20px;"
+                value="{!v.secondaryContactValue}" options="{!v.secondaryContactValues}" variant="label-inline" onchange="{!c.handleSecondaryContactChange}"/>
+            
+            <aura:if isTrue="{!v.existingSecondaryContactDocument}">
+                <lightning:combobox aura:id="secondaryContactDocument" label="{!$Label.c.XC_CL_SecondaryContactDocument}" style="padding-inline: 20px;"
+                    value="{!v.secondaryContactDocumentValue}" options="{!v.secondaryContactDocumentValues}" variant="label-inline" 
+                    onchange="{!c.checkFields}"/>
+                <aura:set attribute="else">
+                    <div class="slds-var-p-around_small">
+                        <lightning:recordEditForm aura:id="secondaryContactDocumentForm" objectApiName="XC_PersonalDocument__c" onsuccess="{!c.handleSuccessSecondary}"> <!--onsubmit="{!c.handleSave}"-->
+                            <lightning:messages /> 
+                            <lightning:card class="slds-card_boundary" title="{!$Label.c.XC_CL_SecondaryContactDocumentCreate}"
+                                iconName="standard:document">
+                                <lightning:layout multipleRows="true">
+                                    <aura:iteration items="{!v.personalDocumentFieldSet}" var="field">
+                                        <lightning:layoutItem size="6" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="6">
+                                            <div class="slds-p-around_xx-small">
+                                                <lightning:inputField aura:id="field1" readonly="{!v.readOnly}" disabled="false"
+                                                    required="{!field.isRequired}" fieldName="{!field.fieldName}" class="{!if(field.fieldName == 'XC_Account__c' || field.fieldName == 'XC_Contact__c','slds-hide','slds-show')}" onchange="{!c.checkFields}"/>
+                                            </div>
+                                        </lightning:layoutItem>
+                                    </aura:iteration>
+                                    
+                                </lightning:layout>
+                            </lightning:card>
+                        </lightning:recordEditForm>
+                    </div>
+                </aura:set>
+            </aura:if>
+
+            <aura:if isTrue="{!v.existingPrimaryContactDocument}">
+                <lightning:combobox aura:id="primaryContactDocument" label="{!$Label.c.XC_CL_PrimaryContactDocument}" style="padding-inline: 20px;"
+                    value="{!v.primaryContactDocumentValue}" options="{!v.primaryContactDocumentValues}" variant="label-inline" onchange="{!c.checkFields}"/>
+                <aura:set attribute="else">
+                    <div class="slds-var-p-around_small">
+                        <lightning:recordEditForm aura:id="primaryContactDocumentForm" objectApiName="XC_PersonalDocument__c" onsuccess="{!c.handleSuccessPrimary}">
+                            <lightning:messages /> 
+                            <lightning:card class="slds-card_boundary" title="{!$Label.c.XC_CL_PrimaryContactDocumentCreate}"
+                                iconName="standard:document">
+                                <lightning:layout multipleRows="true">
+                                    <aura:iteration items="{!v.personalPrimaryDocumentFieldSet}" var="field">
+                                        <lightning:layoutItem size="6" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="6">
+                                            <div class="slds-p-around_xx-small">
+                                                <lightning:inputField aura:id="field2" readonly="{!v.readOnly}" disabled="false"
+                                                    required="{!field.isRequired}" fieldName="{!field.fieldName}" class="{!if(field.fieldName == 'XC_Account__c' || field.fieldName == 'XC_Contact__c','slds-hide','slds-show')}" onchange="{!c.checkFields}"/>
+                                            </div>
+                                        </lightning:layoutItem>
+                                    </aura:iteration>
+                                </lightning:layout>
+                            </lightning:card>
+                        </lightning:recordEditForm>
+                    </div>
+                </aura:set>
+            </aura:if>
+        
+        </div>
+        <div class="slds-modal__footer">
+            <lightning:button class="slds-m-top_small" variant="brand" label="{!$Label.c.XC_CL_CancelButton}" onclick="{!c.handleCancel}"/>
+            <lightning:button class="slds-m-top_small" aura:id="saveButtonId" variant="brand" type="submit" label="{!$Label.c.XC_CL_SaveButton}" 
+                disabled="{!v.buttonDisabled}" onclick="{!c.handleSave}"/>
+        </div>
+    </div>
+
+    <aura:if isTrue="{!v.showSpinner}">
+        <div
+            style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" variant="brand"/>
+            <span class="slds-assistive-text">{!$Label.c.XC_CL_Loading}</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>
+    </aura:if>
+
+</aura:component>

@@ -1,0 +1,185 @@
+<!--
+* @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @date Creation 09/07/2019
+* @description XC_LCP128_LeadConverted – Component for Lead Converted
+-->
+
+<aura:component
+    extends="c:XC_LCP022_TabNavigationManager"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,lightning:availableForFlowScreens"
+    access="global">
+
+    <aura:attribute name="account" type="Account" />
+    <aura:attribute name="contact" type="Contact" />
+    <aura:attribute name="opportunity" type="Opportunity" />
+    <aura:attribute name="urlAccount" type="String" default="" />
+    <aura:attribute name="urlContact" type="String" default="" />
+    <aura:attribute name="urlOpportunity" type="String" default="" />
+    <aura:attribute name="opportunityCreated" type="Boolean" default="false" />
+    <aura:attribute name="nameContact" type="String" default="" />
+    <aura:attribute name="productCategoryOfInterest" type="String" default="" />
+    <aura:attribute name="phoneContact" type="String" default="" />
+    <aura:attribute name="phoneAccount" type="String" default="" />
+    <aura:attribute name="mapForLeadString" type="String" default="" />
+    <aura:attribute name="warningMessage" type="String" default="" />
+    <aura:attribute name="type" type="String" default="" />
+    <aura:attribute name="isCommunity" type="Boolean" default="false" />
+    <aura:html tag="style">
+        .slds-modal__container { max-width:80rem !important; width:70%!important; max-height:80rem !important; }
+        .cuf-content { padding: 0 0rem !important; }
+        .slds-p-around--medium { padding: 0rem !important; }
+        .slds-modal__content { background-color:#f2f1f1!important; }
+        .slds-card { background-color:#f2f1f1!important; }
+    </aura:html>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <div style="margin-bottom: 15px">
+        <br></br>
+        <br></br>
+        <lightning:layout verticalAlign="center" horizontalAlign="center" class="class-trasparent">
+            <img src="{!$Resource.XC_SR_LeadConverted}" width="300" height="300"/>
+        </lightning:layout>
+        <br></br>
+        <br></br>
+        <lightning:layout verticalAlign="center" horizontalAlign="center">
+            <lightning:layoutItem padding="around-small">
+                <!-- BOX ACCOUNT -->
+                <div class="custom-box" style="background-color: #ffff">
+                    <lightning:card variant="Narrow" title="{!$Label.c.Account}" iconName="standard:account">
+                        <div style="margin = 2px 2px 2px 2px; background-color: #ffff">
+                            <div style="text-align: right; background-color: #ffff">
+                                <p>
+                                    <aura:if isTrue="{!v.isCommunity}">
+                                        <lightning:buttonIcon aura:id="Account" iconName="utility:forward" variant="brand" alternativeText="Go to Account" title="Go to Account" onclick="{!c.handleClick}"/>
+                                    <aura:set attribute="else">
+                                        <lightning:formattedUrl value="{!v.urlAccount}" tooltip="Go to Account" label="{!$Label.c.XC_CL_LeadConv_GoTo}" target="_top"/>
+                                    </aura:set></aura:if>
+                                </p>
+                            </div>
+                            <p style="overflow-wrap: break-word; background-color: #ffff">
+                                <aura:if isTrue="{!v.type == $Label.c.XC_CL_Lead_Residential}">
+                                    <aura:if isTrue="{!not(empty(v.account.Name))}">
+                                        <br></br>
+                                        <b>{!$Label.c.XC_CL_LeadConvert_Name}&nbsp;</b> {!v.account.Name}
+                                    </aura:if>
+                                    <aura:if isTrue="{!not(empty(v.account.PrimaryEmail__c))}">
+                                        <br></br>
+                                        <b>{!$Label.c.XC_CL_LeadConvert_Email}&nbsp;</b> {!v.account.PrimaryEmail__c}
+                                    </aura:if>
+                                    <aura:if isTrue="{!not(empty(v.phoneAccount))}">
+                                        <br></br>
+                                        <b>{!$Label.c.XC_CL_LeadConvert_Phone}&nbsp;</b> {!v.phoneAccount}
+                                    </aura:if>
+                                <aura:set attribute="else">
+                                    <aura:if isTrue="{!not(empty(v.account.Company__c))}">
+                                        <br></br>
+                                        <aura:if isTrue="{!v.type  == $Label.c.XC_CL_Lead_Soho}">
+                                            <b>{!$Label.c.XC_CL_LeadConvert_Company}&nbsp;</b>
+                                        <aura:set attribute="else">
+                                            <b>{!$Label.c.XC_CL_LeadConvert_Name}&nbsp;</b>
+                                        </aura:set></aura:if>
+                                    {!v.account.Company__c}
+                                    </aura:if>
+                                        <aura:if isTrue="{!not(empty(v.account.IdentityType__c))}">
+                                            <br></br>
+                                            <b>{!$Label.c.XC_CL_LeadConvert_Doc_Type}&nbsp;</b>{!v.account.IdentityType__c}
+                                        </aura:if>
+                                        <aura:if isTrue="{!not(empty(v.account.IdentityNumber__c))}">
+                                            <br></br>
+                                            <b>{!$Label.c.XC_CL_LeadConvert_Doc_Numb}&nbsp;</b>{!v.account.IdentityNumber__c}
+                                        </aura:if>
+                                    </aura:set>
+                                </aura:if>
+                                <br></br>
+                                <br></br>
+                            </p>
+                        </div>
+                    </lightning:card>
+                </div>
+            </lightning:layoutItem>
+
+            <lightning:layoutItem padding="around-small">
+                <!-- BOX CONTACT -->
+                <div class="custom-box" style="background-color: #ffff">
+                    <lightning:card variant="Narrow" title="{!$Label.c.Contact}" iconName="standard:contact">
+                        <div style="margin=2px 2px 2px 2px; background-color: #ffff">
+                            <div style="text-align: right; background-color: #ffff">
+                                <p>
+                                    <aura:if isTrue="{!v.isCommunity}">
+                                        <lightning:buttonIcon aura:id="Contact" iconName="utility:forward" variant="brand" alternativeText="Go to Contact" title="Go to Contact" onclick="{!c.handleClick}"/>
+                                    <aura:set attribute="else">
+                                        <lightning:formattedUrl value="{!v.urlContact}" tooltip="Go to Contact" label="{!$Label.c.XC_CL_LeadConv_GoTo}" target="_self" />
+                                    </aura:set></aura:if>
+                                </p>
+                            </div>
+                            <p style="overflow-wrap: break-word; background-color: #ffff">
+                                <aura:if isTrue="{!not(empty(v.nameContact))}">
+                                    <br></br>
+                                    <b>{!$Label.c.XC_CL_LeadConvert_Name}&nbsp;</b> {!v.nameContact}
+                                </aura:if>
+                                <aura:if isTrue="{!not(empty(v.contact.Email))}">
+                                    <br></br>
+                                    <b>{!$Label.c.XC_CL_LeadConvert_Email}&nbsp;</b> {!v.contact.Email}
+                                </aura:if>
+                                <aura:if isTrue="{!not(empty(v.phoneContact))}">
+                                    <br></br>
+                                    <b>{!$Label.c.XC_CL_LeadConvert_Phone}&nbsp;</b> {!v.phoneContact}
+                                </aura:if>
+                                <aura:if isTrue="{!not(empty(v.contact.XC_ContactDocumentType__c))}">
+                                    <br></br>
+                                    <b>{!$Label.c.XC_CL_LeadConvert_Doc_Type}&nbsp;</b>{!v.contact.XC_ContactDocumentType__c}
+                                </aura:if>
+                                <aura:if isTrue="{!not(empty(v.contact.XC_ContactDocumentNumber__c))}">
+                                    <br></br>
+                                    <b>{!$Label.c.XC_CL_LeadConvert_Doc_Numb}&nbsp;</b>{!v.contact.XC_ContactDocumentNumber__c}
+                                </aura:if>
+                                <br></br>
+                                <br></br>
+                            </p>
+                        </div>
+                    </lightning:card>
+                </div>
+            </lightning:layoutItem>
+
+            <aura:if isTrue="{!v.opportunityCreated}">
+                <lightning:layoutItem padding="around-small">
+                    <!-- BOX OPPORTUNITY -->
+                    <div class="custom-box" style="background-color: #ffff">
+                        <lightning:card variant="Narrow" title="{!$Label.c.Opportunity}" iconName="standard:opportunity">
+                            <div style="margin=2px 2px 2px 2px; background-color: #ffff">
+                                <div style="text-align: right; background-color: #ffff">
+                                    <p>
+                                        <aura:if isTrue="{!v.isCommunity}">
+                                            <lightning:buttonIcon aura:id="Opportunity" iconName="utility:forward" variant="brand" alternativeText="Go to Opportunity" title="Go to Opportunity" onclick="{!c.handleClick}"/>
+                                        <aura:set attribute="else">
+                                            <lightning:formattedUrl value="{!v.urlOpportunity}" tooltip="Go to Opportunity" label="{!$Label.c.XC_CL_LeadConv_GoTo}" target="_self" />
+                                        </aura:set></aura:if>
+                                    </p>
+                                </div>
+                                <p style="overflow-wrap: break-word; background-color: #ffff">
+                                    <aura:if isTrue="{!not(empty(v.opportunity.XC_ProductCategoryOfInterest__c))}">
+                                        <br></br>
+                                        <b>{!$Label.c.XC_CL_LeadConvert_Category}&nbsp;</b> {!v.productCategoryOfInterest}
+                                    </aura:if>
+                                    <!--<aura:if isTrue="{!not(empty(v.opportunity.XC_ReceivingChannel__c))}">
+                                        <br></br>
+                                        <b>{!$Label.c.XC_CL_LeadConvert_RecChannel}&nbsp;</b> {!v.opportunity.XC_ReceivingChannel__c}
+                                    </aura:if>-->
+                                    <aura:if isTrue="{!not(empty(v.opportunity.XC_Source__c))}">
+                                        <br></br>
+                                        <b>{!$Label.c.XC_CL_LeadConvert_Source}&nbsp;</b> {!v.opportunity.XC_Source__c}
+                                    </aura:if>
+                                    <br></br>
+                                    <br></br>
+                                </p>
+                            </div>
+                        </lightning:card>
+                    </div>
+                </lightning:layoutItem>
+            </aura:if>
+
+        </lightning:layout>
+    </div>
+
+</aura:component>

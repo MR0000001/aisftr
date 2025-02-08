@@ -1,0 +1,10 @@
+<aura:component controller="Giic_WarehouseUtility" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="defaultValue" type="String" default="Calculating..."/>
+    <aura:attribute name ="showSpinner" type="Boolean" default="true"/>
+    <aura:if isTrue="{!v.showSpinner}">
+        <!--lightning:spinner variant="brand"/-->
+    </aura:if>
+    <b>{!v.defaultValue}</b>
+    
+</aura:component>

@@ -1,0 +1,4 @@
+<design:component>
+	<design:attribute name="recordId" label="record Id" required="true"/>
+    <design:attribute name="getAllValue" label="Get choiced element"/>
+</design:component>

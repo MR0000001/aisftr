@@ -1,0 +1,333 @@
+<aura:component controller="TA_LCC226_CartContainer"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable"
+    access="global">
+
+    <aura:attribute access="public" name="b2winResponse" type="Object" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="lastestB2winResponse" type="Object" />
+    <aura:attribute access="private" name="listOfItems" type="List" />
+
+    <!-- Generic Logic Attributes -->
+    <aura:attribute access="private" name="currentTechType" type="String" default=""/>
+    <aura:attribute access="private" name="modalHeaderTitle" type="String" default="false"/>
+    <aura:attribute access="private" name="disableDoneButton" type="Boolean" default="true"/>
+
+    <!-- Modal Visibility Attributes -->
+    <aura:attribute access="private" name="showTechnicalProductModal" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="showGenericTechnicalProductModal" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="showGenericTechnicalCatalog" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="showCatalogModal" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="noSelectedProduct" type="Boolean" default="true"/>
+
+    <!-- Data Storage Attributes -->
+    <aura:attribute access="public" name="infoBag" type="Object"/>
+    <aura:attribute access="public" name="genericTechnicalProductToSend" type="Object"/>
+    <aura:attribute access="public" name="retrievedProduct2List" type="List"/>
+    <aura:attribute access="public" name="selectedProduct2List" type="List"/>
+    <aura:attribute access="public" name="productsToSend" type="Integer" default="0"/>
+    <aura:attribute access="public" name="filteredRetrievedProduct2List" type="List"/>
+    <aura:attribute access="public" name="genericTechnicalProductQuantity" type="Integer" default="0"/>
+    <aura:attribute access="public" name="cartResponse" type="Object"/>
+    <aura:attribute access="public" name="saveConfigurationAlreadyCalled" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="upsertEventAlreadyCalled" type="Boolean" default="false"/>
+    <aura:attribute access="public" name="upsertEventAlreadyCalledMatrix" type="List"/>
+    <aura:attribute access="public" name="currentCallingProductId" type="String"/>
+    <aura:attribute access="private" name="currentProduct" type="Object"/>
+    <aura:attribute access="private" name="workOrder" type="Object"/>
+
+    <ltng:require styles="{!join(',',
+                            $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <!-- Events handling-->
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}" />
+    <aura:handler event="c:TA_LCE226_CartStep" action="{!c.handleManageB2WResponse}" />
+
+    <!-- Events registering-->
+    <aura:registerEvent name="upsertItemsEvt" type="c:TA_LCE226_CartStep"/>
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="refreshCart" type="c:TA_LCE224_Refresh"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <!-- Component -->
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem size="12" class="ta-border-bottom-white slds-p-bottom_large slds-m-bottom_large">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="6">
+                    <h3 class="ta-color-white"> {!$Label.c.TA_InstallationExtra} </h3>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="6">
+                    <c:TA_LCP232_CartSummary workOrder="{!v.workOrder}"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </lightning:layoutItem>
+
+        <!-- Cards -->
+        <aura:iteration items="{!v.listOfItems}" var="item">
+            <span id="{!item.id}" onclick="{!c.handleToggleCardModal}" name="{!item.fields.LicProductName}">
+                <lightning:layoutItem size="12" class="ta-card">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="6">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12" class="slds-m-bottom_xx-small"> <p class="ta-color-white ta-font-weight-800"> {!item.fields.LicCategoryName} </p> </lightning:layoutItem>
+                                <lightning:layoutItem size="12"> <p class="ta-color-white-opacity-60"> {!item.fields.LicProductName} </p> </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="6" class="slds-text-align_right">
+                            <img class="ta-card-icon" src="{!$Resource.TA_Icons + '/xc-icons/cart-white.svg'}"/>
+                            <aura:if isTrue="{!item.fields.LicProductName == 'Technical Product'}">
+                                <h3 class="slds-float_right slds-p-top_small ta-color-white-opacity-60"> {!v.infoBag.selectedTechnicalProductTotalAmount} € </h3>
+                                <aura:set attribute="else">
+                                    <aura:if isTrue="{!item.fields.LicProductName == 'Technical Work'}">
+                                        <h3 class="slds-float_right slds-p-top_small ta-color-white-opacity-60"> {!v.infoBag.selectedTechnicalWorkTotalAmount} € </h3>
+                                        <aura:set attribute="else">
+                                            <h3 class="slds-float_right slds-p-top_small ta-color-white-opacity-60"> {!v.infoBag.genericTechnicalProductTotalAmount} € </h3>
+                                        </aura:set>
+                                    </aura:if>
+                                </aura:set>
+                            </aura:if>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </span>
+        </aura:iteration>
+    </lightning:layout>
+
+    <!-- Modal Technical Product / Technical Work -->
+    <aura:if isTrue="{!v.showTechnicalProductModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">               
+                <!--[HEADER] TECHNICAL PRODUCT HEADER -->
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="8" class="slds-text-align_left"> <h3 class="ta-color-purple"> {!v.modalHeaderTitle} </h3></lightning:layoutItem>
+                        <lightning:layoutItem size="4" class="slds-text-align_right">
+                            <img class="ta-modal-header-button" src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleToggleCardModal}" name="closeTechnicalProductModal" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <!-- [BODY] PRODUCTS TABLE -->
+                <lightning:layoutItem size="12" class="ta-modal-body">
+                    <aura:if isTrue="{!v.noSelectedProduct}">
+                        <div class="ta-no-selected-product">
+                            {!$Label.c.TA_NoSelectedProduct}
+                        </div>
+                        <aura:set attribute="else">
+                            <aura:iteration items="{!v.selectedProduct2List}" var="product">
+                                <div id="{!product.productId}" name="productCartContainer" class="ta-cards">
+                                    <lightning:layout multipleRows="true">
+                                        <lightning:layoutItem size="8" class="slds-m-bottom_small">
+                                            <lightning:layout multipleRows="true">
+                                                <lightning:layoutItem size="12">
+                                                    <p class="font-weight-800 ta-color-white-opacity-60"> {!$Label.c.TA_TechnicalProductName} </p>
+                                                </lightning:layoutItem>
+                                                <lightning:layoutItem size="12">
+                                                    <p class="ta-color-white"> {!product.name} </p>
+                                                </lightning:layoutItem>
+                                            </lightning:layout>
+                                        </lightning:layoutItem>
+
+                                        <lightning:layoutItem size="4" class="slds-m-bottom_small">
+                                            <lightning:layout multipleRows="true">
+                                                <lightning:layoutItem size="12">
+                                                    <p class="font-weight-800 ta-color-white-opacity-60"> {!$Label.c.TA_TechnicalProductUnitPrice} </p>
+                                                </lightning:layoutItem>
+                                                <lightning:layoutItem size="12">
+                                                    <p class="ta-color-white"> {!product.unitPrice} € </p>
+                                                </lightning:layoutItem>
+                                            </lightning:layout>
+                                        </lightning:layoutItem>
+
+                                        <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                                            <lightning:layout multipleRows="true">
+                                                <lightning:layoutItem size="12">
+                                                    <p class="font-weight-800 ta-color-white-opacity-60"> {!$Label.c.TA_TechnicalProductDescription} </p>
+                                                </lightning:layoutItem>
+                                                <lightning:layoutItem size="12" class="ta-cards-text-b">
+                                                    {!product.description}
+                                                </lightning:layoutItem>
+                                            </lightning:layout>
+                                        </lightning:layoutItem>
+
+                                        <lightning:layoutItem size="5" class="slds-text-align_left slds-float_left">
+                                            <div id="{!product.productId}" 
+                                                class="ta-quantity-operator slds-float_left slds-m-right_xx-small" 
+                                                onclick="{!c.handleDecrementQuantity}"> - </div>
+                                            <div class="ta-quantity-editable-2 slds-float_left"> {!product.quantity} </div>
+                                            <div id="{!product.productId}" 
+                                                class="ta-quantity-operator slds-float_left slds-m-left_xx-small" 
+                                                onclick="{!c.handleIncrementQuantity}"> + </div>
+                                        </lightning:layoutItem>
+
+                                        <lightning:layoutItem size="7" class="slds-text-align_right slds-m-top_xx-small">
+                                            <span class="ta-button-simple slds-text-align_center" id="{!product.productId}" onclick="{!c.handleRemoveProduct}">
+                                                {!$Label.c.TA_TechnicalProductRemove}
+                                            </span>
+                                        </lightning:layoutItem>  
+                                    </lightning:layout>
+                                </div>
+                            </aura:iteration>
+                        </aura:set>
+                    </aura:if>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="slds-text-align_center ta-modal-footer">
+                    <lightning:button aura:id="openCatalogButton" 
+                                      class="ta-modal-button-primary"
+                                      onclick="{!c.handleToggleCatalogModal}"> {!$Label.c.TA_OpenCatalog} </lightning:button>
+                </lightning:layoutItem>
+
+                 <lightning:layoutItem size="12" class="slds-text-align_center ta-modal-footer-2">
+                    <lightning:button aura:id="doneButton" 
+                                      class="{!v.disableDoneButton ? 'ta-button-primary-disabled' : 'ta-modal-button-primary'}"
+                                      onclick="{!c.handleAddSelectedProductsToCart}"
+                                      disabled="{!v.disableDoneButton}"> {!$Label.c.TA_TechnicalCatalogDone} </lightning:button>
+                </lightning:layoutItem>
+
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+    <!-- Modal Generic Technical Product -->
+    <aura:if isTrue="{!v.showGenericTechnicalProductModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">               
+                
+                <!--[HEADER] CATALOGO TECNICO HEADER -->
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="8"/>
+                        <lightning:layoutItem size="4" class="slds-text-align_right">
+                            <img class="ta-modal-header-button" src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleToggleCardModal}" name="closeGenericTechnicalProductModal" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="slds-text-align_center slds-m-top_medium"> <h3 class="ta-color-purple"> Catalogo Tecnico </h3> </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_medium"> <p> {!v.modalHeaderTitle} </p> </lightning:layoutItem>
+                
+                <!--[BODY] QUANTITY SELECTION -->
+                <lightning:layoutItem size="12" class="slds-m-bottom_medium ta-quantity-container">
+                    <div class="ta-quantity-operator slds-float_left slds-m-right_xx-small" 
+                         onclick="{!c.handleDecrementGenericTechnicalProductQuantity}"> - </div>
+                    <div class="ta-quantity-editable slds-float_left"> {!v.genericTechnicalProductToSend.quantity} </div>
+                    <div class="ta-quantity-operator slds-float_left slds-m-left_xx-small" 
+                         onclick="{!c.handleIncrementGenericTechnicalProductQuantity}"> + </div>
+                </lightning:layoutItem>
+
+                <!--[FOOTER] BUTTON -->
+                <lightning:layoutItem size="12" class="slds-text-align_center ta-modal-footer slds-m-top_medium">
+                    <lightning:button aura:id="addToCartButton" 
+                                      class="ta-modal-button-primary"
+                                      onclick="{!c.handleToggleGenericTechnicalCatalog}"> Add to cart </lightning:button>
+                </lightning:layoutItem>
+              
+            </lightning:layout>
+        </div>
+    </aura:if>
+
+    <!-- START MODAL TECHNICAL CATALOG STEP 1 -->
+    <aura:if isTrue="{!v.showGenericTechnicalCatalog}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in slds-p-around_medium">               
+
+                <lightning:layoutItem size="12">
+                    <lightning:input type="text"
+                                     value="{!v.genericTechnicalProductToSend.description}"
+                                     label="Description"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-m-top_small">
+                    <lightning:input type="text"
+                                     value="{!v.genericTechnicalProductToSend.unitPrice}"
+                                     label="Price"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="slds-m-top_small">
+                    <lightning:input type="text"
+                                     value="{!v.genericTechnicalProductToSend.reference}"
+                                     label="Reference"/>
+                </lightning:layoutItem>
+
+                <!--[FOOTER] BUTTON -->
+                <lightning:layoutItem size="6" class="slds-p-right_xx-small slds-m-top_medium">
+                    <lightning:button aura:id="goToCart" 
+                                      class="ta-modal-button-primary"
+                                      onclick="{!c.handleAddGenericTechnicalProductToCart}"> {!$Label.c.TA_TechnicalCatalogAddToCart} </lightning:button>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="6" class="slds-p-left_xx-small slds-m-top_medium">
+                    <lightning:button aura:id="cancel" 
+                                        class="ta-modal-button-closing"
+                                        onclick="{!c.handleToggleGenericTechnicalCatalog}"> {!$Label.c.TA_TechnicalCatalogCancel} </lightning:button>
+                </lightning:layoutItem>
+              
+            </lightning:layout>
+        </div>
+    </aura:if>
+    <!-- END MODAL TECHNICAL CATALOG STEP 1 -->
+
+    <!-- START MODAL CATALOG -->
+    <aura:if isTrue="{!v.showCatalogModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">               
+                <!--[HEADER] TECHNICAL PRODUCT HEADER -->
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="8" class="slds-text-align_left"> <h3 class="ta-color-purple"> {!$Label.c.TA_ListOfItems} </h3> </lightning:layoutItem>
+                        <lightning:layoutItem size="4" class="slds-text-align_right">
+                            <img class="ta-modal-header-button" src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleToggleCatalogModal}" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="7" class="slds-p-right_xx-small">
+                            <lightning:input type="text"
+                                             name="searchInput"
+                                             onblur="{!c.handleSearchProduct}" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="5" class="slds-p-left_xx-small slds-m-top_medium">
+                            <lightning:button aura:id="filterButton" class="ta-button-closing-modal"
+                                              label="Filters"
+                                              name="Filters"
+                                              onclick="{!c.handleActionButton}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <!-- [BODY] PRODUCTS TABLE -->
+                <lightning:layoutItem size="12" class="ta-modal-body">
+                    <lightning:layout multipleRows="true">
+                        <aura:iteration items="{!v.retrievedProduct2List}" var="product">
+                            <lightning:layoutItem size="12" class="ta-border-top-purple slds-p-top_large slds-p-bottom_large">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="7">
+                                        <lightning:layout multipleRows="true"> 
+                                            <lightning:layoutItem size="7" class="slds-m-bottom_small">
+                                                <p class="ta-color-purple"> {!product.name} </p>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="5" class="ta-cards-text-retrieved-product-price">
+                                                <h3 class="ta-color-purple"> {!product.unitPrice} € </h3>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                    </lightning:layoutItem>
+
+                                    <lightning:layoutItem size="5" class="slds-text-align_right ta-box-atc">
+                                        <span id="{!product.productId}" onclick="{!c.handleAddProduct}">
+                                            <img src="{!$Resource.TA_Icons + '/xc-icons/cart.svg'}" class="ta-icon-atc slds-float_left slds-m-right_x-small"/>
+                                            <p class="slds-float_left ta-color-purple slds-float_left"> Add to cart </p>
+                                        </span>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </lightning:layoutItem>
+                        </aura:iteration>
+                    </lightning:layout>
+                </lightning:layoutItem>                
+            </lightning:layout>
+        </div>
+    </aura:if>
+    <!-- END MODAL CATALOG -->
+
+</aura:component>

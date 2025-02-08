@@ -1,0 +1,98 @@
+<aura:component controller="Giic_LCC019_ClearErrorLog" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,force:hasSObjectName" access="global">
+    
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="purchaseOrder" type="gii__PurchaseOrder__c"/>   
+    <aura:attribute name="showSpinner"   type="Boolean" default="false" /> 
+    <aura:attribute name="show3PLError"  type="Boolean" default="true" /> 
+    <aura:attribute name="showSAPError"  type="Boolean" default="true" /> 
+    <aura:attribute name="clearSAPError" type="Boolean" default="false"/>
+    <aura:attribute name="clear3PLError" type="Boolean"  default="false"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    <aura:attribute name="data" type="List"/>
+    <aura:attribute name="columns" type="List"/>  
+    <aura:attribute  name="errorLogProcessName" type="List"/> 
+    <aura:attribute name="currentErrorSelected" type="String"  /> 
+    
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner aura:id="mySpinner" />
+    </aura:if>
+    
+    
+    <lightning:card>
+        <aura:set attribute="title">
+            <div class="slds-text-heading_medium">
+                <b > Clear Error Logs: </b>
+            </div>
+        </aura:set>
+        <aura:set attribute="footer">
+            &nbsp;
+        </aura:set>
+    </lightning:card>
+    
+    <br></br> 
+    
+    <lightning:layout multipleRows = "true" >
+        <br></br> 
+        <aura:if isTrue="{!v.showSAPError}">
+            <lightning:layoutItem size = "6" >
+                <div class="slds-visual-picker slds-visual-picker_medium">
+                    <input type="checkbox" id="visual-picker-76" value="visual-picker-76" name="options" checked="{!v.clearSAPError}" onchange="{!c.setCheckboxVal}"/>
+                    <label for="visual-picker-76">
+                        <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                            <span class="slds-is-selected">
+                                <div class="slds-text-heading_large"> 
+                                    <lightning:icon iconName="action:check" alternativeText="Approved" />
+                                </div>
+                            </span>
+                            <span class="slds-is-not-selected">
+                                <div class="slds-text-heading_large"> 
+                                    <lightning:icon iconName="standard:account" alternativeText="Approved" /><br></br>
+                                    SAP 
+                                </div>
+                                
+                            </span>
+                        </span>
+                        <span class="slds-visual-picker__body">
+                            
+                        </span>
+                    </label>
+                </div>
+            </lightning:layoutItem>
+            
+        </aura:if>
+        <br></br> 
+        <br></br>
+        <aura:if isTrue="{!v.show3PLError}">
+            <lightning:layoutItem size = "6" >
+                <div class="slds-visual-picker slds-visual-picker_medium">
+                    <input type="checkbox" id="visual-picker-77" value="visual-picker-77" name="options" checked="{!v.clear3PLError}" onchange="{!c.setCheckboxVal}"/>
+                    <label for="visual-picker-77">
+                        <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                            <span class="slds-is-selected">
+                                <div class="slds-text-heading_large"> 
+                                    <lightning:icon iconName="action:check" alternativeText="Approved" />
+                                </div>
+                            </span>
+                            <span class="slds-is-not-selected">
+                                <div class="slds-text-heading_large"> 
+                                    <lightning:icon iconName="custom:custom98" alternativeText="Approved" /><br></br>
+                                    3PL
+                                </div>
+                            </span>
+                        </span>
+                        <span class="slds-visual-picker__body">
+                        </span>
+                    </label>
+                </div>
+                
+            </lightning:layoutItem>
+        </aura:if>
+    </lightning:layout>
+    <br></br>
+    <div class="slds-modal__footer">
+        <lightning:button label="Cancel" variant="neutral" onclick="{!c.closeModal}"/>
+        <lightning:button label="Confirm" variant="brand" onclick="{!c.clearError}"/> 
+    </div>  
+</aura:component>

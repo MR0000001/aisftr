@@ -1,0 +1,98 @@
+<aura:component controller="TA_LCC226_CartContainer"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable"
+    access="global">
+
+    <aura:attribute access="public" name="b2winResponse" type="Object"/> 
+    <aura:attribute access="public" name="categoryListToShow" type="Object"/> 
+
+    <aura:attribute access="private" name="actionType" type="String" />
+    <aura:attribute access="private" name="showProducts" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="workOrder" type="Object"/>
+
+    <ltng:require styles="{!join(',',
+                            $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:handler event="c:TA_LCE226_CartStep" action="{!c.handleManageB2WResponse}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/>
+    <aura:registerEvent name="TA_LCE226_CartStep" type="c:TA_LCE226_CartStep"/>
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12">
+                <!-- BUNDLES --> 
+                <lightning:layout multipleRows="true" class="slds-m-bottom_medium">
+                    <lightning:layoutItem size="11">
+                        <h3 class="ta-color-white"> {!$Label.c.TA_Bundles} </h3>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="1">
+                        <c:TA_LCP232_CartSummary workOrder="{!v.workOrder}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+
+                <lightning:layout multipleRows="true" class="ta-border-top">
+                    <aura:iteration items="{!v.b2winResponse.listOfBundles}" var="singleBundle">
+                        <aura:if isTrue="{!singleBundle.fields.eligible}">
+                            <lightning:layoutItem size="6">
+                                <div id="{!singleBundle.id}" onclick="{!c.handlePressButton}" class="{!if(singleBundle.holdButton, 'ta-bundle-selected', 'ta-bundle')}">
+                                    {!singleBundle.fields.name}
+                                </div>
+                            </lightning:layoutItem>
+                        </aura:if>
+                    </aura:iteration>
+                </lightning:layout>
+
+                <!-- PRODUCTS-->  
+                <lightning:layout multipleRows="true" class="slds-m-bottom_medium slds-m-top_large">
+                    <lightning:layoutItem size="12">
+                        <h3 class="ta-color-white"> {!$Label.c.TA_Products} </h3>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                <aura:if isTrue="{!v.categoryListToShow.length > 0}">
+                    <div onclick="{!c.handleShowProducts}" class="ta-border-top">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="11">
+                                <p class="ta-color-white-opacity-60"> {!$Label.c.TA_SelectProduct} </p>
+                            </lightning:layoutItem>
+                            <aura:if isTrue="{!not(v.showProducts)}">
+                                <lightning:layoutItem size="1">
+                                    <img src="{!$Resource.TA_Icons + '/xc-icons/arrow-down-white.svg' }"/>
+                                </lightning:layoutItem>
+                                <aura:set attribute="else">
+                                    <img src="{!$Resource.TA_Icons + '/xc-icons/arrow-up-white.png' }"/>
+                                </aura:set>
+                            </aura:if>
+                        </lightning:layout>
+                    </div>
+                    <aura:set attribute="else">
+                        <div class="ta-border-top">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12">
+                                    <p class="ta-color-white-opacity-60"> {!$Label.c.TA_NoProductAvailable} </p>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </div>
+                    </aura:set>
+                </aura:if>
+                
+
+                <aura:if isTrue="{!v.showProducts}">
+                    <lightning:layout multipleRows="true" class="slds-m-top_medium">
+                        <aura:iteration items="{!v.categoryListToShow}" var="singleCategory">
+                            <lightning:layoutItem size="12">
+                                <div class="{!if(singleCategory.holdButton,'ta-product-selected', 'ta-product')}" id="{!singleCategory.id}" onclick="{!c.handlePressButton}">
+                                    {!singleCategory.categoryName}
+                                </div>
+                            </lightning:layoutItem>
+                        </aura:iteration>
+                    </lightning:layout>
+                </aura:if>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,19 @@
+.THIS .centerLayoutItem {
+    text-align: -webkit-center !important;
+}
+.THIS .rightLayoutItem {
+    text-align: -webkit-right !important;
+}
+.THIS .borderCard {
+    border: 1px solid #d8dde6 !important;
+    border-radius: 15px;
+}
+.THIS .borderSolid {
+    border: solid;
+}
+.THIS .marginRight {
+    margin-right: 5px;
+}
+.THIS .margin15 {
+    margin: 15px;
+}

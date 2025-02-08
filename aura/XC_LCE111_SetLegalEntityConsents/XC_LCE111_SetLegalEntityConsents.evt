@@ -1,0 +1,1 @@
+<aura:event type="COMPONENT" description="Legal Entity Consents to save - Component type event" />

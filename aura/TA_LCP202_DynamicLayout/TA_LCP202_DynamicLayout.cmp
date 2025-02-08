@@ -1,0 +1,202 @@
+<aura:component controller="TA_LCC202_DynamicLayout"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                access="global">
+
+    <aura:attribute access="public" name="workOrderId" type="String" />
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="cmpName" type="String" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="customerCardBg" type="String" />
+    <aura:attribute access="private" name="checkIcon" type="String" />
+    <aura:attribute access="private" name="general" type="Object" />
+    <aura:attribute access="private" name="custom" type="Object" />
+    <aura:attribute access="private" name="title" type="String" />
+    <aura:attribute access="private" name="description" type="String" />
+    <aura:attribute access="private" name="objWrapper" type="Object" />
+    <aura:attribute access="private" name="massUpdateFields" type="List" />
+    <aura:attribute access="private" name="errors" type="List" />
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false" />
+    <aura:attribute access="private" name="isEditEnabled" type="Boolean" default="false" />
+    <aura:attribute access="private" name="whereCondition" type="String" />
+    <aura:attribute access="private" name="faultType" type="String" /> <!-- [20220428AL] - NR2331 (Req. D)-->
+
+    <ltng:require styles="{!join(',',
+            $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+            $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+            $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}" />
+    <aura:handler event="c:TA_LCE224_Refresh" action="{!c.handleRefresh}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt" />
+    <aura:registerEvent name="updateFieldsEvt" type="c:TA_LCE214_UpdateFields" />
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt" />
+    <aura:registerEvent name="validationEvt" type="c:TA_LCE199_Validation" />
+    <aura:registerEvent name="addLogicEvent" type="c:TA_LCE248_GenericEvent"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!and(v.isInitialized, !v.objWrapper.isQueryEmpty)}">
+        <lightning:layout multipleRows="true" class="slds-m-top_large slds-m-left_small slds-m-right_small">
+            <div class="{!v.objWrapper.show ? 'slds-col slds-size_12-of-12 ta-box-shadow ta-accordion-header ta-accordion-open'
+                    : 'slds-col slds-size_12-of-12 ta-accordion-header ta-accordion-close'}"
+                 style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover;
+                         background-position: ' + v.general.bgPosition + '; background-color: ' + v.general.bgColor + ';background-blend-mode: lighten;'}">
+                <lightning:layout multipleRows="true">
+                    <aura:if isTrue="{!v.general.defaultTitle}">
+                        <lightning:layoutItem size="12">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="10">
+                                    <lightning:layout multipleRows="true">
+                                        <lightning:layoutItem size="12">
+                                            <!-- START - [20220428AL] - NR2331 (Req. D) -->
+                                            <h3>{!if(v.faultType, $Label.c.TA_Fault + ' ' + v.faultType + ' - ', '')}{!v.title}</h3>
+                                            <!-- <h3>{!v.title}</h3> -->
+                                            <!-- END - [20220428AL] - NR2331 (Req. D) -->
+                                        </lightning:layoutItem>
+                                        <aura:if isTrue="{!and(v.isInitialized, !v.objWrapper.isQueryEmpty)}">
+                                            <lightning:layoutItem size="12" class="slds-m-top_small">
+                                                <span name="{!v.general.defaultTitle}" id="{!v.general.defaultTitle}"
+                                                    class="ta-accordion-header-button" onclick="{!c.handleManageAccordion}">
+                                                        {!if(v.objWrapper.show == false, $Label.c.TA_ShowDetails, $Label.c.TA_CloseDetails)}
+                                                </span>
+                                            </lightning:layoutItem>
+                                            <aura:set attribute="else">
+                                                {!$Label.c.TA_GenericNoInfo}
+                                            </aura:set>
+                                        </aura:if>
+                                    </lightning:layout>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="2">
+                                    <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}" class="slds-float_right ta-accordion-header-icon" />
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </aura:if>
+
+                    <!--<aura:if isTrue="{!v.objWrapper.show}">-->
+                    <aura:if isTrue="{!and(and(v.isInitialized, !v.objWrapper.isQueryEmpty),v.objWrapper.show)}">    
+                        <lightning:layoutItem size="12" class="ta-border-top-white">
+                            <lightning:layout multipleRows="true">
+                                <aura:iteration items="{!v.objWrapper.fields}" var="field">
+                                    <aura:if isTrue="{!or(field.mode == 'view', and(field.editEnabled == false, field.mode != 'defaultEdit'))}">
+                                        <!-- <aura:if isTrue="{!and(field.type == 'BOOLEAN', field.value == 'true')}"> -->
+                                        <aura:if isTrue="{!field.type == 'BOOLEAN'}">
+                                            <lightning:layoutItem size="6" class="slds-m-top_medium">
+                                                <aura:if isTrue="{!field.image != null}">
+                                                    <div id="{!field.apiName}" class="{!field.value == true ? 'ta-checked' : 'ta-unchecked'}"
+                                                        style="{!if(field.value == true, 'background-image: url(' + v.checkIcon +')', 'text-align: center;')}">
+                                                        <img src="{!$Resource.TA_Icons + '/xc-icons/' + field.image}"/>
+                                                        <p class="ta-color-purple slds-m-top_small"> {!field.label} </p>
+                                                    </div>
+                                                    <aura:set attribute="else">
+                                                        <lightning:input type="checkbox" label="{!field.label}" checked="{!field.value}" value="{!field.value}" name="{!field.apiName}" disabled="true"/>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </lightning:layoutItem>
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{!and(field.mode != 'none',field.type != 'BOOLEAN')}">
+                                                    <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                                        <lightning:layout multipleRows="true">
+                                                            <lightning:layoutItem size="12">
+                                                                <div class="slds-float_left slds-form-element__label">
+                                                                    <aura:if isTrue="{!field.required}"> <span class="slds-required">*</span> </aura:if> 
+                                                                    {!field.label}
+                                                                </div>
+                                                                <aura:if isTrue="{!and(field.mode == 'edit', !v.objWrapper.massEdit)}">
+                                                                    <div class="ta-pencil-container">
+                                                                        <span onclick="{!c.handleManageButtons}" id="{!field.apiName}" name="single-edit">
+                                                                            <img src="{!$Resource.TA_Icons + '/xc-icons/edit-white.svg'}"/>
+                                                                        </span>
+                                                                    </div>
+                                                                </aura:if>
+                                                            </lightning:layoutItem>
+                                                            <lightning:layoutItem size="12">
+                                                                <p class="slds-float_left ta-value-container"> {!field.value} </p>
+                                                                <!--<aura:if isTrue="{!field.redirectTo != null}">-->
+                                                                <aura:if isTrue="{!and(field.redirectTo != null,field.value != null)}">
+                                                                    <div onclick="{!c.handleRedirectToObject}" name="{!field.redirectTo}" id="{!field.value}"> <img class="slds-m-left_xx-small ta-icon-redirect" src="{!$Resource.TA_Icons + '/xc-icons/customer-info-white.svg'}"/> </div>
+                                                                </aura:if>
+                                                                <aura:if isTrue="{!field.type == 'PHONE'}">
+                                                                    <a class="slds-p-left_xx-small" href="{!'callto:' + field.value}"> <img class="ta-icon-redirect" src="{!$Resource.TA_Icons + '/xc-icons/phone-white.png'}"/> </a>
+                                                                </aura:if>
+                                                            </lightning:layoutItem>
+                                                        </lightning:layout>
+                                                    </lightning:layoutItem>
+                                                </aura:if>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:if>
+
+                                    <aura:if isTrue="{!or(and(field.mode == 'edit', field.editEnabled), field.mode == 'defaultEdit')}">
+                                        <aura:if isTrue="{!field.type == 'PICKLIST'}">
+                                            <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                                <lightning:select required="{!field.required}"
+                                                                value="{!field.value}" label="{!field.label}"
+                                                                name="{!field.apiName}" onblur="{!c.handleManageField}">
+                                                    <aura:iteration items="{!field.options}" var="option">
+                                                        <option value="{!option.value}">{!option.label}</option>
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                            </lightning:layoutItem>
+                                        </aura:if>
+
+                                        <aura:if isTrue="{!field.type == 'TEXTAREA'}">
+                                            <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                                <lightning:textarea required="{!field.required}" name="{!field.apiName}"
+                                                                    label="{!field.label}" value="{!field.value}" onblur="{!c.handleManageField}"/>
+                                            </lightning:layoutItem>
+                                        </aura:if>
+
+                                        <aura:if isTrue="{!field.type == 'BOOLEAN'}">
+                                            <lightning:layoutItem size="6" class="slds-m-top_medium">
+                                                <aura:if isTrue="{!field.image != null}">
+                                                    <div id="{!field.apiName}" class="{!field.value == true ? 'ta-checked' : 'ta-unchecked'}"
+                                                                            style="{!if(field.value == true, 'background-image: url(' + v.checkIcon +')', 'text-align: center;')}"
+                                                                            onclick="{!c.handleManageCheckbox}">
+                                                        <img src="{!$Resource.TA_Icons + '/xc-icons/' + field.image}"/>
+                                                        <p class="ta-color-purple slds-m-top_small"> {!field.label} </p>
+                                                    </div>
+                                                    <aura:set attribute="else">
+                                                        <lightning:input type="checkbox" label="{!field.label}" checked="{!field.value}" name="{!field.apiName}" onchange="{!c.handleManageField}"/>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </lightning:layoutItem>
+                                        </aura:if>
+
+                                        <aura:if isTrue="{!and(field.type != 'BOOLEAN', and(field.type != 'TEXTAREA', field.type!= 'PICKLIST'))}">
+                                            <span id="{!field.apiName}"></span>
+                                            <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                                <lightning:input required="{!field.required}" type="{!field.type}"
+                                                                name="{!field.apiName}" label="{!field.label}"
+                                                                value="{!field.value}" onblur="{!c.handleManageField}"/>
+                                            </lightning:layoutItem>
+                                        </aura:if>
+                                    </aura:if>
+                                </aura:iteration>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+
+                        <aura:if isTrue="{!v.objWrapper.massEdit}">
+                            <lightning:layoutItem size="6" class="slds-text-align_left slds-m-top_large">
+                                <aura:if isTrue="{!v.isEditEnabled}">
+                                    <span name="cancel" class="ta-accordion-header-button" onclick="{!c.handleManageButtons}">
+                                            {!$Label.c.TA_DynamicLayoutCancel}
+                                    </span>
+                                </aura:if>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="6" class="slds-text-align_right slds-m-top_large">
+                                <span name="{!v.isEditEnabled ? 'save' : 'edit'}" class="ta-accordion-header-button" onclick="{!c.handleManageButtons}">
+                                        {!v.isEditEnabled ? $Label.c.TA_DynamicLayoutSave : $Label.c.TA_DynamicLayoutEdit}
+                                </span>
+                            </lightning:layoutItem>
+                        </aura:if>
+                    </aura:if>
+                </lightning:layout>
+            </div>
+        </lightning:layout>
+    </aura:if>
+</aura:component>

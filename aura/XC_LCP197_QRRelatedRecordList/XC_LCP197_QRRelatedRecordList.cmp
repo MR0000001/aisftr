@@ -1,0 +1,30 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 07-09-2020
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   07-09-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId"
+    controller="XC_LCC197_QRRelatedRecordList" access="global">
+
+    <aura:attribute name = "records" type="List"/>
+    <aura:attribute name = "showCmp" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:if isTrue="{!v.showCmp}">
+        <lightning:card variant="narrow" iconName ="custom:custom5" title="{!$Label.c.XC_CL_LCP197_CardHeader}">
+            <aura:iteration items="{!v.records}" var="rr">
+                <div class="slds-p-around_small">
+                    <c:XC_LCP197_QRRelatedRecord record="{!rr}"/>
+                </div>
+            </aura:iteration>
+        </lightning:card>
+    </aura:if>
+
+</aura:component>

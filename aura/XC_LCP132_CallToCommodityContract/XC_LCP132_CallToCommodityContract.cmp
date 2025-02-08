@@ -1,0 +1,35 @@
+<!--
+* @author Monica Cutillo - monica.cutillo@nttdata.com
+* @date Creation 11/07/2019
+* @date Modification 
+* @description XC_LCP132_CallToCommodityContract – STUB Component to call Commodity System to retrieve Contract Data
+-->
+<aura:component 
+    extends="c:XC_LCP134_ViewFieldsBuilder"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference" access="global" >
+<!--controller="XC_LCC132_CallToCommodityContract" -->
+
+    <!--<aura:attribute name="sobjecttype" type="String" />
+    <aura:attribute name="contractSectionBody" type="Object[]" />
+    <aura:attribute name="contractBody" type="Object[]" />
+    <aura:attribute name="latency" type="Integer" default="2000" />
+    <aura:attribute name="result" type="Object" />-->
+    
+    <aura:attribute name="contractCommodityObj"     type="Object" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+    
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    
+    <lightning:card variant="Narrow" >
+    </lightning:card>
+    
+    {!v.sectionBody}
+
+    <aura:if isTrue="{!v.spinnerControl}" >
+        <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+	
+</aura:component>

@@ -1,0 +1,27 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,forceCommunity:availableForAllPageTypes"
+                access="global"
+                extends="c:TA_LCP209_BaseWizard">
+    
+    <aura:attribute access="public"     name="fieldSet"         type="String" />
+
+    <aura:attribute access="private"    name="title"            type="String" />
+    <aura:attribute access="private"    name="general"          type="Object" />
+    <aura:attribute access="private"    name="custom"           type="Object" />
+
+    <ltng:require styles="{!join(',', 
+                $Resource.TA_CSS + '/TA_CSS/slds-override.css', 
+                $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css', 
+                $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.handleInitialize}" />
+
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem size="12">
+            <div class="ta-appointment-preview">
+                <h3 class="ta-color-purple ta-font-weight-800 slds-m-bottom_small">{!v.title}</h3>
+                <c:TA_LCP206_AppointmentPreview processType="{!v.processType}"/>
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+
+</aura:component>

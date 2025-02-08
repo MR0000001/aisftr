@@ -1,0 +1,393 @@
+/* .THIS .ta-border-bottom-white {
+  border-bottom: .5vw solid white;
+}
+
+.THIS .ta-title {
+  font-size: 4vw;
+  color: white;
+  font-weight: 800;
+  text-transform: capitalize
+}
+
+.THIS .ta-refresh-button {
+  color: #f70606;
+  box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+  background: linear-gradient(45deg, #fdfdfd 0%, #d1cadd 100%);
+  border: none;
+  width: 30%; 
+  border-radius: 10vw;
+  margin-left: 10vw;
+  margin-bottom: 1vw;
+  font-weight: 800;
+}
+
+.THIS .ta-invoice-title {
+  font-size: 3.3vw;
+  color: rgba(255, 255, 255, 1);
+  font-weight: 800;
+  text-transform: capitalize;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-invoice-section {  
+  border-radius: 2.5vw;
+  margin-top: 4vw;
+}
+
+/* .THIS .ta-select-card {
+  padding: 4vw;
+  color: white;
+  border-radius: 2.5vw;
+  position: relative;
+  border: 1px solid white;
+  margin-bottom: 4vw;
+}
+
+.THIS .ta-select-card-title {
+  font-size: 4vw;
+  color: white;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.THIS .ta-card-img {
+  margin-bottom: 2vw;
+}
+
+.THIS .ta-select-card-description {
+  font-size: 3.3vw;
+  color: rgba(255, 255, 255 ,0.5);
+  font-weight: 300;
+  text-transform: capitalize;
+} 
+
+
+.THIS .ta-select-icon-container {
+    background: white;
+    border-radius: 5vw;
+    top: 2vw;
+    right: 2vw;
+    width: 5vw;
+    height: 5vw;
+    position: absolute;
+}
+
+.THIS .ta-icon-check {
+  height: 3.5vw;
+  width: 3.5vw;
+  margin-left: 0.2vw;
+  margin-bottom: 1vw;
+}
+
+.THIS .ta-button-add-payment-method {
+  padding: 3vw;
+  color: white;
+  font-weight: 800;
+  text-transform: capitalize;
+  font-size: 3.3vw;
+  background: transparent;
+  border-radius: 2.5vw;
+  margin: 2vw 0vw 2vw 0vw;
+  border: 1px solid white;
+  width: 100%;
+}
+
+.THIS .ta-button-add-payment-method-disabled {
+  padding: 3vw;
+  color: white;
+  font-weight: 800;
+  text-transform: capitalize;
+  font-size: 3.3vw;
+  background: transparent;
+  border-radius: 2.5vw;
+  margin: 2vw 0vw 2vw 0vw;
+  pointer-events: none;
+  border: 1px solid white;
+  opacity: 0.5;
+  width: 100%;
+} 
+
+.THIS .ta-height-100 {
+    height: 100%;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-modal-container {
+  margin: 5vw 10vw 10vw 10vw;
+  z-index: -1;
+  background: white;
+  margin-top: 20vh;
+  border-radius: 5vw;
+  box-shadow: 0 0vw 1vw 0vw black;
+  padding: 5vw;
+}
+
+.THIS.ta-modal-bg {
+  position: fixed;
+  z-index: 5;
+  left: 0;
+  top: 0;
+  background: rgba(70, 30, 125, 0.8);
+  height: 100vh;
+  width: 100vw;
+  overflow: auto;
+}
+
+/* .THIS h3 {
+    font-family: Montserrat;
+    font-size: 5vw;
+    font-weight: 800;
+    font-stretch: normal;
+    font-style: normal;
+    letter-spacing: normal;
+} */
+
+/* .THIS .ta-animation-pop-out {
+    animation: pop-out 0.5s;
+    -webkit-animation-name: pop-out 0.5s;
+    animation-name: pop-out 0.5s;
+  }
+  
+.THIS .ta-animation-pop-in {
+    animation: pop-in 0.5s;
+    -webkit-animation-name: pop-in 0.5s;
+    animation-name: pop-in 0.5s;
+}
+
+.THIS .ta-button-primary-modal {
+  color: #ffffff;
+  box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+  background: linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+  border: none;
+  width: 100%;
+  padding: 1vw;
+  text-transform: uppercase;
+  border-radius: 10vw;
+  margin-top: 5vw;
+  font-weight: 800;
+}
+  
+    @keyframes pop-in {
+      0% {
+        -webkit-transform: scale3d(0,0,0);
+        transform: scale3d(0,0,0);
+        opacity: 0;
+      }
+    
+      20% {
+        opacity: 1;
+      }
+    
+      40% {
+        -webkit-animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);
+        animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);  
+      }
+    
+      60% {
+        -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+        animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+        -webkit-transform: scale3d(1.08,1.08,1.08);
+        transform: scale3d(1.08,1.08,1.08);
+      }
+    
+      80% {
+        -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+        animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+      }
+    
+      100% {
+        -webkit-animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+        animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+        -webkit-transform: scale3d(1,1,1);
+        transform: scale3d(1,1,1);
+      }
+    }
+  
+  
+    @keyframes pop-out {
+      100% {
+        -webkit-transform: scale3d(0,0,0);
+        transform: scale3d(0,0,0);
+        opacity: 0;
+      }
+    
+      80% {
+        opacity: 1;
+      }
+    
+      60% {
+        -webkit-animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);
+        animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);  
+      }
+    
+      40% {
+        -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+        animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+        -webkit-transform: scale3d(1.08,1.08,1.08);
+        transform: scale3d(1.08,1.08,1.08);
+      }
+    
+      20% {
+        -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+        animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+      }
+    
+      0% {
+        -webkit-animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+        animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+        -webkit-transform: scale3d(1,1,1);
+        transform: scale3d(1,1,1);
+      }
+      
+      
+    }
+
+.THIS .ta-accordion-header-button {
+  font-size: 3.5vw;
+  font-weight: 100;
+  border: 1px solid white;
+  padding: 1vw 2vw 1vw 2vw;
+  border-radius: 2.5vw;
+  color: white;
+  background: transparent;
+  text-transform: capitalize;
+} */
+
+.THIS .slds-form-element__label {
+  font-size: 3.3vw !important;
+  text-transform: capitalize !important;
+  font-weight: 800 !important;
+  padding-bottom: 1.5vw !important;
+  padding-top: 3.5vw !important;
+  color: #461e7d  !important;
+} 
+
+/* CUSTOM-TAG */
+.THIS .slds-input:disabled, .THIS .slds-select[disabled], .THIS .slds-is-disabled  {
+  font-size: 3.3vw !important;
+  font-weight: 300 !important;
+  color: #461e7d  !important;
+  background-color: rgb(0, 0, 0, .1) !important;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-invoice-section-disabled .slds-form-element fieldset {
+  opacity: .5 !important;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-invoice-section-disabled {
+  border-radius: 2.5vw !important;
+  margin-top: 4vw !important;
+}
+
+.THIS .slds-form-element__control .slds-radio, 
+.THIS .slds-form-element__control .slds-checkbox {
+  margin-bottom: 1vw !important;
+} 
+
+.THIS .slds-radio [type=radio]:checked+.slds-radio_faux:after, 
+.THIS .slds-radio [type=radio]:checked+.slds-radio--faux:after, 
+.THIS .slds-radio [type=radio]:checked~.slds-radio_faux:after, 
+.THIS .slds-radio [type=radio]:checked~.slds-radio--faux:after, 
+.THIS .slds-radio [type=radio]:checked+.slds-radio__label .slds-radio_faux:after, 
+.THIS .slds-radio [type=radio]:checked+.slds-radio__label .slds-radio--faux:after {
+  background: rgb(70,30,125) !important;
+} 
+
+.THIS [role=combobox] input {
+  font-size: 3.3vw !important;
+  border-radius: 5vw !important;
+} 
+
+.THIS .slds-input[name="bic"], .THIS .slds-input:focus[name="bic"], .THIS .slds-input:active[name="bic"],
+.THIS .slds-input[name="iban"], .THIS .slds-input:focus[name="iban"], .THIS .slds-input:active[name="iban"] {
+  background-color: #ece8f2 !important;
+  border: 1px solid #ece8f2 !important;
+  border-radius: 5vw !important;
+  opacity: 0.5 !important;
+  font-size: 3.3vw !important;
+}
+
+/* .THIS .ta-modal-desc {
+  font-size: 3.3vw;
+  font-weight: 300;
+} */
+
+.THIS lightning-radio-group[disabled] {
+  opacity: .5 !important;
+}
+
+.THIS .slds-button_brand[disabled] {  
+  background-color:  rgba(0, 0, 0, 0.16) !important;
+  border-color: rgba(0, 0, 0, 0.16) !important;
+}
+
+.THIS .slds-button_neutral {
+  color: #ff006e !important;
+  box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5) !important;
+  background-color: #ffffff !important;
+  border-color: #ff006e !important;
+  padding: 1vw 5vw 1vw 5vw !important;
+  text-transform: uppercase !important;
+  border-radius: 5vw !important;
+  font-weight: 800 !important;
+  font-weight: 800 !important;
+  font-size:3.5vw !important;
+  text-transform: uppercase !important;
+}
+
+/* CUSTOM-TAG */
+.THIS.ta-box-custom-margin {
+  margin: 6vw 3vw 3vw 3vw; 
+}
+
+/* CUSTOM-TAG */
+@media only screen and (min-width: 601px) {
+  .THIS.ta-box-custom-margin {
+      margin: 3vw 1.5vw 3vw 1.5vw;
+  }
+
+  /* CUSTOM-TAG */
+  .THIS .slds-input:disabled, .THIS .slds-select[disabled], .THIS .slds-is-disabled {
+    font-size: 2.5vw !important;
+    font-weight: 300;
+    color: #461e7d  !important;
+    background-color: rgb(0, 0, 0, .1) !important;
+  }
+}
+
+.THIS fieldset .slds-radio .slds-radio__label .slds-form-element__label {
+  color: rgba(255, 255, 255, 0.5) !important; 
+}
+
+.THIS .slds-input[inputmode="email"] {
+  background-color: rgb(0, 0, 0, .1) !important;
+}
+
+.THIS .slds-modal__footer {
+  box-shadow: none !important;
+  padding: 5vw 0 !important;
+}
+
+.THIS .ta-margin-vertical-small {
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+}
+
+.THIS .ta-picklist-container .slds-select_container {
+  margin: 0;
+}
+
+.THIS .ta-picklist-container .slds-form-element__label {
+  display: none;
+}
+
+.THIS .ta-picklist-container .slds-form-element__control.slds-grow {
+  top: 0;
+  left: 0;
+}
+
+.THIS .ta-color-grey {
+  color: rgb(255, 255, 255, 0.6);
+}

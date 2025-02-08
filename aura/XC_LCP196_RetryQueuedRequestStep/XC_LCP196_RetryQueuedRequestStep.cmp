@@ -1,0 +1,22 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 07-06-2020
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   07-06-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component controller="XC_LCC196_RetryQRS" implements = "flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader,forceCommunity:availableForAllPageTypes">
+
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+
+    <!-- <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white"> -->
+        <lightning:spinner aura:id="mySpinner" variant="brand" size="large"/>
+    <!-- </div> -->
+
+</aura:component>

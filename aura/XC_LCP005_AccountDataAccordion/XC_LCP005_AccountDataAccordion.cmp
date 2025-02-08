@@ -1,0 +1,61 @@
+<aura:component controller="XC_LCC005_AccountDataAccordion" implements="force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:hasSObjectName,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="activeSections"           type="List" default="['A','B']" /> <!-- ,'C' -->
+    <aura:attribute name="activeSectionName"        type="String"/>
+    <aura:attribute name="sobjecttype"              type="String" default="{!v.sObjectName}"/>
+    <aura:attribute name="identityNumber"           type="String" />
+    <aura:attribute name="accountCommodityObj"      type="Object" />
+    <aura:attribute name="contractCommodityObj"     type="Object" />
+    <aura:attribute name="caseCommodityObj"         type="Object" />
+    <aura:attribute name="invoiceCommodityObj"      type="Object" />
+    <aura:attribute name="commodityGlobalMessage"   type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <lightning:card>
+        <lightning:accordion activeSectionName="{! v.activeSectionName }" > <!-- onsectiontoggle="{! c.handleSectionToggle }" > -->
+
+            <lightning:accordionSection name="A" label="{!$Label.c.XC_CL_360View}">
+                <aura:set attribute="body">
+                    <aura:if isTrue="{!v.activeSectionName == 'A'}">
+                        <p> {!$Label.c.XC_CL_CustomMessageExternalSystem} </p>
+                    </aura:if>
+                </aura:set>
+            </lightning:accordionSection>
+
+            <lightning:accordionSection name="B" label="{!$Label.c.XC_CL_CommodityAccounts}">
+                <aura:set attribute="body">
+                    <aura:if isTrue="{!v.activeSectionName == 'B'}">
+                        <c:XC_LCP130_AccountCommodityDataBox
+                                accountCommodityObj="{!v.accountCommodityObj}"
+                                commodityGlobalMessage="{!v.commodityGlobalMessage}"
+                                recordId="{!v.recordId}"
+                                sobjecttype="{!v.sobjecttype}" />
+                    </aura:if>
+                </aura:set>
+            </lightning:accordionSection>
+
+            <lightning:accordionSection name="C" label="{!$Label.c.XC_CL_CommodityContracts}">
+                <aura:set attribute="body">
+                    <aura:if isTrue="{!v.activeSectionName == 'C'}">
+                        <c:XC_LCP132_CallToCommodityContract contractCommodityObj="{!v.contractCommodityObj}" commodityGlobalMessage="{!v.commodityGlobalMessage}" />
+                    </aura:if>
+                </aura:set>
+            </lightning:accordionSection>
+
+            <lightning:accordionSection name="D" label="{!$Label.c.XC_CL_CommodityInvoices}">
+                <aura:set attribute="body">
+                    <aura:if isTrue="{!v.activeSectionName == 'D'}">
+                        <c:XC_LCP135_CallToCommodityInvoice invoiceCommodityObj="{!v.invoiceCommodityObj}" commodityGlobalMessage="{!v.commodityGlobalMessage}" />
+                    </aura:if>
+                </aura:set>
+            </lightning:accordionSection>
+
+            <lightning:accordionSection name="E" label="{!$Label.c.XC_CL_CommodityCases}">
+                <aura:set attribute="body">
+                    <aura:if isTrue="{!v.activeSectionName == 'E'}">
+                        <c:XC_LCP133_CallToCommodityCase caseCommodityObj = "{!v.caseCommodityObj}" commodityGlobalMessage="{!v.commodityGlobalMessage}" />
+                    </aura:if>
+                </aura:set>
+            </lightning:accordionSection>
+
+        </lightning:accordion>
+    </lightning:card>
+</aura:component>

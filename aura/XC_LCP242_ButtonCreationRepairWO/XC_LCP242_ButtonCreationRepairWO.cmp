@@ -1,0 +1,34 @@
+<aura:component controller="XC_LCC242_ButtonCreationRepairWO"  implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable">
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="preconditionsOK" type="Boolean" default="false" />
+    <aura:attribute name="buttonDisabled" type="Boolean" default="true" />
+    <aura:attribute name="showSpinner" type="Boolean" default="true" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <lightning:notificationsLibrary aura:id="notifLib" />
+
+    <aura:if isTrue="{!v.preconditionsOK}">
+        <lightning:recordEditForm aura:id="createRepairWorkOrder" recordId="{!v.recordId}" objectApiName="Case" 
+                                onsubmit="{!c.handleSubmit}">
+            <lightning:messages />
+            <lightning:outputField fieldName="Reason" disabled="true"/>
+            <lightning:outputField fieldName="SubCause__c" disabled="true" />
+            <lightning:inputField aura:id="subtype" fieldName="XC_Subtype__c" required="true" onchange="{!c.handleSubtypeChange}"/>
+            <div class="slds-modal__footer">
+                <lightning:button class="slds-m-top_small" variant="brand" label="{!$Label.c.XC_CL_CancelButton}" onclick="{!c.handleCancel}"/>
+                <lightning:button class="slds-m-top_small" aura:id="createButtonId" variant="brand" type="submit" label="{!$Label.c.XC_CL_Create}" disabled="{!v.buttonDisabled}"/>
+            </div>
+        </lightning:recordEditForm>
+    </aura:if>
+
+  <aura:if isTrue="{!v.showSpinner}">
+        <div
+            style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" variant="brand"/>
+            <span class="slds-assistive-text">{!$Label.c.XC_CL_Loading}</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>
+    </aura:if>
+
+
+</aura:component>

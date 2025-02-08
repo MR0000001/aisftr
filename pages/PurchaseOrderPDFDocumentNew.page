@@ -1,0 +1,232 @@
+<apex:page StandardController="gii__PurchaseOrder__c" extensions="PurchaseOrderController" renderAs="pdf" applyBodyTag="false" showQuickActionVfHeader="false">
+    <!-- <apex:stylesheet value="{!$Resource.gii__Porttrait1}" /> -->
+    <apex:stylesheet value="{!URLFOR($Resource.gii__gloviaOM_Resources, 'CSS/gloviaCSS.css')}" />
+    <!-- v10.5 added while background style to avoid LE issue for blue background -->
+    <div style="background-color:white">     
+
+    <apex:panelGrid columns="2" width="100%" id="header"
+        styleClass="tableLayoutFixed">
+
+        <apex:panelGrid columns="2" styleClass="companyTable tableLayoutFixed"
+            width="85%">
+            <!--img src="{!sitePrefix}/servlet/servlet.FileDownload?file={!LogoId}" alt="logo"
+                border="0" width="100" height="50" /-->
+            <img src="{!URLFOR($Resource.EnelLogo)}" alt="logo"
+                border="0" width="100" height="100" />
+            <apex:panelGroup >
+                <!--<apex:outputText value="{!$Organization.Name}"
+                    styleClass="companyName tableLayoutFixed" />
+                <br />
+                <!-- use output field to retain the new line char in text area 
+                NOTE : ShipToStreet__c is used only as a place holder to display org street addrees-->
+                <!--<apex:outputText value="{!$Organization.Street}" /> 
+                <!--apex:outputfield value="{!OrgAddress.gii__ShipToStreet__c}"/> <br/>-->
+                <!--apex:outputfield value="{!OrgAddress.gii__ShipToStreet__c}"
+                    rendered="{!$ObjectType.Organization.accessible}" /-->
+                <!--<apex:outputText value="{!$Organization.Street}"
+                    rendered="{!NOT($ObjectType.Organization.accessible)}" />
+                <br />
+                <apex:outputText value="{!$Organization.City}, {!$Organization.State} {!$Organization.PostalCode}" />
+                <br />
+                <apex:outputText value="{!$Organization.Phone}" />-->
+            </apex:panelGroup>
+        </apex:panelGrid>
+
+        <apex:panelGroup styleClass="tableLayoutFixed">
+            <apex:outputtext value="Purchase Order"
+                styleClass="title right tableLayoutFixed" />
+        </apex:panelGroup>
+
+        <!-- Supplier Address-->
+        <apex:panelGroup styleClass="tableLayoutFixed">
+            <apex:outputtext value="{!$ObjectType.gii__PurchaseOrder__c.Fields.gii__Supplier__c.label}"
+                styleClass="companyName tableLayoutFixed" />
+            <br />
+            {!PO.gii__SupplierName__c}<br />
+            <apex:outputField value="{!PO.gii__SupplierStreet__c}" />
+            <br />
+            {!PO.gii__SupplierCity__c} ,&nbsp;
+            {!PO.gii__SupplierStateProvince__c} &nbsp;
+            {!PO.gii__SupplierZipPostalcode__c} <br />
+            {!PO.gii__SupplierCountry__c}<br />
+            <br />
+        </apex:panelGroup>
+
+        <!-- Purchase Order Header Details -->
+        <apex:panelGrid columns="2" width="100%" cellspacing="0"
+            styleClass="tableLayoutFixed bordersTopBottom"
+            columnClasses="columnBorders left">
+
+            <apex:outputtext value="{!$ObjectType.gii__PurchaseOrder__c.Fields.Name.label}" />
+            <apex:outputtext value="{!PO.Name}" />
+            
+            <apex:outputtext value="Status" />
+            <apex:outputtext value="{!PO.giic_Status__c}" />
+            
+            <apex:outputtext value="SAP PO Code" />
+            <apex:outputtext value="{!PO.giic_POCode__c}" />            
+            
+            <apex:outputtext value="Print Date" />
+            <apex:outputText value="{0, date, MMMM d','  yyyy}">
+                <apex:param value="{!NOW()}" />
+            </apex:outputText>
+            <apex:outputtext value="Currency"/>
+            <apex:outputtext value="{!PO.CurrencyIsoCode}"/>
+            <apex:outputtext value="{!$ObjectType.gii__PurchaseOrder__c.Fields.gii__PaymentTerms__c.label}" />
+            <apex:outputField value="{!PO.gii__PaymentTerms__c}" />
+            <!-- ** Uncomment following line if AP Payment Terms name needs to be printed  
+            and comment out the Payment terms picklist field for sales order header  **
+        <apex:outputField value="{!PO.gii__APPaymentTerms__r.name}"/><br/>
+        -->
+            <apex:outputtext value="{!$ObjectType.gii__PurchaseOrder__c.Fields.gii__DeliveryTerms__c.label}" />
+        {!IF(PO.gii__DeliveryTerms__c = null,'',PO.gii__DeliveryTerms__c)}
+        <apex:outputtext value="{!$ObjectType.gii__PurchaseOrder__c.Fields.gii__Carrier__c.label}" />
+            <apex:outputField value="{!PO.gii__carrier__r.Name}" />
+            <apex:outputtext value="{!$ObjectType.gii__PurchaseOrder__c.Fields.gii__Buyer__c.label}" />
+            <apex:outputField value="{!PO.gii__Buyer__r.Name}" />
+            <apex:outputtext value="{!$ObjectType.gii__PurchaseOrder__c.Fields.gii__SupplierContact__c.label}" />
+            <apex:outputField value="{!PO.gii__SupplierContact__r.Name}" />
+        </apex:panelGrid>
+    </apex:panelGrid>
+
+    <apex:panelGrid columns="2" width="100%" border="0" frame="box"
+        styleClass="tableLayoutFixed">
+        <!-- Ship To Address -->
+        <apex:panelGroup >
+            <br />
+            <apex:outputtext value="Ship To:"
+                styleClass="companyName tableLayoutFixed" />
+            <br />           
+            {!PO.gii__ShipToName__c} <br />
+            <apex:outputField value="{!PO.gii__ShipToStreet__c}" />
+            <br /> 
+            {!PO.gii__ShipToCity__c} , &nbsp;
+            {!PO.gii__ShipToStateProvince__c} 
+            {!PO.gii__ShipToZipPostalCode__c} <br />
+            {!PO.gii__ShipToCountry__c}<br />
+            <br />
+        </apex:panelGroup>
+
+        <!-- Invoice To Address -->
+        <apex:panelGroup >
+            <apex:outputtext value="Invoice To:"
+                styleClass="companyName tableLayoutFixed" />
+            <br />
+            {!PO.gii__InvoiceToName__c}<br />
+            <apex:outputField value="{!PO.gii__InvoiceToStreet__c}" />
+            <br />
+            {!PO.gii__InvoiceToCity__c} ,&nbsp;
+            {!PO.gii__InvoiceToStateProvince__c} &nbsp;
+            {!PO.gii__InvoiceToZipPostalCode__c} <br />
+            {!PO.gii__InvoiceToCountry__c}<br />
+            <br />
+        </apex:panelGroup>
+
+    </apex:panelGrid>
+
+    <b><apex:outputtext value="Details"
+            styleClass="companyName" /></b>
+    <br />
+
+    <!-- Purchase Order Line Details -->
+    <apex:panelGrid width="100%" id="Detail">
+        <apex:dataTable width="100%" id="DataTable" value="{!POLines}"
+            var="POLine" styleClass="tableLayoutFixed font10 verticalTop"
+            headerClass="tableLayoutFixed" border="1" frame="box"
+             columnsWidth="6%,,12%,3%,11%,12%,12%">
+            <apex:column headervalue="Line"
+                headerClass="left" styleClass="left">
+                <apex:outputField value="{!POLine.Name}" />
+            </apex:column>
+            <!-- Purchase Order Line Product-->
+            <apex:column headerClass="left" styleClass="left">
+                <apex:facet name="header">
+            {!$ObjectType.gii__PurchaseOrderLine__c.Fields.gii__Product__c.label}
+      </apex:facet>
+        {!IF(POLine.gii__Product__r.name = null,POLine.gii__Product__c, POLine.gii__Product__r.name)}<br />
+                <apex:outputField value="{!POLine.gii__LineDescription__c}" />
+                <b> {!IF(POLine.gii__Product__r.gii__ProductCode__c =
+                    null,"",POLine.gii__Product__r.gii__ProductCode__c )}</b>
+                <br />
+                <apex:outputPanel rendered="{!POLine.gii__Service__c}">
+            {!$ObjectType.gii__PurchaseOrderLine__c.Fields.gii__ServiceStartDate__c.label} : 
+            <apex:outputField value="{!POLine.gii__ServiceStartDate__c}" />
+            &nbsp;&nbsp;
+            {!$ObjectType.gii__PurchaseOrderLine__c.Fields.gii__ServiceEndDate__c.label} :
+            <apex:outputField value="{!POLine.gii__ServiceEndDate__c}" />
+                </apex:outputPanel>
+            </apex:column>
+            <apex:column headerClass="left" styleClass="left">
+                <apex:facet name="header">{!$ObjectType.gii__PurchaseOrderLine__c.Fields.gii__StockUM__c.label} </apex:facet>
+                <apex:outputText value="{!POLine.gii__StockUM__c}" 
+                                        rendered="{!IF(POLine.gii__BuyingUnitofMeasure__c <> null,false,true)}"/>
+                <apex:outputText value="{!POLine.gii__BuyingUnitofMeasure__r.name}" 
+                                        rendered="{!IF(POLine.gii__BuyingUnitofMeasure__c <> null,true,false)}"/>                
+                <br />&nbsp;
+       </apex:column>
+            <apex:column headerClass="left" styleClass="left">
+                <apex:facet name="header">Tax </apex:facet>
+                <!-- <apex:outputField value="{!POLine.gii__Taxable__c}"/>-->
+               {!IF(POLine.gii__Taxable__c,"Y"," ")}
+       </apex:column>
+            <apex:column styleClass="right" headerClass="right"
+                headervalue="{!$ObjectType.gii__PurchaseOrderLine__c.Fields.gii__OrderQuantity__c.label}">
+                <apex:outputField value="{!POLine.gii__OrderQuantity__c}" />
+                <apex:outputPanel rendered="{!IF(POLine.gii__CancelReason__c <> null, true, false)}">
+                    <br />
+           </apex:outputPanel>
+            </apex:column>
+            <apex:column styleClass="right" headerClass="right"
+                headervalue="{!$ObjectType.gii__PurchaseOrderLine__c.Fields.gii__UnitPrice__c.label}">
+                <apex:outputField value="{!POLine.gii__UnitPrice__c}" />
+                <!--apex:outputText
+                    value="{!FORMATCURRENCY(!PO.CurrencyIsoCode,POLine.gii__UnitPrice__c)}" /-->
+            </apex:column>
+            <apex:column styleClass="right" headerClass="right"
+                headervalue="Extension">
+                <apex:outputField value="{!POLine.gii__LineNetAmount__c}" />
+                <!--apex:outputText 
+                    value="{!FORMATCURRENCY(currencyCode,POLine.gii__LineNetAmount__c)}" /-->
+            </apex:column>
+        </apex:dataTable>
+
+        <!--   Total Order Gross Amount before discount 
+ 
+  <apex:panelGrid columns="2" width="100%" columnClasses="right"  border="0" 
+  styleClass="tableLayoutFixed" rendered="{!IF(PO.gii__GrossAmount__c > 0 ,true,false)}">
+       <apex:outputText value="{!$Label.LineSubTotal}" />
+       <apex:outputField rendered="{!NOT(UsingMultipleCurrencies)}" value="{!PO.gii__GrossAmount__c}"/>
+       <apex:outputText rendered="{!UsingMultipleCurrencies}" value="{!FORMATCURRENCY(currencyCode,PO.gii__GrossAmount__c)}"/>
+  </apex:panelGrid>
+
+
+  <apex:panelGrid columns="2" width="100%" columnClasses="right" border="0"
+      rendered="{!IF(PO.gii__SupplierDiscountAmount__c = 0,false,true)}"   styleClass="tableLayoutFixed" >
+      <apex:outputText value="{!$Label.OrderDiscount}" />
+      <apex:outputField rendered="{!NOT(UsingMultipleCurrencies)}" value="{!PO.gii__SupplierDiscountAmount__c}"/>
+      <apex:outputText rendered="{!UsingMultipleCurrencies}" value="{!FORMATCURRENCY(currencyCode,PO.gii__SupplierDiscountAmount__c)}"/>
+  </apex:panelGrid>
+
+  -->
+        <!-- Order total Amount with discount -->
+
+        <br />
+        <apex:panelGrid columns="2" width="100%"
+            columnClasses="subtotal right" border="0"
+            styleClass="subtotal tableLayoutFixed">
+            <apex:outputText value="Order Total" />
+            <apex:outputField value="{!PO.gii__OrderAmount__c}" />
+            <!--apex:outputText rendered="{!UsingMultipleCurrencies}"
+                value="{!FORMATCURRENCY(currencyCode,PO.gii__OrderAmount__c)}" /-->
+        </apex:panelGrid>
+    </apex:panelGrid>
+
+    <!-- Purchase Order Document Text -->
+    <apex:panelGrid columns="1">
+        <apex:panelGroup rendered="{!PO.gii__PrintDocumentText__c}">
+            <br />
+            <apex:outputField value="{!PO.gii__DocumentText__c}" />
+        </apex:panelGroup>
+    </apex:panelGrid>
+   </div>
+</apex:page>

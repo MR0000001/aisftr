@@ -1,0 +1,7 @@
+.THIS .custom-box2 {
+
+padding: 10px;
+box-shadow: 5px 5px 10px 2px #333333;
+-webkit-box-shadow: 5px 5px 10px 2px #333333;
+-moz-box-shadow: 5px 5px 10px 2px #333333;
+}

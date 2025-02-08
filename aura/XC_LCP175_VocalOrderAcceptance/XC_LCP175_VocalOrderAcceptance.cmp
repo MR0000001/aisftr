@@ -1,0 +1,19 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickAction">
+
+<aura:attribute name="orderRecordError" type="Object"/>
+<aura:attribute name="recordError" type="String"/>
+<aura:attribute name="orderRecord" type="Object"/>
+<aura:attribute name="notCloseModal" type="Boolean" default="false"/>
+
+<force:recordData aura:id="recordLoader" recordId="{!v.recordId}" targetFields="{!v.orderRecord}"
+targetError="{!v.recordError}" fields="Name,XC_SignedByExternal__c"
+ layoutType="FULL" mode="EDIT"/>
+
+ <aura:handler name="change" value="{!v.orderRecord}" action="{!c.init}"/>
+
+    <div class="c-container">
+        <div class="slds-is-relative">
+            <lightning:spinner alternativeText="Loading" size="medium" variant="brand" />
+        </div>
+    </div>
+</aura:component>

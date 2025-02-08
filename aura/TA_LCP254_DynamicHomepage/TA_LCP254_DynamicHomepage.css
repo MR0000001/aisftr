@@ -1,0 +1,83 @@
+/* CUSTOM-TAG TABLET */
+@media screen and (min-width: 768px) {
+    .THIS .ta-home-bg {
+        width: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding-top: 22vw;
+        background: #461e7d;
+        height: 40vh;
+        z-index: 1;
+    }
+}
+
+/* CUSTOM-TAG MOBILE */
+@media screen and (max-width: 767px) {
+    .THIS .ta-home-bg {
+        width: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        /* padding-top: 15vw; */
+        background: #461e7d;
+        height: 40vh;
+        z-index: 1;
+    }
+
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-home-box-page {
+    position: relative;
+    width: 100%;
+    left: 0;
+    /* padding-left: 4vw; */
+    margin-top: 30vw;
+    border-top-right-radius: 15vw;
+    border-top-left-radius: 15vw;
+    padding-top: 14vw;
+    background: white;
+    z-index: 1;
+    /* padding-bottom: 25vw; */
+    box-shadow: 0 -5vw 5vw -5vw black;
+    padding: 8vh 4vw 0 4vw;
+}
+
+.THIS .ta-grid-container {
+    width: 100%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* grid-gap: 0.5vh; */
+    grid-gap: 1vh 0.5vh;
+    background: white;
+    padding-top: 5vw;
+    border-top: 1.1vw solid #e6e6e6;
+}
+
+.THIS .ta-grid-tab {
+    position: relative;
+    border-radius: 2.5vw;
+    padding: 3vw;
+    margin: 0 1vw;
+    box-shadow: 1vw 1vw 2vw -0.8vw grey;
+    min-height: 10vh;
+}
+
+.THIS .ta-grid-inside-box {
+    height:100%;
+}
+
+.THIS .ta-tab-item {
+    /* position:relative; */
+}
+
+.THIS .ta-tab-icon-bottom {
+    /* position:absolute;                 
+    bottom:0;                         
+    left:0; */
+    position: absolute;
+    bottom: 2vh;
+    right: 2vh;
+}

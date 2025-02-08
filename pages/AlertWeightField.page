@@ -1,0 +1,6 @@
+<apex:page standardController="Opportunity" rendered="{!IF(OR(Opportunity.XC_PipelineStatus__c== 'Prepared proposal',Opportunity.XC_PipelineStatus__c== 'Presented proposal',Opportunity.XC_PipelineStatus__c== 'Accepted proposal'),TRUE,FALSE)}">
+ <script type="text/javascript">
+ 
+ { window.alert("{!$Label.XC_CL_AlertWeight}")} ;
+ </script>
+</apex:page>

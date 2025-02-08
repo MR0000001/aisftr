@@ -1,0 +1,71 @@
+<!--
+* @author Lorenzo Orlanducci lorenzo.orlanducci@nttdata.com & Monica Cutillo monica.cutillo@nttdata.com
+* @date Creation 27/11/2018
+* @date Modification dd/mm/yyyy
+* @description XC_LCP044_OptyCheckBeforeNextStep – Associated to a button action 'Next Step' custom, 
+* checks if is bossible do effectly the Next Step for an order Opty.
+-->
+<aura:component controller="XC_LCC044_OptyCheckBeforeNextStep"
+  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasSObjectName,lightning:availableForFlowScreens"
+  access="global">
+
+  <ltng:require styles="{!$Resource.XC_STR004_CompWidth70}" />
+
+  <aura:attribute name="recordId" type="String" />
+  <aura:attribute name="isModal" type="Boolean" default="false" />
+  <aura:attribute name="showInsertPhone" type="Boolean" default="false" />
+  <aura:attribute name="isCommunity" type="Boolean" default="false" />
+
+  <aura:attribute name="urlNextStepB2W" type="String" />
+  <aura:attribute name="phoneInsert" type="String" />
+  <aura:attribute name="phoneNumber" type="String" />
+  <aura:attribute name="phonePrefix" type="String" />
+  <aura:attribute name="sitePrefix" type="String" />
+
+  <aura:attribute name="showNextStepModal" type="Boolean" default="false" />
+
+  <lightning:notificationsLibrary aura:id="notifLib" />
+  <aura:handler name="init" value="{!this}" action="{!c.init}" />
+  <aura:handler event="c:XC_LCE019_CloseChildComponent" name="XC_LCE019_CloseChildComponent"
+  action="{!c.closeChildComponent}" />
+
+  <div aura:id="masterSpinner" class="slds-is-relative">
+    <lightning:spinner aura:id="mySpinner" />
+  </div>
+  <aura:if isTrue="{!v.showInsertPhone}">
+    <c:strike_modal title="" primaryButtonLabel="Ok" secondaryButtonLabel="Cancel" showHeader="false" showFooter="false"
+      showClose="false" showModal="true">
+      <div class="mainWrap">
+        <b> {!v.phoneInsert} </b> <br></br><br></br>
+
+        <lightning:recordEditForm objectApiName="Account">
+
+          <lightning:messages />
+          <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="12"
+              padding="around-small">
+              <lightning:inputField aura:id="phonePrefix" fieldName="XC_AccountPhonePrefix__c"
+                value="{!v.phonePrefix}" />
+              <lightning:inputField aura:id="phoneNumber" fieldName="XC_AccountPhone__c" value="{!v.phoneNumber }" />
+            </lightning:layoutItem>
+          </lightning:layout>
+        </lightning:recordEditForm>
+
+        <br></br><br></br>
+        <div style="text-align:center">
+          <lightning:button variant="brand" label="No" onclick="{! c.closePhoneSection }" />
+          <lightning:button variant="neutral" label="Save" onclick="{! c.createPhoneOnAccount }"
+            disabled="{!v.blockDocSave }" />
+        </div>
+      </div>
+
+    </c:strike_modal>
+  </aura:if>
+  <aura:if isTrue="{!or(v.isModal,v.showNextStepModal)}">
+    <!-- <iframe src="{!v.urlNextStepB2W}" width="100%" height="130%" frameBorder="0" scrolling="yes" allowtransparency="true"
+              id="NE__Order__c.Next_Step" name="NE__Order__c.Next_Step"/> -->
+    <c:XC_LCP184_B2WNextStep recordId="{!v.recordId}" />
+  </aura:if>
+
+
+</aura:component>

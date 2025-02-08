@@ -1,0 +1,323 @@
+<!--
+* @author Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.it & Sara Miozza - sara.miozza@nttdata.com
+* @date Creation 08/04/2019
+* @date Modification 08/04/2019 Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.it
+* @description XC_LCP102_OrderPayment – Component for Payment button on Order detail page
+-->
+
+
+<aura:component controller="XC_LCC102_OrderPayment"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable">
+    <aura:attribute name="body5" type="Object[]" />
+    <aura:attribute name="body1" type="Object[]" />
+    <aura:attribute name="body2" type="Object[]" />
+    <aura:attribute name="body3" type="Object[]" />
+    <aura:attribute name="body4" type="Object[]" />
+    <aura:attribute name="columns" type="List" />
+    <aura:attribute name="orderItemId" type="List" />
+    <aura:attribute name="testvalue" type="Map" default="{ 
+                                                         
+                                                         }" />
+
+    <aura:attribute name="orderItemPayment" type="Map" default="{ 
+                                                         
+                                                         }" />
+    <aura:attribute name="appoggio" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="docCountry" type="String" />
+    <aura:attribute name="docType" type="String" />
+    <aura:attribute name="docNumber" type="String" />
+    <aura:attribute name="accountId" type="String" />
+    <aura:attribute name="addressId" type="String" />
+    <aura:attribute name="contactId" type="String" />
+    <aura:attribute name="legalEnt" type="String" />
+    <aura:attribute name="documentChoise" type="String" />
+    <aura:attribute name="billValue" type="String" />
+    <aura:attribute name="legalEntityId" type="String" />
+    <aura:attribute name="showNewAddress" type="Boolean" default="false" />
+    <aura:attribute name="alreadyInPick" type="Boolean" default="false" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="blockDocSave" type="Boolean" default="true" />
+    <aura:attribute name="showInsertDocument" type="Boolean" default="false" />
+    <aura:attribute name="disablePayment" type="Boolean" default="true" />
+    <aura:attribute name="disabledSubmit" type="Boolean" default="true" />
+    <aura:attribute name="start" type="Boolean" default="false" />
+    <aura:attribute name="addressOK" type="Boolean" default="false" />
+    <aura:attribute name="showZuora" type="Boolean" default="false" />
+    <aura:attribute name="showTable" type="Boolean" default="false" />
+    <aura:attribute name="picklistValue" type="String" />
+    <aura:attribute name="filter" type="String" />
+    <aura:attribute name="configurationId" type="String" />
+    <aura:attribute name="billingProfileId" type="String" />
+    <aura:attribute name="paymentTypeFromTable" type="String" />
+    <aura:attribute name="bankNumberFromTable" type="String" />
+    <aura:attribute name="isComfy" type="Boolean" default="false" />
+    <aura:attribute name="objectType" type="String" default="Account" />
+    <aura:attribute name="categoryOptions" type="List" />
+    <aura:attribute name="paymentOptions" type="List" />
+    <aura:attribute name="shippingAddress" type="Object" />
+    <aura:attribute name="totalMap" type="Map" default="{ 
+                                                         
+                                                         }" />
+    <aura:attribute name="data" type="List" />
+    <aura:attribute name="legendaText" type="String"/>
+    <aura:attribute name="paymentMapFiltered" type="Object"/>
+    <aura:attribute name="isBillToPartner" type="Boolean" default= "false"/>
+    <aura:attribute name="isBillingAccountFilter" type="Boolean" default="false"/>
+    <!-- [ BEGIN, mridul.b.jain@accenture.com, 06/01/2022, ID-1 Select Payment Method, NR2073, ENEL X - r12 ] -->
+    <aura:attribute name="paymentTermFilter" type="String"/>
+    <aura:attribute name="isB2B" type="Boolean" default= "false"/>
+    <aura:attribute name="isItaly" type="Boolean" default= "false"/>
+    <!-- [ END, mridul.b.jain@accenture.com, 06/01/2022, ID-1 Select Payment Method, NR2073, ENEL X - r12 ] -->
+    <lightning:navigation aura:id="navService" />
+    <lightning:notificationsLibrary aura:id="notifLib" />
+
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }" />
+    <aura:handler event="c:XC_LCE002_SendConfigurationItemValues" action="{!c.handleComponentEvent}" />
+    <aura:handler event="c:XC_LCE016_RefreshView" action="{!c.closeZuora}" />
+    <aura:handler event="c:XC_LCE003_CloseStrikeModal" action="{!c.closeStrikeModal}" />
+    <aura:handler event="c:XC_LCE004_closeNewAddress" name="XC_LCE004_closeNewAddress" action="{!c.closeNewAddress}" />
+    <aura:handler event="c:XC_LCE019_CloseChildComponent" name="XC_LCE019_CloseChildComponent"
+        action="{!c.closeChildComponent}" />
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" />
+
+    <aura:html tag="style">
+        .cuf-content {
+        padding: 0 0rem !important;
+        }
+        .slds-p-around--medium {
+        padding: 0rem !important;
+        }
+        .slds-modal__content{
+        height:unset !important;
+        max-height:unset !important;
+        }
+    </aura:html>
+
+
+    <!-- ADDRESS CONF.ITEM CARD -->
+
+    <div class="c-container slds-p-around_small">
+        <lightning:card>
+            <!-- <aura:set attribute="title"> -->
+
+                    <div class="modal-header slds-modal__header slds-size_1-of-1">
+                            <h4 class="title slds-text-heading--medium">
+                                <lightning:icon iconName="utility:moneybag" /><span
+                                    class="slds-p-left_small">{!$Label.c.XC_CL_SelectPaymentMethod}</span></h4>
+                        </div><br></br>
+            <!-- </aura:set> -->
+
+            <!-- GUIDED FLOW CARDS -->
+            <lightning:layout verticalAlign="center" horizontalAlign="center">
+                <lightning:layoutItem padding="around-medium">
+                    <div class="custom-box">
+                        <lightning:card variant="Narrow" iconName="standard:partner_marketing_budget">
+                            <aura:set attribute="title">
+                                <h4>{!$Label.c.XC_CL_HelpCard1_Title}</h4>
+                            </aura:set>
+                        </lightning:card>
+                    </div>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-medium">
+                    <div class="custom-box">
+                        <lightning:card variant="Narrow" iconName="standard:calibration">
+                            <aura:set attribute="title">
+                                <h4>{!$Label.c.XC_CL_HelpCard2_Title}</h4>
+                            </aura:set>
+                        </lightning:card>
+                    </div>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-medium">
+                    <div class="custom-box">
+                        <lightning:card variant="Narrow" iconName="standard:marketing_actions">
+                            <aura:set attribute="title">
+                                <h4>{!$Label.c.XC_CL_HelpCard3_Title}</h4>
+                            </aura:set>
+                        </lightning:card>
+                    </div>
+                </lightning:layoutItem>
+            </lightning:layout>
+
+
+            <div class="centerr">
+            </div>
+            <div class="slds-p-top_small slds-p-bottom_small">
+                <!-- Add a card -->
+                <lightning:card iconName="standard:address" title="{!$Label.c.XC_CL_AddressCard_LCP102}" variant="Narrow" class="slds-card_boundary">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="12"
+                            largeDeviceSize="12" padding="around-small">
+                                    <!-- <div class="slds-p-top_small slds-p-bottom_small slds-text-heading_medium" align="center"> -->
+                                            <b>{!$Label.c.XC_CL_LCP102DelAddress} : </b> {!v.shippingAddress.deliveryAddressName}
+                                        <!-- </div> -->
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="12"
+                            largeDeviceSize="12" padding="around-small">
+                                    <lightning:combobox name="Address" label="{!$Label.c.XC_CL_Billing_Address}" value="{!v.billValue}"
+                                    options="{! v.categoryOptions }" onchange="{!c.setAddressValue}"
+                                    disabled="{!v.hasBillingAddress}" required="true"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                </lightning:card>
+            </div>
+            <aura:if isTrue="{!v.showNewAddress}">
+                <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="addrModal" class="slds-modal">
+                    <div class="slds-modal__container">
+                        <div class="modal-header slds-modal__header">
+                            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close"
+                                onclick="{!c.closeAddrModal}">
+                                X
+                                <span class="slds-assistive-text">{!$Label.c.XC_CL_Close}</span>
+                            </button>
+                        </div>
+                        <div class="slds-modal__content slds-p-around__medium">
+                            <c:XC_LCP_Address recordId="{!v.accountId}" source="102" />
+                        </div>
+                    </div>
+                </div>
+            </aura:if>
+            <aura:if isTrue="{!and(v.start, v.addressOK)}">
+                <lightning:card variant="Narrow"
+                    title="{!(join(' ', $Label.c.XC_CL_ConfItemHeaderCard, join('','(', join('',v.orderItemId.length,')'))))}"
+                    iconName="action:map" class="slds-card_boundary">
+
+                    <lightning:layout horizontalAlign="end">
+                        <lightning:layoutItem size="3" smallDeviceSize="12" mediumDeviceSize="6"
+                        largeDeviceSize="3"  padding="around-small">
+                            <lightning:card class="slds-card_boundary" title="{!$Label.c.XC_LCP102_LegendaCardTitle}" iconName="standard:display_text" variant="narrow">
+                                <div class="slds-p-around_small">
+                                    <lightning:formattedText value="{!v.legendaText}"/>
+                                </div>
+                            </lightning:card>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+
+                    <aura:iteration items="{!v.orderItemId}" var="item">
+                        <c:XC_LCP103_ConfItemEditForm recordId="{!item}" accountId="{!v.accountId}"
+                            contactId="{!v.contactId}" legalEntityId="{!v.legalEntityId}" mapbillingIds="{!v.testvalue}" isItaly ="{!v.isItaly}"
+                            mapOrderItemPayment="{!v.orderItemPayment}" addressId="{!v.addressId}"
+                            isComfy="{!v.isComfy}" soldAddressId="{!v.shippingAddress.deliveryAddressId}" availableMopsMap="{!v.paymentMapFiltered}" isBillToPartner="{!v.isBillToPartner}" 
+                            isB2B="{!v.isB2B}" paymentTermFilter="{!v.paymentTermFilter}" isBillingAccountFilter="{!v.isBillingAccountFilter}"/>
+                            <!--[ BEGIN, mridul.b.jain@accenture.com, 06/01/2022, ID-1 Select Payment Method added isB2B and paymentTermFilter, NR2073, ENEL X - r12 ] -->
+                    </aura:iteration>
+                </lightning:card>
+            </aura:if>
+
+        </lightning:card>
+        <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner alternativeText="Loading" size="large" />
+        </aura:if>
+
+
+        <!-- DOCUMENT MODAL  -->
+
+        <aura:if isTrue="{!v.showInsertDocument}">
+            <c:strike_modal title="" primaryButtonLabel="Ok" secondaryButtonLabel="Cancel" showHeader="false"
+                showFooter="false" showClose="false" showModal="true">
+                <div class="mainWrap">
+                    <b> {!v.documentChoise} </b> <br></br><br></br>
+                    <div style="padding-left:640px">
+                        <lightning:recordEditForm objectApiName="XC_PersonalDocument__c">
+
+                            <lightning:messages />
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12" smallDeviceSize="5" mediumDeviceSize="5"
+                                    largeDeviceSize="5" padding="around-small">
+
+                                    <lightning:inputField aura:id="docCountry" fieldName="XC_Country__c"
+                                        onchange="{!c.checkDoc }" value="{!v.docCountry}" />
+                                    <lightning:inputField aura:id="docType" fieldName="XC_DocumentType__c"
+                                        onchange="{!c.checkDoc }" value="{!v.docType}" />
+                                    <lightning:inputField aura:id="docNumber" fieldName="XC_DocumentNumber__c"
+                                        onchange="{!c.checkDoc}" value="{!v.docNumber }" />
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:recordEditForm>
+                    </div>
+                    <br></br><br></br>
+                    <div style="text-align:center">
+                        <lightning:button variant="brand" label="No" onclick="{! c.closeDocSection }" />
+                        <lightning:button variant="neutral" label="Save" onclick="{! c.createPersonalDoc }"
+                            disabled="{!v.blockDocSave }" />
+                    </div>
+                </div>
+
+            </c:strike_modal>
+        </aura:if>
+        <div class="abbass">
+        </div>
+
+
+        <!-- BUTTONS  -->
+
+        <lightning:button variant="neutral" label="{!$Label.c.XC_CL_CreateBillingProfile}"
+            onclick="{! c.createPayment }" disabled="{!or(v.disablePayment, v.isBillToPartner)}" />
+        <lightning:button variant="neutral" label="{!$Label.c.XC_CL_NewAddress}" onclick="{! c.createAddress }" disabled="{!v.isBillToPartner}"/>
+        <br></br><br></br>
+
+
+        <!-- EXISTING PAYMENT MODAL -->
+
+        <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="ExtModal" class="slds-modal">
+            <div class="slds-modal__container">
+
+                <div class="modal-header slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close"
+                        onclick="{!c.closeFirstModal}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="title slds-text-heading__medium">
+                        <lightning:icon iconName="custom:custom41" /><span class="slds-p-left_small">{!$Label.c.XC_CL_ChooseExistingPaymentMethod}</span></h2>
+                </div>
+                <div class="slds-modal__content slds-p-around__medium">
+
+                    <!-- FIRST MODAL CONTENT -->
+                    <lightning:datatable columns="{! v.columns }" data="{! v.data }" keyField="id" maxRowSelection="1"
+                        onrowselection="{!c.openZuora}" />
+                    <div>
+                        <!-- SCROLL FOR NEW ZBILLINGPROFILE -->
+                        <aura:if isTrue="{!v.showZuora}">
+                            <!-- CREATE BILLING PROFILE MODAL -->
+                            <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="IntModal"
+                                class="slds-modal">
+                                <div class="slds-modal__container">
+                                    <div class="slds-modal__content slds-p-around__medium">
+                                        <c:XC_LCP116_CreateBillingFromOrder fromOrderComponent="true"
+                                            firstRecordId="{!v.accountId}" recordId="{!v.recordId}"
+                                            sobjecttype="{!v.objectType}" contactId="{!v.contactId}"
+                                            addressId="{!v.addressId}" legalEnt="{!v.legalEnt}" closeStrikeModal="true"
+                                            billingProfileId="{!v.billingProfileId}"
+                                            configurationId="{!v.configurationId}"
+                                            paymentAttr="{!v.paymentTypeFromTable}"
+                                            bankFromParent="{!v.bankNumberFromTable}"
+                                            soldToAddrFromParent="{!v.shippingAddress}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </aura:if>
+                        <div class="slds-backdrop " aura:id="ModalbackdropInt"></div>
+                    </div>
+                </div>
+                <div class="modal-footer slds-modal__footer">
+                    <div>
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_CreateNewBillinProfile}"
+                            onclick="{!c.createNEWPayment }" />
+                        <lightning:button variant="neutral" label="Cancel" onclick="{!c.closeFirstModal}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="slds-modal__footer">
+            <lightning:button variant="neutral" label="{!$Label.c.XC_CL_Cancel}" title="Cancel"
+                onclick="{! c.closeModal }" />
+
+
+            <lightning:button variant="brand" label="{!$Label.c.XC_CL_SaveButton}" disabled="{!v.disabledSubmit}"
+                onclick="{! c.createOrder }" />
+
+        </footer>
+    </div>
+    <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+</aura:component>

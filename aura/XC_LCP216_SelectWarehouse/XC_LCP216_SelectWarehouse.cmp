@@ -1,0 +1,108 @@
+<aura:component controller ="XC_LCC216_SelectWarehouse" implements="forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:hasPageReference,lightning:actionOverride,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <aura:attribute name="warehouseList" type="Object[]"/>
+    <aura:attribute name="parentRecordId" type="String" default=""/>
+    <aura:attribute name="warehouseLegalEntityFilter" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <ltng:require styles="{!$Resource.XC_NE_PopupCss}" />
+    
+    <aura:if isTrue="{!v.spinner}">
+        <div class="slds-spinner_container">
+            <div class="slds-spinner--brand slds-spinner slds-spinner--medium slds-is-relative" role="alert">
+                <span class="slds-assistive-text">{!$Label.c.XC_CL_Loading}</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    
+    <div aura:id="editDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" width="600px">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                <h2 class="slds-text-heading--medium">{!$Label.c.XC_CL_SelectWarehouse}</h2>
+                
+                <div class="slds-grid">
+                    <div class="slds-col slds-var-p-around_medium slds-size_4-of-12">
+                        <lightning:input  name="warehouseNameFilter" aura:id="warehouseNameFilter" label="{!$Label.c.XC_CL_Name}" />
+                    </div>
+                    <div class="slds-col slds-var-p-around_medium slds-size_2-of-12">
+                        <lightning:input  name="warehouseCodeFilter" aura:id="warehouseCodeFilter" label="{!$Label.c.XC_CL_WarehouseCode}" />
+                    </div>
+                    <div class="slds-col slds-var-p-around_medium slds-size_3-of-12">
+                        <lightning:input  name="warehouseCoverageFilter" aura:id="warehouseCoverageFilter" label="{!$Label.c.XC_CL_WarehouseCoverage}" />
+                    </div>
+                    <!--aura:renderif isTrue="false"-->
+                        <div class="slds-col slds-var-p-around_medium slds-size_3-of-12">
+                            <label class="slds-checkbox__label" for="FlagApplyFilter">
+                                <span class="slds-checkbox_faux"></span>
+                                <span class="slds-form-element__label">{!$Label.c.XC_CL_DisableWarehouseLE}</span>
+                            </label>
+                            <lightning:input type="checkbox" name="warehouseLegalEntityFilterF" aura:id="warehouseLegalEntityFilterF" onchange="{!c.checkLegalEntityFilter}"/>
+                        </div> 
+                    <!--/aura:renderif-->
+                </div>
+                <div class="slds-grid">
+                    <div class="slds-col slds-var-p-around_medium slds-size_1-of-12">
+                        <lightning:button class="slds-button slds-button_brand" label="{!$Label.c.XC_CL_Search}"  onclick="{!c.doSearch}"/>
+                    </div>
+                </div>
+                <BR></BR>
+                
+                <div style="width: 100%; max-height: 300px; overflow-y: scroll;">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="width: 100%; overflow-x: auto !important; opacity: 1.0 !important;" >
+                    <thead style="position: sticky; top: 0; opacity: 1.0 !important; z-index:9999 !important;">
+                        <tr class="slds-line-height_reset" style="position: sticky; top: 0; opacity: 1.0 !important;">
+                            <th class="" scope="col" >
+                                <div class="slds-truncate" title="wharehouse Name">{!$Label.c.XC_CL_Name}</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="wharehouse Code">{!$Label.c.XC_CL_WarehouseCode}</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="wharehouse legal entity">{!$Label.c.XC_CL_LegalEntity}</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="wharehouse coverage">{!$Label.c.XC_CL_WarehouseCoverage}</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="wharehouse address">{!$Label.c.XC_CL_Address}</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--ul class="slds-listbox slds-listbox_vertical" role="presentation"-->
+                        <aura:iteration items="{!v.warehouseList}" var="listView" indexVar="optIndex">
+                            <tr class="slds-hint-parent">
+                                <td data-label="Account Name">
+                                    <li  role="presentation" class="slds-listbox__item" data-record="{!optIndex}" data-id="{!listView.recordId}"  onclick="{!c.onPicklistChange}">
+                                        <div aria-selected="true" style="text-align: left;" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta rTableCell" role="option" tabindex="0">
+                                            <a><div class="slds-truncate" style="width: 150px;" title="{!listView.warehouseName}">{!listView.warehouseName}</div></a>
+                                        </div>
+                                    </li>    
+                                </td>
+                                <td data-label="Account Name">
+                                    <div class="slds-truncate" title="{!$Label.c.XC_CL_WarehouseCode}">{!listView.warehouseCode}</div>
+                                </td>
+                                <td data-label="Account Name">
+                                    <div class="slds-truncate" title="{!$Label.c.XC_CL_LegalEntity}">{!listView.legalEntity}</div>
+                                </td>
+                                <td data-label="Account Name">
+                                    <div class="slds-truncate" style="width: 140px; " title="{!if(listView.provinceCoverage!=null,'['+listView.provinceCoverage+']',$Label.c.XC_CL_WarehouseCoverage)}">{!if(listView.provinceCoverage!=null,'['+listView.provinceCoverage+']','')}</div>
+                                </td> 
+                                <td data-label="Account Name">
+                                    <div class="slds-truncate" style="width: 140px;" title="{!listView.wareHouseStreet+' '+listView.wareHouseCity+' '+listView.wareHouseZipPostalCode+' ('+listView.wareHouseStateProvince+')'+' '+listView.wareHouseCountry}">{!listView.wareHouseStreet+' '+listView.wareHouseCity+' '+listView.wareHouseZipPostalCode+' ('+listView.wareHouseStateProvince+')'+' '+listView.wareHouseCountry}</div>
+                                </td> 
+                            </tr>
+                        </aura:iteration>
+                        <!--/ul-->   
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</aura:component>

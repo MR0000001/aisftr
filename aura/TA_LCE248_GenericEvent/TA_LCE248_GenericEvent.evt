@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Generic Event">
+    <aura:attribute name="action"  type="String" />
+    <aura:attribute name="params"  type="Object" />
+</aura:event>

@@ -1,0 +1,35 @@
+<!--
+  @File Name          : XC_LCP262_ContractRenewal.cmp
+  @Description        : Component for the contract renewal
+  @Author             : Luca Calicchio - lcalicchio@deloitte.it
+  @Group              : 
+  @Last Modified By   : 
+  @Last Modified On   : 
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    11/10/2021   Luca Calicchio               Initial Version
+-->
+<aura:component>
+    <aura:attribute name="showMyself" type="Boolean" /><!-- To tell parent to show/hide this component -->
+    <aura:attribute name="showNext" type="Boolean" /><!-- To tell parent to show/hide next wizard component -->
+    <lightning:layoutItem padding="around-medium">
+        <div class="custom-box slds-p-around_medium">
+            <lightning:card variant="Narrow" title="{!$Label.c.XC_CL_LCP262_Header}"
+                iconName="standard:fulfillment_order" class="slds-card_boundary">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" smallDeviceSize="12" largeDeviceSize="12" mediumDeviceSize="12"
+                        padding="around-small">
+                        <div class="slds-box">
+                            <lightning:formattedText value="{!$Label.c.XC_CL_LCP262_ContractRenewalInfo}" />
+                        </div>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" smallDeviceSize="12" largeDeviceSize="12" mediumDeviceSize="12"
+                        padding="around-small">
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_LCP262_ContractRenewalBTN}"
+                           onclick="{!c.contractRenewalClick}" />
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </lightning:layoutItem>
+</aura:component>

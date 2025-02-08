@@ -1,0 +1,27 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 01-19-2021
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   01-19-2021   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes,force:hasSObjectName"
+access="global">
+
+ <aura:attribute name="script" type="Object"/>
+ <aura:attribute name="showPdf" type="Boolean" default="false"/>
+
+ <lightning:card iconName="utility:display_text" variant="narrow" class="slds-card_boundary" title="{!v.script.sectionLabel}">
+
+    <aura:set attribute="actions">
+        <lightning:button variant="neutral" iconName="standard:proposition"
+        label="{!$Label.c.XC_CL_CTIShowScriptBTN}" onclick="{!c.showPdf}" />
+    </aura:set>
+    <aura:if isTrue="{!v.showPdf}">
+        <c:XC_LCP173_CTIShowPDF pdfData="{!v.script.base64content}"/>
+    </aura:if>
+ </lightning:card>
+</aura:component>

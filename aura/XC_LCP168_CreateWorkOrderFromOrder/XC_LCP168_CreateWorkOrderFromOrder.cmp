@@ -1,0 +1,23 @@
+<!--
+* @author Salvatore Agrillo, Marco Rosa
+* @date Creation 30/10/2019
+* @description XC_LCP168_CreateWorkOrderFromOrder – Component to create WO from Order
+-->
+
+<aura:component controller= "XC_LCC168_CreateWorkOrderFromOrder" 
+                implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference" 
+                access="global">
+
+    <aura:Attribute name="recordId" type="String"/>
+    <aura:Attribute name="spinnerControl" type="Boolean" default="false"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div
+            style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+
+</aura:component>

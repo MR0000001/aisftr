@@ -1,0 +1,291 @@
+<!--
+ - Created by dpalamides on 14/10/2019.
+ -->
+
+<aura:component description="XC_LCP163_CreateConsents" controller="XC_LCC163_CreateConsents"
+                implements="forceCommunity:availableForAllPageTypes,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,lightning:isUrlAddressable,force:lightningQuickAction,lightning:actionOverride">
+    <aura:html tag="style">
+        .slds-modal__container {
+        width : 80% !important;
+        max-width : 80% !important;
+        }
+    </aura:html>
+
+    <aura:Attribute name="recordId" type="String"/>
+    <aura:Attribute name="showLeSelection" type="Boolean" default="false"/>
+    <aura:Attribute name="isAccount" type="Boolean" default="false"/>
+    <aura:Attribute name="objectType" type="String"/>
+    <aura:Attribute name="sObjectData" type="SObject"/>
+    <aura:Attribute name="toggleSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="legalEntitiesList" type="List" default="[]"/>
+    <aura:attribute name="chosenLE" type="List" default="[]"/>
+    <aura:attribute name="selectedLE" type="String"/>
+    <aura:attribute name="optionsLE" type="List" default="[]"/>
+    <aura:attribute name="recordTypeId" type="String" />
+    <aura:attribute name="legalEntityEndesaX" type="String" default="EndesaX"/>
+    <aura:registerEvent name="saveConsents" type="c:XC_LCE163_SaveConsents"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <div class="slds-box" style="background-color:white; border:none;">
+        <aura:if isTrue="{!v.legalEntitiesList.length>0}">
+            <aura:if isTrue="{!v.recordId!=null}">
+                <div class="slds-checkbox">
+                    <input type="checkbox" name="options" id="checkbox-unique-id-72"
+                           value="{!v.legalEntitiesList[0].confirmationByTheCustomer}" checked="{!v.legalEntitiesList[0].confirmationByTheCustomer}"
+                           onchange="{!c.changeConfirmationByTheCustomer}"/>
+                    <label class="slds-checkbox__label" for="checkbox-unique-id-72">
+                        <span class="slds-checkbox_faux"></span>
+                        <span class="slds-form-element__label">&nbsp;{!$Label.c.XC_CL_ConfirmationByTheCustomer}</span>
+                    </label>
+                </div>
+                <BR/><BR/>
+            </aura:if>
+            <div class="slds-grid slds-wrap" style="background-color:white; margin:5px;">
+                <div class="slds-col slds-size_6-of-12">
+                    <B>{!v.legalEntitiesList[0].thirdPartyLabel}</B>
+                    <div class="slds-text-body_regular">{!v.legalEntitiesList[0].descriptionThirdParties}</div>
+                    <BR/><BR/>
+                </div>
+                <div class="slds-col slds-size_1-of-12">
+                    <BR/>
+                </div>
+                <div class="slds-col slds-size_5-of-12">
+                    <lightning:select
+                            onchange="{!c.saveLegalEntityConsentThirdParty}"
+                            name="ConsentThirdPartyOption"
+                            label="{!$Label.c.XC_CL_Consents_GiveConsent}"
+                            value="{!v.legalEntitiesList[0].thirdPartyValue}"
+                            variant="standard"
+                            required="false"
+                            disabled="{!and(v.legalEntitiesList[0].isExisting,v.recordId!=null)}">
+                        <option value="">--{!$Label.c.XC_CL_None}--</option>
+                        <option value="Yes">{!$Label.c.XC_CL_YesText}</option>
+                        <option value="No">{!$Label.c.XC_CL_NoText}</option>
+                    </lightning:select>
+                </div>
+                <aura:set attribute="footer">
+                    Legal Entities
+                </aura:set>
+            </div>
+
+        </aura:if>
+        <hr/>
+        <aura:iteration items="{!v.legalEntitiesList}" var="item" indexVar="optIndex">
+            <lightning:card
+                    variant="base"
+                    iconName="standard:contact">
+                <aura:set attribute="title">
+                    <aura:if isTrue="{!item.label == 'Codensa'}">
+                        Enel Colombia
+                        <aura:set attribute="else">
+                              {!item.label}
+						</aura:set>
+                    </aura:if>  
+                </aura:set>
+                <aura:set attribute="actions">
+                    <div class="slds-grid slds-wrap" style="background-color:white; margin:5px; width:100%;">
+                        <lightning:buttonGroup>
+                            <div onclick="{!c.saveLegalEntityConsent}" data-record="{!optIndex}">
+                                <aura:if isTrue="{!and(!item.isExisting,v.recordId!=null)}">
+                                    <lightning:button
+                                            label="{!$Label.c.XC_CL_Save}"
+                                            variant="neutral"
+                                            iconName="utility:note"
+                                            iconPosition="left"
+                                    disabled="{!and(or(v.legalEntitiesList[0].confirmationByTheCustomer==null,v.legalEntitiesList[0].confirmationByTheCustomer==false),v.recordId!=null)}">
+                                    </lightning:button>
+                                </aura:if>
+                            </div>
+                            <div onclick="{!c.removeLegalEntityConsent}" data-record="{!optIndex}"
+                                 style="background-color:white; margin-right:5px;">
+                                <aura:if isTrue="{!item.legalEntityConsentId==null}">
+                                    <lightning:buttonIcon alternativeText="Remove"
+                                                          iconName="utility:delete">
+                                    </lightning:buttonIcon>
+                                </aura:if>
+                            </div>
+                        </lightning:buttonGroup>
+                    </div>
+                </aura:set>
+                <BR/>
+                <div class="slds-grid slds-wrap" style="background-color:white; margin:5px;">
+                    <aura:if isTrue = "{!v.legalEntityEndesaX != item.legalEntity}">
+                        <aura:if isTrue="{!v.recordId==null || true}">
+                            <div class="slds-col slds-size_12-of-12">
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-checkbox">
+                                            <input type="checkbox" name="options" id="checkbox-unique-id-72"
+                                                value="checkbox-unique-id-72" disabled="true" checked="true"/>
+                                            <label class="slds-checkbox__label" for="checkbox-unique-id-72">
+                                                <span class="slds-checkbox_faux"></span>
+                                                <span class="slds-form-element__label"><h1>{!item.descriptionGiveData}</h1></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <BR/><BR/><BR/>
+                        </aura:if>
+                    </aura:if>
+
+                    <!-- For Marketing -->
+                    <div class="slds-col slds-size_6-of-12">
+                        <B>{!item.marketingLabel}</B>
+                        <div class="slds-text-body_regular">{!item.descriptionMarketing}</div>
+                        <BR/><BR/>
+                    </div>
+                    <div class="slds-col slds-size_1-of-12">
+                    </div>
+                    <div class="slds-col slds-size_5-of-12">
+                        <lightning:select
+                                onchange="{!c.onChangeNewObject}"
+                                name="ConsentMarketingOption"
+                                label="{!$Label.c.XC_CL_Consents_GiveConsent}"
+                                value="{!item.marketingValue}"
+                                variant="standard"
+                                disabled="{!item.isExisting}">
+                            <option value="">--{!$Label.c.XC_CL_None}--</option>
+                            <option value="Yes">{!$Label.c.XC_CL_YesText}</option>
+                            <option value="No">{!$Label.c.XC_CL_NoText}</option>
+                        </lightning:select>
+                    </div>
+                    
+                    <!-- For Profiling -->
+                    <div class="slds-col slds-size_6-of-12">
+                        <B>{!item.profilingLabel}</B>
+                        <div class="slds-text-body_regular">{!item.descriptionProfiling}</div>
+                        <BR/><BR/>
+                    </div>
+                    <div class="slds-col slds-size_1-of-12">
+                    </div>
+                    <div class="slds-col slds-size_5-of-12">
+                        <lightning:select
+                                onchange="{!c.onChangeNewObject}"
+                                name="ConsentProfilingOption"
+                                label="{!$Label.c.XC_CL_Consents_GiveConsent}"
+                                value="{!item.profilingValue}"
+                                variant="standard"
+                                disabled="{!item.isExisting}">
+                            <option value="">--{!$Label.c.XC_CL_None}--</option>
+                            <option value="Yes">{!$Label.c.XC_CL_YesText}</option>
+                            <option value="No">{!$Label.c.XC_CL_NoText}</option>
+                        </lightning:select>
+                    </div>
+
+                    <!-- For Not Customer -->
+                    <aura:if isTrue="{!item.isExistingNotCustomer}">
+                        <div class="slds-col slds-size_6-of-12">
+                            <B>{!item.notCustomerLabel}</B>
+                            <div class="slds-text-body_regular">{!item.descriptionNotCustomer}</div>
+                            <BR/><BR/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-12">
+                        </div>
+                        <div class="slds-col slds-size_5-of-12">
+                            <lightning:select
+                                    onchange="{!c.onChangeNewObject}"
+                                    name="ConsentProfilingOption"
+                                    label="{!$Label.c.XC_CL_Consents_GiveConsent}"
+                                    value="{!item.notCustomerValue}"
+                                    variant="standard"
+                                    disabled="{!item.isExisting}">
+                                <option value="">--{!$Label.c.XC_CL_None}--</option>
+                                <option value="Yes">{!$Label.c.XC_CL_YesText}</option>
+                                <option value="No">{!$Label.c.XC_CL_NoText}</option>
+                            </lightning:select>
+                        </div>
+                    </aura:if>
+
+                    <!-- For 3parties marketing -->
+                    <aura:if isTrue="{!item.isExistingThPartiesMarketing}">
+                        <aura:if isTrue="{!v.legalEntityEndesaX != item.legalEntity}">
+                            <div class="slds-col slds-size_6-of-12">
+                                <B>{!item.thPartiesMarketingLabel}</B>
+                                <div class="slds-text-body_regular">{!item.descriptionThPartiesMarketing}</div>
+                                <BR/><BR/>
+                            </div>
+                            <div class="slds-col slds-size_1-of-12">
+                            </div>
+                            <div class="slds-col slds-size_5-of-12">
+                                <lightning:select
+                                        onchange="{!c.onChangeNewObject}"
+                                        name="ConsentProfilingOption"
+                                        label="{!$Label.c.XC_CL_Consents_GiveConsent}"
+                                        value="{!item.thPartiesMarketingValue}"
+                                        variant="standard"
+                                        disabled="{!item.isExisting}">
+                                    <option value="">--{!$Label.c.XC_CL_None}--</option>
+                                    <option value="Yes">{!$Label.c.XC_CL_YesText}</option>
+                                    <option value="No">{!$Label.c.XC_CL_NoText}</option>
+                                </lightning:select>
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="slds-col slds-size_6-of-12">
+                                    <B>{!$Label.c.XC_CL_GiveData}</B>
+                                    <div class="slds-text-body_regular">{!item.descriptionThPartiesMarketing}</div>
+                                    <BR/><BR/>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12">
+                                </div>
+                                <div class="slds-col slds-size_5-of-12">
+                                    <lightning:select
+                                            onchange="{!c.onChangeNewObject}"
+                                            name="ConsentProfilingOption"
+                                            label="{!$Label.c.XC_CL_Consents_GiveConsent}"
+                                            value="{!item.thPartiesMarketingValue}"
+                                            variant="standard"
+                                            disabled="{!item.isExisting}">
+                                        <option value="">--{!$Label.c.XC_CL_None}--</option>
+                                        <option value="Yes">{!$Label.c.XC_CL_YesText}</option>
+                                        <option value="No">{!$Label.c.XC_CL_NoText}</option>
+                                    </lightning:select>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                    </aura:if>
+                </div>
+
+                <aura:set attribute="footer">
+                    <p>{!$Label.c.XC_CL_Consents_Version}:&nbsp;{!item.consentVersion}</p>
+                    <aura:if isTrue="{!item.privacyConsentUrl!=null}">
+                        <lightning:formattedUrl value="{!item.privacyConsentUrl}" label="{!$Label.c.XC_CL_GoPrivacyPolicy}" target="_top"/>
+                    </aura:if>
+                </aura:set>
+            </lightning:card>
+        </aura:iteration>
+        <div class="slds-grid slds-wrap" style="background-color:white; margin:5px;">
+          <!--  <aura:if isTrue={!and(v.optionsLE.length>=1,!v.isAccount)}> -->
+            <aura:if isTrue="{!v.optionsLE.length>=1}">
+                <aura:renderIf isTrue="{!v.showLeSelection}">
+                    <lightning:select
+                            onchange="{!c.onChangeAddLegalEntityWrapper}"
+                            aura:id="legalEntityOptions"
+                            name="legalEntityOptions"
+                            label="Legal Entities"
+                            variant="standard"
+                            value="{!v.selectedLE}"
+                    >
+                        <option value="null">--{!$Label.c.XC_CL_None}--</option>
+                        <aura:iteration items="{!v.optionsLE}" var="item">
+                            <option value="{!item}">{!item}</option>
+                        </aura:iteration>
+                    </lightning:select>
+
+                </aura:renderIf>
+                <aura:renderIf isTrue="{!!v.showLeSelection}">
+                    <!--<lightning:icon iconName="utility:add" class="slds-icon slds-icon_small" size="small"
+                                    alternativeText="add" onclick="{!c.showHideSelection}" style=" cursor: pointer; "/> -->
+                    <a onclick="{!c.showHideSelection}" style=" cursor: pointer; ">{!$Label.c.XC_CL_LCP163AddLegalEntity}</a>
+                    <span class="slds-assistive-text">{!$Label.c.XC_CL_LCP163AddLegalEntity}</span>
+                </aura:renderIf>
+            </aura:if>
+        </div>
+        <aura:if isTrue="{!v.toggleSpinner}">
+            <div class="exampleHolder">
+                <lightning:spinner alternativeText="Loading" size="large"/>
+            </div>
+        </aura:if>
+
+    </div>
+</aura:component>

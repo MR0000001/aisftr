@@ -1,0 +1,135 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global">
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="isOpenBudget" type="Boolean" default="false"/>
+    <aura:attribute name="isOpenWarehouse" type="Boolean" default="false"/>
+    <aura:attribute name="isOpenMultiple" type="Boolean" default="false"/>
+    <aura:attribute name="isOpenWrongQuantity" type="Boolean" default="false"/>
+    <aura:attribute name="record" type="gii__PurchaseOrder__c"/>
+    <aura:attribute name="purchaseFields" type="String[]" default="gii__ShipToName__c,gii__ShipToZipPostalCode__c,gii__ShipToStreet__c,gii__ShipToStateProvince__c,gii__ShipToCity__c,gii__ShipToCountry__c,gii__GrossAmount__c,gii__OrderAmount__c,giic_BudgetLimitExceeded__c,giic_WarehouseLimitExceeded__c,giic_MultipleSuppliersForProduct__c,giic_ProductsWithWrongQuantity__c"  />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <force:recordData aura:id="purchaseRecord"
+                        recordId="{!v.recordId}"   
+                        targetFields="{!v.record}"
+                      	fields="{!v.purchaseFields}"
+                        layoutType="FULL"/>
+    
+    <lightning:card iconName="action:info" title="{! 'Information for ' + v.record.Name}"><br></br>
+        <div class="slds-p-left_large slds-p-right_medium">
+            
+            <lightning:recordForm aura:id="brokerForm"
+                                recordId="{!v.recordId}"
+                                objectApiName="gii__PurchaseOrder__c"
+                                fields="{!v.purchaseFields}"
+                                columns="2"
+                                mode="readonly"
+                                onload="{!c.manageData}"/>
+        </div>
+          <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="6" padding="around-small">
+        <aura:if isTrue="{!v.isOpenBudget}">&nbsp;&nbsp;&nbsp;&nbsp;
+        <section aria-describedby="dialog-body-id-98" aria-labelledby="dialog-heading-id-2" class="slds-popover slds-popover_error slds-nubbin_top-left slds-popover_small" role="dialog">
+		<lightning:button variant="base" class="slds-button slds-button_icon slds-button_icon-small slds-float_right slds-popover__close slds-button_icon-inverse" title="Close dialog" onclick="{! c.closeB }">
+		
+                                                <lightning:icon iconName="utility:close" size="small"/>
+                                              
+                                            
+		
+            </lightning:button>
+		<header class="slds-popover__header">
+		<div class="slds-media slds-media_center slds-has-flexi-truncate ">
+		<div class="slds-media__figure">
+		<span class="slds-icon_container slds-icon-utility-error">
+		
+		</span>
+		</div>
+		<div class="slds-media__body">
+		<h2 class="slds-truncate slds-text-heading_medium"  title="error">Attention! </h2>
+		</div>
+		</div>
+		</header>
+		<div class="slds-popover__body" >
+		<p>Budget limit has been exceeded.<br></br><br></br> Please check this value.</p>
+		</div>
+		</section>
+        </aura:if>
+              </lightning:layoutItem>
+                <lightning:layoutItem size="5" padding="around-small">
+                <aura:if isTrue="{!v.isOpenWarehouse}">&nbsp;&nbsp;&nbsp;
+        <section aria-describedby="dialog-body-id-97" aria-labelledby="dialog-heading-id-1" class="slds-popover slds-popover_error slds-nubbin_top-left slds-popover_small" role="dialog">
+		<lightning:button variant="base" class="slds-button slds-button_icon slds-button_icon-small slds-float_right slds-popover__close slds-button_icon-inverse" title="Close dialog" onclick="{!c.closeW}" >
+		<lightning:icon iconName="utility:close" size="small"/></lightning:button>
+		<header class="slds-popover__header">
+		<div class="slds-media slds-media_center slds-has-flexi-truncate ">
+		<div class="slds-media__figure">
+		<span class="slds-icon_container slds-icon-utility-error">
+		
+		</span>
+		</div>
+		<div class="slds-media__body">
+		<h2 class="slds-truncate slds-text-heading_medium"  title="error">Attention! </h2>
+		</div>
+		</div>
+		</header>
+		<div class="slds-popover__body" >
+		<p>Warehouse limit has been exceeded.<br></br> Please check this value.</p>
+		</div>
+		</section>
+        </aura:if>
+              </lightning:layoutItem>
+        </lightning:layout>
+             
+        
+         <lightning:layout>
+              <lightning:layoutItem size="6" padding="around-small">
+                <aura:if isTrue="{!v.isOpenMultiple}">&nbsp;&nbsp;&nbsp;
+        <section aria-describedby="dialog-body-id-97" aria-labelledby="dialog-heading-id-1" class="slds-popover slds-popover_error slds-nubbin_top-left slds-popover_small" role="dialog">
+		<lightning:button variant="base" class="slds-button slds-button_icon slds-button_icon-small slds-float_right slds-popover__close slds-button_icon-inverse" title="Close dialog" onclick="{! c.closeM}" >
+		<lightning:icon iconName="utility:close" size="small"/>  </lightning:button>
+		<header class="slds-popover__header">
+		<div class="slds-media slds-media_center slds-has-flexi-truncate ">
+		<div class="slds-media__figure">
+		<span class="slds-icon_container slds-icon-utility-error">
+		
+		</span>
+		</div>
+		<div class="slds-media__body">
+		<h2 class="slds-truncate slds-text-heading_medium"  title="error">Attention! </h2>
+		</div>
+		</div>
+		</header>
+		<div class="slds-popover__body" >
+		<p>There are multiple suppliers for the same product.</p>
+		</div>
+		</section>
+        </aura:if>
+              </lightning:layoutItem>
+           
+             <lightning:layoutItem size="6" padding="around-small">
+                <aura:if isTrue="{!v.isOpenWrongQuantity}">&nbsp;&nbsp;&nbsp;
+        <section aria-describedby="dialog-body-id-97" aria-labelledby="dialog-heading-id-1" class="slds-popover slds-popover_error slds-nubbin_top-left slds-popover_small" role="dialog">
+		<lightning:button variant="base" class="slds-button slds-button_icon slds-button_icon-small slds-float_right slds-popover__close slds-button_icon-inverse" title="Close dialog" onclick="{!c.closeQ}" >
+		<lightning:icon iconName="utility:close" size="small"/>  </lightning:button>
+		<header class="slds-popover__header">
+		<div class="slds-media slds-media_center slds-has-flexi-truncate ">
+		<div class="slds-media__figure">
+		<span class="slds-icon_container slds-icon-utility-error">
+		
+		</span>
+		</div>
+		<div class="slds-media__body">
+		<h2 class="slds-truncate slds-text-heading_medium"  title="error">Attention! </h2>
+		</div>
+		</div>
+		</header>
+		<div class="slds-popover__body" >
+		<p>Order quantity doesn't comply with Multiple of Packaging quantity for some products as specified into default PriceBookEntry.<br></br> Please check this value.</p>
+		</div>
+		</section>
+        </aura:if>
+              </lightning:layoutItem>
+             
+        </lightning:layout>
+        
+        <br></br><br></br>
+    </lightning:card>
+</aura:component>

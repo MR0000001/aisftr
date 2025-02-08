@@ -1,0 +1,27 @@
+.THIS .slds-backdrop .slds-backdrop--open{ 
+z-index: 0;
+background-color:red;
+}
+.THIS .oneWorkspace .pmcontainer .slds-backdrop { 
+z-index: 0;
+background-color:red;
+}
+
+.THIS .oneWorkspace .pmcontainer .slds-modal{
+    z-index: 0;
+    background-color:red;
+}
+
+.THIS .slds-spinner_container  {
+    background-color: rgba(0, 0, 0, 0);
+    margin-top: 200px;
+    margin-bottom: 200px; 
+}
+
+
+.THIS.whiteDiv{
+    padding-left: 3%;
+    padding-right: 3%;
+    background-color: white ;
+    
+}

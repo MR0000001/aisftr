@@ -1,0 +1,38 @@
+.THIS .centerr{
+    text-align: center;
+    font-size:30px;
+    
+}
+
+.THIS .abbass{
+    padding-top: 5%;
+    
+}
+.THIS .abbassPlus{
+    padding-top: 34%;
+    
+}
+.THIS .scrolll{
+    height: 420px;
+    padding-left:10%;
+    padding-top:1%;
+    
+}
+
+.THIS .sWrapTest {
+    height:500px;
+    
+}
+.THIS .downLeftPlus {
+   padding-top: 5%;
+   padding-left:11%;
+    
+}
+
+.THIS .custom-box {
+    height: 75px;
+    /* width: 250px; */
+    padding: 1rem;
+    border: 1px solid #d8dde6;
+    box-shadow: 0px 0px 20px 5px #899aa3;
+}

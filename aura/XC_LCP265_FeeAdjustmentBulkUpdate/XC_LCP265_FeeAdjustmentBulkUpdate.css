@@ -1,0 +1,12 @@
+.THIS .custom-box {
+    height: 250px;
+    width: 250px;
+    padding: 1rem;
+    border: 1px solid #d8dde6;
+    box-shadow: 0px 0px 20px 5px #899aa3;
+}
+
+.THIS .spinner-bckg{
+    background-color: white;
+    opacity: 0.5;
+}

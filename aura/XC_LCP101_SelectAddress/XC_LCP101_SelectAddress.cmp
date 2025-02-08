@@ -1,0 +1,58 @@
+<!--
+* @author Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.it & Sara Miozza - sara.miozza@nttdata.com
+* @date Creation 05/04/2019
+* @date Modification 08/04/2019 Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.it
+* @description XC_LCP101_SelectAddress – Component for show All Available Address
+-->
+
+<aura:component controller="XC_LCC014_CreateWorkOrder"
+                extends = "c:XC_LCP022_TabNavigationManager"
+                implements="force:hasRecordId,force:appHostable,force:lightningQuickActionWithoutHeader" access="global" >
+  <aura:attribute name="recordId" type="String"/>
+  <aura:attribute name="title" type="String" default="{!$Label.c.XC_CL_Opportunity_CreateWorlOrder}"/>
+  <aura:attribute name="columns" type="List"/>
+  <aura:attribute name="data" type="List"/>
+  <aura:attribute name="SelectedRow" type="List"/>
+  <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+  <aura:attribute name="spinnerControl2" type="Boolean" default="false" />
+  <aura:attribute name="isMobile" type="Boolean" default="false" />  
+  <aura:attribute name="addressReady" type="Boolean" default="false" /> 
+  <aura:attribute name="workorderId" type="String"/>
+  <aura:attribute name="description" type="String" />
+  <aura:attribute name="modelValue" type="String" />
+  <aura:attribute name="accountId" type="String"/>
+  <aura:attribute name="catalogCategory" type="String"/>
+  <aura:attribute name="catalog" type="String"/>  
+  <aura:attribute name="billingProfLineItem" type="String" default=""/>
+  <aura:attribute name="contactId" type="String"/>
+  <aura:attribute name="workOrderCreated" type="Boolean" default="false" />
+  <aura:attribute name="isAssetCreation" type="Boolean" default="false" />
+  <lightning:navigation aura:id="navService"/>
+  <lightning:notificationsLibrary aura:id="notifLib"/>
+  <lightning:workspaceAPI aura:id="workspace" />
+  
+   <aura:handler name="init" value="{!this}" action="{!c.init}" />
+   <aura:handler event="c:XC_LCE011_DataTable" action="{!c.handler}" name=""/>
+    <aura:if isTrue="{!v.spinnerControl}" >
+        <div aura:id="masterSpinner"  class="slds-is-relative">
+            <lightning:spinner aura:id="mySpinner" alternativeText="Loading" size="large"/>
+        </div>
+    </aura:if>
+     <aura:if isTrue="{!v.addressReady}" >
+   <c:XC_LCP017_DataTable data="{!v.data}" 
+                          columns="{!v.columns}" 
+                          title="{!v.title}" 
+                          isWithSelection="true"
+                          maxRowSelection="1"
+                          errorMessage="{!$Label.c.XC_CL_WorkOrder_NoAddressForThisAccount}" 
+                          Selected="{!v.SelectedRow}" 
+                          isModal="true"
+                          resizeColumnDisabled="true"/> 
+    </aura:if>
+    
+    <aura:if isTrue="{!v.spinnerControl2}" >
+        <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner2"/>
+        </div>
+    </aura:if>
+</aura:component>

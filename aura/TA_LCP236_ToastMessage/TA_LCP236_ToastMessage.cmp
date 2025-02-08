@@ -1,0 +1,27 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+    access="global">
+
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" default="false" />
+    <aura:attribute access="public" name="isError" type="Boolean" default="false" />
+    <aura:attribute access="public" name="toastMessage" type="String" default="false" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <div class="{!if(v.showToastMessage, if(v.isError,'ta-error-toast','ta-green-toast'),'slds-hide')}">
+        <lightning:layout multipleRows="true" class="slds-p-top_small slds-p-left_medium slds-p-right_medium">
+            <lightning:layoutItem size="10">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" class="slds-m-bottom_small ta-error-toast-text">
+                        <aura:unescapedHtml value="{!v.toastMessage}" />
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="2" class="slds-text-align_right">
+                <img class="ta-error-toast-icon" src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" onclick="{!c.handleCloseToast}" />
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

@@ -1,0 +1,63 @@
+<aura:component controller="XC_LCC121_AssetSelectionOnCase" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable">
+    
+    <aura:attribute name="data" type="List"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="title" type="String"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="errorMessage" type="String" default="no row found"/>
+    <aura:attribute name="selected" type="List"/>
+    <aura:attribute name="selectedRows" type="List" access="PRIVATE"/>
+    <aura:attribute name="countRowSelected" type="Integer" default="0"/>
+    
+    <aura:attribute name="cardTitle" type="String" default="{!$Label.c.XC_CL_AttachAssets}" />
+    <aura:attribute name="disabled" type="Boolean" default="true" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth70}" />
+
+    <div class="c-container">
+    <lightning:card>
+        <aura:set attribute="title">
+            <lightning:icon iconName="standard:asset" size="large"/>
+              <b> {! v.cardTitle } </b>
+        </aura:set>
+
+        <div style="margin-bottom:10px;height: 7px; width: 200px">
+            <h1 style="text-align:center;">{!$Label.c.XC_CL_MassAssSkill_SelectedRow}: {!v.countRowSelected}</h1>
+        </div>
+        <lightning:datatable
+            keyField="Id"
+            data="{! v.data }"
+            columns="{! v.columns }"
+            onrowselection="{!c.updateSelectedRows}"
+            resizeColumnDisabled="true"
+            selectedRows= "{! v.selectedRows }"
+        />
+        <!--
+        -->
+        <div class="topborder" style="text-align:right">
+            <button type="button" class="slds-button slds-button_neutral" onclick="{!c.goBack}">{!$Label.c.XC_CL_CPAB_Cancel}</button>
+            <lightning:button name="btn1" label="{!$Label.c.XC_CL_SaveButton}" class="slds-button slds-button_brand" onclick="{!c.attachSelectedAssets}" />
+                   
+       </div>
+    </lightning:card>
+
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner alternativeText="Loading" size="large" />
+    </aura:if>
+    <!--<aura:if isTrue="{!v.showSpinner}">
+            <div class="topborder">
+            <div class="demo-only" style="height: 6rem;">
+            <div role="status" class="slds-spinner slds-spinner_large">
+            <span class="slds-assistive-text">'{!$Label.c.XC_CL_Loading}'</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+            </div>
+            </div>
+            </div>
+    </aura:if>-->
+
+    </div>
+</aura:component>

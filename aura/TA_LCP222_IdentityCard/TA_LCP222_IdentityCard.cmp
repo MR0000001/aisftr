@@ -1,0 +1,154 @@
+<aura:component controller="TA_LCC222_IdentityCard"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                access="global" >
+
+    <!-- ATTRIBUTES PUBLIC -->
+    <aura:attribute access="public" name="fieldSet" type="String"/>
+    <aura:attribute access="public" name="workOrderId" type="String"/>
+
+    <!-- ATTRIBUTES CONFIGURATION -->
+    <aura:attribute access="private" name="general" type="Object"/>
+    <aura:attribute access="private" name="custom" type="Object"/>
+    <aura:attribute access="private" name="title" type="String"/>
+    <aura:attribute access="private" name="description" type="String"/>
+    <aura:attribute access="private" name="customerCardBg" type="String"/>
+    <aura:attribute access="private" name="descriptionFront" type="String"/>
+    <aura:attribute access="private" name="descriptionRear" type="String"/>    
+
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <!-- ATTRIBUTES LOGIC -->
+    <aura:attribute access="private" name="objWrapper" type="Object"/>
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/>
+    <aura:registerEvent name="validationEvt" type="c:TA_LCE199_Validation"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <div class="ta-box-custom-margin" style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover; border-radius: 2.5vw;
+                   background-position: ' + v.general.bgPosition + '; background-color:' + v.general.bgColor + '; box-shadow: 0vw 1vw 2vw -0.8vw black; background-blend-mode: lighten; padding: 5vw;'}">
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="10" class="ta-color-white">
+                        <h3> {!v.title} </h3>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="2" class="slds-text-align_right ta-height">
+                        <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}" class="ta-icon-resize"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:layoutItem>
+
+            <!-- IDENTITY CARD FRONT -->
+            <lightning:layoutItem size="12">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="6" class="slds-m-top_small slds-text-align_left ta-container-height">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="12" class="ta-color-white-opacity-60 slds-m-top_xx-small">
+                                <p> {!v.descriptionFront} </p>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                <lightning:input type="file" name="IdentityCard_Front" multiple="false" title="{!v.custom.FileCategoryFront}"
+                                                 id="{!v.objWrapper.objectId}" onchange="{!c.handleUploadFile}"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <lightning:layoutItem size="6" class="slds-m-top_medium slds-is-relative slds-text-align_center slds-p-left_medium">
+                        <aura:if isTrue="{!v.objWrapper.identityCardFront.TA_DoxeeURL__c != null}">
+                            <aura:if isTrue="{!v.objWrapper.identityCardFront.TA_isPdf__c}">     
+                                <div class="ta-box-photo-blank">                                                                                
+                                    <a href="{!v.objWrapper.identityCardFront.TA_DoxeeURL__c}" target="_blank">
+                                        <img src="{!$Resource.TA_Icons + '/xc-icons/pdf-icon.svg'}" class="ta-pdf-icon"/>
+                                    </a> 
+                                    <!-- START FIX [ADC27/05/2021] ENXCRM-118 aggiunta estensione per i pdf --> 
+                                    <div class="ta-pdf-name">
+                                        {!v.objWrapper.identityCardFront.TA_FileName__c}
+                                    </div>     
+                                    <!-- END FIX [ADC27/05/2021] ENXCRM-118 aggiunta estensione per i pdf -->                                     
+                                </div>    
+                            </aura:if> 
+                            <aura:if isTrue="{!v.objWrapper.identityCardFront.TA_isDoc__c}">     
+                                <div class="ta-box-photo-blank">                                                                               
+                                    <img src="{!$Resource.TA_Icons + '/xc-icons/word-icon.svg'}" class="ta-word-icon"/>                                 
+                                    <div class="ta-pdf-name">
+                                        {!v.objWrapper.identityCardFront.TA_FileName__c}
+                                    </div>                                        
+                                </div>    
+                            </aura:if>                                                         
+                            <aura:if isTrue="{!and(not(v.objWrapper.identityCardFront.TA_isPdf__c),not(v.objWrapper.identityCardFront.TA_isDoc__c))}">
+                                    <img src="{!v.objWrapper.identityCardFront.TA_DoxeeURL__c}" class="ta-box-photo"/>
+                            </aura:if>                                                
+                            <div id="IdentityCard_Front" onclick="{!c.handleDeletePhoto}" class="ta-button-close">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" class="ta-icon-close-size" />
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="ta-box-photo-blank slds-text-align_center">
+                                    <img src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" class="ta-icon-close-blank" />
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:layoutItem>
+
+            <!-- IDENTITY CARD RETRO -->
+            <lightning:layoutItem size="6" class="slds-m-top_large slds-text-align_left ta-container-height">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" class="slds-m-top_xx-small">
+                        <p class="ta-color-white-opacity-60"> {!v.descriptionRear} </p>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" class="slds-m-top_medium">
+                        <lightning:input type="file" name="IdentityCard_Retro" multiple="false" title="{!v.custom.FileCategoryRear}"
+                                        id="{!v.objWrapper.objectId}" onchange="{!c.handleUploadFile}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:layoutItem>
+
+            <lightning:layoutItem size="6" class="slds-m-top_large slds-is-relative slds-text-align_center slds-p-left_medium">
+                <aura:if isTrue="{!v.objWrapper.identityCardRetro.TA_DoxeeURL__c != null}">
+
+                    <aura:if isTrue="{!v.objWrapper.identityCardRetro.TA_isPdf__c}">     
+                        <div class="ta-box-photo-blank">                                                                                
+                            <a href="{!v.objWrapper.identityCardRetro.TA_DoxeeURL__c}" target="_blank">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/pdf-icon.svg'}" class="ta-pdf-icon"/>
+                            </a>  
+                            <!-- START FIX [ADC27/05/2021] ENXCRM-118 aggiunta estensione per i pdf --> 
+                            <div class="ta-pdf-name">
+                                {!v.objWrapper.identityCardRetro.TA_FileName__c}
+                            </div>
+                            <!-- END FIX [ADC27/05/2021] ENXCRM-118 aggiunta estensione per i pdf -->                                      
+                        </div>   
+                    </aura:if>   
+                    <aura:if isTrue="{!v.objWrapper.identityCardRetro.TA_isDoc__c}">     
+                        <div class="ta-box-photo-blank">                                                                            
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/word-icon.svg'}" class="ta-word-icon"/>
+                            <div class="ta-pdf-name">
+                                {!v.objWrapper.identityCardRetro.TA_FileName__c}
+                            </div>                                                            
+                        </div>   
+                    </aura:if>                            
+                    <aura:if isTrue="{!and(not(v.objWrapper.identityCardRetro.TA_isPdf__c),not(v.objWrapper.identityCardRetro.TA_isDoc__c))}">
+                        <img src="{!v.objWrapper.identityCardRetro.TA_DoxeeURL__c}" class="ta-box-photo"/>
+                    </aura:if>                                       <div id="IdentityCard_Retro" onclick="{!c.handleDeletePhoto}" class="ta-button-close">
+                        <img src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" class="ta-icon-close-size" />
+                    </div>
+                    <aura:set attribute="else">
+                        <div class="ta-box-photo-blank slds-text-align_center">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-white.svg'}" class="ta-icon-close-blank" />
+                        </div>
+                    </aura:set>
+                </aura:if>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

@@ -1,0 +1,83 @@
+<aura:component controller="XC_LCC_SummaryAssetSection" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasSObjectName,lightning:availableForFlowScreens" access="global">
+    <aura:attribute name="recordId" type="String" />  
+    <aura:attribute name="Confs" type="String"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="mycolumns" type="List"/>
+    <aura:attribute name="configurationItemHierarchy" type="NE__OrderItem__c[]"/>
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="data1" type="Object"/>
+    <aura:attribute name="checkCommType" type="Integer"/> 
+    <aura:attribute name="PaginationList" type="List"/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="20"/>
+    <aura:attribute name="pageNumber" type="Integer" default="1"/>
+    <aura:attribute name="sortedBy" type="String" default="Name"/>
+    <aura:attribute name="sortedDirection" type="string" default="asc" />
+    
+    <aura:attribute name="PaginationList2" type="List"/>
+    <aura:attribute name="startPage2" type="Integer" />
+    <aura:attribute name="endPage2" type="Integer"/>
+    <aura:attribute name="totalRecords2" type="Integer"/>
+    <aura:attribute name="pageSize2" type="Integer" default="20"/>
+    <aura:attribute name="pageNumber2" type="Integer" default="1"/>
+    <aura:attribute name="sortedBy2" type="String" default="Name"/>
+    <aura:attribute name="sortedDirection2" type="string" default="asc" />
+         <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+        
+        <p class="field-title" title=""><b></b></p>
+
+        <lightning:layout multipleRows="true" >
+          <lightning:layoutItem padding="around-small" size="12">
+            <h2 id="modal-heading-01" class="slds-text-heading_small">Asset-Technical</h2> 
+              <lightning:datatable 
+                data="{!v.PaginationList}"
+                columns="{!v.columns}"
+                keyField="id"
+                hideCheckboxColumn="true" 
+                 onsort="{!c.sortColumn}"
+                sortedBy="{!v.sortedBy}"
+                sortedDirection="{!v.sortedDirection}"
+              />
+              <lightning:buttonGroup >
+                    <lightning:button label="Previous" disabled="{!v.startPage == 0}"  
+                                  onclick="{!c.technicalprevious}" variant="brand"
+                                  iconName='utility:back'/>
+            		&nbsp; &nbsp; &nbsp;
+                    <span class="slds-var-p-horizontal_small">
+                            {!format($Label.c.XC_CL_PageShowingRecFromTo, v.pageNumber, ((v.pageNumber-1)*v.pageSize), ((v.pageNumber-1)*v.pageSize+v.pageSize))}
+                            <!-- Page {!v.pageNumber} | Showing records from {! ((v.pageNumber-1)*v.pageSize)+' to '+((v.pageNumber-1)*v.pageSize+v.resultSize)} -->
+                	</span>
+            		<lightning:button label="Next" disabled="{!v.endPage >= v.totalRecords}" 
+                              onclick="{!c.technicalnext}" variant="brand"
+                              iconName='utility:forward' iconPosition='right'/>
+        	  </lightning:buttonGroup>
+          </lightning:layoutItem>
+          <lightning:layoutItem padding="around-small" size="12">
+            <h2 id="modal-heading-01" class="slds-text-heading_small">Asset-Commercial</h2> 
+                <lightning:datatable 
+                  data="{!v.PaginationList2}"
+                  columns="{!v.mycolumns}"
+                  keyField="id"
+                  hideCheckboxColumn="true"
+                  onsort="{!c.sortColumn2}"
+                  sortedBy="{!v.sortedBy2}"
+                  sortedDirection="{!v.sortedDirection2}"                                     
+                />
+            <lightning:buttonGroup >
+                <lightning:button label="Previous" disabled="{!v.startPage2 == 0}"  
+                                  onclick="{!c.commercialprevious}" variant="brand"
+                                  iconName='utility:back'/>
+                &nbsp; &nbsp; &nbsp;
+                <span class="slds-var-p-horizontal_small">
+                            {!format($Label.c.XC_CL_PageShowingRecFromTo, v.pageNumber2, ((v.pageNumber2-1)*v.pageSize2), ((v.pageNumber2-1)*v.pageSize2+v.pageSize2))}
+                            <!-- Page {!v.pageNumber} | Showing records from {! ((v.pageNumber-1)*v.pageSize)+' to '+((v.pageNumber-1)*v.pageSize+v.resultSize)} -->
+                </span>
+                <lightning:button label="Next" disabled="{!v.endPage2 >= v.totalRecords2}" 
+                                  onclick="{!c.commercialnext}" variant="brand"
+                                  iconName='utility:forward' iconPosition='right'/>
+        	</lightning:buttonGroup>
+          </lightning:layoutItem> 
+        </lightning:layout>
+</aura:component>

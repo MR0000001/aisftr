@@ -1,0 +1,10 @@
+/**
+ * Created by dpalamides on 21/10/2019.
+ */
+.THIS .Accordion360{
+    display:none;
+}
+.THIS .slds-card_narrow{
+    border:none !important;
+    box-shadow: none !important;
+}

@@ -1,0 +1,57 @@
+<aura:component controller="XC_LCC004_SendMailComponent" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    
+    <aura:attribute name="recordId" type="String" default="" access="global"/>
+    <aura:attribute name="emailId" type="String" default="" access="global"/>
+    <aura:attribute name="fromField" type="String" default="" access="global"/>
+    <aura:attribute name="toField" type="String" default="" access="global"/>
+    <aura:attribute name="bccField" type="String" default="" access="global"/>
+    <aura:attribute name="subjField" type="String" default="" access="global"/>
+    <aura:attribute name="bodyField" type="String" default="" access="global"/>
+    <aura:attribute name="accountAddress" type="String" default="" access="global"/>
+    <aura:attribute name="accept" type="List" default="['.jpg', '.pdf']" access="global"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    
+     <force:recordData aura:id="record"
+                      layoutType="FULL"
+                      recordId="{!v.recordId}"
+                      targetError="{!v.recordError}"
+                      targetRecord="{!v.record}" 
+                      targetFields="{!v.OpptyRecord }"
+                      mode="VIEW"/>
+    
+    <lightning:card title="{!$Label.c.XC_CL_SendMail}" class="slds-size--12-of-12" >
+        <lightning:layout  multipleRows="true">
+            <!--<lightning:layoutItem  padding="horizontal-small" size="12">
+                <lightning:input name="fromInput" label="From" value="{!v.fromField}" />
+            </lightning:layoutItem>-->
+            <lightning:layoutItem  padding="horizontal-small" size="12">
+                <lightning:input name="toInput" label="{!$Label.c.XC_CL_To}"  value="{!v.toField}" />
+                <!-- <lightning:input name="toInput" label="To" value="{!v.OpptyRecord.AccountId.PrimaryEmail__c}" /> -->
+            </lightning:layoutItem > 
+            <lightning:layoutItem  padding="horizontal-small" size="12">
+                <lightning:input name="bccInput" label="Bcc" value="{!v.bccField}" />
+            </lightning:layoutItem>   
+            <lightning:layoutItem  padding="horizontal-small" size="12">
+                <lightning:input name="subjInput" label="{!$Label.c.XC_CL_Subject}" value="{!v.subjField}" />
+            </lightning:layoutItem>    
+            <lightning:layoutItem  padding="around-small" size="12">
+                <lightning:inputRichText label="Body" placeholder="{!$Label.c.XC_CL_TypeSomething}" value="{!v.bodyField}"/>
+            </lightning:layoutItem> 
+            <lightning:layoutItem  padding="around-small" size="12">
+                
+                <lightning:fileUpload label="{!$Label.c.XC_CL_AttachReceipt}" 
+                                      name="fileUploader"
+                                      multiple="true" 
+                                      recordId="{!v.emailId}"  
+                                      onuploadfinished="{!c.handleUploadFinished}"
+                                      />
+            </lightning:layoutItem>
+            <lightning:layoutItem  padding="around-small" size="12">
+                <lightning:button name="sendMail" label="{!$Label.c.XC_CL_Send}" onclick="{!c.sendMailMethod}" variant="brand"  class="slds-button slds-button_brand slds-float_right" /> 
+            </lightning:layoutItem>
+            
+        </lightning:layout>
+    </lightning:card>
+    
+</aura:component>

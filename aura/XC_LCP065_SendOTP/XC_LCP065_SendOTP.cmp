@@ -1,0 +1,46 @@
+<aura:component
+controller="XC_LCC065_SendOTP"
+implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,lightning:actionOverride,forceCommunity:availableForAllPageTypes,force:hasSObjectName,lightning:availableForFlowScreens,lightning:isUrlAddressable,lightning:hasPageReference,force:lightningQuickActionWithoutHeader" access="global" >
+    
+<lightning:navigation aura:id="navService"/>
+<lightning:workspaceAPI aura:id="workspace" />
+<lightning:notificationsLibrary aura:id="notifLib"/>
+<aura:attribute name="customerInteraction" type="Map" />
+<aura:attribute name="recordId" type="String" />
+<aura:attribute name="selectedValue" type="String" />
+<aura:attribute name="customerTypeValue" type="String" />
+<aura:attribute name="phoneValue" type="String" />
+<aura:attribute name="emailValue" type="String" />
+    <aura:attribute name="showPhone" type="Boolean" default="false" />
+    <aura:attribute name="showEmail" type="Boolean" default="false" />
+    <aura:attribute name="disabledSubmit" type="Boolean" default="true" />
+    <aura:attribute name="messageType" type="List" default="[ {'label': 'SMS', 'value': 'SMS'},
+    													    {'label': 'Email', 'value': 'Email'}
+                                                             ]"  />
+    
+    <lightning:combobox name="messageType" label="Choose" value="{! v.selectedValue }" required="true"
+                            options="{! v.messageType }" onchange="{! c.change }" /> 
+    <aura:if isTrue="{!v.showPhone}">
+    <lightning:input aura:id="phone" name="phone" label="Phone" value="{! v.phoneValue}"   /> 
+    </aura:if>
+    <aura:if isTrue="{!v.showEmail}">
+    <lightning:input aura:id="email" type="email"  name="email" label="Email" value="{! v.emailValue }" onchange="{!c.disableMail}" />
+    </aura:if>
+     <br></br><br></br><br></br>
+     <footer class="slds-modal__footer slds-theme_default">   
+                         <lightning:button variant="neutral" 
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick="{! c.closeModal }"/>
+                        
+                                <lightning:button variant="brand" 
+                                                  label="Submit"
+                                                  title="Submit"
+                                                  disabled="{!v.disabledSubmit}"
+                                                  onclick="{! c.create }"/>
+    </footer>
+
+    
+    
+	
+</aura:component>

@@ -1,0 +1,68 @@
+<aura:component 
+    controller="XC_LCC110_LegalEntityDynamicTable"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasSObjectName,lightning:availableForFlowScreens" 
+    access="global" >
+
+    <aura:attribute name="ConsentsInstance" type="Map"/>
+    <aura:attribute name="rowIndex" type="String"/>
+    <aura:attribute name="country" type="List"/>
+    <aura:attribute name="consentsOptions" type="List"/>
+    <aura:attribute name="legalEntityConsents" type="List"/>
+    
+    <aura:registerEvent name="XC_LCE_RowEvt" type="c:XC_LCE_RowEvt"/> 
+    <aura:registerEvent name="XC_LCE_SetLEConsents" type="c:XC_LCE_SetLEConsents"/> 
+    <aura:registerEvent name="XC_LCE111_SetLegalEntityConsents" type="c:XC_LCE111_SetLegalEntityConsents"/> 
+    <!--<aura:handler name="init" value="{!this}" action="{!c.init}"/>-->
+    
+    <tr> <!-- class="slds-text-title_caps" -->
+        <td>
+            {!v.rowIndex + 1}
+        </td>
+        <td>
+            <lightning:combobox name="country" aura:id="leCountry" value="{! v.ConsentsInstance.XC_LeCountry__c }" options="{! v.country }" onchange="{!c.onCountryChange}" />
+            <div class="rialz"></div>
+        </td>
+        <td>
+            <!--<ui:inputSelect class="single" aura:id="legalEntity" value="{!v.ConsentsInstance.XC_LegalEntity__c}" change="{!c.onConsentsChange}" />-->
+            <lightning:combobox name="legalEntity" aura:id="legalEntity" value="{! v.ConsentsInstance.XC_LegalEntity__c }" options="{! v.ConsentsInstance.legalEntityConsents }" onchange="{!c.onConsentsChange}" />
+            <div class="rialz"></div>
+        </td>
+        <td>
+            <!--<lightning:input type="checkbox" name="checkGiveDataTo" checked="{!v.ConsentsInstance.XC_GiveDataTo__c}" aura:id="checkGiveDataTo" disabled="true" class="slds-p-vertical_small" />-->
+            <lightning:combobox name="checkGiveDataTo" aura:id="checkGiveDataTo" value="{! v.ConsentsInstance.XC_GiveDataTo__c }" options="{! v.consentsOptions }" disabled="true"/>
+            <div class="rialz"></div>
+        </td>
+        <td>
+            <lightning:input name="giveDataToVersion" value="{!v.ConsentsInstance.XC_CompanyConsentVersion__c}" aura:id="giveDataToVersion" onchange="{!c.onConsentsChange}" />
+            <div class="rialz"></div>
+        </td>
+        <td>
+            <!--<lightning:input type="checkbox" name="checkKeepMeUpd" checked="{!v.ConsentsInstance.XC_KeepMeUpdateOnProducts__c}" aura:id="checkKeepMeUpd" class="slds-p-vertical_small" onchange="{!c.onConsentsChange}" />-->
+            <lightning:combobox name="checkKeepMeUpd" aura:id="checkKeepMeUpd" value="{! v.ConsentsInstance.XC_KeepMeUpdateOnProducts__c }" options="{! v.consentsOptions }" onchange="{!c.onConsentsChange}" />
+            <div class="rialz"></div>
+        </td>
+        <td>
+            <lightning:input name="keepMeUpdVersion" value="{!v.ConsentsInstance.XC_MarketingConsentVersion__c}" aura:id="keepMeUpdVersion" onchange="{!c.onConsentsChange}" />
+            <div class="rialz"></div>
+        </td>
+        <td>
+            <!--<lightning:input type="checkbox" name="checkConsentToPro" checked="{!v.ConsentsInstance.XC_GiveConsentToDataProcessing__c}" aura:id="checkConsentToPro" class="slds-p-vertical_small" onchange="{!c.onConsentsChange}" />-->
+            <lightning:combobox name="checkConsentToPro" aura:id="checkConsentToPro" value="{! v.ConsentsInstance.XC_GiveConsentToDataProcessing__c }" options="{! v.consentsOptions }" onchange="{!c.onConsentsChange}" />
+            <div class="rialz"></div>
+        </td>
+        <td>
+            <lightning:input name="consentToProVersion" value="{!v.ConsentsInstance.XC_ProfilingConsentVersion__c}" aura:id="consentToProVersion" onchange="{!c.onConsentsChange}" />
+            <div class="rialz"></div>
+        </td>
+        <td>
+            <a onclick="{!c.addNewRow}">
+                <lightning:icon iconName="utility:add" class="slds-icon slds-icon_small" size="small" alternativeText="add"/>
+                <span class="slds-assistive-text">Add Row</span>
+            </a>&nbsp;
+            <a onclick="{!c.removeRow}">
+                <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                <span class="slds-assistive-text">Delete Row</span>
+            </a>
+        </td> 
+    </tr>
+</aura:component>

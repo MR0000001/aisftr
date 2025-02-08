@@ -1,0 +1,56 @@
+<!--
+* @author Fabrizio Antonioli - fabrizio.antonioli@nttdata.com, Giovanni Schioppa - giovanni.schioppa@nttdata.com, Salvatore Scarpato - salvatore.scarpato@nttdata.com
+* @date Creation 29/10/2018
+* @date Modification
+* @description XC_LCP030_CancelOrder - Component for a button that cancel an order and call a b2w method
+-->
+
+<aura:component controller="XC_LCC030_CancelOrder" implements="lightning:actionOverride,force:appHostable,force:lightningQuickActionWithoutHeader,lightning:actionOverride,force:hasRecordId,flexipage:availableForAllPageTypes" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="record" type="Object" />
+    <aura:attribute name="componentRecord" type="Object" />
+    <aura:attribute name="recordError" type="String" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:attribute name="showModal" type="Boolean" default="true"/>
+    
+    <force:recordData 
+                      aura:id="recordLoader" 
+                      recordId="{!v.recordId}" 
+                      layoutType="FULL" 
+                      mode="EDIT"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.componentRecord}"
+                      targetError="{!v.recordError}" />
+    
+    <aura:if isTrue="{!v.spinnerControl}" >
+        <div aura:id="masterSpinner" style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.showModal}" >       
+        <div class="modal-header slds-modal__header slds-size_1-of-1">
+            <h4 class="title slds-text-heading--medium" >{!$Label.c.XC_CL_CancelOrder}</h4>
+        </div>      
+        <div class="slds-modal__container">
+            <lightning:layoutItem>
+                
+                <footer class="slds-modal__footer" >
+                    
+                    <lightning:button label="{!$Label.c.XC_CL_Cancel}" title="Brand action" onclick="{! c.cancel }" />
+                    <lightning:button variant="brand" label="{!$Label.c.XC_CL_SaveButton}" title="Brand action" onclick="{! c.doCancel }" disabled="true" aura:id="saveButt"/>
+                    
+                </footer>
+            </lightning:layoutItem>
+        </div>      
+    </aura:if> 
+    
+    <lightning:recordEditForm objectApiName="NE__Order__c" recordId="{!v.recordId}">     
+        <lightning:inputField class="customRequired" aura:id = "cancType" value = '' fieldName="XC_Type_of_cancellation__c" onchange="{! c.buttonAction}"/> 
+        <lightning:inputField class="customRequired" aura:id = "reasonType" value = '' fieldName="XC_Reason_of_cancellation__c" onchange="{! c.buttonAction}"/>              
+    </lightning:recordEditForm>
+    
+    
+    
+</aura:component>

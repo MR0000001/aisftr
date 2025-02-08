@@ -1,0 +1,7 @@
+<aura:event type="COMPONENT" description="Event to set the Legal Entity Consents Object value - Component type event">
+    <aura:attribute name="consentsLE" type="List" />
+    <aura:attribute name="robinsonCustomer" type="Boolean" />
+    <aura:attribute name="thirdPartiesCheck" type="String" />
+    <aura:attribute name="thirdPartiesVersion" type="String" />
+    <aura:attribute name="relatedObject" type="String" />
+</aura:event>

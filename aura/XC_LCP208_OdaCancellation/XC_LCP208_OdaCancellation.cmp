@@ -1,0 +1,39 @@
+<aura:component controller="XC_LCC208_OdaCancellation" implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute name="recordId" type="String" />  
+    <aura:attribute name ="spinnerControl" type = "boolean" default = "false" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+
+    
+
+    <div class="slds-modal__container" style="width:100%;">
+
+        <!-- ###### MODAL BOX HEADER Start ######-->
+        <header class="slds-modal__header">
+
+            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">SAP Process</h2>
+        </header>
+        <!--###### MODAL BOX BODY Part Start######-->
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+
+
+            <p><b> Do you want to delete the Purchase Order?</b>
+            </p>
+
+        </div>
+
+        <!--###### MODAL BOX FOOTER Part Start ######-->
+        <footer class="slds-modal__footer">
+
+            <lightning:button variant="neutral"
+                              label="Close"
+                              title="Cancel"
+                              onclick="{! c.closeModal }"/>
+            <lightning:button variant="brand"
+                              label="Proceed"
+                              title="Send"
+                              onclick="{! c.onConfirm }"/>
+        </footer>
+    </div>
+
+</aura:component>

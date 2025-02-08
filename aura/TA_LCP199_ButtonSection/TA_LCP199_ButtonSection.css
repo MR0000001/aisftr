@@ -1,0 +1,350 @@
+@media only screen and (max-width: 600px) {
+    /* CUSTOM-TAG */
+    .THIS.button-section-container {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        padding-bottom: 5vw;
+        padding-top: 3vw;
+        box-shadow: 0 0vw 6vw -1.5vw rgba(0, 0, 0, 0.5);
+        background: #ffffff;
+        z-index: 3;
+    }
+}
+
+/* .THIS .ta-buttons-shown-container {
+    width: 100%;
+}
+
+.THIS .ta-custom-button {
+    font-weight: 800;
+    font-size:3.5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    height: 9vw;
+    width: 9vw;
+}
+
+.THIS .ta-button-primary {
+    color: #ffffff;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background: linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+    border: 1px solid black;
+    padding: 1vw 5vw 1vw 5vw;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size:3.5vw;
+    text-transform: uppercase;
+    height: 9vw;
+}
+
+.THIS .ta-button-secondary {
+    color: #461e7d;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background-color: #ffffff;
+    border-color: #461e7d;
+    padding: 1vw 5vw 1vw 5vw;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size:3.5vw;
+    text-transform: uppercase;
+    height: 9vw;
+}
+
+.THIS .ta-button-closing {
+    color: #ff006e;
+    background-color: #ffffff;
+    border-color: #ff006e;
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size: 3.5vw;
+    height: 9vw;
+}
+
+.THIS .ta-right-button {
+    float: right;
+    margin-right: 2vw;
+}
+
+.THIS .ta-left-button {
+    float: left;
+    margin-left: 2vw;
+}
+
+.THIS .ta-more-options {
+    color: #ffffff;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background: #461e7d;
+    border: none;
+} */
+
+/* CUSTOM-TAG */
+.THIS.ta-modal-more-options {
+    z-index: 2;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(70, 30, 125, 0.8);
+    height: 100vh;
+    width: 100%;
+}
+
+/* .THIS .ta-modal-button-container {
+    bottom: 16.5vw;
+    width: 100%;
+    position: inherit;
+    padding-bottom: 5vw;
+}
+
+.THIS .ta-modal-button {
+    float: right;
+    margin-right: 2vw;
+    margin-top: 2vw;
+    min-width: 35vw;
+    border-radius: 5vw !important;
+} */
+
+/* .THIS .slds-button__icon[data-key="threedots_vertical"], .THIS .slds-button__icon[data-key="close"] {
+    width: 4vw !important;
+    height: 4vw !important;
+} */
+
+/* .THIS .ta-modal-container {
+    position: absolute;
+    margin: 5vw 10vw 10vw 10vw;
+    z-index: -1;
+    background: white;
+    top: 30vw;
+    border-radius: 5vw;
+    box-shadow: 0 0vw 1vw 0vw black;
+}
+
+.THIS .ta-animation-pop-in {
+    animation: pop-in 0.5s;
+    -webkit-animation-name: pop-in 0.5s;
+    animation-name: pop-in 0.5s;
+} */
+
+/* @keyframes pop-in {
+    0% {
+        -webkit-transform: scale3d(0,0,0);
+        transform: scale3d(0,0,0);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    40% {
+        -webkit-animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);
+        animation-timing-function: cubic-bezier(0.47,0,0.745,0.715);
+    }
+
+    60% {
+        -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+        animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+        -webkit-transform: scale3d(1.08,1.08,1.08);
+        transform: scale3d(1.08,1.08,1.08);
+    }
+
+    80% {
+        -webkit-animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+        animation-timing-function: cubic-bezier(0.42,0,0.58,1);
+    }
+
+    100% {
+        -webkit-animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+        animation-timing-function: cubic-bezier(0.25,0.46,0.45,0.94);
+        -webkit-transform: scale3d(1,1,1);
+        transform: scale3d(1,1,1);
+    }
+} */
+
+/* .THIS .ta-modal-header {
+    border-top-left-radius: 5vw;
+    border-top-right-radius: 5vw;
+    padding: 5vw;
+}
+
+.THIS .ta-modal-header-button {
+    height: inherit;
+    width: 5vw;
+}
+
+.THIS .ta-modal-body {
+    padding: 3vh;
+    height: 30vh;
+    overflow-y: auto;
+}
+
+.THIS .ta-modal-footer-anc {
+    background: white;
+    border-bottom-left-radius: 5vw;
+    border-bottom-right-radius: 5vw;
+    padding: 3vw;
+}
+
+.THIS .ta-button-primary-modal {
+    background: linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+    border: none;
+    border-radius: 5vw;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    font-size: 3.5vw;
+    font-weight: 800;
+    margin-top: 5vw;
+    min-width: 35vw;
+    padding: 2vw;
+    text-transform: uppercase;
+    width: 100%;
+}
+
+.THIS .ta-button-closing-modal {
+    background-color: #ffffff;
+    border-color: #ff006e;
+    border-radius: 5vw;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    color: #ff006e;
+    font-size: 3.5vw;
+    font-weight: 800;
+    margin-top: 5vw;
+    min-width: 35vw;
+    padding: 2vw;
+    text-transform: uppercase;
+    width: 100%;
+}
+
+.THIS .ta-button-secondary-modal {
+    color: #461e7d;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background-color: #ffffff;
+    border-color: #461e7d;
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size: 3.5vw;
+    text-transform: uppercase;
+    min-width: 35vw;
+    width: 100%;
+} */
+
+/* .THIS.ta-error-toast {
+    width: 100vw;
+    background: rgb(255 0 110);
+    position: fixed;
+    left: 0;
+    top: 233px;
+    z-index: 9999;
+    box-shadow: 0 1vw 2vw rgba(0,0,0,0.5);
+} */
+
+/* .THIS .ta-error-toast-text {
+    color: white;
+    font-size: 3.3vw;
+    font-weight: 300;
+    text-align: left;
+} */
+
+/* .THIS .ta-error-toast-icon {
+    width: 4vw;
+} */
+
+/* .THIS .ta-disable-button {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.THIS button:focus {
+    outline: none;
+}
+
+.THIS .ta-modal-info-title {
+    font-size: 4vw;
+    font-weight: 800;
+}
+
+.THIS .ta-modal-info-description {
+    font-size: 3.3vw;
+}
+
+.THIS .ta-modal-info-body {
+    padding: 7vw 0vw 4vw 0vw;
+    height: auto;
+    overflow-y: auto;
+}
+
+.THIS .ta-modal-info-container {
+    position: absolute;
+    margin: 5vw 10vw 10vw 10vw;
+    z-index: -1;
+    background: white;
+    top: 80vw;
+    border-radius: 5vw;
+    box-shadow: 0 0vw 1vw 0vw black;
+}
+
+.THIS .ta-modal-asset-body {
+    padding: 4vw;
+    height: auto;
+    overflow-y: auto;
+}
+
+.THIS .ta-modal-asset-footer {
+    background: white;
+    border-bottom-left-radius: 5vw;
+    border-bottom-right-radius: 5vw;
+    padding: 4vw;
+} */
+
+/* .THIS .slds-input, .THIS .slds-select, .THIS .slds-input:focus, .THIS .slds-input:active {
+    background-color: #ece8f2 !important;
+    border: 1px solid #ece8f2 !important;
+    border-radius: 5vw !important;
+    opacity: 0.5 !important;
+    font-size: 3.3vw !important;
+    color: black;
+} */
+
+/* .THIS .ta-modal-suspend-container {
+    position: absolute;
+    background: white;
+    border-radius: 5vw;
+    box-shadow: 0 0vw 1vw 0vw black;
+    top: 30vh;
+    left: 10vw;
+    right: 10vw;
+}
+
+.THIS .ta-modal-suspend-body {
+    padding: 4vw 0vw 0vw 0vw;
+    height: auto;
+    overflow-y: auto;
+}
+
+.THIS .ta-modal-suspend-title {
+    font-size: 4vw;
+    font-weight: 800;
+    padding: 0vw 2vw 4vw 2vw;
+}
+
+.THIS .ta-modal-suspend-description {
+    font-size: 3.3vw;
+    padding: 0vw 2vw;
+} */
+
+.THIS .ta-button-height {
+    height: 10vw;
+}
+
+.THIS .ta-input-date .slds-form-element__control .slds-input {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.THIS .ta-input-date .slds-form-element__label {
+    color: black !important;
+}

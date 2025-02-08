@@ -1,0 +1,6 @@
+<aura:component controller="XC_SC065_MigrationWorkOrderBatch" implements="force:lightningQuickAction" access="global">
+    <!-- ATTRIBUTES -->
+    <aura:attribute name="recordId" type="String" />
+     <!-- HANDLERS -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+</aura:component>

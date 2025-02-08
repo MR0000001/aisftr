@@ -1,0 +1,149 @@
+<aura:component controller="TA_LCC212_OrderSummary"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="workOrder" type="Object" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="general" type="Object" />
+    <aura:attribute access="private" name="custom" type="Object" />
+    <aura:attribute access="private" name="title" type="String" />
+    <aura:attribute access="private" name="description" type="String" />
+    <aura:attribute access="private" name="customerCardBg" type="String" />
+    <aura:attribute access="private" name="checkIcon" type="String" />
+    <aura:attribute access="private" name="infoBag" type="Object" />
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false" />
+    <aura:attribute access="private" name="showOrderItems" type="Boolean" default="false" />
+    <aura:attribute access="private" name="showOIDetailModal" type="Boolean" default="false" />
+    <aura:attribute access="private" name="orderItemToShow" type="List" default="[]" />
+    <aura:attribute access="private" name="bundleList" type="List" default="[]" />
+    <aura:attribute access="private" name="equipmentList" type="List" default="[]" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <lightning:layout multipleRows="true" class="slds-m-top_large slds-m-left_small slds-m-right_small">
+            <div class="{!v.general.show ? 'slds-col slds-size_12-of-12 ta-box-shadow ta-accordion-header ta-accordion-open' : 'slds-col slds-size_12-of-12 ta-accordion-header ta-accordion-close'}"
+                style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover; background-position: bottom; background-color: ' + v.general.bgColor + ';background-blend-mode: lighten;'}">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="10">
+                                <h3>{!v.title}</h3>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="2">
+                                <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}" class="slds-float_right ta-accordion-header-icon" />
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <lightning:layoutItem size="12" class="ta-border-top-white">
+                        <lightning:layout multipleRows="true">
+                            <aura:iteration items="{!v.infoBag.order}" var="orderField">
+                                <lightning:layoutItem size="12">
+                                    <span class="ta-text-label">{!orderField.label}:</span>
+                                    <span class="ta-text-value ta-padding-left-small">{!orderField.value}</span>
+                                </lightning:layoutItem>
+                            </aura:iteration>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+
+                    <lightning:layoutItem size="12" class="ta-padding-vertical-small">
+                        <span class="ta-accordion-header-button slds-float_right" onclick="{!c.handleShowOrderItems}">
+                            {!$Label.c.TA_Details}
+                        </span>
+                    </lightning:layoutItem>
+                    <aura:if isTrue="{!v.showOrderItems}">
+                        <aura:if isTrue="{!not(empty(v.infoBag.orderItemsBundle))}">
+                            <span class="slds-p-vertical_x-small">{!$Label.c.TA_BundlesList}</span>
+                            <aura:iteration items="{!v.infoBag.orderItemsBundle}" var="orderItem" indexVar="index">
+                                <lightning:layoutItem size="12" class="ta-border-top-white-small">
+                                    <lightning:layout>
+                                        <lightning:layoutItem size="10">
+                                            <lightning:layout multipleRows="true">
+                                                <aura:iteration items="{!orderItem.orderItemFields}" var="orderItemField">
+                                                    <lightning:layoutItem size="12">
+                                                        <span class="ta-text-label">{!orderItemField.label}:</span>
+                                                        <span class="ta-text-value ta-padding-left-small">{!orderItemField.value}</span>
+                                                    </lightning:layoutItem>
+                                                </aura:iteration>
+                                            </lightning:layout>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="2" class="slds-align_absolute-center">
+                                            <span data-value="{!index}" onclick="{!c.handleShowOrderItemDetails}" name="show-details">
+                                                <lightning:icon iconName="utility:multi_picklist" alternativeText="Show details" variant="inverse" size="medium" />
+                                            </span>
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </lightning:layoutItem>    
+                            </aura:iteration>
+                        </aura:if>
+
+                        <aura:if isTrue="{!not(empty(v.infoBag.orderItemsEquipment))}">
+                            <span class="slds-p-vertical_x-small">{!$Label.c.TA_EquipmentList}</span>
+                            <aura:iteration items="{!v.infoBag.orderItemsEquipment}" var="orderItem">
+                                <lightning:layoutItem size="12" class="ta-border-top-white-small">
+                                    <lightning:layout multipleRows="true">
+                                        <aura:iteration items="{!orderItem.orderItemFields}" var="orderItemField">
+                                            <lightning:layoutItem size="12">
+                                                <span class="ta-text-label">{!orderItemField.label}:</span>
+                                                <span class="ta-text-value ta-padding-left-small">{!orderItemField.value}</span>
+                                            </lightning:layoutItem>
+                                        </aura:iteration>
+                                    </lightning:layout>
+                                </lightning:layoutItem>
+                            </aura:iteration>
+                        </aura:if>
+                    </aura:if>
+                </lightning:layout>
+            </div>
+        </lightning:layout>
+    </aura:if>
+
+    <!-- ORDER ITEM DETAIL MODAL -->
+    <aura:if isTrue="{!v.showOIDetailModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="slds-p-horizontal_small slds-scrollable_y ta-detail-container">
+                    <lightning:layout multipleRows="true">
+                        <aura:iteration items="{!v.orderItemToShow}" var="oi">
+                            <lightning:layoutItem size="12" class="ta-border-top-black">
+                                <lightning:layout multipleRows="true">
+                                    <aura:iteration items="{!oi}" var="oiField">
+                                        <lightning:layoutItem size="12">
+                                            <span class="">{!oiField.label}:</span>
+                                            <span class="ta-padding-left-small">{!oiField.value}</span>
+                                        </lightning:layoutItem>
+                                    </aura:iteration>
+                                </lightning:layout>
+                            </lightning:layoutItem>
+                        </aura:iteration>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-footer-anc">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12">
+                            <button class="ta-button-closing-modal" onclick="{!c.handleCloseOrderItemDetails}">
+                                {!$Label.c.TA_CloseDetails}
+                            </button>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+    <!-- ORDER ITEM DETAIL -->
+
+</aura:component>

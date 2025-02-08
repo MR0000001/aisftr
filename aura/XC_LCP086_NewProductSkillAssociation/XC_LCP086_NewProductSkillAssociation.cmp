@@ -1,0 +1,101 @@
+<!--
+* @author  Roberta Cossiga r.cossiga@deloitte.it && Roberta Porrega roberta.porrega@nttdata.com
+* @date Creation 22/02/2019
+* @date Modification dd/mm/yyyy
+* @description component for create a new Product Skill Association
+-->
+<aura:component controller="XC_LCC086_NewProductSkillAssociation"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable" access="global" >
+    <!-- components attributes --> 
+    <!-- XC_SkillId__c-->
+    <aura:attribute name="skillId" type="String" /> 
+    <aura:attribute name="skillName" type="String" /> 
+    <aura:attribute name="selectedTechSkill" type="String" />
+    <aura:attribute name="selectedCovTechSkill" type="String" /> 
+    <aura:attribute name="techSkillOptions" type="List" />
+    <aura:attribute name="CovTechSkillOptions" type="List" /> 
+    <aura:attribute name="selectedWorkTypeCategory" type="String" /> 
+    <aura:attribute name="wtCategoryOptions" type="List" />
+    <!-- XC_WorkTypeId__c-->
+    <aura:attribute name="workType" type="String" /> 
+    <!-- XC_CatalogCategoryId__c-->
+    <aura:attribute name="catalogCategory" type="String" /> 
+    
+    <lightning:workspaceAPI aura:id="workspace" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <lightning:navigation aura:id="navService"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+        <div class="slds-text-align_left">
+            <lightning:card title="{!$Label.c.XC_CL_NewProductSkill}" iconName="utility:left_align_text">
+              <lightning:recordEditForm aura:id="editForm" recordId="{!v.recordId}" recordTypeId="{!v.recordTypeId}"  objectApiName="XC_ProductSkill_Association__c"   >    
+                <lightning:layout verticalAlign="left" horizontalAlign="left" >
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="12">
+                            <c:strike_picklist value="{!v.selectedTechSkill}"
+                            label="{!$Label.c.XC_CL_TechnicalSkill}"
+                            placeholder="{!$Label.c.XC_CL_SelectATechnicalSkill}"
+                            errorMessage="Invalid input"
+                            required = "true"> 
+                            <aura:iteration items="{!v.techSkillOptions}" var="option">
+                                <c:strike_option label="{!option.label}" value="{!option.value}"/>
+                            </aura:iteration>
+                        </c:strike_picklist> 
+                    </lightning:layoutItem> 
+                </lightning:layout> 
+                
+                <lightning:layout verticalAlign="left" horizontalAlign="left" >
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="12">
+                            <c:strike_picklist value="{!v.selectedCovTechSkill}"
+                            label="{!$Label.c.XC_CL_CoverageTechSkill}"
+                            placeholder="{!$Label.c.XC_CL_SelectACoverageTechSkill}"
+                            errorMessage="Invalid input"
+                         	> 
+                            <aura:iteration items="{!v.CovTechSkillOptions}" var="option">
+                                <c:strike_option label="{!option.label}" value="{!option.value}"/>
+                            </aura:iteration>
+                        </c:strike_picklist> 
+                    </lightning:layoutItem> 
+                </lightning:layout>
+
+                <lightning:layout verticalAlign="left" horizontalAlign="left" >
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="12">
+                            <c:strike_picklist value="{!v.selectedWorkTypeCategory}"
+                            label="{!$Label.c.XC_CL_WorkType}"
+                            placeholder="Search a Work Type"
+                            errorMessage="Invalid input"> 
+                                <aura:iteration items="{!v.wtCategoryOptions}" var="option">
+                                    <c:strike_option label="{!option.label}" value="{!option.value}"/>
+                                </aura:iteration>
+                            </c:strike_picklist> 
+                    </lightning:layoutItem>
+                </lightning:layout>                     
+                <lightning:layout verticalAlign="left" horizontalAlign="left" >
+                        <lightning:layoutItem padding="around-small" flexibility="auto" size="12">
+                            <c:strike_lookup
+                                             label="{!$Label.c.XC_CL_Skill}"
+                                             object="Skill"
+                                             searchField="MasterLabel"
+                                             placeholder="Search a skill"
+                                             iconName="custom:custom9"
+                                             order="MasterLabel"
+                                             limit="5"
+                                             loadingMessage="Loading..."
+                                             errorMessage="Invalid input"
+                                             showRecentRecords="true"
+                                             required="true"
+                                             value="{!v.skillId}" 
+                                             valueLabel="{!v.skillName}"/>      
+                    </lightning:layoutItem>
+                </lightning:layout>                                 
+             </lightning:recordEditForm>
+            </lightning:card>
+        </div>
+                <div class="space">
+                    <div class="modal-footer slds-modal__footer slds-size_1-of-1">
+                        <div class="forceChangeRecordTypeFooter">
+                            <lightning:button  label="{!$Label.c.XC_CL_CancelButton}" title="Cancel" onclick="{! c.cancel}"/>
+                            <lightning:button variant="brand" label="{!$Label.c.XC_CL_ConfirmButton}" title="Submit" onclick="{! c.confirm}" />
+                        </div>
+                    </div>
+                </div>   
+</aura:component>

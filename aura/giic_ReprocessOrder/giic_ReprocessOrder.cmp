@@ -1,0 +1,23 @@
+<!--
+  @author GLOVIA Team
+  @date Mod 06/09/2021 - Salvatore Agrillo - salvatore.agrillo@nttdata.com
+  @description giic_ReprocessOrder - Component to reprocess Sales Order
+-->
+
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" 
+                controller="Giic_SalesOrderUtility"
+                access="global">
+
+	<aura:attribute name="isLoading" type="Boolean" default="false"/>
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+  <div aura:id="spinnerId" class="slds-spinner_container">
+      <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+        <span class="slds-assistive-text">Loading</span>
+        <div class="slds-spinner__dot-a"></div>
+        <div class="slds-spinner__dot-b"></div>
+      </div>
+  </div>
+
+</aura:component>

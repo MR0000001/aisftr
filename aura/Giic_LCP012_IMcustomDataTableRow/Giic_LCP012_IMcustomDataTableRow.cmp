@@ -1,0 +1,37 @@
+<aura:component controller="giic_LCC010_InventoryMovement">
+    
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }" />
+    <aura:attribute name="onHand" type="Integer" default="0" />
+    <aura:attribute name="options" type="List" />
+    <aura:attribute name="selectedValue" type="String" />
+    <aura:attribute name="piqd" type="gii__ProductInventoryQuantityDetail__c" />
+    <aura:handler name="change" value="{!v.onHand}" action="{!c.sendOnHandEvent}"/>
+    <aura:registerEvent name="sendOnHand" type="c:Giic_LCE001_SendOnHand"/>
+    <tr class="slds-hint-parent">
+         <td data-label="{!v.piqd.Name}" scope="row">
+            <div class="slds-truncate" title="{!v.piqd.Name}">{!v.piqd.Name}</div>
+        </td>
+        <td data-label="{!v.piqd.gii__Location__r.Name}" scope="row">
+            <div class="slds-truncate" title="{!v.piqd.gii__Location__r.Name}">{!v.piqd.gii__Location__r.Name}</div>
+        </td>
+        <td data-label="{!v.piqd.gii__ProductSerial__r.Name}">
+            <div class="slds-truncate" title="{!v.piqd.gii__ProductSerial__r.Name}">{!v.piqd.gii__ProductSerial__r.Name}</div>
+        </td>
+        <td data-label="{!v.piqd.gii__ProductLot__r.Name}">
+            <div class="slds-truncate" title="{!v.piqd.gii__ProductLot__r.Name}">{!v.piqd.gii__ProductLot__r.Name}</div>
+        </td>
+        <td data-label="{!v.piqd.gii__OnHandQuantity__c}">
+            <div class="slds-truncate" title="{!v.piqd.gii__OnHandQuantity__c}">{!v.piqd.gii__OnHandQuantity__c}</div>
+        </td>
+         <td data-label="{!v.piqd.gii__ReservedQuantity__c}">
+            <div class="slds-truncate" title="{!v.piqd.gii__ReservedQuantity__c}">{!v.piqd.gii__ReservedQuantity__c}</div>
+        </td>
+        <td data-label="{!v.piqd.gii__MovableQuantity__c}">
+            <div class="slds-truncate" title="{!v.piqd.gii__MovableQuantity__c}">{!v.piqd.gii__MovableQuantity__c}</div>
+        </td>
+        <td data-label="ON HAND">
+            <div class="slds-truncate" title="ON HAND"> <lightning:input type="number" name="input2" label="On Hand" value="{!v.onHand}"  /></div>
+        </td>
+    </tr>
+    
+</aura:component>

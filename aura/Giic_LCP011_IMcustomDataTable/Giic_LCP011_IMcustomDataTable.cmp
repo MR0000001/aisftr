@@ -1,0 +1,80 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,force:hasSObjectName"
+     controller="giic_LCC010_InventoryMovement">
+    
+    <aura:attribute name="locationToId" type="String" />
+    <aura:attribute name="productInventoryId" type="String" />
+    <aura:attribute name="mapIdToOnHand" type="Map" default="{}"></aura:attribute>
+    <aura:attribute name="mapIdPiqdToLocationFrom" type="Map" default="{}"></aura:attribute>
+    <aura:attribute name="allPiqDetails" type="gii__ProductInventoryQuantityDetail__c[]" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" /> 
+    <lightning:navigation aura:id="navService"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler event="c:Giic_LCE001_SendOnHand" action="{!c.handleComponentEvent}"/>
+	<lightning:card title="">
+         <aura:if isTrue="{!v.showSpinner}">
+        	<lightning:spinner aura:id="mySpinner" />
+         </aura:if>
+         <div class="slds-text-heading_medium">
+             <b>Product Inventory Quantity Details:</b></div><br></br>
+		<table class="slds-table slds-table_cell-buffer slds-table_bordered">
+			<thead>
+				<tr class="slds-line-height_reset">
+                    <th class="slds-text-title_caps" scope="col">
+						<div class="slds-truncate" title="Number">NUMBER</div>
+					</th>
+					<th class="slds-text-title_caps" scope="col">
+						<div class="slds-truncate" title="Location">LOCATION</div>
+					</th>
+					<th class="slds-text-title_caps" scope="col">
+						<div class="slds-truncate" title="Product Serial">PRODUCT SERIAL</div>
+					</th>
+                    <th class="slds-text-title_caps" scope="col">
+						<div class="slds-truncate" title="Product Lot">PRODUCT LOT</div>
+					</th>
+					<th class="slds-text-title_caps" scope="col">
+						<div class="slds-truncate" title="Industry">ON HAND</div>
+					</th>
+					<th class="slds-text-title_caps" scope="col">
+						<div class="slds-truncate" title="Rating">RESERVED</div>
+					</th>
+                    
+                    <th class="slds-text-title_caps" scope="col">
+						<div class="slds-truncate" title="Rating">MOVABLE QUANTITY</div>
+					</th>
+                    
+                     <th class="slds-text-title_caps" scope="col">
+						<div class="slds-truncate" title="Rating">ON HAND</div>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+
+
+				<aura:iteration items="{!v.allPiqDetails }" var="piqd">
+					<c:Giic_LCP012_IMcustomDataTableRow piqd="{!piqd}"/>
+				</aura:iteration><br></br>
+              
+			</tbody>
+            
+		</table>
+          <footer class="slds-modal__footer">
+                   <lightning:buttonGroup>
+                  
+                   <lightning:button variant="brand" 
+                              label="Save"
+                              title="save"
+                              iconName="utility:save"
+                              iconPosition="right"
+                              disabled="{!v.permitSave}"
+                              onclick="{! c.saveAllPiqd }"/>  
+              <lightning:button variant="neutral"   
+                              label="Close"
+                              title="Close"
+                              onclick="{! c.closeModal }"/>
+            
+           
+        </lightning:buttonGroup>
+                </footer>
+	</lightning:card>
+	
+</aura:component>

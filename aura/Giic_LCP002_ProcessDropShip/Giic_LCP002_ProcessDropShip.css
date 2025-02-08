@@ -1,0 +1,16 @@
+.THIS .slds-th__action{ justify-content: center !important; }
+
+.THIS .slds-grid_align-end { justify-content: center !important; }
+
+.THIS .spazio {
+    padding-top: 30pt;
+    text-align: right;
+}
+
+.THIS .custom-box2 {
+
+padding: 10px;
+box-shadow: 5px 5px 10px 2px #333333;
+-webkit-box-shadow: 5px 5px 10px 2px #333333;
+-moz-box-shadow: 5px 5px 10px 2px #333333;
+}

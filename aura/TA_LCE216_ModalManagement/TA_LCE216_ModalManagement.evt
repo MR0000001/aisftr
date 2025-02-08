@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="show" type="Boolean"/> 
+    <aura:attribute name="type" type="String"/> 
+    <aura:attribute name="params" type="Object"/> 
+</aura:event>

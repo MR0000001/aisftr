@@ -1,0 +1,35 @@
+<aura:component controller="TA_LCC226_CartContainer"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable"
+    access="global">
+
+    <aura:attribute access="public" name="listOfPicklist" type="List"/> 
+    <aura:attribute access="public" name="bargainingParametersItem" type="Object"/>
+    <aura:attribute access="public" name="b2winResponse" type="Object"/>
+
+    <ltng:require styles="{!join(',',
+                            $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+
+    <lightning:layout multipleRows="true" class="slds-p-bottom_large slds-m-bottom_medium">
+        <lightning:layoutItem size="12">
+            <h3 class="ta-color-white ta-border-bottom-white"> {!$Label.c.TA_CatalogConfiguration} </h3>
+        </lightning:layoutItem>
+            
+        <aura:iteration items="{!v.listOfPicklist}" var="picklist"> 
+            <!-- <lightning:layoutItem size="12" class="ta-picklist-label"> {!picklist.label} </lightning:layoutItem> -->
+            <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                <lightning:select name="{!picklist.pfpId}" label="{!picklist.label}" value="{!picklist.value}" onchange="{!c.handleCatalogPicklist}">
+                    <aura:iteration items="{!picklist.options}" var="option">
+                        <option text="{!option}" value="{!option}"></option>
+                    </aura:iteration>
+                </lightning:select>  
+            </lightning:layoutItem>           
+        </aura:iteration>
+    </lightning:layout>
+
+</aura:component>

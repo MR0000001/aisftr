@@ -1,0 +1,131 @@
+<aura:component controller="giic_LCC004_SendSap" >
+    <aura:attribute name="polId" type="String" />
+    <aura:attribute name="Name" type="String" />
+    <aura:attribute name="purchaseOrderId" type="String" />
+    <aura:attribute name="applicantUnitDefault" type="String" />
+    <aura:attribute name="readOnly" type="Boolean" default="false" />   
+    <aura:attribute name="showIcon" type="Boolean" default="false" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />  
+    <aura:attribute name="plantDisabled" type="Boolean" default="false" />
+    <aura:attribute name="isForClosedContract" type="Boolean" default="false" />
+    <aura:attribute name="unitDisabled" type="Boolean" default="false" />
+    <aura:attribute name="applicantUnitOnPBE" type="Boolean" default="false" />
+    <aura:attribute name="plantOnPBE" type="Boolean" default="false" />
+    <aura:attribute name="isForSpain" type="Boolean" default="false" />
+    <aura:attribute name="category" type="String" />  
+    <aura:attribute name="priceBookEntryName" type="String" />
+    <aura:attribute name="product" type="String" /> 
+    <aura:attribute name="quantity" type="String" />  
+    <aura:attribute name="division" type="String" />  
+    <aura:attribute name="purchaseOrganization" type="String" />
+    <aura:attribute name="definitionOfDivision" type="String" />  
+    <aura:attribute name="definitionOfPurchaseOrganization" type="String" />  
+    
+    <aura:attribute name="applicantUnitNameToDef" type="map" default="{}"/>  
+    
+    <aura:attribute name="categoryOptions" type="List" default="[
+    {'label': 'K - Cost Center', 'value': 'K'},
+    {'label': 'P - WBE', 'value': 'P'}
+    ]"/>   
+    
+      <aura:attribute name="appUnitOptions" type="List" />
+      <aura:attribute name="applicantUnitMap" type="List" />
+      <aura:attribute name="purchaseOrganizationMap" type="List" />
+      <aura:attribute name="divisionMap" type="List" />
+      <aura:attribute name="divisionToDefinition" type="List" ></aura:attribute>
+      <aura:attribute name="divisionOptions" type="List" ></aura:attribute>  
+      <aura:attribute name="purchaseOptions" type="List" ></aura:attribute> 
+      <aura:attribute name="purchaseOrganizationToDefinition" type="List" ></aura:attribute>
+      <lightning:notificationsLibrary aura:id="notifLib"/>
+      <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+     <lightning:card>
+         <div class="slds-text-heading_small">
+         <b>Purchase Order Line:</b> &nbsp;&nbsp;{!v.Name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Product:</b>&nbsp;&nbsp;{!v.product}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Quantity:</b>&nbsp;&nbsp;{!v.quantity}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Pricebook Entry:</b>&nbsp;&nbsp;{!v.priceBookEntryName}
+         </div>
+          <aura:if isTrue="{!v.showIcon}">
+              <div class="superpad">
+          <lightning:icon iconName="standard:task2" alternativeText="Event" />
+                  </div>
+         </aura:if>
+         <br></br>
+             <lightning:layout multipleRows="true">
+                   <aura:if isTrue="{!v.showSpinner}">
+       				 <lightning:spinner aura:id="mySpinner" />
+   				   </aura:if>
+                <div class="slds-hidden">   
+            <lightning:layoutItem size="1"  >
+                 <lightning:input name="ser" disabled="true" value="{!v.polId}" label="Pol Id" />
+            </lightning:layoutItem>
+                </div>
+            
+                <lightning:layoutItem size="4" padding="horizontal-medium"  >
+                 <lightning:combobox name="ser" disabled="{!v.unitDisabled}" value="{!v.applicantUnitDefault}" label="Requesting Unit" options="{!v.appUnitOptions }"/>
+            </lightning:layoutItem>
+               
+                 <lightning:layoutItem size="2" padding="horizontal-medium"  >
+                <aura:if isTrue="{!v.readOnly}">
+           
+                 <lightning:input name="ser" disabled="{!v.readOnly}" value="{!v.category}" label="Category"  />
+         
+                <aura:set attribute="else">
+                	<lightning:combobox name="ser" disabled="{!v.readOnly}" value="{!v.category}" label="Category" options="{!v.categoryOptions }" placeholder="Options"  />
+                </aura:set>
+
+                </aura:if>
+                        </lightning:layoutItem>
+                 
+                 <lightning:layoutItem size="3" padding="horizontal-medium"  >
+                 <lightning:combobox name="ser" disabled="{!v.plantDisabled}" value="{!v.division}" label="Plant" options="{!v.divisionOptions }"  onchange="{!c.setDDefinition}"/>
+            </lightning:layoutItem>
+                   <!--
+    <lightning:layoutItem size="4" padding="horizontal-medium"  >
+                 <lightning:input name="ser" disabled="true" value="{!v.definitionOfDivision}" label="Definition of Division" />
+            </lightning:layoutItem>
+       -->
+                </lightning:layout>
+                <lightning:layout>
+                   <div class="slds-hidden">   
+            <lightning:layoutItem size="2" padding="horizontal-medium"  >
+               <lightning:input name="ser" disabled="true" />
+            </lightning:layoutItem>
+                </div>
+                  
+                <!--    <lightning:layoutItem size="3" padding="horizontal-medium"  >
+                  <lightning:combobox name="ser" disabled="true" value="{!v.purchaseOrganization}" label="Purchasing Organization"  onchange="{!c.setOrgDefinition}" options="{!v.purchaseOptions}"/>
+             </lightning:layoutItem>-->
+                     <!--
+                    <lightning:layoutItem size="3" padding="horizontal-medium"  >
+                  <lightning:input name="ser" disabled="true" value="{!v.definitionOfPurchaseOrganization}" label="Definition of Purchase Organization" />
+                    </lightning:layoutItem>
+                     -->
+                    <lightning:layoutItem size="3" padding="horizontal-medium"  >
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                    </lightning:layoutItem>
+                  
+     <lightning:layoutItem size="3" padding="around-large"  >
+           
+          <lightning:buttonGroup>
+            <lightning:button variant="brand" 
+                              label="Save Line"
+                              title="save"
+                              iconName="utility:save"
+                              iconPosition="right"
+                              disabled="false"
+                              onclick="{! c.saveLineValues}"/>  
+        <lightning:button variant="neutral"   
+                              label="{!$Label.c.XC_CL_Cancel}"
+                              title="Cancel"
+                              onclick="{! c.closeLine}"/>
+              </lightning:buttonGroup>
+             
+               </lightning:layoutItem>
+                    
+                     </lightning:layout>
+<aura:set attribute="footer">
+            <lightning:badge label=""/>
+        </aura:set>
+     
+    </lightning:card>
+       
+           
+</aura:component>

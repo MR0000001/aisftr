@@ -1,0 +1,533 @@
+@media only screen and (max-width: 600px) {
+    /* CUSTOM-TAG */
+    .THIS .ta-section-title {
+        font-weight: 300;
+        font-size: 4vw;
+    }
+
+    /* CUSTOM-TAG */
+    .THIS .ta-section-description {
+        font-weight: 300;
+        font-size: 3.3vw;
+        border-top: .5vw solid rgba(255, 255, 255, 0.3);
+        padding-top: 3vw;
+        margin-top: 3vw;
+    }
+
+    /* CUSTOM-TAG */
+    .THIS .ta-required {    
+        font-size: 5vw;
+        position: absolute;
+        top: -1.2vw;
+        margin-left: .5vw;
+        float: left;
+    }
+}
+
+@media only screen and (min-width: 601px) {
+    .THIS .slds-file-selector__text {
+        display: none;
+    }
+
+    .THIS .slds-file-selector__button.slds-button.slds-button_neutral {
+        font-size: 2.5vw !important;
+        padding: 1.5vw;
+    }
+
+    .THIS .slds-form-element__control.slds-grow {
+        top: 0;
+        left: 0;
+    }
+}
+.THIS .ta-modal-container {
+    background: white;
+    border-radius: 5vw;
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    top: 30vw;
+    padding: 6vw 6vw 0vw 6vw;
+    margin: 5vw;
+    width: 90vw;
+}
+.THIS .flowRuntimeV2 .slds-card__footer{
+    display: inline !important;
+}
+.THIS .flowRuntimeV2 .slds-card__header{
+    display: none !important;
+}
+.THIS .flowRuntimeV2 .slds-form-element__label{
+   color: var(--lwc-colorTextLabel,rgba(0, 0, 0, 0.6)) !important;
+}
+
+.THIS .flowRuntimeV2 .uiOutputRichText{
+    color: var(--lwc-colorTextLabel,rgba(0, 0, 0, 0.6)) !important;
+}
+.THIS .flowRuntimeV2 .slds-input{
+    background-color: var(--sds-c-input-color-background, var(--lwc-colorBackgroundInput,rgb(255, 255, 255))) !important;
+        border: var(--lwc-borderWidthThin,1px) solid var(--sds-c-input-color-border, var(--lwc-colorBorderInput,rgb(212, 212, 212))) !important;
+}
+.THIS .flowRuntimeV2 .slds-button_neutral{
+    color: #ff006e;
+    background-color: #ffffff;
+    border-color: #ff006e;
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size: 3.5vw;
+    height: 9vw;
+}
+
+.THIS .ta-flow-container .content{
+    overflow:auto;
+    max-height: 500px;
+}
+
+.THIS .ta-wolitype{
+    font-size: large;
+    text-align: center;
+}
+/* .THIS h3 {
+    font-family: Montserrat;
+    font-size: 4vw;
+    font-weight: 800;
+    font-stretch: normal;
+    font-style: normal;
+    letter-spacing: normal;
+} */
+
+/* .THIS .ta-title {
+    font-size: 4vw;
+    color: white;
+    font-weight: 800;
+    text-transform: capitalize;
+}
+
+.THIS .ta-border-bottom-white {
+    border-bottom: .5vw solid white;
+}
+
+.THIS .ta-completed {
+    color: green;   
+}
+
+.THIS .ta-not-completed {
+    color: red;   
+}
+
+.THIS .ta-section {
+    padding: 3vw;
+    color: white;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2.5vw;
+    margin: 2vw 0vw 2vw 0vw;
+}
+
+.THIS .ta-section-green {
+    padding: 3vw;
+    color: white;
+    background: rgba(0, 201, 131, 0.6);
+    border-radius: 2.5vw;
+    margin: 2vw 0vw 2vw 0vw;
+    box-shadow: 0vw 1vw 2vw -0.8vw black;
+}
+
+.THIS .ta-section-orange {
+    padding: 3vw;
+    color: white;
+    background: rgba(255, 188, 0, 0.6);
+    border-radius: 2.5vw;
+    margin: 2vw 0vw 2vw 0vw;
+    box-shadow: 0vw 1vw 2vw -0.8vw black;
+}
+
+.THIS .ta-section-red {
+    padding: 3vw;
+    color: white;
+    background: rgba(255,64,64,0.6);
+    border-radius: 2.5vw;
+    margin: 2vw 0vw 2vw 0vw;
+    box-shadow: 0vw 1vw 2vw -0.8vw black;
+} */
+
+
+/* .THIS .ta-section-subtitle {
+    font-weight: 300;
+    font-size: 3.3vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-description {
+    font-weight: 300;
+    font-size: 3.3vw;
+    opacity: .6;
+}
+
+/* .THIS .ta-icon-close-size {
+    width: 4.5vw;
+} */
+
+
+/* .THIS p {
+    font-family: none;    
+    font-size: 4vw;
+    font-weight: 800;
+    font-stretch: normal;
+    font-style: italic;
+    letter-spacing: normal;
+} */
+
+/* .THIS .ta-button-primary {
+    color: #ffffff;
+    background: transparent;
+    border: 1px solid linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-weight: 800;
+    font-size: 3vw;
+    text-transform: uppercase;
+    min-width: 34vw;
+    width: 100%;
+    padding: 2vw;
+    margin-bottom: 3vw;
+    margin-right: 1.5vw;
+    text-align: center;
+    border: 2px solid white;
+}
+
+.THIS .ta-button-primary-disabled {
+    color: #ffffff;
+    background: transparent;
+    border: 1px solid linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-weight: 800;
+    font-size: 3vw;
+    text-transform: uppercase;
+    min-width: 34vw;
+    width: 100%;
+    padding: 2vw;
+    margin-bottom: 3vw;
+    margin-right: 1.5vw;
+    text-align: center;
+    border: 2px solid white;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.THIS .ta-button-closing {
+    color: white;
+    background-color: transparent;
+    border-color: #ff006e;
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-weight: 800;
+    font-size: 3vw;
+    text-transform: uppercase;
+    padding: 2vw;
+    margin-bottom: 3vw;
+    margin-left: 1.5vw;
+    border: 1px solid;
+    text-align: center;
+    border: 2px solid white;
+}
+
+.THIS .ta-button-closing-disabled {
+    color: white;
+    background-color: transparent;
+    border-color: #ff006e;
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-weight: 800;
+    font-size: 3vw;
+    text-transform: uppercase;
+    padding: 2vw;
+    margin-bottom: 3vw;
+    margin-left: 1.5vw;
+    border: 1px solid;
+    text-align: center;
+    border: 2px solid white;
+    opacity: 0.5;
+    pointer-events: none;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-icon-check {
+    width: 4vw;
+    height: 4vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-icon-close {
+    width: 3vw;
+    height: 4vw;
+}
+
+/* .THIS .ta-input-measure {
+    color: #000000;   
+    font-weight: 800;
+}
+
+.THIS .ta-font-weight-800 {
+    font-weight: 800;
+} */
+/* .THIS .slds-file-selector.slds-file-selector_files {
+    text-transform: capitalize !important;
+    color: white !important;
+    background: transparent !important;
+    border: 2px solid white !important;
+    font-size: 4vw !important;
+    border-radius: 2.5vw !important;
+    margin-top: 0 !important;
+}
+
+.THIS .slds-file-selector__button.slds-button.slds-button_neutral {
+    text-transform: capitalize !important;
+    color: white !important;
+    background: transparent !important;
+    font-size: 4vw !important;
+    border: 0px !important;
+}
+
+.THIS .slds-button.slds-button_icon.slds-button_icon-border-inverse[name="download"] {
+    border: none !important;
+    width: 6vw !important;
+    height: 6vw !important;
+}
+
+.THIS .slds-file-selector__dropzone {
+    border: none !important;
+} */
+
+
+/* .THIS .ta-line {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+    width: 100%;
+    height: 2px;
+    margin-top: 2.5vw;
+    margin-bottom: 2vw;
+}
+
+.THIS .ta-toast {   
+    background: rgba(255, 188, 0, 0.8);   
+    box-shadow: 0 1vw 2vw rgba(0,0,0,0.5);
+}
+
+.THIS .ta-toast-text {
+    color: white;
+    font-size: 3.6vw;
+    font-weight: 300;
+    text-align: left;
+}
+
+.THIS .ta-toast-icon {
+    width: 4vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-warning svg{
+    fill:rgba(255, 188, 0, 0.8) !important;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-warning {
+    margin-top: 11vw;
+    margin-left: 2vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-info svg{
+    fill:white !important;
+}
+
+/* .THIS .slds-input, .THIS .slds-select, .THIS .slds-input:focus, .THIS .slds-input:active {
+    background-color: #ece8f2 !important;
+    border: 1px solid #ece8f2 !important;
+    border-radius: 5vw !important;
+    color:black !important;
+}*/
+
+/* CUSTOM-TAG */
+.THIS div.chart {
+    position: relative;
+    width: 11vw;
+    height: 11vw;
+    margin-left: 3vw;
+} 
+
+/* CUSTOM-TAG */
+.THIS .chart canvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    width: 11vw;
+    height: 11vw;
+    left: 0;
+}
+
+/* CUSTOM-TAG */
+.THIS #graphspan {
+    color: white;
+    display: block;
+    text-align: center;
+    width: 11vw;
+    height: 11vw;
+    font-size: 2.5vw;
+    font-weight: 800;
+    padding: 3.5vw;
+    margin-left: -.6vw;
+    padding-top: 3.7vw;
+}
+
+/* CUSTOM-TAG */
+.THIS #graphspancompleted {
+    color: white;
+    display: block;
+    text-align: center;
+    width: 11vw;
+    height: 11vw;
+    font-size: 2.5vw;
+    font-weight: 800;
+    padding: 3.5vw;
+    margin-left: -1.2vw;
+    padding-top: 3.7vw;
+}
+
+
+/* CUSTOM-TAG */
+.THIS .ta-img-container {
+    border-radius: 2.5vw;
+    height: 35vw;
+    margin-left: 1vw;
+    margin-right: 1vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-box-photo {
+    border-radius: 2.5vw;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    vertical-align: middle;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-button-close {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2vw;
+    border-radius: 5vw;
+    position: absolute;
+    top: 1vw;
+    right: 2vw;
+}
+
+/* CUSTOM-TAG TABLET */
+@media only screen and (min-width: 601px) {
+    .THIS div.chart {
+        position: relative;
+        width: 11vw;
+        height: 11vw;
+        margin-left: 5vw;
+    }
+
+    .THIS #graphspan {
+        color: white;
+        display: block;
+        text-align: center;
+        width: 8vw;
+        height: 8vw;
+        font-size: 2.5vw;
+        font-weight: 800;
+        padding: 3.5vw;
+        margin-left: -3vw;
+        padding-top: 2.3vw;
+    }
+
+    .THIS .chart canvas {
+        display: block;
+        position: absolute;
+        top: 0;
+        width: 8vw;
+        height: 8vw;
+        left: 0;
+    }    
+}
+
+.THIS .slds-pill__label {       
+    color: black !important;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-pdf-icon {
+    border-radius: 2.5vw;
+    position: absolute;
+    width: 20vw;
+    height: 20vw;
+    margin-bottom: 0vw;
+    top: 2.5vw;
+    left: 9vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-pdf-name {    
+    position: absolute; 
+    top: 25vw;
+    left: 3vw;
+    width: 31vw;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: 3.3vw;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-word-icon {
+    border-radius: 2.5vw;
+    position: absolute;
+    width: 17vw;
+    height: 22vw;
+    margin-bottom: 0vw;
+    top: 2.5vw;
+    left: 8vw;
+}
+
+.THIS .ta-input-file-label{
+    display: inline-block;
+    position: relative;
+    height: 50px;
+    width: 130px;
+}
+
+.THIS .ta-input-file-text{
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    background: rgba(204, 204, 204, 0);
+    border: 2px solid white;
+}
+
+.THIS .ta-input-file-standard{
+    position: absolute;
+    left: 0;
+    opacity: 0;
+    top: 0;
+    bottom: 0;
+}
+
+/* .THIS .slds-form-element__control{
+    top: -7vw;
+} */

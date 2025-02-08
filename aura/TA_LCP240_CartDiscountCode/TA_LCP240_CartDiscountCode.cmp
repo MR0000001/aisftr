@@ -1,0 +1,212 @@
+<aura:component controller="TA_LCC240_CartDiscountCode"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable"
+                access="global">
+
+    <aura:attribute access="public" name="cartContext" type="Object" />
+    <aura:attribute access="public" name="workOrderId" type="String" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    
+    <aura:attribute access="private" name="b2winResponse" type="Object"/>
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false" />
+    <aura:attribute access="private" name="voucherCode" type="String"/> 
+    <aura:attribute access="private" name="showVoucherCodeModal" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="isVoucherCodeFound" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="selectedVoucher" type="Object"/>
+    <aura:attribute access="private" name="appliedVouchers" type="List"/>
+    <aura:attribute access="private" name="selectedProduct" type="Object"/>
+    <aura:attribute access="private" name="currentAction" type="String"/>
+    <aura:attribute access="private" name="totalCartAmount" type="Integer" />
+    <aura:attribute access="private" name="workOrder" type="Object"/>
+    <!-- <aura:attribute access="private" name="subsidies" type="List"/>
+    <aura:attribute access="private" name="selectedSubsidyId" type="String"/>
+    <aura:attribute access="private" name="selectedSubsidy" type="Object" default="{}"/> -->
+
+    <ltng:require styles="{!join(',',
+                            $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                            $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:handler event="c:TA_LCE226_CartStep" action="{!c.handleManageB2WResponse}" />
+
+    <aura:registerEvent name="upsertItemsEvt" type="c:TA_LCE226_CartStep"/>
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="11" class="slds-p-top_small slds-p-bottom_small">
+                        <h3 class="ta-color-white"> {!$Label.c.TA_Voucher} </h3>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="1">
+                        <c:TA_LCP232_CartSummary workOrder="{!v.workOrder}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>   
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" class="ta-border-top">
+                <lightning:layout multipleRows="true">
+                    <aura:if isTrue="{!v.appliedVouchers.length == 0}">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                            <p class="ta-color-white-opacity-60"> {!$Label.c.TA_VoucherUseDescription} </p>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="8" class="slds-p-right_medium">
+                            <lightning:input type="text" label="Voucher Code" value="{!v.voucherCode}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="4" class="slds-m-top_xx-small">
+                            <div name="apply" class="ta-button-simple" onclick="{!c.handleGetVoucherCode}"> {!$Label.c.TA_CartDiscountCodeSearch} </div>
+                        </lightning:layoutItem>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.appliedVouchers.length > 0}">
+                        <aura:iteration items="{!v.appliedVouchers}" var="appliedVoucher">
+                            <lightning:layoutItem size="12">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="8">
+                                        <lightning:layout multipleRows="true">
+                                            <lightning:layoutItem size="12">
+                                                <h3 class="ta-color-white"> {!appliedVoucher.XC_Amount__c} {!if(appliedVoucher.XC_Type_of_Discount__c == 'Percentage', '% ', '€ ')} {!$Label.c.TA_Discount} </h3>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12">
+                                                <p class="ta-color-white-opacity-60"> {!appliedVoucher.XC_VoucherCode__c} </p>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="4">
+                                        <div name="remove" id="{!appliedVoucher.fields.id}" class="ta-button-simple slds-m-top_xx-small" onclick="{!c.handleRemoveVoucherCode}"> {!$Label.c.TA_DiscountRemove} </div>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </lightning:layoutItem>
+                        </aura:iteration>
+                    </aura:if>  
+
+                    <!-- <lightning:layoutItem size="12" class="slds-m-top_medium ta-border-top-2 slds-text-align_left ta-cart-total-amount-label">
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem size="12" class="ta-card-title">
+                                Subsidy
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12">
+                                <aura:if isTrue="{!v.subsidies.length > 0}">
+                                    <aura:if isTrue="{!v.selectedSubsidy.Id == null}">
+
+                                        <lightning:layout multipleRows="true">
+                                            <lightning:layoutItem size="8">
+                                                <lightning:select value="{v.selectedSubsidyId}">
+                                                    <aura:iteration items="{!v.subsidies}" var="subsidy">
+                                                        <option value="{!subsidy.Id}">{!subsidy.XC_Promo_Name__c}</option>
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="4">
+                                                <div name="apply-subsidy" class="ta-button-invert" onclick="{!c.handleApplySubsidy}"> APPLY </div>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+           
+                                        <aura:set attribute="else">
+                                            <lightning:layout multipleRows="true" class="slds-m-top_medium ta-voucher-code-section">
+                                                <lightning:layoutItem size="8">
+                                                    <lightning:layout multipleRows="true">
+                                                        <lightning:layoutItem size="12" class="ta-voucher-discount">
+                                                            {!v.selectedSubsidy.XC_Discount__c} € Discount
+                                                        </lightning:layoutItem>
+                                                        <lightning:layoutItem size="12" class="ta-voucher-code">
+                                                            {!v.selectedSubsidy.XC_Promo_Name__c}
+                                                        </lightning:layoutItem>
+                                                    </lightning:layout>
+                                                </lightning:layoutItem>
+                                                <lightning:layoutItem size="4">
+                                                    <div name="remove" id="{!v.selectedSubsidy.Id}" class="ta-button-invert slds-m-top_xx-small" onclick="{!c.handleRemoveSubsidy}"> REMOVE </div>
+                                                </lightning:layoutItem>
+                                            </lightning:layout>
+                                        </aura:set>
+                                    </aura:if>
+                                    
+                                    <aura:set attribute="else">
+                                        <div class="slds-m-bottom_medium ta-voucher-description"> No subsidies available </div> 
+                                    </aura:set>
+                                </aura:if>
+                            </lightning:layoutItem>
+                        </lightning:layout>   
+                    </lightning:layoutItem> -->
+
+                    <lightning:layoutItem size="12" class="slds-m-top_xx-small ta-border-top slds-text-align_right">
+                       <h3 class="ta-color-white"> {!$Label.c.TA_CartDiscountCodeTotalAmount} <span class="ta-cart-total-amount-value"> {!v.totalCartAmount} € </span> </h3>  
+                    </lightning:layoutItem>
+                    
+                </lightning:layout>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showVoucherCodeModal}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-container-2 ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11"> <h3 class="ta-color-black"> {!$Label.c.TA_VoucherInfo} </h3></lightning:layoutItem>
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.handleCloseModal}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-info-body slds-text-align_center">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_medium slds-text-align_center">
+                            <h3 class="ta-color-black ta-font-weight-300"> {!$Label.c.TA_DiscountInformation} </h3>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <aura:if isTrue="{!v.isVoucherCodeFound}">
+                                <lightning:layout multipleRows="true" class="ta-margin-top">
+                                    <lightning:layoutItem size="6" class="slds-m-bottom_x-small">
+                                        <h3 class="ta-color-black"> {!$Label.c.TA_CouponStatus} </h3>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="6" class="slds-m-bottom_x-small">
+                                        <h3 class="ta-color-black ta-font-weight-300"> {!v.selectedVoucher.XC_Status__c} </h3>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="6" class="slds-m-bottom_x-small">
+                                        <h3 class="ta-color-black"> {!$Label.c.TA_CouponValidFrom} </h3>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="6" class="slds-m-bottom_x-small">
+                                        <h3 class="ta-color-black ta-font-weight-300"> {!v.selectedVoucher.XC_StartDate__c} </h3>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="6" class="slds-m-bottom_x-small">
+                                        <h3 class="ta-color-black"> {!$Label.c.TA_CouponValidTo} </h3>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="6" class="slds-m-bottom_x-small">
+                                        <h3 class="ta-color-black ta-font-weight-300"> {!v.selectedVoucher.XC_EndDate__c}</h3>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                                <aura:set attribute="else">
+                                    <div class="ta-discount-not-found"> {!$Label.c.TA_DiscountNotFound} </div> 
+                                </aura:set>
+                            </aura:if>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-footer">
+                    <lightning:layout multipleRows="true">
+                        <aura:if isTrue="{!v.isVoucherCodeFound}">
+                            <lightning:layoutItem size="12">
+                                <lightning:button label="{!$Label.c.TA_Cancel}" class="slds-m-bottom_small ta-button-closing-modal" onclick="{!c.handleCloseModal}"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12">
+                                <lightning:button label="{!$Label.c.TA_Apply}" class="ta-button-primary-modal" onclick="{!c.handleApplyVoucher}"/>
+                            </lightning:layoutItem>
+                            <aura:set attribute="else">
+                                <lightning:layoutItem size="12">
+                                    <lightning:button label="{!$Label.c.TA_Cancel}" class="ta-button-closing-modal" onclick="{!c.handleCloseModal}"/>
+                                </lightning:layoutItem>
+                            </aura:set>
+                        </aura:if>
+                    </lightning:layout>
+                </lightning:layoutItem> 
+            </lightning:layout>
+        </div>
+    </aura:if>
+</aura:component>

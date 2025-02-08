@@ -1,0 +1,50 @@
+<!--
+* @author Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.com & Monica Cutillo - monica.cutillo@nttdata.com
+* @date Creation 06/12/2018
+* @date Modification dd/mm/yyyy
+* @description XC_LCP051_CloneLead – Allows to clone e Lead, after new Product Category Of Interest and state selection.
+-->
+<aura:component 
+    extends = "c:XC_LCP022_TabNavigationManager"
+    controller="XC_LCC051_CloneLead" 
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:hasSObjectName,lightning:availableForFlowScreens,force:lightningQuickActionWithoutHeader" access="global" >
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="productCategoryOfInterest" type="String" />
+    <aura:attribute name="isSystemAdmin" type="Boolean" default="false" />
+     <aura:attribute name="disableCheckBox" type="Boolean" default="true" />
+     <aura:attribute name="executeAssignment" type="Boolean" default="true" />
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <lightning:navigation aura:id="navService"/>
+    <lightning:workspaceAPI aura:id="workspace" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+
+    <div class="modal-header slds-modal__header slds-size_1-of-1">
+       <h4 class="title slds-text-heading_medium" > {!$Label.c.XC_CL_CloneLead} </h4>  
+    </div>
+     <lightning:recordEditForm objectApiName="Lead">
+            <!-- the messages component is for error messages -->
+            <lightning:messages />
+            <lightning:inputField label="{!$Label.c.XC_CL_ProductCategoryOfInterest}" aura:id="ProductCategoryOfInterest" value="{!v.productCategoryOfInterest}" fieldName="XC_ProductCategoryOfInterest__c" onchange="{!c.changePick }"/>
+     </lightning:recordEditForm>
+<br></br><br></br>
+ <div class="forceChangeRecordTypeFooter slds-float--left slds-m-around--medium">
+ <lightning:input type="checkbox" name="assignLeadName" label="{!$Label.c.XC_CL_AssignmentRule}" checked="{!v.executeAssignment}" aura:id="assignLead" disabled="{!v.disableCheckBox}" class="slds-p-vertical_small" /> <!-- onchange="{!c.assignLeadChecked}" -->
+ </div>
+     <aura:if isTrue="{!v.spinnerControl}" >
+        <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+                    <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+    
+     <div class="modal-footer slds-modal__footer slds-size_1-of-1">
+
+        <div class="forceChangeRecordTypeFooter">
+            <lightning:button  label="{!$Label.c.XC_CL_CancelButton}" title="Cancel" onclick="{! c.cancel}"/>
+            <lightning:button variant="brand" label="{!$Label.c.XC_CL_ConfirmButton}" title="Submit" onclick="{! c.confirm}" />
+            
+          </div>
+      </div>
+	
+</aura:component>

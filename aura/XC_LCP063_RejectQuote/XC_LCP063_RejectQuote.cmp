@@ -1,0 +1,31 @@
+<!--
+* @author Lorenzo Orlanducci lorenzo.orlanducci@nttdata.com 
+* @date Creation 02/01/2019
+* @date Modification dd/mm/yyyy
+* @description change XC_Status in Rejected if it possible
+-->
+<aura:component controller="XC_LCC063_RejectQuote" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasSObjectName,lightning:availableForFlowScreens" access="global" >
+<aura:attribute name="recordId" type="String" />
+<aura:attribute name="reasonValue" type="String" />
+<aura:attribute name="reasonOptions" type="List" />
+<lightning:notificationsLibrary aura:id="notifLib"/>
+<aura:handler name="init" value="{!this}" action="{!c.init}"/>  
+
+   <lightning:combobox name="lossReason" label="{!$Label.c.XC_CL_LossReason}" value="{! v.reasonValue }" options="{! v.reasonOptions }" />
+    <div class="scala">
+     <footer class="slds-modal__footer slds-theme_default">   
+                         <lightning:button variant="neutral" 
+                                          label="{!$Label.c.XC_CL_Cancel}"
+                                          title="Cancel"
+                                          onclick="{! c.closeModal }"/>
+                        
+                                <lightning:button variant="brand" 
+                                                  label="{!$Label.c.XC_CL_Submit}"
+                                                  title="Submit"
+                                                  disabled="{!v.disabledSubmit}"
+                                                  onclick="{! c.reject }"/>
+         
+    </footer>
+</div>
+
+</aura:component>

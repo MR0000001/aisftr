@@ -1,0 +1,166 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    controller="TA_LCC264_DynamicListView"
+    access="global"
+>
+
+    <aura:attribute access="public" name="custom" type="String" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="public" name="isOpen" type="Boolean" default="false" />
+    
+    <aura:attribute access="private" name="listViews" type="List"/>
+    <aura:attribute access="private" name="selectedListViewId" type="String"/>
+    <aura:attribute access="private" name="columns" type="List"/>
+    <aura:attribute access="private" name="data" type="List"/>
+    <aura:attribute access="private" name="showMainView" type="Boolean" default="false" />
+    <aura:attribute access="private" name="showRelatedWorkOrders" type="Boolean" default="false" />
+    <aura:attribute access="private" name="accountName" type="String"/>
+
+    <aura:attribute access="private" name="columnsWorkOrders" type="List"/>
+    <aura:attribute access="private" name="dataWorkOrders" type="List"/>
+    <aura:attribute access="private" name="filteredDataWorkOrders" type="List"/>
+    <aura:attribute access="private" name="statusPickValues" type="List"/>
+    <aura:attribute access="private" name="woTypePickValues" type="List"/>
+    <aura:attribute access="private" name="faultTypePickValues" type="List"/>
+    <aura:attribute access="private" name="selectedWoStatus" type="String" default="All"/>
+    <aura:attribute access="private" name="selectedWoType" type="String" default="All"/>
+    <aura:attribute access="private" name="selectedFaultType" type="String" default="All"/>
+    <aura:attribute access="private" name="accountNameLike" type="String"/>
+
+    <aura:handler name="change" value="{!v.isOpen}" action="{!c.handleIsOpen}" />
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt" />
+    
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!v.isOpen}">
+        <div class="ta-full-screen-modal-container">
+
+            <!-- MAIN VIEW -->
+            <aura:if isTrue="{!v.showMainView}">
+
+                <!-- HEADER -->
+                <div class="ta-full-screen-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" class="slds-text-align_left">
+                            <h3 class="ta-color-black"> {!v.custom.objectName} Lists View</h3>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="1">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" class="ta-full-screen-modal-header-button" onclick="{!c.handleCloseModal}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+
+                <div class="ta-full-screen-modal-body">
+                    <lightning:layout multipleRows="true">
+
+                        <!-- LIST VIEW -->
+                        <lightning:layoutItem size="12">
+                            <lightning:select name="selectListView" value="{!v.selectedListViewId}" onchange="{!c.handleChangeView}" label="{!$Label.c.TA_SelectListView}" aura:id="selectListView" class="ta-select-category">
+                                <option value="">{!$Label.c.TA_Select}</option>
+                                <aura:iteration items="{!v.listViews}" var="listView">
+                                    <option value="{!listView.Id}">{!listView.Name}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </lightning:layoutItem>
+
+                        <!-- SEARCH & FILTERS -->
+                        <aura:if isTrue="{!v.custom.objectName == 'Account'}">
+                            <lightning:layoutItem size="12" class="slds-m-top_medium">
+                                {!$Label.c.TA_AccountName}
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                                <lightning:input type="text" name="searchText" value="{!v.accountNameLike}" class="ta-search-text"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" class="slds-m-bottom_large">
+                                <button style="width: 100%;" class="ta-button-primary" name="searchButton" onclick="{!c.handleSearchAccount}">{!$Label.c.TA_Search}</button>
+                            </lightning:layoutItem>
+                        </aura:if>
+                        
+                        <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                            <aura:if isTrue="{!v.data.length > 0}">
+                                <lightning:datatable
+                                    keyField="id"
+                                    enableInfiniteLoading="true"
+                                    loadMoreOffset="50"
+                                    aura:id="data-table-dynamic"
+                                    data="{!v.data}"
+                                    columns="{!v.columns}"
+                                    minColumnWidth="150"
+                                    maxRowSelection="1"
+                                    onrowselection="{!c.handleRowSelection}"
+                                    onrowaction="{!c.handleRowAction}"/>
+                                <aura:set attribute="else">
+                                    {!$Label.c.TA_ListViewBlank}
+                                </aura:set>
+                            </aura:if>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+            </aura:if>
+
+            <!-- RELATED WORK ORDERS -->
+            <aura:if isTrue="{!v.showRelatedWorkOrders}">
+                <div class="ta-full-screen-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" class="slds-text-align_left">
+                            <h3 class="ta-color-black"> {!v.accountName} - Work Orders </h3>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="1">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" class="ta-full-screen-modal-header-button" name="relatedWoBack" onclick="{!c.handleCloseModal}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+                <div class="ta-full-screen-modal-body">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="6">
+                            <lightning:select name="selectWoType" onchange="{!c.handleChangeFilter}" label="{!$Label.c.TA_SelectWorkTypeCategory}" aura:id="selectWoType" class="ta-select-category">
+                                <option value="All">{!$Label.c.TA_All}</option>
+                                <aura:iteration items="{!v.woTypePickValues}" var="woTypePickVal">
+                                    <option value="{!woTypePickVal.value}">{!woTypePickVal.label}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="6" class="slds-p-left_small">
+                            <lightning:select name="selectWoStatus" onchange="{!c.handleChangeFilter}" label="{!$Label.c.TA_SelectWoStatus}" aura:id="selectWoStatus" class="ta-select-category">
+                                <option value="All">{!$Label.c.TA_All}</option>
+                                <aura:iteration items="{!v.statusPickValues}" var="statusPickVal">
+                                    <option value="{!statusPickVal.value}">{!statusPickVal.label}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem size="6" class="'slds-m-top_medium">
+                            <lightning:select name="selectFaultType" onchange="{!c.handleChangeFilter}" label="{!$Label.c.TA_Fault}" aura:id="selectFaultType" class="ta-select-category">
+                                <option value="All">{!$Label.c.TA_All}</option>
+                                <aura:iteration items="{!v.faultTypePickValues}" var="faultTypePickVal">
+                                    <option value="{!faultTypePickVal.value}">{!faultTypePickVal.label}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </lightning:layoutItem>
+                        
+                        <lightning:layoutItem size="12" class="slds-m-bottom_medium">
+                            <aura:if isTrue="{!v.filteredDataWorkOrders.length > 0}">
+                                <lightning:datatable
+                                    keyField="id"
+                                    enableInfiniteLoading="true"
+                                    loadMoreOffset="50"
+                                    aura:id="data-table-wo"
+                                    data="{!v.filteredDataWorkOrders}"
+                                    columns="{!v.columnsWorkOrders}"
+                                    minColumnWidth="150"
+                                    maxRowSelection="1"
+                                    onrowselection="{!c.handleRowSelection}"/>
+                                <aura:set attribute="else">
+                                    {!$Label.c.TA_ListViewBlank}
+                                </aura:set>
+                            </aura:if>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+            </aura:if>
+        </div>
+    </aura:if>
+    
+</aura:component>

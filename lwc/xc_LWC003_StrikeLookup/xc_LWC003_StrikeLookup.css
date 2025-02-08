@@ -1,0 +1,4 @@
+.slds-combobox__form-element { 
+    display:block !important;
+    flex:none !important; 
+}

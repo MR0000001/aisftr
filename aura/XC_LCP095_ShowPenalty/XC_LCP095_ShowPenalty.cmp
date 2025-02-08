@@ -1,0 +1,20 @@
+<!--
+* @author Lorenzo Orlanducci lorenzo.orlanducci@nttdata.com 
+* @date Creation 30/01/2019
+* @date Modification dd/mm/yyyy
+* @description component for disconnect button on asset record page
+-->
+<aura:component controller="XC_LCC095_ShowPenalty" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasSObjectName,lightning:availableForFlowScreens" access="global" >
+<!-- components attributes -->
+<aura:attribute name="recordId" type="String" />
+<lightning:notificationsLibrary aura:id="notifLib"/>
+<lightning:navigation aura:id="navService"/>
+<aura:handler name="init" value="{!this}" action="{!c.init}"/>  
+
+    
+     <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+      <lightning:spinner aura:id="mySpinner" />
+   </div>
+   
+
+</aura:component>

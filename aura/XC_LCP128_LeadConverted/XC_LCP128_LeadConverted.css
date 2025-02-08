@@ -1,0 +1,20 @@
+.THIS.c-container {
+    margin: 10px 0 20px 0;
+    position: inherit;
+}
+.THIS .large {
+    height: 150px;
+}
+.THIS .x-large {
+    height: 150px;
+}
+.THIS .custom-box {
+    height: 250px;
+    width: 250px;
+    padding: 1rem;
+    border: 1px solid #d8dde6;
+    box-shadow: 0px 0px 20px 5px #899aa3;
+}
+.THIS .hide-box {
+    display: none !important;
+}

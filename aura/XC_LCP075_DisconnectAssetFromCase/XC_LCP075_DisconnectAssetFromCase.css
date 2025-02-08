@@ -1,0 +1,13 @@
+.THIS .abbass{
+    height: 35%;
+    background-color:white;
+}
+.THIS.main{
+	background-color:white;
+    padding-left:8px;
+    padding-right:8px;
+    height: 100%;
+}
+.THIS .tallTextArea textarea {
+    height: 8rem;
+}

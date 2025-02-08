@@ -1,0 +1,59 @@
+<aura:component controller="TA_LCC198_ProcessIndicator"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global">
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:attribute access="public" name="recordId" type="String" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="infoBag" type="Object" default="{}" />
+    <aura:attribute access="private" name="percentageProcess" type="Decimal" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <div class="slds-progress ta-process-indicator">
+        <ol class="slds-progress__list">
+            <aura:iteration items="{!v.infoBag.listProcess}" var="processWrapper">
+                <aura:if isTrue="{!v.infoBag.index == processWrapper.index}">
+                    <li class="slds-progress__item slds-is-active">
+                        <div>
+                            <button class="slds-button slds-progress__marker actual" aria-describedby="step-2-tooltip" />
+                            <label class="ta-bar-label">{!processWrapper.name}</label>
+                        </div>
+                    </li>
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{!v.infoBag.index > processWrapper.index}">
+                            <li class="slds-progress__item slds-is-completed">
+                                <div>
+                                    <button class="slds-button slds-progress__marker complete" aria-describedby="step-2-tooltip"/>
+                                    <label class="slds-hide">{!processWrapper.name}</label>
+                                </div>
+                            </li>
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!lessthan(v.infoBag.index, processWrapper.index)}">
+                                    <li class="slds-progress__item">
+                                        <div>
+                                            <button class="slds-button slds-progress__marker" aria-describedby="step-2-tooltip"/>
+                                            <label class="slds-hide">{!processWrapper.name}</label>
+                                        </div>
+                                    </li>
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+            </aura:iteration>
+        </ol>
+        <div class="slds-progress-bar slds-progress-bar_x-small" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" role="progressbar">
+            <span class="slds-progress-bar__value" style="{!'width:'+v.percentageProcess+'%; background-color:#461e7d;'}" />
+        </div>
+    </div>
+</aura:component>

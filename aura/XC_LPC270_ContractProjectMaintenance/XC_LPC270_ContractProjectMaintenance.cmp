@@ -1,0 +1,21 @@
+<!--
+  @description       : Lightning component used on quick action on Contract object (XC_PlanningContractServices)
+  @author            : pedro.danielalmeida@nttdata.com
+  @group             : 
+  @last modified on  : 27-04-2022
+  @last modified by  : pedro.danielalmeida@nttdata.com
+-->
+<aura:component controller="XC_LCC270_ContractProjectMaintenance" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:actionOverride" access="global" >
+    <!--Attribute-->
+	<aura:attribute name="recordId" type="String" /> 
+    <aura:attribute name="loading" type="Boolean" default="false"/>
+    <!--handler-->
+    <aura:handler name="init" value="this" action="{!c.doInit}"/> 
+    
+    <div class="slds-is-relative" style="height: 200px;">
+        <aura:if isTrue="{!v.loading}">
+            <lightning:spinner class="spins" alternativeText="Loading" size="medium" variant="brand"/>
+        </aura:if>
+    </div>
+
+ </aura:component>

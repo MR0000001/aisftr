@@ -1,0 +1,97 @@
+<!--
+  @File Name          : XC_LCP129_CTIMultipleMatch.cmp
+  @Description        : 
+  @Author             : Francesco Imperioli - fimperioli@deloitte.it
+  @Group              : 
+  @Last Modified By   : Francesco Imperioli - fimperioli@deloitte.it
+  @Last Modified On   : 11/5/2020, 18:16:46
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    11/5/2020   Francesco Imperioli - fimperioli@deloitte.it     Initial Version
+-->
+<aura:component controller="XC_LCC129_CTIMultipleMatch" implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+
+<!-- <aura:handler name="init" value="{!this}" action="{!c.init}"/> -->
+<aura:attribute name="interactionRecord" type="Object"/>
+<aura:attribute name="recordError" type="String"/>
+
+<aura:attribute name="leadMatches" type="Lead[]"/>
+<aura:attribute name="contactMatches" type="Contact[]"/>
+
+<aura:attribute name="contactColumns" type="List"/>
+<aura:attribute name="contactSelectedRows" type="List"/>
+
+<aura:attribute name="leadColumns" type="List"/>
+<aura:attribute name="leadSelectedRows" type="List"/>
+
+<aura:attribute name="maxRowSelection" type="Integer" default="1" />
+<aura:attribute name="rowSelected" type="Boolean" default="false"/>
+
+<aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+<aura:attribute name="hasNoMatch" type="Boolean" default="true"/>
+
+<!-- Lightning console management -->
+<lightning:workspaceAPI aura:id="workspace"/>
+
+
+<force:recordData aura:id="recordLoader"
+      recordId="{!v.recordId}"
+      targetFields="{!v.interactionRecord}"
+      targetError="{!v.recordError}"
+      fields="Name,XC_Phone__c,XC_ContactId__c,XC_AccountId__c,XC_LeadId__c,XC_HasMultipleMatch__c"
+      recordUpdated="{!c.init}"
+      layoutType="FULL"
+      mode="EDIT"
+/>
+<!--TODO USE CUSTOM LABELS -->
+
+<div class="c-container">
+    
+        
+                <lightning:card variant="Narrow" title="{!if(v.hasNoMatch,$Label.c.XC_CL_CTIMultiplematch_Header_1,$Label.c.XC_CL_CTIMultiplematch_Header_2 +' '+ v.interactionRecord.XC_Phone__c)}" iconName="custom:custom22">
+                        <!-- <aura:set attribute="actions">
+                                <lightning:button label="New Lead" onclick="{!c.createLead}"/>
+                        </aura:set> -->
+
+                        <lightning:layout multipleRows="true">
+
+                            <aura:if isTrue="{! !v.hasNoMatch}">
+
+                                <aura:if isTrue="{!v.contactMatches.length>0}">
+                                    <lightning:layoutItem size="12" padding="around-small">
+                                        <div class="slds-p-bottom_small slds-p-right_small">
+                                            <lightning:icon iconName="standard:contact" size="small" alternativeText="contact matches"/> {!$Label.c.XC_CL_CTIContactMatches}
+                                        </div>
+
+                                        <lightning:datatable columns="{!v.contactColumns}" data="{!v.contactMatches}"
+                                        keyField="Id" maxRowSelection="{!v.maxRowSelection}"
+                                        onrowselection="{!c.contactSelected}" selectedRows="{!v.contactSelectedRows}"/>
+
+                                    </lightning:layoutItem>
+                                </aura:if>
+                                <aura:if isTrue="{!v.leadMatches.length>0}">
+                                    <lightning:layoutItem size="12" padding="around-small">
+                                        <div class="slds-p-bottom_small slds-p-right_small">
+                                            <lightning:icon iconName="standard:lead" size="small" alternativeText="lead matches"/> {!$Label.c.XC_CL_CTILeadMatches}
+                                        </div>
+
+                                        <lightning:datatable columns="{!v.leadColumns}" data="{!v.leadMatches}"
+                                        keyField="Id" maxRowSelection="{!v.maxRowSelection}"
+                                        onrowselection="{!c.leadSelected}" selectedRows="{!v.leadSelectedRows}"/>
+                                        
+                                    </lightning:layoutItem>
+                                </aura:if>
+                            </aura:if>
+
+                    </lightning:layout>
+                </lightning:card>                   
+</div>
+
+<aura:if isTrue="{!v.spinnerControl}">
+        <div class="spinnerHolder">
+            <lightning:spinner alternativeText="Loading" size="large" variant="brand" />
+        </div>
+</aura:if>
+
+
+</aura:component>

@@ -1,0 +1,201 @@
+/* CUSTOM-TAG TABLET */
+@media screen and (min-width: 768px) {
+    .THIS .ta-home-bg {
+        width: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding-top: 22vw;
+        background: #461e7d;
+        height: 40vh;
+        z-index: 1;
+    }
+}
+
+/* CUSTOM-TAG MOBILE */
+@media screen and (max-width: 767px) {
+    .THIS .ta-home-bg {
+        width: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding-top: 15vw;
+        background: #461e7d;
+        height: 40vh;
+        z-index: 1;
+    }
+}
+
+.THIS .ta-tab-bg-large {
+    border-radius: 2.5vw;
+    box-shadow: 1vw 1vw 2vw -0.8vw grey;
+    margin: 1vh 1vw;
+    padding: 3vw;
+}
+
+.THIS .ta-left-tabs {
+    position: relative;
+    height: auto;
+    display: table-cell;
+}
+
+.THIS .ta-right-tabs {
+    position: relative;
+    height: 100%;
+    display: table-cell;
+}
+
+/* .THIS .ta-icon-large {
+    width: 9vw;
+    height: 9vw;
+    object-fit: contain;
+}
+
+.THIS .ta-tab-bg {
+    border-radius: 2.5vw;
+    height: 44vw;
+    width: 44vw;
+    box-shadow: 1vw 1vw 2vw -0.8vw grey;
+}
+
+.THIS .ta-tab-bg-small {
+    border-radius: 2.5vw;
+    height: 20.5vw;
+    width: 44vw;
+    box-shadow: 1vw 1vw 2vw -0.8vw grey;
+}
+
+.THIS .ta-color-black {
+    color:#303030;
+}
+
+.THIS .ta-color-white {
+    color: white;
+}
+
+.THIS .ta-color-purple {
+    color: #461e7d;
+}
+
+.THIS .ta-color-grey {
+    color: grey;
+}
+
+.THIS .ta-color-white-opacity-60 {
+    color: rgb(255, 255, 255, 0.6);
+} */
+
+/* .THIS h1 {
+    font-family: Montserrat;
+    font-size: 8vw;
+    font-weight: 300;
+    font-stretch: normal;
+    font-style: normal;
+    letter-spacing: normal;
+}
+
+.THIS h2 {
+    font-family: Montserrat;
+    font-size: 6vw;
+    font-weight: 800;
+    font-stretch: normal;
+    font-style: normal;
+    letter-spacing: normal;
+}
+
+
+.THIS h3 {
+    font-family: Montserrat;
+    font-size: 4.3vw;
+    font-weight: 300;
+    font-stretch: normal;
+    font-style: normal;
+    letter-spacing: normal;
+}
+
+.THIS p {
+    font-family: Montserrat;
+    font-size: 3.7vw;
+    font-weight: 300;
+    font-stretch: normal;
+    font-style: normal;
+    letter-spacing: normal;
+}
+
+.THIS .ta-tab-title {
+    height: 16vw;
+} */
+
+/* .THIS .ta-tab-title-small {
+    height: 8vw;
+} */
+
+/* .THIS .ta-tab-description {
+    height: 10vw;
+} */
+
+/*.THIS .xc-container-description-small {
+    height: 5vw;
+}*/
+
+
+/* .THIS .ta-text-uppercase {
+    text-transform: uppercase;
+} */
+
+/* .THIS .slds-col_padded, .THIS .slds-col--padded {
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-home-box-page {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    /* padding-left: 4vw; */
+    margin-top: 30vw;
+    border-top-right-radius: 15vw;
+    border-top-left-radius: 15vw;
+    padding-top: 14vw;
+    background: white;
+    z-index: 1;
+    /* padding-bottom: 25vw; */
+    box-shadow: 0 -5vw 5vw -5vw black;
+    padding: 8vh 4vw 0 4vw;
+}
+
+/* .THIS .ta-border-top-grey {
+    border-top: 1.1vw solid #e6e6e6;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-box-dummy {
+    background-image:white;
+    height: 55vh;
+    position: absolute;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+}
+
+/* .THIS .ta-font-weight-800 {
+    font-weight: 800;
+}
+
+.THIS .ta-margin-bottom {
+    margin-bottom: 2.5vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-appointment-preview {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    padding: 10vw 5vw 5vw 5vw;
+    z-index: 2;
+}
+
+.THIS .ta-text-uppercase {
+    text-transform: uppercase;
+}

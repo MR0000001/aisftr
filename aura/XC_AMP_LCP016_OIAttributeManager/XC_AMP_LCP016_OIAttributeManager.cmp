@@ -1,0 +1,59 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 02-08-2021
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   02-08-2021   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId">
+
+    <!-- EXPOSED ATTRIBUTES -->
+    <aura:attribute name="attributes" type="List"/>
+    <aura:attribute name="itemCode" type="String"/>
+
+    <!-- INNER ATTRIBUTES  -->
+    <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+
+    <!-- EVENT MANAGEMENT -->
+    <aura:registerEvent name="XC_AMP_LCE001_AMPCommunicationEvent" type="c:XC_AMP_LCE001_AMPCommunicationEvent"/>
+
+
+
+    <div class="slds-p-around_small">
+
+        <c:XC_AMP_LCP005_SectionHeaderIcon text="Configure Product"
+        iconName="utility:palette" />
+
+        <lightning:card class="slds-card_boundary">
+
+            <aura:if isTrue="{!v.spinnerControl}">
+                <div class="slds-is-relative slds-p-around_small">
+                  <lightning:spinner aura:id="mySpinner" variant="brand" size="large"
+                    style="background-color: rgba(0, 0, 0, 0)" />
+                </div>
+            </aura:if>
+    
+            <aura:iteration items="{!v.attributes}" var="attr">
+                <div class="slds-p-around_small">
+                    <lightning:card class="slds-card_boundary" title="{!attr.name}">
+                        <div class="slds-p-around_small">
+                            <lightning:combobox name="{!attr.pfpId}" 
+                            label="{!attr.name}" 
+                            options="{!attr.attributeLOV}"
+                            value="{!attr.value}" 
+                            onchange="{!c.onChangeAttribute}"
+                            disabled="{!v.spinnerControl}"/>
+                        </div>
+                    </lightning:card>
+                </div>
+            </aura:iteration>
+
+        </lightning:card>
+
+
+    </div>
+
+</aura:component>

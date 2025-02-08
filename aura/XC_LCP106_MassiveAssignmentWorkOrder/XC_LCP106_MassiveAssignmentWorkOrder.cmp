@@ -1,0 +1,635 @@
+<!--
+* @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @date Creation 23/11/2020
+* @description XC_LCP106_MassiveAssignmentWorkOrder – Component for Massive Assignment Work Order 
+-->
+
+<aura:component controller="XC_LCC106_MassiveAssignmentWorkOrder"
+                implements="force:appHostable,force:lightningQuickActionWithoutHeader"
+                access="global">
+
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <ltng:require scripts="{!$Resource.XC_SR_xlsx}"/>
+    <ltng:require scripts="{!$Resource.XC_SR_jszip}"/>
+
+    <aura:attribute name="maxNumberWorkorder" type="Integer" default="10000"/>
+    <aura:attribute name="offSetWorkOrder" type="Integer" default="200"/>
+    <aura:attribute name="indexOffsetWorkOrder" type="Integer" default="0"/>
+    <aura:attribute name="offsetListData" type="List"/>
+    <aura:attribute name="partnerChoosed" type="Boolean" default="false"/>
+    <aura:attribute name="isNotCaringAgent" type="Boolean" default="true"/>
+    <aura:attribute name="showChooseOutOfDateForFilterSelection" type="Boolean" default="false"/>
+    <aura:attribute name="originPartner" type="String" default=""/>
+    <aura:attribute name="summaryWorkOrdersView" type="String" default="{!$Label.c.XC_CL_TitleMassiveAssignmentWorkOrder}"/>
+    <aura:attribute name="infoBoxForInitialInfo" type="String" default="{!$Label.c.XC_CL_MassiveWoSelectSomeWO}"/>
+    <aura:attribute name="destinationPartner" type="String" default=""/>
+    <aura:attribute name="workTypeOptions" type="List"/>
+    <aura:attribute name="zipCodeOptions" type="List"/>
+    <aura:attribute name="statusOptions" type="List"/> 
+    <aura:attribute name="provincesOptions" type="List"/> 
+    <aura:attribute name="workTypeOptionsOriginal" type="List"/>
+    <aura:attribute name="zipCodeOptionsOriginal" type="List"/>
+    <aura:attribute name="listAllZipCode" type="List"/>
+    <aura:attribute name="statusOptionsOriginal" type="List"/> 
+    <aura:attribute name="provincesOptionsOriginal" type="List"/> 
+    <aura:attribute name="preferredTypeWOFilter" type="String" default=""/> 
+    <aura:attribute name="selectedStatus" type="List"/> 
+    <aura:attribute name="selectedStatusReason" type="List"/> 
+    <aura:attribute name="selectedWorkType" type="List"/> 
+    <aura:attribute name="selectedProvinces" type="List"/> 
+    <aura:attribute name="selectedZipCode" type="List"/> 
+    <aura:attribute name="workOrderFiltered" type="List"/>
+    <aura:attribute name="title" type="String" default="{!$Label.c.XC_CL_TitleMassiveAssignmentWorkOrder}"/>
+    <aura:attribute name="columns" type="List"/> 
+    <aura:attribute name="data" type="List"/> 
+    <aura:attribute name="dataString" type="String"/> 
+    <aura:attribute name="messageForUpdateDueDate" type="String" default="{!$Label.c.XC_CL_MassiveWoUpdateDueDate}"/> 
+    <aura:attribute name="comments" type="String"/> 
+    <aura:attribute name="originalData" type="List"/>
+    <aura:attribute name="productOptions" type="List" />
+    <aura:attribute name="filterStrikeLookupDestination" type="String"/>
+    <aura:attribute name="filterWorkOrderMultiLookup" type="String"/>
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:attribute name="showInitialRequiredFilter" type="Boolean" default="false"/>
+    <aura:attribute name="outOfDate" type="Boolean" default="false"/>
+    <aura:attribute name="updateDueDate" type="Boolean" default="false"/> 
+    <aura:attribute name="viewAllToggle" type="Boolean" default="false"/> 
+    <aura:attribute name="disabledButton" type="Boolean" default="true"/>
+    <aura:attribute name="showManualSelection" type="Boolean" default="false"/> 
+    <aura:attribute name="showFilterSelection" type="Boolean" default="false"/> 
+    <aura:attribute name="loadWorkOrder" type="Boolean" default="false"/>
+    <aura:attribute name="showChooseOperation" type="Boolean" default="true"/> 
+    <aura:attribute name="showTableZipCode" type="Boolean" default="false"/> 
+    <aura:attribute name="showDestinationPartner" type="Boolean" default="false"/> 
+    <aura:attribute name="notHideFilter" type="Boolean" default="false"/> 
+    <aura:attribute name="columnsWorkType" type="List" />
+    <aura:attribute name="columnsZipcode" type="List" />
+    <aura:attribute name="columnsStatus" type="List" />
+    <aura:attribute name="filterWorkType" type="String" />
+    <aura:attribute name="filterZipCode" type="String" />
+    <aura:attribute name="filterStatus" type="String" />
+    <aura:attribute name="operationSelected" type="String" />
+    <aura:attribute name="filterProvinces" type="String" />
+    <aura:attribute name="columnsProvinces" type="List" />
+    <aura:attribute name="oldSelectedRowStatus" type="List" />
+    <aura:attribute name="oldSelectedRowWorkType" type="List" />
+    <aura:attribute name="oldSelectedRowZipcode" type="List" />
+    <aura:attribute name="oldSelectedRowProvince" type="List" />
+    <aura:attribute name="mapProvinceListZipCode" type="Object" />
+    <aura:attribute name="checkCoverage" type="Boolean" default="false" />
+    <aura:attribute name="assignToPartner" type="Boolean" default="false" />
+
+    <aura:attribute name="statusReasonOptions" type="List"/> 
+    <aura:attribute name="statusReasonOptionsOriginal" type="List"/> 
+    <aura:attribute name="oldSelectedRowStatusReason" type="List" />
+    <aura:attribute name="columnsStatusReason" type="List" />
+    <aura:attribute name="filterStatusReason" type="String" />
+
+    <aura:attribute name="selectedProduct" type="List"/> 
+    <aura:attribute name="selectedProductString" type="String" default=""/> 
+    <aura:attribute name="selectedStartDate" type="String" default=""/> 
+    <aura:attribute name="selectedEndDate" type="String" default=""/> 
+
+    <aura:attribute name="valueSearchChoiceOrigin" type="Boolean" default="true"/>
+    <aura:attribute name="fieldOrigin" type="String" default="Name"/>
+    <aura:attribute name="valueSearchChoiceDestination" type="Boolean" default="true"/>
+    <aura:attribute name="fieldDestination" type="String" default="Name"/>
+    <aura:attribute name="showOriginPartner" type="Boolean" default="false"/> 
+    <aura:attribute name="valueStep" type="String" default="1"/> 
+    <aura:attribute name="labelForUpload" type="String" default="{!$Label.c.XC_CL_ChooseFile}"/> 
+    <aura:attribute name="showLoadExcelOption" type="Boolean" default="false"/>
+    <aura:attribute name="showExcelWorkOrder" type="Boolean" default="false"/>
+
+    <lightning:navigation aura:id="navService"/>
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+
+    <aura:handler name="change" value="{!v.originPartner}" action="{!c.selectedOriginPartner}" />
+    <aura:handler name="change" value="{!v.loadWorkOrder}" action="{!c.searchWorkOrder}" />
+    <aura:handler name="change" value="{!v.dataString}" action="{!c.enableButton}" />
+    <aura:handler name="change" value="{!v.destinationPartner}" action="{!c.enableButton}" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <div class="cardViewLogs">
+        <lightning:layout verticalAlign="right" horizontalAlign="right">
+                <lightning:layoutItem padding="around-small" flexibility="auto">
+                    <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderViewLog}" title="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderViewLog}" onclick="{!c.viewLogs}"/>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    
+    <div style="margin-bottom:7px;">
+        <lightning:card class="backgroundColorCard">
+            <lightning:progressIndicator currentStep="{!v.valueStep}" type="base" variant="base">
+                <lightning:progressStep label="{!$Label.c.XC_CL_ChooseOperation}" value="1"/>
+                <lightning:progressStep label="{!$Label.c.XC_CL_SelectWorkOrder}" value="2"/>
+                <lightning:progressStep label="{!$Label.c.XC_CL_SelectTransferOption}" value="3"/>
+                <lightning:progressStep label="{!$Label.c.XC_CL_MassiveWoCompleteStep}" value="4"/>
+            </lightning:progressIndicator>
+        </lightning:card>
+    </div>
+
+    <aura:if isTrue="{!v.showChooseOperation}">  
+        <div style="margin-bottom:7px">  
+            <lightning:card title="Choose Operation">
+                <lightning:layout multipleRows="false" verticalAlign="center" horizontalAlign="center">
+                    <lightning:layoutItem size="3.9" aura:id="cardOperationManualSelection" flexibility="auto" padding="around-small" class="classOperation">
+                        <div onmouseover="{!c.changeColorMouseOverSelectManual}" onmouseout="{!c.changeColorMouseOutSelectManual}" onclick="{!c.changeColorMouseClickSelectManual}">
+                            <lightning:icon iconName="action:new_task"/>
+                            <p class="classOperationText">{!$Label.c.XC_CL_MassiveWoManualSelection}</p>
+                        </div>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="3.9" aura:id="cardOperationFilterSelection" flexibility="auto" padding="around-small" class="classOperation">
+                        <div onmouseover="{!c.changeColorMouseOverFilter}" onmouseout="{!c.changeColorMouseOutFilter}" onclick="{!c.changeColorMouseClickFilter}">
+                            <lightning:icon iconName="action:flow"/>
+                            <p class="classOperationText">{!$Label.c.XC_CL_MassiveWoMassiveSelection}</p>
+                        </div>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="3.9" aura:id="cardOperationExcelSelection" flexibility="auto" padding="around-small" class="classOperation">
+                        <div onmouseover="{!c.changeColorMouseOverExcel}" onmouseout="{!c.changeColorMouseOutExcel}" onclick="{!c.changeColorMouseClickExcel}">
+                            <lightning:icon iconName="action:upload"/>
+                            <p class="classOperationText">{!$Label.c.XC_CL_MassiveWoExcelSelection}</p>
+                        </div>
+                    </lightning:layoutItem>
+                </lightning:layout> 
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showOriginPartner}">
+        <div class="cardOriginPartner" style="margin-bottom:7px">
+            <lightning:card title="{!$Label.c.XC_CL_SelectionOriginPartnerCard}">
+                <lightning:layout verticalAlign="center" horizontalAlign="center">
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <lightning:helptext content="{!$Label.c.XC_CL_MassiveCovButtonInfo}"/>
+                        <lightning:buttonStateful
+                            labelWhenOff="{!$Label.c.XC_CL_MassiveCovSearchCode}"
+                            labelWhenOn="{!$Label.c.XC_CL_MassiveCovSearchName}"
+                            labelWhenHover="{!$Label.c.XC_CL_MassiveCovChangeInfo}"
+                            iconNameWhenOff="utility:topic2"
+                            iconNameWhenOn="utility:text"
+                            iconNameWhenHover="utility:change_record_type"
+                            state="{!v.valueSearchChoiceOrigin}"
+                            onclick="{!c.handleClickStatefulButtonOrigin}"
+                            variant="brand"
+                            aura:id="buttonStatefulOrigin"
+                            class="classButtonStateful"
+                        />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="6">
+                        <c:strike_lookup
+                            label="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderPartner}"
+                            object="Account"
+                            searchField="{!v.fieldOrigin}"
+                            placeholder="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderSelectPartner}"
+                            iconName="standard:account"
+                            order="{!v.fieldOrigin}"
+                            limit="5"
+                            loadingMessage="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderLoading}"
+                            errorMessage="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderErrorInput}"
+                            showRecentRecords="true"
+                            value = "{!v.originPartner}"
+                            required="true"
+                            filter="RecordType.Name = 'Partner' AND Name != 'No Candidate Found'"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                <lightning:layout verticalAlign="right" horizontalAlign="right">
+                    <lightning:layoutItem size="12" flexibility="auto" padding="around-small" class="classAlignRight">
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_ClearResetAll}" title="{!$Label.c.XC_CL_ClearResetAll}" onclick="{!c.resetAll}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showChooseOutOfDateForFilterSelection}">  
+        <div style="margin-bottom:7px">  
+            <lightning:card title="{!$Label.c.XC_CL_MassiveWoChooseMassiveWo}">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" flexibility="auto" padding="around-small">
+                        <c:strike_picklist 
+                            value="{!v.preferredTypeWOFilter}"
+                            label="{!$Label.c.XC_CL_MassiveWoSelectPreferredType}"
+                            placeholder="{!$Label.c.XC_CL_MassAssSkillHolderOperation}"
+                            errorMessage="{!$Label.c.XC_CL_MassAssSkillErrorOperation}"
+                            required="true">
+                            <c:strike_optionGroup label="{!$Label.c.XC_CL_OutOfDate}">
+                                <c:strike_option label="{!$Label.c.XC_CL_OutOfDateIn}" value="TypeWOOutofDate" iconName="utility:clock"/>
+                                <c:strike_option label="{!$Label.c.XC_CL_OutOfDateOut}" value="TypeWONotOutofDate" iconName="utility:multi_select_checkbox"/>
+                            </c:strike_optionGroup>
+                        </c:strike_picklist>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" flexibility="auto" padding="around-small" class="classAlignRight">
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_Save}" title="{!$Label.c.XC_CL_Save}" onclick="{!c.onSaveTypeWOfilter}" />
+                    </lightning:layoutItem>
+                </lightning:layout> 
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showManualSelection}"> 
+        <div style="margin-bottom:7px">  
+            <lightning:card title="{!$Label.c.XC_CL_MassiveWoManualSelection}">
+                <lightning:layout multipleRows="true" class="classCenter">
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="3">
+                        <div style="margin-top: 15px !important; text-align: center !important;">
+                            <div style="text-align: center; display: block;"><p>{!$Label.c.XC_CL_MassiveWoManualOutOfDate}</p></div>
+                            <div class="classCenter" style="display: flex;"><lightning:input type="toggle" label="" name="{!$Label.c.XC_CL_OutOfDate}" checked="{!v.outOfDate}" disabled="false" onchange="{!c.changeOutOfDate}"/></div>    
+                        </div>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small" size="7">
+                        <c:strike_multiLookup
+                            label="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderWorkOrderNumber}"
+                            object="WorkOrder"
+                            searchField="WorkOrderNumber"
+                            placeholder="{!$Label.c.XC_CL_MassiveWoSelectWONumber}"
+                            iconName="standard:work_order"
+                            subtitleField="XC_WorkTypeLabel__c"
+                            filter="{!v.filterWorkOrderMultiLookup}"
+                            order="WorkOrderNumber"
+                            limit="5"
+                            value="{!v.dataString}"
+                            loadingMessage="{!$Label.c.XC_CL_Loading}"
+                            errorMessage="{!$Label.c.XC_CL_InvalidInput}"
+                            disabled = "{!v.viewAllToggle}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showFilterSelection}"> 
+        <div class="cardFilters" style="margin-bottom:7px">  
+            <lightning:card title="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderChooseFilter}">
+
+                <lightning:button aura:id="buttonFilter" iconName="utility:settings" variant="brand" label="{!$Label.c.XC_CL_ShowFilter}" title="{!$Label.c.XC_CL_ShowFilter}" onclick="{!c.selectFilterShow}" class="classButton"/>
+
+                <aura:if isTrue="{!v.notHideFilter}">               
+                    <!-- Filter Work Order Information -->
+                    <lightning:layout class="classBorder" verticalAlign="center" horizontalAlign="center">
+                        <!--<lightning:layoutItem flexibility="auto" padding="around-small">
+                            <div class="cardCheckboxFilterWorkType">
+                                <ui:scrollerWrapper class="scrollerSize">
+                                    <lightning:checkboxGroup name="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderWorkType}" label="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderSelectWorkType}" options="{!v.workTypeOptions}" value="{!v.selectedWorkType}" onchange="{!c.onChangeTable}"/>
+                                </ui:scrollerWrapper>
+                            </div>
+                        </lightning:layoutItem>-->
+                        <lightning:layoutItem padding="around-small">
+                            <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                                <lightning:input type="text" onchange="{!c.workTypeFiltered}" value="{!v.filterWorkType}" label="{!$Label.c.XC_CL_MassiveWT_SearchWT}"/>
+                                <lightning:datatable 
+                                    keyField="label"
+                                    aura:id="worktypeFilterTable" 
+                                    columns="{!v.columnsWorkType}" 
+                                    data="{!v.workTypeOptions}"
+                                    onrowselection="{!c.addSelectedWorkType}"
+                                />
+                            </div>
+                        </lightning:layoutItem>
+
+                        <!--<lightning:layoutItem flexibility="auto" padding="around-small">
+                            <div>      
+                                <ui:scrollerWrapper >
+                                    <lightning:checkboxGroup name="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderStatus}" label="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderSelectStatus}" options="{!v.statusOptions}" value="{!v.selectedStatus}" onchange="{!c.onChangeTable}"/>
+                                </ui:scrollerWrapper>
+                            </div>
+                        </lightning:layoutItem>-->
+                        <lightning:layoutItem padding="around-small">
+                            <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                                <lightning:input type="text" onchange="{!c.statusFiltered}" value="{!v.filterStatus}" label="{!$Label.c.XC_CL_SearchStatus}"/>
+                                <lightning:datatable 
+                                    keyField="label"
+                                    aura:id="statusFilterTable" 
+                                    columns="{!v.columnsStatus}" 
+                                    data="{!v.statusOptions}"
+                                    onrowselection="{!c.addSelectedStatus}"
+                                />
+                            </div>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem padding="around-small">
+                            <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                                <lightning:input type="text" onchange="{!c.statusReasonFiltered}" value="{!v.filterStatusReason}" label="{!$Label.c.XC_CL_SearchStatusReason}"/>
+                                <lightning:datatable 
+                                    keyField="label"
+                                    aura:id="statusReasonFilterTable" 
+                                    columns="{!v.columnsStatusReason}" 
+                                    data="{!v.statusReasonOptions}"
+                                    onrowselection="{!c.addSelectedStatusReason}"
+                                />
+                            </div>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+
+                    <!-- Filter Zipcode/Province -->
+                    <lightning:layout multipleRows="false" class="classBorder classCenter">
+                        <lightning:layoutItem padding="around-small">
+                            <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                                <lightning:layout multipleRows="false">
+                                    <lightning:layoutItem size="11">
+                                        <lightning:input type="text" onchange="{!c.provincesFiltered}" value="{!v.filterProvinces}" label="{!$Label.c.XC_CL_MassiveWT_SearchProv}"/>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="1" class="alignCenter">
+                                        <lightning:helptext content="{!$Label.c.XC_CL_MassiveWT_HelpProv}"/>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                                <lightning:datatable 
+                                    keyField="label"
+                                    aura:id="provincesFilterTable" 
+                                    columns="{!v.columnsProvinces}" 
+                                    data="{!v.provincesOptions}"
+                                    onrowselection="{!c.addSelectedProvinces}"
+                                />
+                            </div>
+                        </lightning:layoutItem>
+                        <aura:if isTrue="{!v.showTableZipCode}"> 
+                            <lightning:layoutItem padding="around-small">
+                                <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                                    <lightning:input type="text" onchange="{!c.zipCodeFiltered}" value="{!v.filterZipCode}" label="{!$Label.c.XC_CL_MassiveWT_SearchZP}"/>
+                                    <lightning:datatable 
+                                        keyField="label"
+                                        aura:id="zipCodeFilterTable" 
+                                        columns="{!v.columnsZipcode}" 
+                                        data="{!v.zipCodeOptions}"
+                                        onrowselection="{!c.addSelectedZipcode}"
+                                    />
+                                </div>
+                            </lightning:layoutItem>
+                        </aura:if>
+                    </lightning:layout>
+                        
+                    <!-- Filter date -->
+                    <!--<lightning:layout multipleRows="false" class="classBorder">
+                        <lightning:layoutItem flexibility="auto" padding="around-small" size="6">
+                            <div >      
+                                <c:strike_datepicker
+                                    label="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderStartDate}"
+                                    aura:id="StartDatePicker"
+                                    valueFormat="yyyy-MM-dd"
+                                    yearsBefore="100"
+                                    yearsAfter="30"
+                                    value="{!v.selectedStartDate}"
+                                    errorMessage="Populate Start Date too"
+                                />
+                            </div>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem flexibility="auto" padding="around-small" size="6">
+                            <div >      
+                                <c:strike_datepicker
+                                    aura:id="EndDatePicker"
+                                    label="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderEndDate}"
+                                    valueFormat="yyyy-MM-dd"
+                                    yearsBefore="100"
+                                    yearsAfter="30"
+                                    value="{!v.selectedEndDate}"
+                                    errorMessage="Populate End Date too"
+                                />
+                            </div>
+                        </lightning:layoutItem>
+                        </lightning:layout>-->
+
+                    <!-- Filter product -->
+                    <lightning:layout class="classBorder">
+                        <lightning:layoutItem flexibility="auto" padding="around-small">
+                            <div >      
+                                <c:strike_multiSelectPicklist
+                                    label="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderProducts}"
+                                    errorMessage="{!$Label.c.XC_CL_InvalidInput}"
+                                    value="{!v.selectedProductString}">
+                                    <aura:iteration items="{!v.productOptions}" var="option">
+                                        <c:strike_option label="{!option.label}" value="{!option.value}"/>
+                                    </aura:iteration>
+                                </c:strike_multiSelectPicklist>
+                            </div>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+
+                    <lightning:layout verticalAlign="center" horizontalAlign="center">
+                        <lightning:layoutItem padding="around-small" flexibility="auto">
+                            <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ApplyFilters}" title="{!$Label.c.XC_CL_MassiveWT_ApplyFilters}" onclick="{!c.applyFilter}"/>
+                        </lightning:layoutItem> 
+                    </lightning:layout>
+                </aura:if>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showInitialRequiredFilter}"> 
+        <div class="cardFilters" style="margin-bottom:7px">  
+            <lightning:card title="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderChooseFilter}">             
+                    <!-- Filter Work Order Information -->
+                    <lightning:layout class="classBorder" verticalAlign="center" horizontalAlign="center">
+                        <lightning:layoutItem padding="around-small">
+                            <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                                <lightning:input type="text" onchange="{!c.workTypeFiltered}" value="{!v.filterWorkType}" label="{!$Label.c.XC_CL_MassiveWT_SearchWT}"/>
+                                <lightning:datatable 
+                                    keyField="label"
+                                    aura:id="worktypeFilterTable" 
+                                    columns="{!v.columnsWorkType}" 
+                                    data="{!v.workTypeOptions}"
+                                    onrowselection="{!c.addSelectedWorkType}"
+                                />
+                            </div>
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem padding="around-small">
+                            <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                                <lightning:layout multipleRows="false">
+                                    <lightning:layoutItem size="11">
+                                        <lightning:input type="text" onchange="{!c.provincesFiltered}" value="{!v.filterProvinces}" label="{!$Label.c.XC_CL_MassiveWT_SearchProv}"/>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="1" class="alignCenter">
+                                        <lightning:helptext content="{!$Label.c.XC_CL_MassiveWT_HelpProv}"/>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                                <lightning:datatable 
+                                    keyField="label"
+                                    aura:id="provincesFilterTable" 
+                                    columns="{!v.columnsProvinces}" 
+                                    data="{!v.provincesOptions}"
+                                    onrowselection="{!c.addSelectedProvinces}"
+                                />
+                            </div>
+                        </lightning:layoutItem>
+
+                        <aura:if isTrue="{!v.showTableZipCode}"> 
+                            <lightning:layoutItem padding="around-small">
+                                <div style="margin-bottom:45px;height: 300px; max-width: 350px;">
+                                    <lightning:input type="text" onchange="{!c.zipCodeFiltered}" value="{!v.filterZipCode}" label="{!$Label.c.XC_CL_MassiveWT_SearchZP}"/>
+                                    <lightning:datatable 
+                                        keyField="label"
+                                        aura:id="zipCodeFilterTable" 
+                                        columns="{!v.columnsZipcode}" 
+                                        data="{!v.zipCodeOptions}"
+                                        onrowselection="{!c.addSelectedZipcode}"
+                                    />
+                                </div>
+                            </lightning:layoutItem>
+                        </aura:if>
+                    </lightning:layout>
+
+                    <lightning:layout verticalAlign="center" horizontalAlign="center">
+                        <lightning:layoutItem padding="around-small" flexibility="auto">
+                            <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ResetAll}" title="{!$Label.c.XC_CL_MassiveWT_ResetAll}" onclick="{!c.resetInitialFilter}"/>
+                            <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ApplyFilters}" title="{!$Label.c.XC_CL_MassiveWT_ApplyFilters}" onclick="{!c.applyInitialFilter}"/>
+                            <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWO_SelectLimitedWo}" title="{!$Label.c.XC_CL_MassiveWO_SelectLimitedWo}" onclick="{!c.applyInitialFilterLimited}"/>
+                            <lightning:helptext content="{!v.infoBoxForInitialInfo}" />
+                        </lightning:layoutItem> 
+                    </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!or(v.showFilterSelection, v.showExcelWorkOrder)}">  
+        <div class="cardTableWorkOrderFiltered" style="margin-bottom:7px">
+            <lightning:card title="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderTitleTable}">
+                <!--<lightning:layout verticalAlign="center" horizontalAlign="center">
+                    <lightning:layoutItem>
+                        <div class="classCenter" style="display: flex;"><lightning:input type="toggle" label="Out of Date?" name="Out of date" checked="{!v.outOfDate}" disabled="false" onchange="{!c.changeOutOfDate}"/></div>     
+                    </lightning:layoutItem>
+                </lightning:layout>-->
+                <lightning:layout>
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <ui:outputRichText  class="slds-text-longform classBorderWOShown" value="{!v.summaryWorkOrdersView}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                <lightning:layout verticalAlign="center" horizontalAlign="center">
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <div style="height: 300px; min-height: 300px important!">
+                            <lightning:datatable 
+                                aura:id="tableWorkOrders" 
+                                keyField="id" 
+                                showRowNumberColumn="true"
+                                data="{!v.data}" 
+                                columns="{!v.columns}" 
+                                hideCheckboxColumn="true"
+                                enableInfiniteLoading="true"
+                                onloadmore="{!c.loadMoreDataTableWorkOrder}"/>
+                        </div>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showDestinationPartner}">  
+        <div class="cardDestinationPartner" style="margin-bottom:7px">
+            <lightning:card title="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderTitleDestPartner}">
+                <lightning:layout verticalAlign="center" horizontalAlign="center">
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="2">
+                        <div style="text-align-last: right !important;">
+                            <lightning:helptext content="{!$Label.c.XC_CL_MassiveCovButtonInfo}"/>
+                            <lightning:buttonStateful
+                                labelWhenOff="{!$Label.c.XC_CL_MassiveCovSearchCode}"
+                                labelWhenOn="{!$Label.c.XC_CL_MassiveCovSearchName}"
+                                labelWhenHover="{!$Label.c.XC_CL_MassiveCovChangeInfo}"
+                                iconNameWhenOff="utility:topic2"
+                                iconNameWhenOn="utility:text"
+                                iconNameWhenHover="utility:change_record_type"
+                                state="{!v.valueSearchChoiceDestination}"
+                                onclick="{!c.handleClickStatefulButtonDestination}"
+                                variant="brand"
+                                aura:id="buttonStatefulDestination"
+                                class="classButtonStateful"
+                            />
+                        </div>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="7">
+                        <c:strike_lookup
+                            label="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderDestPartner}"
+                            object="Account"
+                            searchField="{!v.fieldDestination}"
+                            placeholder="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderSelectDestPartner}"
+                            iconName="standard:account"
+                            order="{!v.fieldDestination}"
+                            limit="5"
+                            loadingMessage="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderLoading}"
+                            errorMessage="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderErrorInput}"
+                            showRecentRecords="true"
+                            value = "{!v.destinationPartner}"
+                            required="true"
+                            filter="{!v.filterStrikeLookupDestination}"/>
+                    </lightning:layoutItem>
+                    <aura:if isTrue="{!not(v.viewAllToggle)}">
+                        <lightning:layoutItem flexibility="auto" padding="around-small" size="3">
+                            <div style="margin-top: 15px !important; text-align: center !important;">
+                                <div style="text-align: center; display: block;"><p>{!$Label.c.XC_CL_AssignTo}</p></div>
+                                <div class="classCenter" style="display: flex;"><lightning:input type="toggle" label="" name="Assignment" checked="{!v.assignToPartner}" disabled="false" messageToggleActive="Partner" messageToggleInactive="{!$Label.c.XC_CL_Contact_PartnerTechnician}"/></div>    
+                            </div>
+                            <div style="margin-top: 15px !important; text-align: center !important;">
+                                <div style="text-align: center; display: block;"><p>{!$Label.c.XC_CL_QuestionCoverageActive}</p></div>
+                                <div class="classCenter" style="display: flex;"><lightning:input type="toggle" label="" name="Check Coverage" checked="{!v.checkCoverage}" disabled="false"/></div>    
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:if>
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showLoadExcelOption}">
+        <div style="margin-bottom:7px">
+            <lightning:card title="{!$Label.c.XC_CL_MassiveTitleCSV}">
+                <lightning:layout verticalAlign="center" horizontalAlign="center" multipleRows="false">
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="4">
+                        <lightning:layout verticalAlign="center" horizontalAlign="center" multipleRows="false">
+                            <lightning:layoutItem class="flexEnd">
+                                <lightning:button label="{!$Label.c.XC_CL_MassiveImport}" onclick="{!c.uploadFile}" iconName="utility:upload"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem>
+                                <lightning:input aura:id="file" name="file" type="file" label="{!v.labelForUpload}" onchange="{!c.handleFilesChange}"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="6">
+                        {!$Label.c.XC_CL_MassiveWoTextImport1}
+                        <br></br>
+                        <b>WorkOrderNumber</b>
+                        <br></br>
+                        {!$Label.c.XC_CL_MassiveWoTextImport2}
+                        <br></br>
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveCovDownloadTemplate}" title="Excel template" onclick="{!c.downloadExceltemplate}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                <lightning:layout verticalAlign="right" horizontalAlign="right">
+                    <lightning:layoutItem size="12" flexibility="auto" padding="around-small" class="classAlignRight">
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ResetAll}" title="{!$Label.c.XC_CL_MassiveWT_ResetAll}" onclick="{!c.resetAll}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.partnerChoosed}">
+        <div style="margin-bottom:7px;">
+            <lightning:card title="{!$Label.c.XC_CL_MassiveWoInsertReason}">
+                <lightning:layout verticalAlign="left" horizontalAlign="left">
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="12">
+                        <ui:inputTextArea aura:id="comments" label="{!$Label.c.XC_CL_Comments}" value="{!v.comments}" rows="2"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:card>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.showDestinationPartner}">
+        <div style="text-align: -webkit-right;">
+            <lightning:card class="miniCard backgroundColorCard">
+                <div style="text-align: right; padding-left: 30px; padding-right: 30px;">
+                    <lightning:input aura:id="inputOutOfDate" type="checkbox" label="{!v.messageForUpdateDueDate}" checked="{!v.updateDueDate}" class="colorBlue"/>
+                    <lightning:layoutItem padding="around-small" flexibility="auto" class="classRight">
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveWT_ResetAll}" title="{!$Label.c.XC_CL_MassiveWT_ResetAll}" onclick="{!c.resetAll}"/>
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderAssign}" title="{!$Label.c.XC_CL_MassiveAssignmentWorkOrderAssign}" onclick="{!c.assignWorkOrder}" disabled="{!v.disabledButton}"/>
+                    </lightning:layoutItem> 
+                </div>
+            </lightning:card>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <div class="loader">Loading...</div>
+        </div>   
+    </aura:if>
+    
+
+</aura:component>

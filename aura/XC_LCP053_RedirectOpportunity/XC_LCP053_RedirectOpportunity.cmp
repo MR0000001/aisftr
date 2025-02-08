@@ -1,0 +1,60 @@
+<!--
+* @author Monica Cutillo - monicaa.cutillo@nttdata.com
+* @date Creation 16/01/2019
+* @date Modification 25/10/2019 - Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @description XC_LCP053_RedirectOpportunity – Component for Redirect to Create Opportunity
+-->
+
+<aura:component controller="XC_LCC053_RedirectOpportunity"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference" access="global" >
+
+    <aura:attribute name="recordTypeId" type="String"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="fromContact" type="Boolean" default="false"/>
+    <aura:attribute name="initRedirect" type="Boolean" default="false"/> 
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:attribute name="contactId" type="String" />
+    <aura:attribute name="accountId" type="String" />
+    <aura:attribute name="legalEntityValue" type="String" default=""/>
+    <aura:attribute name="productCategory" type="String" />
+    <aura:attribute name="addressId" type="String" />
+    <aura:attribute name="addressIdResidential" type="String" />
+    <aura:attribute name="podId" type="String" />
+    <aura:attribute name="workOrderId" type="String" />
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="receivingChannel" type="String" />
+    <aura:attribute name="stageName" type="String" />
+    <aura:attribute name="serviceId" type="String" default=""/> <!--763-->
+    <aura:attribute name="closeDate" type="Date" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <aura:if isTrue = "{!v.initRedirect}">
+        <c:XC_LCP000_RedirectLogicNewSobject objectName="Opportunity" 
+            objectPrefix="006" 
+            recordId="{!v.recordId}" 
+            recordTypeId="{!v.recordTypeId}"
+            fromContact= "{!v.fromContact}"
+            contactId = "{!v.contactId}"
+            accountId = "{!v.accountId}"
+            workOrderId = "{!v.workOrderId}"
+            caseId = "{!v.caseId}"
+            stageName= "{!v.stageName}"
+            closeDate= "{!v.closeDate}"
+            receivingChannel= "{!v.receivingChannel}"
+            isCommunity = "false"
+            addressId = "{!v.addressId}"
+            addressIdResidential = "{!v.addressIdResidential}"
+            productCategory = "{!v.productCategory}"
+            legalEntityValue = "{!v.legalEntityValue}"
+            serviceId="{!v.serviceId}"
+            />
+    </aura:if>
+    
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div class="spinnerHolder">
+            <lightning:spinner alternativeText="Loading" size="large" variant="brand" />
+        </div>   
+    </aura:if>
+
+</aura:component>

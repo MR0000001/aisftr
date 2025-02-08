@@ -1,0 +1,93 @@
+<!--
+* @author Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.com
+* @date Creation 10/10/2018
+* @date Modification 25/10/2019 - Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @description XC_LCP028_CreateOppFromContact – Component for Create Opportunity
+-->
+
+<aura:component 
+    extends = "c:XC_LCP022_TabNavigationManager"
+    controller= "XC_LCC028_CreateOppFromContact" 
+    implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference" 
+    access="global" >
+
+    <aura:Attribute name="recordId" type="String"/>  
+    <aura:Attribute name="visibleTo" type="List"/> 
+    <aura:Attribute name="selectedRT" type="String"/>
+    <!--Start CR763 -->
+    <aura:Attribute name="serviceId" type="String" default=""/>
+    <aura:Attribute name="caseId" type="String" />
+    <aura:Attribute name="workOrderId" type="String" />
+    <!--END 763-->
+    <aura:Attribute name="listRT" type="List"/> 
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    <aura:attribute name="showComponent" type="boolean" default="true"/>
+    <aura:attribute name="isCommunity" type="Boolean" default="false" />
+    <aura:attribute name="closeDate" type="Date" />
+    <aura:attribute name="value" type="String" />
+    <aura:attribute name="objectType" type="String"  default="Opportunity"/>
+    <aura:attribute name="objectName" type="String"  default="{!$Label.c.XC_CL_OpportunityLabel}"/>
+    <aura:attribute name="showOpportunity" type="Boolean"/>
+    <aura:registerEvent name="XC_LCE019_CloseChildComponent" type="c:XC_LCE019_CloseChildComponent" />
+
+    
+    <lightning:navigation aura:id="navService"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <aura:if isTrue="{!v.showComponent}">
+        <article class="slds-card">
+            <div class="slds-assistive-text">
+            </div>
+            <div class="slds-border_bottom">
+                <div class="topborder">
+                    <div class="slds-text-heading_medium">
+                    </div>
+                    <br></br>
+                </div>
+            </div>
+        </article>
+        <div class="topborder">{!format($Label.c.XC_CL_SelectRecordTypeMess, v.objectName)}</div>  
+    </aura:if>
+
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" /> 
+    <div class="c-container">
+        {!v.body}
+    </div>
+
+    <aura:if isTrue="{!v.showComponent}">
+        <!--loading spinner start... style=Brand Medium (blue dots)-->
+        <aura:if isTrue="{!v.spinner}">
+            <div class="topborder">
+                <div class="demo-only" style="height: 6rem;">
+                    <div role="status" class="slds-spinner slds-spinner_large">
+                        <span class="slds-assistive-text">'{!$Label.c.XC_CL_Loading}'</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+
+        <div class="topborder">
+            <lightning:radioGroup aura:id="mygroup" name="r" options="{!v.visibleTo}" label="" value="{!v.value}" onchange="{!c.onGroup}" />
+        </div>
+        <div class="topborder" style="text-align:right">
+            <aura:if isTrue="{!v.objectType=='Lead'}">
+                <!--<button type="button" class="slds-button slds-button_neutral" onclick="{!c.goBack}">{!$Label.c.XC_CL_CPAB_Cancel}</button>-->
+                <lightning:button name="btn1" label="{!$Label.c.XC_CL_Create}" class="slds-button slds-button_brand" onclick="{!c.createLead}" />
+            <aura:set attribute="else">
+                <aura:if isTrue="{!v.objectType=='Account'}">
+                    <!--<button type="button" class="slds-button slds-button_neutral" onclick="{!c.goBack}">{!$Label.c.XC_CL_CPAB_Cancel}</button>-->
+                    <lightning:button name="btn1" label="{!$Label.c.XC_CL_Create}" class="slds-button slds-button_brand" onclick="{!c.createAccount}" />
+                <aura:set attribute="else">
+                    <button type="button" class="slds-button slds-button_neutral" onclick="{!c.goBack}">{!$Label.c.XC_CL_CPAB_Cancel}</button>
+                    <lightning:button name="btn1" label="{!$Label.c.XC_CL_Create}" class="slds-button slds-button_brand" onclick="{!c.createOpp}" />
+                </aura:set>
+                </aura:if>
+            </aura:set>
+            </aura:if>
+        </div>
+    </aura:if>
+       
+</aura:component>

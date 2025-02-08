@@ -1,0 +1,252 @@
+<aura:component controller="XC_LCC005_360View"
+    implements="force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:hasSObjectName,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader"
+    access="global">
+
+    <aura:attribute name="sobjecttype" type="String" default="{!v.sObjectName}" />
+    <aura:attribute name="serverSystem" type="String" />
+    <aura:attribute name="identityNumber" type="String" />
+    <aura:attribute name="accountCommodityObj" type="Object" />
+    <aura:attribute name="accountCommodityObj2" type="Object" />
+    <aura:attribute name="contractCommodityObj" type="Object" />
+    <aura:attribute name="caseCommodityObj" type="Object" />
+    <aura:attribute name="invoiceCommodityObj" type="Object" />
+    <aura:attribute name="commodityGlobalMessage" type="String" />
+    <aura:attribute name="showCard" type="Boolean" default="true" />
+    <aura:attribute name="selectedAccount" type="String" />
+    <aura:attribute name="resultList" type="Object[]" />
+    <aura:attribute name="accountDocCountry" type="String" />
+    <aura:attribute name="ShowModule" type="boolean" default="false" />
+    <aura:attribute name="getConsentsFromCommodity" type="boolean" default="true" />
+    <aura:attribute name="Spinner" type="boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}" />
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}" />
+    
+    <aura:if isTrue="{!v.ShowModule}">
+
+        <div class="slds-backdrop slds-backdrop_open" aria-hidden="false"></div>
+        <aura:if isTrue="{!v.Spinner}">
+            <div aura:id="spinnerId" class="slds-spinner_container" style=" height:6rem;">
+
+                <lightning:spinner size="medium" variant="brand" />
+            </div>
+        </aura:if>
+        <div aria-hidden="false">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open" style="height: 100%; width:100%">
+                <div class="slds-modal__container" aria-hidden="true">
+                    <header class="slds-modal__header" style="background: rgb(234, 235, 236);">
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate"> {!$Label.c.XC_CL_360View}
+                        </h2>
+                    </header>
+                    <div style="background: white; size: 50%;" class="slds-modal__content slds-p-around_medium"
+                        id="modal-content-id-1">
+                        <aura:if isTrue="{!v.getConsentsFromCommodity}">
+                            <aura:if isTrue="{!v.showCard}">
+                                <p>The following Accounts are retrieved from Commodity: </p>
+
+                                <aura:if isTrue="{!v.accountCommodityObj.length>0}">
+                                    <div class="slds-grid slds-wrap">
+                                        <aura:iteration var="accountCommodity" items="{!v.accountCommodityObj}"
+                                            indexVar="optIndex">
+
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <div class="slds-box" style="margin:5px !important;">
+
+                                                    <lightning:card variant="narrow" iconName="standard:account">
+                                                        <aura:set attribute="title">
+                                                            {!$Label.c.XC_CL_AccountLabel}
+                                                        </aura:set>
+                                                        <aura:set attribute="actions">
+                                                            <lightning:button label="{!$Label.c.XC_CL_Select}" variant="brand"
+                                                                onclick="{!c.createComponent }" value="{!optIndex}">
+                                                            </lightning:button>
+                                                        </aura:set>
+                                                        <aura:if
+                                                            isTrue="{!or(accountCommodity.AccountType == 'Residential', !and(accountCommodity.AccountType == '', !accountCommodity.Name == ''))}"> <!--isTrue="{!accountCommodity.AccountType == 'Residential'}"-->
+                                                            <p>
+                                                                <p> <b>{!$Label.c.XC_CL_Name}: </b> {!accountCommodity.FirstName} </p>
+                                                                <p> <b>{!$Label.c.XC_CL_Surname}: </b> {!accountCommodity.LastName} </p>
+                                                                <p> <b>{!$Label.c.XC_CL_Phone}: </b> ( {!accountCommodity.MainPhonePrefix}
+                                                                    )
+                                                                    {!accountCommodity.MainPhone}
+                                                                </p>
+                                                                <p> <b>{!$Label.c.XC_CL_Email}: </b> {!accountCommodity.PrimaryEmail} </p>
+                                                            </p>
+
+                                                            <aura:set attribute="else">
+                                                                <p>
+                                                                    <p> <b>{!accountCommodity.AccountType} {!$Label.c.XC_CL_Name}: </b>
+                                                                        {!accountCommodity.Name}
+                                                                    </p>
+                                                                    <p> <b>{!$Label.c.XC_CL_DocumentTypeLabel}: </b>
+                                                                        {!accountCommodity.Identity[0].IdentityType}
+                                                                    </p>
+                                                                    <p> <b>{!$Label.c.XC_DocumentNumberLabel}: </b>
+                                                                        {!accountCommodity.Identity[0].IdentityNumber}
+                                                                    </p>
+                                                                </p>
+                                                            </aura:set>
+                                                        </aura:if>
+
+                                                    </lightning:card>
+
+                                                </div>
+                                            </div>
+
+
+                                        </aura:iteration>
+                                    </div>
+                                    <aura:set attribute="else">
+
+                                        <ui:message severity="error" closable="false">
+                                            {!format($Label.c.XC_CL_360_AccountNotFound, v.sObjectName)}
+                                        </ui:message>
+                                    </aura:set>
+
+                                </aura:if>
+                                <aura:set attribute="else">
+
+                                    <aura:if isTrue="{!v.accountCommodityObj2.accountsResulWrappers.length>0}">
+                                        <c:XC_LCP130_AccountCommodityDataBox
+                                            accountCommodityObj="{!v.accountCommodityObj2}"
+                                            caseCommodityObj="{!v.caseCommodityObj}"
+                                            contractCommodityObj="{!v.contractCommodityObj}"
+                                            commodityGlobalMessage="{!v.commodityGlobalMessage}"
+                                            recordId="{!v.recordId}" sobjecttype="{!v.sobjecttype}"
+                                            selectedAccount="{!v.selectedAccount}"
+                                            serverSystem="{!v.serverSystem}" 
+                                            accountDocCountry="{!v.accountDocCountry}"/>
+                                    </aura:if>
+
+                                </aura:set>
+                            </aura:if>
+                            <aura:set attribute="else">
+                                <c:XC_LCP163_CreateConsents recordId="{!v.recordId}" />
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <aura:if isTrue="{!v.getConsentsFromCommodity}">
+                            <aura:if isTrue="{!v.accountCommodityObj2.accountsResulWrappers.length>0 }">
+                                <ui:button label="Close"
+                                    class="slds-button slds-button--neutral cuf-publisherCancelButton uiButton"
+                                    press="{!c.btnClose}" />
+                                <aura:set attribute="else">
+                                    <ui:button label="Enter consents manually"
+                                        class="slds-button slds-button--neutral cuf-publisherCancelButton uiButton"
+                                        press="{!c.btnCancel}" />
+
+                                </aura:set>
+                            </aura:if>
+                            <aura:set attribute="else">
+                                <ui:button label="Close"
+                                    class="slds-button slds-button--neutral cuf-publisherCancelButton uiButton"
+                                    press="{!c.btnCloseWithConsents}" />
+                            </aura:set>
+                        </aura:if>
+                    </footer>
+                </div>
+            </section>
+
+        </div>
+
+
+    </aura:if>
+
+    <br />
+    <header class="slds-modal__header" style="background: rgb(234, 235, 236);" size="xx-small">
+        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate"> {!$Label.c.XC_CL_360View}
+        </h2>
+    </header>
+    <div style="background: white; size: 50%;" class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+        <aura:if isTrue="{!v.Spinner}">
+            <div aura:id="spinnerId" class="slds-spinner_container" style=" height:6rem;">
+
+                <lightning:spinner size="medium" variant="brand" />
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.showCard}">
+            
+            <aura:if isTrue="{!v.accountCommodityObj.length>0}">
+                <div class="slds-grid slds-wrap">
+                    <aura:iteration var="accountCommodity" items="{!v.accountCommodityObj}" indexVar="optIndex">
+
+                        <div class="slds-col slds-size_1-of-2">
+                            <div class="slds-box" style="margin:5px !important;">
+
+                                <lightning:card variant="narrow" iconName="standard:account">
+                                    <aura:set attribute="title">
+                                        {!$Label.c.XC_CL_AccountLabel}
+                                    </aura:set>
+                                    <aura:set attribute="actions">
+                                        <lightning:button label="{!$Label.c.XC_CL_Select}" variant="brand" onclick="{!c.createComponent }"
+                                            value="{!optIndex}">
+                                        </lightning:button>
+                                    </aura:set>
+                                    <aura:if isTrue="{!or(accountCommodity.AccountType == 'Residential', !and(accountCommodity.AccountType == '', !accountCommodity.Name == ''))}"> <!--!accountCommodity.AccountType == 'Residential'-->
+                                        <p>
+                                            <p> <b>{!$Label.c.XC_CL_Name}: </b> {!accountCommodity.FirstName} </p>
+                                            <p> <b>{!$Label.c.XC_CL_Surname}: </b> {!accountCommodity.LastName} </p>
+                                            <p> <b>{!$Label.c.XC_CL_Phone}: </b> ( {!accountCommodity.MainPhonePrefix} )
+                                                {!accountCommodity.MainPhone}
+                                            </p>
+                                            <p> <b>{!$Label.c.XC_CL_Email}: </b> {!accountCommodity.PrimaryEmail} </p>
+                                        </p>
+
+                                        <aura:set attribute="else">
+                                            <p>
+                                                <p> <b>{!accountCommodity.AccountType} {!$Label.c.XC_CL_Name}: </b>
+                                                    {!accountCommodity.Name}
+                                                </p>
+                                                <p> <b>{!$Label.c.XC_CL_DocumentTypeLabel}: </b>
+                                                    {!accountCommodity.Identity[0].IdentityType}
+                                                </p>
+                                                <p> <b>{!$Label.c.XC_DocumentNumberLabel}: </b>
+                                                    {!accountCommodity.Identity[0].IdentityNumber}
+                                                </p>
+                                            </p>
+                                        </aura:set>
+                                    </aura:if>
+
+                                </lightning:card>
+
+                            </div>
+                        </div>
+
+
+                    </aura:iteration>
+                </div>
+                <aura:set attribute="else">
+
+                    <ui:message severity="error" closable="false">
+                        {!format($Label.c.XC_CL_360_AccountNotFound, v.sObjectName)}
+                    </ui:message>
+
+                </aura:set>
+
+            </aura:if>
+            <aura:set attribute="else">
+                
+                <aura:if isTrue="{!v.accountCommodityObj2.accountsResulWrappers.length>0}">
+                    <c:XC_LCP130_AccountCommodityDataBox 
+                        accountCommodityObj="{!v.accountCommodityObj2}"
+                        caseCommodityObj="{!v.caseCommodityObj}" 
+                        contractCommodityObj="{!v.contractCommodityObj}"
+                        invoiceCommodityObj="{!v.invoiceCommodityObj}" 
+                        commodityGlobalMessage="{!v.commodityGlobalMessage}" 
+                        recordId="{!v.recordId}"
+                        sobjecttype="{!v.sobjecttype}" 
+                        selectedAccount="{!v.selectedAccount}"
+                        serverSystem="{!v.serverSystem}" 
+                        accountDocCountry="{!v.accountDocCountry}" />
+                </aura:if>
+
+            </aura:set>
+
+        </aura:if>
+    </div>
+
+
+
+</aura:component>

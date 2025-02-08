@@ -1,0 +1,26 @@
+<apex:page standardController="gii__SalesOrder__c">
+ <apex:includeLightning />
+ <apex:form >
+        <style>
+           .sfdcBody
+             {
+           		padding: 3px 0px 0 0px !important;
+            }
+            </style>
+     <div class="sfdcBody"  id="FlipcardContainer" >
+ <script>
+ $Lightning.use("c:giic_LightningOutContainerApp", function() {
+ $Lightning.createComponent("c:giic_LCP001_TrafficLight",
+ { 
+ 	recordId : "{!gii__SalesOrder__c.Id}",
+    sobjectType : "gii__SalesOrder__c"
+ },
+ "FlipcardContainer",
+ function(cmp) {
+ console.log('Component creato!');
+ });
+ });
+ </script>
+     </div>
+    </apex:form>
+</apex:page>

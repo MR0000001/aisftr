@@ -1,0 +1,112 @@
+<!--@Created by     Roberta Cossiga rcossiga@deloitte.it || Emanuela Cacace ecacace@deloitte.it || Federico Amici federico.amici@nttdata.com
+        @Creation Date  04/07/2019
+        @Description    The component displays a record retrieved by the corresponding outbound REST
+    -->
+
+    <aura:component controller="XC_LCC126_ResourceSkillRelatedList"
+        implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,force:hasRecordId" access="global" >
+
+        <aura:attribute name="recordId" type="String" /> 
+
+        <!-- Data table attributes -->
+        <aura:attribute name="data" type="Object[]"/>
+        <aura:attribute name="columns" type="String[]" default="['Name', 'Skill Level', 'Start Date' , 'End Date']"/>
+        <aura:attribute name="showModal" type="boolean" default="false"/>
+        <aura:attribute name="updatedRecord" type="Object[]" />
+        <aura:attribute name="globalObjectString" type="String" />
+        <aura:attribute name="skillId" type="String" />
+        <aura:attribute name="skillName" type="String" />
+        <aura:attribute name="skillLevel" type="Decimal" />
+        <aura:attribute name="assignmentStartDate" type="Date" />
+        <aura:attribute name="assignmentEndDate" type="Date" />
+        <aura:attribute name="spinnerControl" type="Boolean" default="false" />
+        <aura:attribute name="hideNewButton" type="Boolean" default="false" />
+        <lightning:notificationsLibrary aura:id="notifLib"/>
+        <lightning:workspaceAPI aura:id="workspace" />
+        <lightning:navigation aura:id="navService"/>
+
+        <!-- Handler -->
+        <aura:handler name="init" value="{!this}" action="{!c.init}"/>  
+        <aura:if isTrue="{!v.spinnerControl}" >
+                        <div aura:id="masterSpinner" style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+                            <lightning:spinner aura:id="mySpinner"/>
+                        </div>
+        </aura:if>
+        <div class="slds-box">
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+
+                        <lightning:icon class="slds-icon" iconName="standard:resource_skill"  />
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title">
+                                <div class="slds-text-heading_small">&nbsp; <b>{!$Label.c.XC_CL_Skills}</b></div>
+                            </h2>
+                        </div>
+                            <div class="buttonstyle">
+                                <lightning:button label="{!$Label.c.XC_CL_New}" title="New Skill" onclick="{!c.showModal}" disabled="{!v.hideNewButton}"/>
+                            </div>
+                            <c:strike_modal
+                                title="{!$Label.c.XC_CL_NewResouceSkill}"
+                                primaryButtonLabel="{!$Label.c.XC_CL_SaveButton}"
+                                secondaryButtonLabel="{!$Label.c.XC_CL_CPAB_Cancel}"
+                                showHeader="true"
+                                showFooter="false"
+                                showClose="true"
+                                showModal="{!v.showModal}"
+                                size="medium">
+                                
+        <div class="container" >
+                <div class="slds-text-align_left">
+                    <lightning:layoutItem>
+                        <div>
+                            <lightning:layoutItem flexibility="auto" size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="12" padding="horizontal-small">
+                                <lightning:recordEditForm objectApiName="ServiceResourceSkill"   >
+                                
+                                    <c:strike_lookup
+                                                     label="{!$Label.c.XC_CL_Skill}"
+                                                     object="Skill"
+                                                     searchField="MasterLabel"
+                                                     placeholder="Search a Skill"
+                                                     iconName="custom:custom9"
+                                                     order="MasterLabel" 
+                                                     loadingMessage="Loading..."
+                                                     errorMessage="Invalid input"
+                                                     showRecentRecords="true"
+                                                     required="true"
+                                                     value="{!v.skillId}"
+                                                     valueLabel="{!v.skillName}"
+                                                     />                                   
+                                            <lightning:inputField aura:id="skillLevel" fieldName="SkillLevel" value="{!v.skillLevel}" required="true"/>
+                                            <lightning:inputField aura:id="assignmentStartDate" fieldName="XC_AssignmentStartDate__c" value="{!v.assignmentStartDate}" required="true" /> 
+                                            <lightning:inputField aura:id="assignmentEndDate" fieldName="XC_AssignmentEndDate__c" value="{!v.assignmentEndDate}"  required="true"/>
+                                </lightning:recordEditForm>
+                            </lightning:layoutItem>
+                        </div>
+                    </lightning:layoutItem>
+                </div>
+            </div>
+            <div class="abbass">
+                    <div class="modal-footer slds-modal__footer slds-size_1-of-1 slds-text-align_center">
+                        <div class="forceChangeRecordTypeFooter">
+                            <lightning:button  label="{!$Label.c.XC_CL_CancelButton}" title="Cancel" onclick="{! c.cancel}"/>
+                            <lightning:button variant="brand" label="{!$Label.c.XC_CL_ConfirmButton}" title="Submit" onclick="{! c.confirm}" />
+                        </div>
+                    </div>
+                </div> 
+                            </c:strike_modal>
+                    </header>
+                </div>
+            </article>
+        </div>
+         <div style="height: 300px">
+            <lightning:datatable
+                        aura:id="datatableID"
+                        keyField="id"
+                        data="{! v.data }"
+                        columns="{! v.columns }"
+                        hideCheckboxColumn="true"
+                        errors="{! v.errors }"   
+                        onsave="{! c.handleSaveEdition}"/>
+         </div> 
+    </aura:component>

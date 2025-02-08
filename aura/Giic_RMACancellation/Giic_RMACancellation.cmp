@@ -1,0 +1,21 @@
+<aura:component controller="Giic_RMAUtility" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasSObjectName,lightning:availableForFlowScreens" access="global"> >
+	<aura:attribute name="recordId" type="String"/> 
+    <aura:attribute name="RMA" type="Object"/>   
+    <aura:attribute name="parentOpp" type="Object"/>
+    <aura:attribute name="oppLoadError" type="String"/>
+  <!--  <force:recordData aura:id="oppRecordLoader"
+                      recordId="{!v.recordId}"
+                      fields="Id,
+                              gii__Reason__c"
+                      targetRecord="{!v.RMA}"
+                      targetFields="{!v.parentOpp}"
+                      targetError="{!v.oppLoadError}"
+                      />-->
+      <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+     
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false" /> 
+  	 <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner aura:id="mySpinner" />
+    </aura:if>
+</aura:component>

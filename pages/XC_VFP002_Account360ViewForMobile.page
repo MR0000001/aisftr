@@ -1,0 +1,15 @@
+<apex:page lightningStylesheets="true" standardController="Account" extensions="XC_VFC001_AccountAddressForMobile">
+    
+    <apex:includeLightning />
+    <div id="lightning" />
+    <script>
+        $Lightning.use("c:XC_LAP002_Address", function() {
+          $Lightning.createComponent("c:XC_LCP005_AccountCallToCommodity",
+          { "IdFromMobile" : "{!account.id}" },
+          "lightning");
+        });
+    </script>
+    
+   
+    
+</apex:page>

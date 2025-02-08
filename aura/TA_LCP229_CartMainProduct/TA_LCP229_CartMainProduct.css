@@ -1,0 +1,540 @@
+/* .THIS .ta-main-product-container {
+    border-radius: 2.5vw;
+    background: rgba(70, 30, 125, 1);
+    margin-bottom: 4vw;
+    height: 35vw;
+    box-shadow: 0vw 1vw 2vw -.8vw black!important;
+}
+
+.THIS .ta-main-product-image-container {
+    width: 35vw;
+    height: 35vw;
+    padding: 2vw;
+    background: white;
+    border-bottom-left-radius: 2.5vw;
+    border-top-left-radius: 2.5vw;
+    text-align: center;
+}
+
+.THIS .ta-main-product-image {
+    max-width: 100%;
+    max-height: 100%;
+    vertical-align: middle;
+}
+
+.THIS .ta-main-product-info {
+    padding: 2.5vw 0vw 2.5vw 2.5vw;
+    color: white;
+    font-size: 3.3vw;
+}
+
+.THIS .ta-main-product-text-1 {
+    font-weight: 800;
+}
+
+.THIS .ta-font-weight-800 {
+    font-weight: 800;
+}
+
+.THIS .ta-font-weight-300 {
+    font-weight: 800;
+}
+
+.THIS .ta-main-product-text-2 {
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+} */
+
+/* CUSTOM-TAG */
+.THIS.ta-modal-bg {
+    z-index: 4;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(70, 30, 125, 0.8);
+    height: 100vh;
+    width: 100vw;
+}
+
+/* .THIS .ta-modal-main-product-container {
+    position: absolute;
+    top: 10vh;
+    left: 10vw;
+    right: 10vw;
+    background: white;
+    border-radius: 5vw;
+    box-shadow: 0 0vw 1vw 0vw black;
+}
+
+.THIS .ta-modal-filter-container {
+    position: absolute;
+    top: 20vh;
+    left: 10vw;
+    right: 10vw;
+    background: white;
+    border-radius: 5vw;
+    box-shadow: 0 0vw 1vw 0vw black;
+}
+
+.THIS .ta-animation-pop-in {
+    animation: pop-in 0.5s;
+    -webkit-animation-name: pop-in 0.5s;
+    animation-name: pop-in 0.5s;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-modal-header {
+    border-top-left-radius: 5vw;
+    border-top-right-radius: 5vw;
+    padding: 5vw 5vw 0vw 5vw;
+    height: 6vh;
+}
+
+/* .THIS .ta-modal-header-button {
+    height: inherit;
+    width: 5vw;
+}
+
+.THIS .ta-modal-main-product-body {
+    padding: 3vw;
+    height: 70vh;
+    overflow-y: auto;
+}
+
+.THIS .ta-modal-filter-body {
+    padding: 3vw 10vw;
+    height: 45vh;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-modal-main-product-fields {
+    padding: 0vh 2vw;
+}
+
+/* .THIS .ta-modal-main-characteristic-label {
+    font-size: 3.3vw;
+    font-weight: 800;
+    padding-right: 2vw;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.THIS .ta-modal-main-characteristic-value {
+    font-size: 3.3vw;
+    font-weight: 300;
+    padding-left: 0vh 2vw;
+    color: rgba(70, 30, 125, 1);
+}
+
+.THIS .ta-card-filter {
+    font-size: 3.3vw;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.THIS .ta-modal-footer-one-button {
+    background: white;
+    border-bottom-left-radius: 5vw;
+    border-bottom-right-radius: 5vw;
+    padding: 3vw;
+    height: 8.4vh;
+}
+
+.THIS .ta-modal-footer-two-button {
+    background: white;
+    border-bottom-left-radius: 5vw;
+    border-bottom-right-radius: 5vw;
+    padding: 3vw;
+    height: 15vh;
+}
+
+.THIS .ta-button-primary-modal {
+    color: #ffffff;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background: linear-gradient(45deg, #0d0713 0%, #3c2462 100%);
+    border: 1px solid black;
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size: 3.5vw;
+    min-width: 35vw;
+    width: 100%;
+    height: 9vw;
+}
+
+.THIS .ta-button-closing-modal {
+    color: #ff006e;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background-color: #ffffff;
+    border-color: #ff006e;
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size: 3.5vw;
+    min-width: 35vw;
+    width: 100%;
+    height: 9vw;
+}
+
+.THIS .ta-button-secondary-modal {
+    color: #461e7d;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background-color: #ffffff;
+    border-color: #461e7d;
+    padding: 1vw 5vw 1vw 5vw;
+    text-transform: uppercase;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size: 3.5vw;
+    min-width: 35vw;
+    width: 100%;
+    height: 9vw;
+}
+
+.THIS .ta-modal-image {
+    background-color: rgba(70,30,125);
+    padding: 15.5vw 5vw;
+    border-radius: 2.5vw;
+    height: 40vw;
+    width: 40vw;
+    position: relative;
+    z-index: 999;
+    margin: 0vw 16.5vw;
+    box-shadow: 0vw 1vw 2vw -.8vw black!important;
+}
+
+.THIS .ta-modal-image-bg {
+    background: rgba(70, 30, 125, 0.3);
+    position: absolute;
+    z-index: -1;
+    width: 55vw;
+    height: 30vw;
+    top: 21vw;
+    left: 12.3vw;
+    border-radius: 2.5vw;
+}
+
+.THIS .ta-card-title {
+    font-size: 4vw;
+    font-weight: 800;
+    color: white;
+    text-transform: capitalize;
+    padding-top: 2vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS.ta-products-container {
+    border-top: 0.3vw solid white;
+    padding-top: 3vw;
+}
+
+/* .THIS .ta-modal-prodname {
+    font-size: 4vw;
+    padding: 0vw 6vw;
+    font-weight: 800;
+    color: rgb(70, 30, 125);
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-modal-price {
+    font-size: 6vw;
+    font-weight: 800;
+    color: rgb(70, 30, 125);
+}
+
+/* .THIS .slds-select_container .slds-select {
+    padding-left: 4vw !important;
+    border-radius: 5vw !important;
+    background: #ece8f2 !important;
+    color: rgb(70, 30, 125) !important;
+} */
+
+/* CUSTOM-TAG */
+.THIS .slds-input {
+    border-radius: 5vw !important;
+    background: #ece8f2 !important;
+    color: rgb(70, 30, 125) !important;
+} 
+
+/* .THIS .slds-select_container:before, .THIS .slds-select_container:after {
+    right: 3.5vw !important;
+} */
+
+/* CUSTOM-TAG */
+.THIS .slds-form-element__label {
+    color: rgba(0, 0, 0, 0.5) !important;
+    padding-bottom: 1.5vw !important;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-pagination-item {
+    color: white;
+    font-size: 3.5vw;
+    font-weight: 800;
+}
+
+/* .THIS .ta-previous-page-text {
+    padding-left: 1vw;
+}
+
+.THIS .ta-next-page-text {
+    padding-right: 1vw;
+}
+
+.THIS .ta-filter-button {
+    color: #ffffff;
+    box-shadow: 0 0 0.5vw 0 rgba(0, 0, 0, 0.5);
+    background-color: rgba(255,255,255,0.1);
+    border: .1vw solid #ffffff;
+    padding: 1vw 5vw;
+    border-radius: 5vw;
+    font-weight: 800;
+    font-size: 3.5vw;
+}
+
+.THIS .ta-filter-button-text {
+    padding-right: 2vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-disable-button {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-characteristic-container {
+    border-bottom: 0.1vw solid rgba(0, 0, 0, 0.1);
+    padding: 0.5vh 0vw;
+}
+
+/* .THIS .ta-characteristic-title {
+    padding: 0vh 2vw;
+    font-weight: 800;
+    font-size: 3.5vw;
+}
+
+.THIS .ta-modal-description-container {
+    padding: 0vh 2vw;
+}
+
+.THIS .ta-modal-description-label {
+    font-size: 3.3vw;
+    font-weight: 800;
+    padding-right: 2vw;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.THIS .ta-modal-description-value {
+    font-size: 3.3vw;
+    font-weight: 300;
+    padding-left: 0vh 2vw;
+    color: rgba(70, 30, 125, 1);
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-main-product-image-helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-mp-selected {
+    position: absolute;
+    background: #ff006e;
+    border-top-right-radius: 2.5vw;
+    height: 7vw;
+    border-bottom-left-radius: 2.5vw;
+    width: 7vw;
+    right: 0;
+    top: 0;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-mp-selected-icon {
+    width: 4vw;
+    height: 4vw;
+    margin-top: 1.2vw;
+}
+
+/* .THIS .ta-filter-label {
+    padding-bottom: 1.5vw;
+}
+
+.THIS .ta-price-range-slider .noUi-target {
+    border-radius: 1vw;
+}
+
+.THIS .ta-price-range-slider .noUi-horizontal {
+    height: 2vw;
+    margin: 2vw 0vw;
+}
+
+.THIS .ta-price-range-slider .noUi-connects {
+    border-radius: 1vw;
+}
+
+.THIS .ta-price-range-slider .noUi-connect {
+    background: #461e7d;
+}
+
+.THIS .ta-price-range-slider .noUi-handle {
+    right: -4vw;
+    top: -2.5vw;
+    border-radius: 5vw;
+}
+
+.THIS .ta-min-price-selected {
+    text-align: left;
+}
+
+.THIS .ta-max-price-selected {
+    text-align: right;
+
+}
+
+.THIS .ta-modal-main-charateristic-title {
+    font-size: 3.3vw;
+    color: black;
+    padding-top: 5vw;
+    font-weight: 800;
+}
+
+.THIS .ta-cart-price-discount {
+    color: #ff006e;
+    text-decoration: line-through;
+    font-size: 3.3vw;
+}
+
+.THIS .ta-cart-price-discount-2 {
+    color: #ff006e;
+    text-decoration: line-through;
+    font-size: 5vw;
+} */
+
+/* CUSTOM-TAG TABLET */
+@media only screen and (min-width: 601px) {
+    /*.THIS .ta-main-product-container {
+        border-radius: 2.5vw;
+        background: rgba(70, 30, 125, 1);
+        margin-bottom: 4vw;
+        height: 25vw;
+        box-shadow: 0vw 1vw 2vw -.8vw black!important;
+    }
+
+    .THIS .ta-main-product-image-container {
+        width: 25vw;
+        height: 25vw;
+        padding: 2vw;
+        background: white;
+        border-bottom-left-radius: 2.5vw;
+        border-top-left-radius: 2.5vw;
+        text-align: center;
+    }
+
+    .THIS .ta-main-product-info {
+        padding: 3vw 0vw 2.5vw 10vw;
+        color: white;
+        font-size: 2.5vw;
+    }*/
+
+    /* CUSTOM-TAG */
+    .THIS .ta-mp-selected-icon {
+        width: 3vw;
+        height: 3vw;
+        margin-top: 1.2vw;
+    }
+
+    /* CUSTOM-TAG */
+    .THIS .ta-mp-selected {
+        position: absolute;
+        background: #ff006e;
+        border-top-right-radius: 2.5vw;
+        height: 5.5vw;
+        border-bottom-left-radius: 2.5vw;
+        width: 5.5vw;
+        right: 0;
+        top: 0;
+    }
+
+    /* CUSTOM-TAG */
+    .THIS.ta-modal-bg {
+        z-index: 5;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: rgba(70, 30, 125, 0.8);
+        height: 100vh;
+        width: 100vw;
+    }
+
+    /*.THIS .ta-modal-footer-one-button {
+        background: white;
+        border-bottom-left-radius: 5vw;
+        border-bottom-right-radius: 5vw;
+        padding: 3vw;
+        height: 10.5vh;
+    }
+
+    .THIS .ta-filter-button {
+        color: #ffffff;
+        box-shadow: 0 0 0.5vw 0 rgb(0 0 0 / 50%);
+        background-color: rgba(255,255,255,0.1);
+        border: .1vw solid #ffffff;
+        padding: 1vw 5vw;
+        border-radius: 5vw;
+        font-weight: 800;
+        font-size: 2.5vw;
+    }
+
+    .THIS .slds-input, .THIS .slds-select, .THIS .slds-input:focus, .THIS .slds-input:active {
+		font-size: 2.5vw !important;
+        height: 6vw !important;
+	}
+
+    .THIS .slds-select_container {
+        margin: 0vw !important;
+    }
+
+    .THIS .ta-modal-footer-two-button {
+        background: white;
+        border-bottom-left-radius: 5vw;
+        border-bottom-right-radius: 5vw;
+        padding: 3vw;
+        height: 18vh;
+    }*/
+}
+
+.THIS .ta-modal-info-body {
+    max-height: 65vh;
+    padding: 0vh 4vw 2vh 4vw;
+}
+
+.THIS .slds-select_container {
+    margin: 0;
+}
+
+.THIS .ta-modal-info-body .slds-form-element__label {
+    display: none;
+}
+
+.THIS .noUi-horizontal .noUi-handle {
+    top: -3vw;
+}
+
+.THIS .ta-padding-horizontal-4vw {
+    padding: 0 4vw;
+}
+
+.THIS .ta-padding-top-1vh {
+    padding-top: 1vh;
+}
+
+.THIS .ta-price-label {
+    color: rgba(0, 0, 0, 0.5)!important;
+    font-size: 3.3vw !important;
+    text-transform: capitalize !important;
+    font-weight: 800 !important;
+}

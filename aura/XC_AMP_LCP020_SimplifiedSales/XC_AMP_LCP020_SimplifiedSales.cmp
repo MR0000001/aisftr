@@ -1,0 +1,96 @@
+<!--
+  @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+  @date 26/03/2021
+  @description XC_AMP_LCP020_SimplifiedSales - Container for Wizard Simplified Sales
+-->
+
+<aura:component implements="force:hasRecordId,force:appHostable,force:lightningQuickActionWithoutHeader,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes"
+                controller="XC_AMP_LCC020_SimplifiedSales"
+                access="global">
+    
+    <!-- For navigation -->
+    <aura:html tag="style">
+        .slds-modal__container { max-width:80rem !important; width:80%!important; max-height:80rem !important; }
+    </aura:html>
+    <lightning:navigation aura:id="navService"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+
+    <!-- Attributes -->
+    <aura:attribute name="spinnerControl" type="Boolean" default="false"/>
+    <aura:attribute name="bigSpinnerControl" type="Boolean" default="false"/>
+    <!--<aura:attribute name="disabledBackButton" type="Boolean" default="true"/>-->
+    <aura:attribute name="disabledNextButton" type="Boolean" default="true"/>
+    <aura:attribute name="recordId" type="String" default=""/>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="showMessage" type="Boolean" default="false"/>
+    <aura:attribute name="legalEntityUser" type="String" default=""/>
+    <aura:attribute name="segmentContact" type="String" default=""/>
+    <aura:attribute name="mapViewDefinition" type="Object"/>
+    <aura:attribute name="mapComponentDefinition" type="Object"/>
+    <aura:attribute name="mapComponentDefinitionOtherInformation" type="Object"/>
+    <aura:attribute name="checkPointStep" type="String" default=""/>
+    <aura:attribute name="order" type="Object"/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="extraFields" type="Object"/>
+    <aura:attribute name="listStep" type="List"/>
+    <aura:attribute name="currentStep" type="Integer" default="0"/>
+    <aura:attribute name="currentValidated" type="Boolean" default="false"/>
+    <aura:attribute name="labelNextButton" type="String" default="{!$Label.c.XC_CL_NextMess}"/>
+    <aura:attribute name="step" type="String" default=""/>
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="paymentMethod" type="String" default=""/>
+    <aura:attribute name="stepDataMap" type="Map" default="{}"/>
+    <aura:attribute name="debtorCode" type="String" default="" />
+    <aura:attribute name="paymentMethodCategory" type="String" default=""/>
+    <aura:attribute name="billingProfileLineItemId" type="String" default=""/>
+    
+    <!-- For handler -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="XC_AMP_LCE001_AMPCommunicationEvent" event="c:XC_AMP_LCE001_AMPCommunicationEvent" action="{!c.handleAMPCommunicationEvent}" />
+
+    <div class="slds-p-around_x-small">
+        <!--<lightning:card title="{!$Label.c.XC_CL_SimplifiedSales}" variant="narrow" class="slds-card_boundary" iconName="standard:catalog">-->
+
+            <aura:if isTrue="{!v.spinnerControl}">
+                <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="12"
+                    padding="around-small">
+                    <div class="slds-is-relative">
+                        <lightning:spinner aura:id="mySpinner" variant="brand" />
+                    </div>
+                </lightning:layoutItem>
+            </aura:if>
+
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="12">
+                    <aura:if isTrue="{!v.showMessage}">
+                        <lightning:card title="{!$Label.c.XC_CL_SimplifiedSales}" variant="narrow" class="slds-card_boundary" iconName="standard:catalog">
+                            <p class="centerLayoutItem margin15">{!v.message}</p>
+                        </lightning:card>
+                    <aura:set attribute="else">
+                        {!v.body}
+                    </aura:set></aura:if>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12">
+                    <lightning:layout multipleRows="false" horizontalAlign="center" verticalAlign="center">
+                        <lightning:layoutItem size="12" padding="around-small" class="centerLayoutItem">
+                            <lightning:buttonGroup>
+                                <!--<lightning:button label="Back" iconName="utility:chevronleft" iconPosition="left" onclick="{!c.onBackButton}" disabled="{!v.disabledBackButton}"/>-->
+                                <lightning:button label="{!v.labelNextButton}" iconName="utility:chevronright" iconPosition="right" onclick="{!c.onNextButton}" disabled="{!v.disabledNextButton}"/>
+                            </lightning:buttonGroup>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+
+        <!--</lightning:card>-->
+    </div>
+
+    <aura:if isTrue="{!v.bigSpinnerControl}">
+        <div
+            style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+
+</aura:component>

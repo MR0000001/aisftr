@@ -1,0 +1,17 @@
+.THIS.cuf-content {
+    padding: 0 0rem !important;
+}
+    
+.THIS.slds-p-around_medium {
+    padding: 0rem !important;
+}      
+.THIS .titleClass{
+    text-align: center;
+    font-size: 150%;
+}
+
+.THIS.slds-modal__content{
+    overflow-y:hidden !important;
+    height:Unset !important;
+    max-height:Unset !important;
+}

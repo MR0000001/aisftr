@@ -1,0 +1,17 @@
+<apex:page standardController="XC_ContractAmendment__c" recordSetVar="contractAmedments">
+    <apex:includeLightning />
+
+    <div id="lightning" />
+ 
+     <script>
+     $Lightning.use("c:ContractDashboardApp", function() {
+         $Lightning.createComponent("c:XC_LCP266_ContractDashboardVF",
+             {},
+             "lightning",
+             function(cmp) {
+          console.log("c:VFPageApp loaded successfully in VF page");
+             }
+         );
+     });
+  </script>
+</apex:page>

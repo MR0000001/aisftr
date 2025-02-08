@@ -1,0 +1,75 @@
+.THIS.body{
+    height:100%;
+    padding-right:0%;
+    
+}
+
+.THIS .slds-media__body {
+    width: 100%;
+}
+
+.THIS .scrollerSize {
+    height: 300px;
+}
+.THIS .field {
+    padding-left:14px;
+    padding-right:10px;
+}
+
+.THIS .slds-card__header {
+    padding: 0;
+}
+
+.THIS .zIndexForTable{
+
+	z-index: 4;
+    position: fixed;
+    margin-top: 5rem;
+}
+.THIS .leftpadding{
+    padding-left:1px; 
+}
+
+.THIS lightning-spinner.slds-spinner_container{
+    margin: -15px -10px -10px -10px !important;
+}
+
+.THIS .show {
+    display:flex;
+    color:red;
+}
+
+.THIS .scrollerSize {
+    height: 400px;
+}
+
+.THIS .slds-card__body {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.THIS .slds-card__header.slds-grid {
+    padding: 0;
+}
+
+@media(max-width: 768px) {
+    
+    .THIS .scrollerSize  {
+      	height: 600px;
+    }
+   
+
+}
+.THIS lightning-spinner.slds-spinner_container{
+    margin: -15px -15px -15px -15px !important;
+}
+.THIS .customRequired{
+ font-weight: 400; } 
+.THIS .customRequired:before{    
+ content: "*";
+ margin: 0 0.125rem 0 0.125rem;
+ color: rgb(194, 57, 52);
+ float: left; } 
+.THIS .none{
+ display:none; 
+}

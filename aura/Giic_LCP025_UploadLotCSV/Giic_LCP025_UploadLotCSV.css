@@ -1,0 +1,6 @@
+.THIS .dashed{
+    width: 300px;
+    height: 120px;
+    border: dashed 1px gray;
+    position: center;
+}

@@ -1,0 +1,98 @@
+<!--
+* @author Eleni Tsiolaki - etsiolaki@deloitte.gr
+* @date Creation 06/10/2021
+* @date Modification dd/mm/yyyy
+* @description Component to manage the Contract Management: Fee Adjustment – Punctual Adjustment
+-->
+<aura:component controller= "XC_LCC256_ContractPunctualFeeAdjustment" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasSObjectName,lightning:availableForFlowScreens" access="global" >
+
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="contractNumber" type="String"/>
+    <aura:attribute name="businessLine" type="String"/>
+    <aura:attribute name="legalEntity" type="String"/>
+    <aura:attribute name="percentage" type="String"/>
+    <aura:attribute name="symbol" type="String"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="disableSearch" type="Boolean" default="true"/>
+    <aura:attribute name="businessLines" type="List" />
+    <aura:attribute name="legaliEntities" type="List" />
+    <aura:attribute name="symbols" type="List" />
+
+    <aura:attribute name="orderItemIds" type="List" />
+
+    <aura:attribute name="searchPressed" type="Boolean" default="false"/>
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="assetIds" type="List"/>
+    
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="selectedContracts" type="List"/>
+
+    <div>
+        <aura:if isTrue="{! !v.searchPressed}">
+            <div style="height:300px">
+                <lightning:layout verticalAlign="center" horizontalAlign="center" multipleRows="false">
+                        <lightning:layoutItem padding="around-small" flexibility="auto" size="4">
+                            <lightning:input name="contract" label="Contract" required="true" value="{! v.contractNumber}" onchange="{!c.handleMandatoryInput}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem padding="around-small" flexibility="auto" size="4">
+                            <lightning:combobox name="businessLine" label="Business Line" value="{! v.businessLine }" options="{! v.businessLines }" disabled="true"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem padding="around-small" flexibility="auto" size="6">
+                            <lightning:combobox name="legalEntity" label="Legal Entity" value="{! v.legalEntity }" options="{! v.legaliEntities }" disabled="true" />
+                        </lightning:layoutItem>
+                </lightning:layout>
+                <lightning:layout verticalAlign="center" horizontalAlign="center" multipleRows="false">
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="2">
+                            <lightning:combobox name="symbol" label="+/-" value="{! v.symbol}" required="true" options="{! v.symbols}" onchange="{!c.handleMandatoryInput}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem padding="around-small" flexibility="auto" size="4">
+                            <lightning:input type="number" name="percentage" required="true" label="Fee adjustment" value="{! v.percentage}" maxlength="20" 
+                                             onchange="{!c.handleMandatoryInput}" step="0.001"/> <!--fieldLevelHelp="{!$Label.c.XC_CL_DecimalDigitComma}"-->
+                        </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="2">
+                             <lightning:input type="text" name="percent" label="Percent" value="%"  disabled="true"/>
+                        </lightning:layoutItem>
+                </lightning:layout>
+                <lightning:layout verticalAlign="center" horizontalAlign="center" multipleRows="false">
+                    <lightning:layoutItem padding="around-small" flexibility="auto" size="7">
+                        <lightning:input type="text" name="helptext" value="{!$Label.c.XC_CL_DecimalDigitComma}"  disabled="true"/>
+                        </lightning:layoutItem>
+                </lightning:layout>
+                <div class="slds-clearfix" style="margin-top:10px;">
+                    <lightning:button variant="brand" label="{!$Label.c.XC_CL_Search}" title="Search" onclick="{! c.handleSearch}" disabled="{!v.disableSearch}" class="slds-float_right"/>
+                </div>
+            </div>
+            
+        <aura:set attribute="else">
+            <aura:if isTrue="{!empty(v.data)}">
+                <div class="slds-align_absolute-center" style="height:200px">
+                    {!$Label.c.XC_NoRecordsFound}
+                </div>
+            <aura:set attribute="else">
+                <div class="slds-align_absolute-center">
+                    <lightning:datatable data="{! v.data}" 
+                    columns="{! v.columns}" 
+                    keyField="Id"
+                    hideCheckboxColumn="true"/>
+                </div>
+                <div class="slds-align_absolute-center" style="height:200px">
+                    <lightning:button variant="brand" label="{!$Label.c.XC_Apply_Adjustment}" title="Apply Adjustment" onclick="{! c.handleAdjust}" />
+                </div>
+            </aura:set>
+            </aura:if>
+        </aura:set>
+        </aura:if>
+    </div>
+
+    <aura:if isTrue="{!v.showSpinner}">
+        <div
+            style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" variant="brand"/>
+            <span class="slds-assistive-text">{!$Label.c.XC_CL_Loading}</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>
+    </aura:if>
+
+</aura:component>

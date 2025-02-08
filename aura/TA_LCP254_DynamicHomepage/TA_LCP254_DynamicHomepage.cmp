@@ -1,0 +1,104 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,forceCommunity:availableForAllPageTypes"
+                access="global"
+                extends="c:TA_LCP209_BaseWizard"
+                controller="TA_LCC254_DynamicHomepage">
+    
+    <aura:attribute access="public"     name="fieldSet"                     type="String" />
+
+    <aura:attribute access="private"    name="general"                      type="Object" />
+    <aura:attribute access="private"    name="custom"                       type="Object" />
+    <aura:attribute access="private"    name="tabs"                         type="Object" />
+    <aura:attribute access="private"    name="showSelectAccountModal"       type="Boolean"  default="false" />
+    <aura:attribute access="private"    name="showAppointmentToBeConfirmed" type="Boolean"  default="false" />
+    <aura:attribute access="private"    name="openHSEQModal"                type="Boolean"  default="false" />
+    <aura:attribute access="private"    name="showGeolocalization"          type="Boolean"  default="false" /> <!-- FIX - [20220224AL] - NR70 -->
+    <aura:attribute access="private"    name="showDynamicListViewWorkOrder" type="Boolean"  default="false" /> <!-- FIX - [20220328AL] - Page Blank Fix -->
+    <aura:attribute access="private"    name="showDynamicListViewAccount"   type="Boolean"  default="false" /> <!-- FIX - [20220517AL] - NR2331 (Req. A) -->
+    <aura:attribute access="private"    name="showTechnicalAssetSearching"   type="Boolean"  default="false" /> <!-- FIX - [20220616AL] - NR2330 (Req. B) -->
+    <aura:attribute access="private"    name="selectedTab"                  type="Object" />
+
+    <ltng:require styles="{!join(',', 
+                $Resource.TA_CSS + '/TA_CSS/slds-override.css', 
+                $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css', 
+                $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init"           value="{!this}"                     action="{!c.handleInitialize}" />
+    <aura:handler name="closeModal"     event="c:TA_LCE248_GenericEvent"    action="{!c.handleCloseModal}" />
+
+    <lightning:layout multipleRows="true">
+        <!-- HEADER -->
+        <div class="ta-home-bg">
+            <lightning:layoutItem size="12" class="slds-text-align_center slds-m-top_large">
+                <h3 class="ta-color-white"> {!$Label.c.TA_WelcomeBack} </h3>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large">
+                <h3 class="ta-text-uppercase ta-color-white"> {!v.userName}!</h3>
+            </lightning:layoutItem>
+        </div> 
+
+
+        <!-- TABS -->
+        <lightning:layoutItem size="12">
+            <div class="ta-home-box-page">
+                <div class="ta-grid-container">
+                    <aura:iteration items="{!v.tabs}" var="tab" indexVar="indx">
+                        <!-- START - Tab -->
+                        <div id="tab-agenda" class="ta-grid-tab" style="{! 'grid-row: span ' + tab.row + '; grid-column: span ' + tab.column + '; background-image:' + ' url(' + v.customerCardBg +'), 
+                                                                        linear-gradient(317deg, #461e7d 104%, #7731d7 -10%);background-size: cover;
+                                                                        background-position: bottom;
+                                                                        background-blend-mode: soft-light; height: ' + tab.height + '; visibility: ' + (tab.isHidden ? 'hidden' : 'visible' ) + ';' }"
+                                    data-action = "{!tab.actionOnClick}" data-param = "{!tab.actionParam}" data-index="{!indx}"
+                                    onclick="{! c.handleOnClick }">
+
+                            <lightning:layout multipleRows="true" class="ta-grid-inside-box" verticalAlign="">
+                                    <lightning:layoutItem size="{!tab.column == '1' ? '10' : '8'}">
+                                        <lightning:layout multipleRows="true">
+                                            <lightning:layoutItem size="12">
+                                                <h3 class="slds-text-align_left ta-color-white ta-text-uppercase">{!tab.name}</h3>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12">
+                                                <p class="slds-text-align_left slds-m-top_xx-small ta-color-white-opacity-60"> {!tab.description} </p>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="{!tab.column == '1' ? '8' : '4'}" class="ta-tab-item">
+                                        <div class="{!tab.iconPosition == 'bottom' ? 'ta-tab-icon-bottom' : 'slds-text-align_right'}">
+                                            <img src="{!$Resource.TA_Icons + '/xc-icons/' + tab.icon}" class="ta-icon-large"/>
+                                        </div>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                                
+                        </div>
+                    </aura:iteration>
+                    
+                </div>
+            </div>
+        </lightning:layoutItem>
+                
+    </lightning:layout>
+    
+    <!-- <div aura:id="showDynamicModal" ></div> -->
+    <aura:if isTrue="{!v.showSelectAccountModal}">
+        <c:TA_LCP250_SelectAccount communityBaseUrl="{!v.communityBaseUrl}"/>
+    </aura:if>
+
+    <c:TA_LCP252_AppointmentToBeConfirmed isOpen="{!v.showAppointmentToBeConfirmed}" />
+
+    <!-- FIX - [20220224AL] - NR70 -->
+    <c:TA_LCP263_GeolocalizationStandalone isOpen="{!v.showGeolocalization}" />
+
+    <!-- FIX - [20220328AL] - Page Blank Fix -->
+    <c:TA_LCP264_DynamicListView isOpen="{!v.showDynamicListViewWorkOrder}" custom="{!v.selectedTab}" />
+
+    <!-- FIX - [20220517AL] - NR2331 (Req. A) -->
+    <c:TA_LCP264_DynamicListView isOpen="{!v.showDynamicListViewAccount}" custom="{!v.selectedTab}" />
+
+    <!-- FIX - [20220616AL] - NR2330 (Req. B) -->
+    <c:TA_LCP266_TechnicalAssetSearching isOpen="{!v.showTechnicalAssetSearching}" />
+
+    <!-- ENXCRM-151 HSEQ bgo 15/06/2021 -->
+    <aura:if isTrue="{!v.openHSEQModal}">
+        <c:TA_LCP258_HSEQManagement custom="{!v.custom.queryCond}" isOpen="{!v.openHSEQModal}" qualityCheckToReview="{!v.selectedTab.qualityCheckToReview}"/>
+    </aura:if>
+	
+</aura:component>

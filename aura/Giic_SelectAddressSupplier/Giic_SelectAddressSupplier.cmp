@@ -1,0 +1,63 @@
+<aura:component controller="Giic_LCC022_RTSFromRMA" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,force:hasSObjectName" access="global">
+
+     <!-- attributes -->
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="maxRowSelection" type="Integer" default="1"/>
+    <aura:attribute name="supplierName" type="String" default=""/>
+     <aura:attribute name="addressId" type="String" default=""/>
+	<aura:attribute name="linesFromServer" type="XC_Address__c" default="[]"/>
+    <aura:attribute name="currentAddrSelected" type="XC_Address__c"/> 
+    <aura:attribute name="countSelectedRow" type="Integer" default="0"/>
+    <aura:attribute  name="AddressLineList" type="List"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false" /> 
+    
+    
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <!-- to store addesses line on grid -->
+    <aura:attribute name="data" type="List"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" /> 
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" /> 
+        
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner aura:id="mySpinner" />
+    </aura:if>	
+    <div class="c-container">
+       <div class="slds-box slds-theme_shade">
+    		<div class="slds-text-heading_medium">
+                 <lightning:icon iconName="standard:return_order" alternativeText="Approved" />&nbsp;
+           
+                <b> Supplier Address selection : {!v.supplierName}</b>
+               
+            </div>
+     	</div>
+	    <lightning:datatable aura:id="AddressesTable"
+                        columns="{!v.columns}"
+                        data="{!v.data}"
+                        keyField="Id"
+                        maxRowSelection="{!v.maxRowSelection}"     
+                       	onrowselection="{!c.selectAddress}"/>  
+                  <br></br>       
+             	  <div class="slds-box">
+               			<div class="slds-text-align_right">
+                 				<lightning:buttonGroup>
+                 					<lightning:button variant="neutral" 
+                              				label="Cancel"
+                              				title="Cancel"
+                             				onclick="{!c.closeModal}"/>
+            
+            						<lightning:button variant="brand" 
+                              				label="Save"
+                              				title="save"
+                              				disabled="{!v.sblokSubmit}"
+                              				onclick="{!c.updateAddressOnPO}"/>  
+                				</lightning:buttonGroup>
+                			</div>
+                   
+         		</div>
+             
+        
+    </div>    
+</aura:component>

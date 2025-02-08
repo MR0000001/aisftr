@@ -1,0 +1,18 @@
+<!--
+  @File Name          : XC_LCP263_FeeAdjustment.cmp
+  @Description        : Parent container for Fee Adjustment single and massive update
+  @Author             : Luca Calicchio - lcalicchio@deloitte.it
+  @Group              : 
+  @Last Modified By   : 
+  @Last Modified On   : 
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    11/10/2021   Luca Calicchio               Initial Version
+-->
+<aura:component>
+    <aura:attribute name="showMyself" type="Boolean" /><!-- To tell parent to show/hide this component -->
+    <aura:attribute name="showNext256" type="Boolean" /><!-- To tell parent to show/hide next wizard component for single adjustment -->
+    <aura:attribute name="showNext257" type="Boolean" /><!-- To tell parent to show/hide next wizard component for massive adjustment -->
+    <c:XC_LCP264_FeeAdjustmentSingleUpdate showMyself="{!v.showMyself}" showNext="{!v.showNext256}"></c:XC_LCP264_FeeAdjustmentSingleUpdate>
+    <c:XC_LCP265_FeeAdjustmentBulkUpdate showMyself="{!v.showMyself}" showNext="{!v.showNext257}"></c:XC_LCP265_FeeAdjustmentBulkUpdate>
+</aura:component>

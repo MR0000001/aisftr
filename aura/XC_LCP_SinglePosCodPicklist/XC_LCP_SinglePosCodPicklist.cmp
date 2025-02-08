@@ -1,0 +1,13 @@
+<aura:component controller="XC_LCC_SinglePosCodPicklistController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasSObjectName,lightning:availableForFlowScreens" access="global">   
+    <aura:attribute name="woli" type="String"/>
+    <aura:attribute name="result" type="String[]"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="getAllValue" type="String" access="global"/>
+    <aura:handler name="init" value="{!this}" action="{!c.getSinglePositionCodeValuesData}"/>
+        <h1><b>Choose a position and select Next to create Woli</b></h1>
+            <lightning:select aura:id="positionValue" label="Select the Position" required="true" onchange="{!c.getPosition}">
+                <aura:iteration items="{!v.result}" var="a">
+                    <option value="{!a}">{!a}</option>
+                </aura:iteration>
+            </lightning:select>
+</aura:component>

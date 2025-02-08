@@ -1,0 +1,72 @@
+<aura:component implements="lightning:availableForFlowScreens" controller="XC_LCC001_SearchContact" access="global">
+    <aura:attribute name="documentType" type="String" access="global" />
+    <aura:attribute name="documentNumber" type="String" access="global" />
+    <aura:attribute name="accountId" type="String" access="global"/>
+    <aura:attribute name="email" type="String" access="global" />
+    <aura:attribute name="contactId" type="String" access="global"/>
+    <aura:attribute name="contacts" type="Contact[]" />
+    <aura:attribute name="flags" type="Boolean[]"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />    
+    
+    <div class="row">
+        <h2 class="header">Search Contact</h2>
+        <lightning:input type="text" name="type" label="Enter a document type" value="{!v.documentType}"/>
+        <lightning:input type="text" name="number" label="Enter a document number" value="{!v.documentNumber}"/>
+        <lightning:input type="text" name="email" label="Enter an email " value="{!v.email}"/>
+    </div>
+    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">   
+    	<lightning:button variant="brand" label="Search" onclick="{! c.handleSearchContact}"/>
+    </div>
+    <aura:if isTrue="{!v.contacts.length == 0}">
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">       
+              <p>The list of contacts is empty. Please update your filter criteria</p>           
+        </div>
+    	<aura:set attribute="else">
+            <div class="slds-modal__content slds-p-around--medium scrollable modalScrollerSize"
+        style="margin-top:20px;" >
+        <div class="slds-large slds-scrollable_y slds-scrollable_x scrollerSize" >
+        <table data-reactroot="" class="slds-table slds-table_bordered slds-table_cell-buffer">
+          <thead>
+                <tr class="slds-text-title_caps">
+                  <th scope="col">
+                  </th>
+                  <th scope="col">
+                      <div class="slds-truncate" title="Name">Contact Name</div>
+                  </th>
+                  <th scope="col">
+                    <div class="slds-truncate" title="Account">Account</div>
+                  </th>
+                  <th scope="col">
+                    <div class="slds-truncate" title="Email">Email</div>
+                  </th>
+    
+                </tr>
+          </thead>
+          <tbody>
+                <aura:iteration items="{!v.contacts}" var="contact" indexVar="index">
+                   <tr>
+                     <td>
+                        <ui:inputCheckbox aura:id="rowSelection" text="{!index}" change="{!c.onCheckContactSelection}"/>  
+                      </td>
+
+                      <td data-label="Name" >
+                        <div class="slds-truncate" title="{!contact.Name}">{!contact.Name}</div>
+                      </td>
+                      <td data-label="Account" class="slds-truncate" >
+                        <div class="slds-truncate slds-size_4-of-5" title="{!contact.Account.Name}">{!contact.Account.Name}</div>
+                      </td>
+                       <td data-label="Email" class="slds-truncate" >
+                        <div class="slds-truncate slds-size_4-of-5" title="{!contact.Email}">{!contact.Email}</div>
+                      </td>
+                    </tr>
+                </aura:iteration>
+          </tbody>
+        </table>
+        </div>
+    </div>
+        </aura:set>
+    </aura:if>
+    
+    
+</aura:component>

@@ -1,0 +1,168 @@
+<!--
+  @File Name          : XC_LCP_DocumentSignature.cmp
+  @Description        : 
+  @Author             : Francesco Imperioli - fimperioli@deloitte.it
+  @Group              : 
+  @Last Modified By   : Francesco Imperioli - fimperioli@deloitte.it
+  @Last Modified On   : 17/6/2020, 15:44:25
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    28/4/2020   Francesco Imperioli - fimperioli@deloitte.it     Initial Version
+-->
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="XC_DocumentSignature" extends="c:XC_LCP_BaseComponent">
+
+    <!--<lightning:empApi aura:id="empApi"/> -->
+
+    <ltng:require scripts="{!join(',',
+    $Resource.XC_STR_CometD + '/cometd.js',
+    $Resource.gl_jquery + '/jquery-1.10.2.min.js', 
+    $Resource.XC_STR_CometD + '/json2.js', 
+    $Resource.XC_STR_CometD + '/jquery_cometd.js', 
+    $Resource.XC_STR_CometD + '/cometdReplayExtension.js', 
+    $Resource.XC_STR_CometD + '/cometdCustom.js')}" 
+    afterScriptsLoaded="{!c.init}"></ltng:require>
+
+    <!-- <aura:handler name="init" value="{!this}" action="{!c.init}"/> -->
+
+    <aura:attribute name="isCommunity" type="Boolean" default="false"/>
+    <aura:attribute name="sessionId" type="String"/>
+    <aura:attribute name="columns" type="List" default="['Nome dossier', 'Riconoscimento agente', 'Firma cliente', 'Stato']"/>
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="showModal" type="Boolean" default="false"/>
+    <aura:attribute name="iframeUrl" type="String"/>
+    <aura:attribute name="buttonLabel" type="String" default="Avvia"/>
+    <aura:attribute name="buttonLabelSkipped" type="String" default="Non Prevista"/>
+    <aura:attribute name="buttonLabelWaiting" type="String" default="In attesa"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+
+    <aura:attribute name="ONESHOT_DEVISU_NONQUALIFICATA" type="String" default="{!$Label.c.XC_CL_ONESHOT_DEVISU_NONQUALIFICATA}"/>
+    <aura:attribute name="FEA_OTP_SI_DOC" type="String" default="{!$Label.c.XC_CL_FEA_OTP_SI_DOC}"/>
+    <aura:attribute name="FEA_OTP_NO_DOC_NEW" type="String" default="{!$Label.c.XC_CL_FEA_OTP_NO_DOC_NEW}"/>
+    <aura:attribute name="FEA_OTP_NO_DOC_NEW_ES" type="String" default="{!$Label.c.XC_CL_FEA_OTP_NO_DOC_NEW_ES}"/>
+    <aura:attribute name="WEBID_ONESHOT" type="String" default="{!$Label.c.XC_CL_WEBID_ONESHOT}"/>
+
+
+
+
+    <!-- <aura:if isTrue="{!v.isCommunity}">
+        <div class="buttonstyle">
+            <lightning:buttonGroup>
+                <lightning:button variant="Neutral" label="{!$Label.c.XC_CL_RefreshButton}"
+                    title="{!$Label.c.XC_CL_RefreshButton}"
+                    onclick="{!c.refreshView}" />
+            </lightning:buttonGroup>
+        </div>
+    </aura:if> -->
+    <!-- table -->
+    <lightning:card title="{!$Label.c.XC_CL_LCP_DocSign_Header}" iconName="custom:custom18" class="slds-card_boundary" variant="narrow">
+        <aura:set attribute="actions">
+            <lightning:buttonIcon iconName="utility:refresh" alternativeText="refresh"
+            title="{!$Label.c.XC_CL_RefreshButton}"
+            onclick="{!c.refreshView}" />
+        </aura:set>
+        <aura:if isTrue="{!v.showSpinner}">
+            <div class="slds-is-relative">
+                <lightning:spinner variant="brand" size="medium"/>
+            </div>
+        </aura:if>
+        <table class="slds-table slds-table_cell-buffer slds-no-row-hover">
+            <thead>
+                <tr>
+                    <aura:iteration var="col" items="{!v.columns}">
+                        <th class="slds-text-align_center">{!col}</th>
+                    </aura:iteration>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration var="row" items="{!v.data}">
+                    <tr>
+                        <td class="slds-text-align_center">{!row.XC_DocumentName__c}</td> 
+                        <td class="slds-text-align_center">
+                            <aura:if isTrue="{!row.XC_UrlAgent__c &amp;&amp; row.XC_Step__c == '1'}">
+                                <lightning:button label="{!v.buttonLabel}" onclick="{!c.openUrl}" value="{!row.XC_UrlAgent__c}"/>
+
+                                <aura:set attribute="else">
+                                    <aura:if isTrue="{!row.XC_Step__c == '4'}">
+                                        <lightning:icon size="x-small" iconName="action:close" alternativeText="deleted"/>
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{!row.XC_Signature_Type__c == v.ONESHOT_DEVISU_NONQUALIFICATA
+                                                    || row.XC_Signature_Type__c == v.FEA_OTP_SI_DOC
+                                                    || row.XC_Signature_Type__c == v.FEA_OTP_NO_DOC_NEW
+                                                    || row.XC_Signature_Type__c == v.FEA_OTP_NO_DOC_NEW_ES
+                                                    || row.XC_Signature_Type__c == v.WEBID_ONESHOT }">
+
+                                                    <lightning:button label="{!v.buttonLabelSkipped}" disabled="true" />
+
+                                                    <aura:set attribute="else">
+                                                        <lightning:icon size="x-small" iconName="action:approval" />
+                                                    </aura:set>
+                                                </aura:if>
+                                        </aura:set>
+                                    </aura:if>
+                                </aura:set>
+                            </aura:if>
+                        </td>
+                        <td class="slds-text-align_center">
+                            <aura:if isTrue="{!row.XC_UrlCustomer__c &amp;&amp; row.XC_Step__c == '1'}">
+                                <lightning:icon size="x-small" iconName="action:defer" />
+                            </aura:if>
+
+                            <aura:if isTrue="{!row.XC_UrlCustomer__c &amp;&amp; row.XC_Step__c == '2'}">
+                                <aura:if isTrue="{!row.XC_Signature_Type__c == v.FEA_OTP_SI_DOC
+                                                    || row.XC_Signature_Type__c == v.FEA_OTP_NO_DOC_NEW
+                                                    || row.XC_Signature_Type__c == v.FEA_OTP_NO_DOC_NEW_ES
+                                                    || row.XC_Signature_Type__c == v.WEBID_ONESHOT }">
+
+                                    <lightning:button label="{!v.buttonLabelWaiting}" disabled="true" />
+
+                                    <aura:set attribute="else">
+                                        <lightning:button label="{!v.buttonLabel}" onclick="{!c.openUrl}" value="{!row.XC_UrlCustomer__c}"/>
+                                    </aura:set>
+                                </aura:if>
+
+                            </aura:if>
+
+                            <aura:if isTrue="{!row.XC_UrlCustomer__c &amp;&amp; row.XC_Step__c == '3'}">
+                                <lightning:icon size="x-small" iconName="action:approval" />
+                            </aura:if>
+
+                            <aura:if isTrue="{!row.XC_Step__c == '4'}">
+                                <lightning:icon size="x-small" iconName="action:close" alternativeText="deleted"/>
+                            </aura:if>
+                        </td>
+                        <td class="slds-text-align_center">
+                            <aura:if isTrue = "{!row.XC_Step__c == '4'}">
+                                <lightning:icon size="x-small" iconName="action:close" alternativeText="deleted"/>
+                                <aura:set attribute="else">
+                                    <lightning:icon size="x-small" iconName="{!row.XC_Step__c == '3' ? 'action:approval' : 'action:defer'}" />
+                                </aura:set>
+                            </aura:if>
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+    </lightning:card>
+
+    <!-- modal -->
+    <aura:if isTrue="{!v.showModal}">
+        <div aura:id="modal">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container" style="width: 100% !important; max-width: 90% !important">
+                    <header class="slds-modal__header">
+                        <h2 class="slds-text-heading_medium slds-hyphenate">TOP</h2>
+                    </header>
+
+                    <div class="slds-modal__content slds-p-around_medium" style="height: 100%">
+                        <iframe src="{!v.iframeUrl}" style="height: 100%; width: 100%;"/>
+                    </div>
+
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.switchModal}">Chiudi</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+</aura:component>

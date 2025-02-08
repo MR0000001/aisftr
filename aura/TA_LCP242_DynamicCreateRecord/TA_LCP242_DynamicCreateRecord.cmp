@@ -1,0 +1,182 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                controller="TA_LCC242_DynamicCreateRecord"                
+                access="global">
+                
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute access="public" name="workOrderId" type="String" />
+
+    <aura:attribute access="private" name="general" type="Object" />
+    <aura:attribute access="private" name="custom" type="Object"/>
+    <aura:attribute access="private" name="title" type="String" />
+    <aura:attribute access="private" name="description" type="String" />
+    <aura:attribute access="private" name="customerCardBg" type="String" />
+    <aura:attribute access="private" name="showFormModal" type="Boolean" />
+    <aura:attribute access="private" name="recordTypes" type="List"/>
+    <aura:attribute access="private" name="formRecordTypeId" type="String"/>
+    <aura:attribute access="private" name="rtNameSelected" type="String"/>
+    <aura:attribute access="private" name="isVisible" type="Boolean" default="true"/>
+    <aura:attribute access="private" name="isInitialized" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="sections" type="List" default="[]"/>
+    <aura:attribute access="private" name="predefinedValues" type="List" />
+    <aura:attribute access="private" name="records" type="List"/>
+    <aura:attribute access="private" name="recordSubmit" type="Object"/>
+    <aura:attribute access="private" name="isMultiRecords" type="Boolean"/>
+    <aura:attribute access="private" name="isRequired" type="Boolean"/>
+    <aura:attribute access="private" name="isRequiredErrorLabel" type="String" />
+    <aura:attribute access="private" name="recordTypesEmpty" type="Boolean" default="false"/>
+    
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:handler name="change" value="{!v.recordSubmit}" action="{!c.handleChangeRecordSubmit}"/>
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt" />
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt" />
+    <aura:registerEvent name="updateFieldsEvt" type="c:TA_LCE214_UpdateFields" />
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <aura:if isTrue="{!and(v.isVisible, v.isInitialized)}">
+        <div style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover; border-radius: 2.5vw;
+        background-position: ' + v.general.bgPosition + '; background-color:' + v.general.bgColor + '; box-shadow: 0vw 1vw 2vw -0.8vw black;
+        background-blend-mode: lighten; margin: 6vw 3vw 3vw 3vw; padding: 5vw;'}">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="12">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="10">
+                            <lightning:layout multipleRows="true">
+
+                                <lightning:layoutItem size="12" class="slds-m-bottom_small"> 
+                                    <h3 class="ta-color-white"> {!v.title} </h3>
+                                </lightning:layoutItem>
+                                
+                                <lightning:layoutItem size="12">
+                                <!-- <aura:if isTrue="{!v.recordSubmit != null}">
+                                    <h3 class="ta-color-white-opacity-60"> {!v.recordSubmit.recordTypeName} </h3> 
+                                    <c:tA_LWC001_getObjDetails objRecordTypeId="{!v.formRecordTypeId}" 
+                                                                   objApiName="{!v.custom.objectName}" 
+                                                                   onobjectDataRecive="{!c.handleResponseLayout}"/>
+                                    <aura:set attribute="else"> -->
+                                        <aura:if isTrue="{!v.recordSubmit != null}">
+                                            <c:tA_LWC001_getObjDetails objRecordTypeId="{!v.formRecordTypeId}" 
+                                                                       objApiName="{!v.custom.objectName}" 
+                                                                       onobjectDataRecive="{!c.handleResponseLayout}"/>
+                                            <aura:set attribute="else">
+                                                <c:tA_LWC001_getObjDetails objRecordTypeId="{!v.formRecordTypeId}" 
+                                                                           objApiName="{!v.custom.objectName}" 
+                                                                           onobjectDataRecive="{!c.handleResponseLayout}"/>
+                                            </aura:set>
+                                        </aura:if>
+
+                                        <aura:if isTrue="{!not(v.recordTypesEmpty)}">
+                                            <lightning:select class="slds-m-top_small" value="{!v.formRecordTypeId}" name="picklist-recordtypes" onchange="{!c.handleChangeRecordTypeId}">
+                                                <aura:iteration items="{!v.recordTypes}" var="rt">
+                                                    <option value="{!rt.recordTypeId}">{!rt.name}</option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                            <aura:set attribute="else">
+                                                <p class="ta-color-white-opacity-60"> {!$Label.c.TA_NoRecordTypesAvailable} </p>
+                                            </aura:set>
+                                        </aura:if>
+
+                                        <aura:if isTrue="{!and(v.formRecordTypeId != null, v.sections.length > 0)}">
+                                            <aura:if isTrue="{!or(v.isMultiRecords, and(not(v.isMultiRecords), v.records.length == 0))}">
+                                                <div class="ta-accordion-header-button slds-text-align_center" name="new" onclick="{!c.handleManageActions}">
+                                                    {!$Label.c.TA_AddNew} {!' ' + v.title}
+                                                </div>
+                                            </aura:if>
+                                        </aura:if>
+                                    <!-- </aura:set>
+                                </aura:if> -->
+                                </lightning:layoutItem>
+
+                                <lightning:layoutItem size="12" class="slds-m-top_small">   
+                                    <aura:iteration items="{!v.records}" var="record">              
+                                    <!-- <aura:if isTrue="{!v.recordSubmit != null}"> -->
+                                        <lightning:layout multipleRows="true" class="slds-m-bottom_medium">
+                                            <lightning:layoutItem size="12">
+                                                <h3 class="ta-color-white-opacity-60"> {!if(record.fieldToDisplay != null, record.fieldToDisplay, record.name)} </h3> 
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem size="12" class="slds-m-top_small">
+                                                <div class="ta-accordion-header-button slds-float_left slds-text-align_center" id="{!record.id}" name="edit" onclick="{!c.handleManageActions}">
+                                                    {!$Label.c.TA_DCR_Edit}
+                                                </div>
+                                                <div class="ta-accordion-header-button slds-float_left slds-text-align_center slds-m-left_small" id="{!record.id}" name="delete" onclick="{!c.handleManageActions}">
+                                                    {!$Label.c.TA_DCR_Delete}
+                                                </div>
+                                            </lightning:layoutItem>  
+                                        </lightning:layout>   
+                                    </aura:iteration>  
+                                        <!-- <aura:set attribute="else">
+                                            <aura:if isTrue="{!and(v.formRecordTypeId != null, v.sections.length > 0)}">
+                                                <div class="ta-accordion-header-button slds-text-align_center" onclick="{!c.handleManageShowFormModal}">
+                                                    Add new record
+                                                </div>
+                                            </aura:if>
+                                        </aura:set>
+                                    </aura:if> -->      
+                                </lightning:layoutItem>
+
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="2">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/' + v.general.iconName}" class="slds-float_right ta-accordion-header-icon" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+    
+    
+
+    <!-- FORM MODAL -->
+    <lightning:layout multipleRows="true" class="{!if(v.showFormModal, 'slds-show ta-modal-bg', 'slds-hide')}">
+        <lightning:layoutItem size="12" class="ta-modal-container">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="10" class="ta-modal-header-title-purple slds-text-align_left"> {!if(v.recordSubmit != null, $Label.c.TA_Edit, $Label.c.TA_AddNew)} {!' ' + v.title} </lightning:layoutItem> 
+                <lightning:layoutItem size="2" class="slds-text-align_right slds-m-bottom_large">
+                    <img src="{!$Resource.TA_Icons + '/xc-icons/close.svg'}" onclick="{!c.handleManageShowFormModal}" class="ta-icon-close" />
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" class="ta-modal-body">
+                    <lightning:recordEditForm objectApiName="{!v.custom.objectName}" 
+                                              recordId="{!if(v.recordSubmit != null, v.recordSubmit.id, '')}" 
+                                              recordTypeId="{!if(v.recordSubmit != null, v.recordSubmit.recordTypeId, v.formRecordTypeId)}"  
+                                              onsuccess="{!c.handleSuccess}"
+                                              onsubmit="{!c.handleSubmitForm}"
+                                              onerror="{!c.handleError}"
+                                              aura:id="recordForm">
+                        <lightning:layout multipleRows="true">
+                            <div id="div-scroll"></div>
+                            <aura:iteration items="{!v.sections}" var="section">
+                                <lightning:layoutItem size="12">
+                                    <h3> {!section.heading} </h3>
+                                </lightning:layoutItem>
+                                <aura:iteration items="{!section.fields}" var="field">
+                                    <lightning:layoutItem size="12">
+                                        <lightning:inputField class="{!if(field.hide, 'slds-hide', '')}" fieldName="{!field.apiName}" required="{!field.required}" disabled="{!field.readonly}" value="{!field.value}"/>
+                                    </lightning:layoutItem>
+                                </aura:iteration>    
+                            </aura:iteration>            
+                        </lightning:layout>
+                        <lightning:layout multipleRows="true" class="slds-p-bottom_medium">
+                            <lightning:layoutItem size="6" class="slds-text-align_left slds-p-right_small">
+                                <lightning:button class="ta-button-closing slds-m-top_medium" label="{!$Label.c.TA_Cancel}" onclick="{!c.handleManageShowFormModal}"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="6" class="slds-text-align_right slds-p-left_small">
+                                <lightning:button class="slds-m-top_medium" type="submit" name="insert" label="{!$Label.c.TA_Save}" />
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:recordEditForm>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </lightning:layoutItem>
+    </lightning:layout>
+
+</aura:component>

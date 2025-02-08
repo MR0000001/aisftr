@@ -1,0 +1,24 @@
+<!--
+* @author Simone Trenta - strenta@deloitte.it
+* @date Creation 01/12/2020
+* @date Modification 
+* @description XC_LCP234_RefreshLoadedDocument
+
+-->
+<aura:component implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:actionOverride,lightning:isUrlAddressable,lightning:hasPageReference" 
+                controller="XC_LCC234_RefreshLoadedDocument" access="global">
+    
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="notCloseAction" type="Boolean" default="false"/>
+    <aura:Attribute name="spinnerControl" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <aura:if isTrue="{!v.spinnerControl}">
+        <div
+            style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: white">
+            <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+    
+</aura:component>

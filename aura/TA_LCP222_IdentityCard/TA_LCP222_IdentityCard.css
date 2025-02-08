@@ -1,0 +1,166 @@
+/* .THIS .ta-title {
+    font-size: 4vw;
+    color: white;
+    font-weight: 800;
+}
+
+.THIS .ta-description {
+    color: rgb(255, 255, 255, 0.6) !important;
+    font-size: 3.3vw;
+} */
+
+/* .THIS .slds-file-selector.slds-file-selector_files {
+    text-transform: capitalize !important;
+    color: white !important;
+    background: transparent !important;
+    border: 2px solid white !important;
+    font-size: 3.6vw !important;
+    border-radius: 2.5vw !important;
+    margin-top: 2vw !important;
+}
+
+.THIS .slds-file-selector__button.slds-button.slds-button_neutral {
+    text-transform: capitalize !important;
+    color: white !important;
+    background: transparent !important;
+    font-size: 3.6vw !important;
+    padding: 2vw 4vw 2vw 4vw !important;
+    border: 0px !important;
+} */
+
+/* CUSTOM-TAG */
+.THIS .slds-form-element__label {
+    display: none !important;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-button-close {
+    top: 0.5vw;
+}
+
+/* .THIS .slds-file-selector__dropzone {
+    border: none !important;
+} */
+
+/* .THIS .ta-photo-container {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 2.5vw;
+    margin-top: 2vw;
+    width: 50%;
+}
+
+.THIS .ta-photo-text {
+    font-size:3vw;
+} */
+
+/* .THIS .slds-button.slds-button_icon.slds-button_icon-border-inverse[name="download"] {
+    border: none !important;
+    width: 6vw !important;
+    height: 6vw !important;
+} */
+
+/* .THIS .ta-photo {
+    border-radius: 2.5vw;
+    position: relative;
+    width: 35vw;
+    height: 35vw;
+}
+
+.THIS .ta-button-close {
+    background: rgba(0,0,0,0.3);
+    padding: 2vw;
+    border-radius: 5vw;
+    position: absolute;
+    top: 1.5vw;
+    right: 1.5vw;
+}
+
+.THIS .ta-icon-close-size {
+    width: 4.5vw;
+}
+
+.THIS .ta-height {
+    height: 11vw;
+}
+
+.THIS .ta-icon {
+    height: 8.5vw;
+}
+
+.THIS .ta-icon-close-blank {
+    width: 9vw;
+    opacity: 0.3;
+}
+
+.THIS .ta-box-photo-blank {
+    width: 35vw;
+    height: 35vw;
+    border-radius: 2.5vw;
+    border: .5vw solid rgba(255, 255, 255, 0.3);
+    background: transparent;
+    padding: 11vw;
+} */
+
+/* CUSTOM-TAG */
+.THIS .ta-pdf-icon {
+    border-radius: 2.5vw;
+    position: absolute;
+    width: 20vw;
+    height: 20vw;
+    margin-bottom: 0vw;
+    top: 2vw;
+    left: 13vw;
+}
+
+/* CUSTOM-TAG */
+.THIS.ta-box-custom-margin {
+    margin: 6vw 3vw 3vw 3vw; 
+}
+
+/* CUSTOM-TAG */
+@media only screen and (min-width: 601px) {
+    .THIS.ta-box-custom-margin {
+        margin: 3vw 1.5vw 3vw 1.5vw;
+    }
+
+    .THIS .ta-icon-resize {
+        width: 7vw !important;
+        margin-bottom: 2vw;
+    }
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-pdf-name {    
+    position: absolute; 
+    top: 25vw;
+    left: 6vw;
+    width: 31vw;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: 3.3vw;
+    color: white;
+}
+
+/* CUSTOM-TAG */
+.THIS .ta-word-icon {
+    border-radius: 2.5vw;
+    position: absolute;
+    width: 17vw;
+    height: 22vw;
+    margin-bottom: 0vw;
+    top: 2.5vw;
+    left: 12vw;
+}
+
+/* CUSTOM-TAG */
+@media screen and (max-width: 600px) {
+    .THIS .ta-box-photo {
+        margin-right: 3vw !important;
+    }
+
+    .THIS .ta-button-close, .THIS .ta-button-close:active {
+        right: 3.5vw !important;
+    }
+}

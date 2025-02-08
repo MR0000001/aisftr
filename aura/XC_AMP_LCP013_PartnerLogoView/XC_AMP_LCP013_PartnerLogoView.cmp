@@ -1,0 +1,27 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 12-21-2020
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   12-21-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component controller="XC_AMP_LCC013_PartnerLogoView" implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId">
+
+    <aura:attribute name="logoUrl" type="String"/>
+    <aura:attribute name="showLogo" type="Boolean" default="false"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+
+    <aura:if isTrue="{!v.showLogo}">
+        <div class="slds-p-around_small">
+            <div align="center" class="slds-is-relative slds-p-around_small auto-resize-portrait">
+                <img src="{!v.logoUrl}"/>
+            </div>
+        </div>
+    </aura:if>
+
+</aura:component>

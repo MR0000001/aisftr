@@ -1,0 +1,18 @@
+<!--
+  @description       : 
+  @author            : Francesco Imperioli - fimperioli@deloitte.it
+  @group             : 
+  @last modified on  : 12-11-2020
+  @last modified by  : Francesco Imperioli - fimperioli@deloitte.it
+  Modifications Log 
+  Ver   Date         Author                                         Modification
+  1.0   12-01-2020   Francesco Imperioli - fimperioli@deloitte.it   Initial Version
+-->
+<aura:component abstract = "true" extensible="true" implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId">
+    <aura:registerEvent name="XC_AMP_LCE001_AMPCommunicationEvent" type="c:XC_AMP_LCE001_AMPCommunicationEvent"/>
+    <aura:attribute name="fieldList" type="Object"/>  
+    <aura:attribute name="extraFields" type="Object"/>
+    <aura:attribute name="sectionName" type="String"/>
+    <aura:attribute name="partnerAMP" type="String" />
+    {!v.body}
+</aura:component>

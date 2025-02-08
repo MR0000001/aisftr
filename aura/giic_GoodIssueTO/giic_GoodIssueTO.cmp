@@ -1,0 +1,472 @@
+<!--
+* @author Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.com
+* @date Creation 13/09/2019
+* @date Mod 05/22/2021 - Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @description Giic_GoodIssueTO – Component to permit Good Issue on Transfer Order
+-->
+
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" 
+                controller="Giic_GoodIssueTO" 
+                access="global">
+
+	<!--Handlers-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <!--Attributes-->
+    <aura:attribute name="mainGIWrapper" type="Giic_GoodIssueTOWrapper"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/> 
+    <aura:attribute name="savePermitted" type="boolean" default="true"/>
+    <aura:attribute name="noProductSerial" type="boolean" default="false"/>
+    <aura:attribute name="lotToQuantity" type="map" default="{}"/>
+    <aura:attribute name="mapPSData" type="Map"/>
+    <aura:attribute name="listShowPS" type="List"/>
+    <aura:attribute name="todayDate" type="Date"/>
+    <aura:attribute name="listShowLocation" type="List"/>
+    <aura:attribute name="serialAlreadySelected" type="List"/>
+    <aura:attribute name="eliminatedList" type="List"/>
+    <aura:attribute name="psPosition" type="string"/>  
+    <aura:attribute name="filter" type="string"/>  
+    <aura:attribute name="locationId" type="string"/> 
+    <aura:attribute name="action" type="string"/>
+    <aura:attribute name="blErrorMsg" type="boolean" default="false"/>  
+    <aura:attribute name="showCustomLocationSearch" type="boolean" default="false"/>  
+    <aura:attribute name="showSpinner" type="boolean" default="false"/>
+    <ltng:require styles="{!$Resource.XC_STR004_CompWidth100}" /> 
+
+
+    <div class="c-container">
+        <!-- Title -->
+        <div class="slds-box slds-theme_shade">
+            <div class="slds-text-heading_large">
+                <lightning:icon iconName="standard:delegated_account" alternativeText="Approved"/>&nbsp;
+                <b>Good Issue</b>
+            </div>
+        </div>    
+
+        <!-- Info card -->
+        <div class="slds-p-around_small">
+            <lightning:layout verticalAlign="center" horizontalAlign="center">
+                <lightning:layoutItem padding="around-medium">
+                    <div class="custom-box2">
+                        <lightning:card variant="Narrow" iconName="custom:custom83">
+                            <aura:set attribute="title">
+                                <h4>Enter the mandatory informations</h4>
+                            </aura:set>
+                        </lightning:card>
+                    </div>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-medium">
+                    <div class="custom-box2">
+                        <lightning:card variant="Narrow" iconName="standard:marketing_actions">
+                            <aura:set attribute="title">
+                                <h4>Select quantity to shipped</h4>
+                            </aura:set>
+                        </lightning:card>
+                    </div>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-medium">
+                    <div class="custom-box2">
+                        <lightning:card variant="Narrow" iconName="standard:location">
+                            <aura:set attribute="title">
+                                <h4>Choose correct location</h4>
+                            </aura:set>
+                        </lightning:card>
+                    </div>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-medium">
+                    <div class="custom-box2">
+                        <lightning:card variant="Narrow" iconName="standard:search">
+                            <aura:set attribute="title">
+                                <h4>Select serials/lots from available</h4>
+                            </aura:set>
+                        </lightning:card>
+                    </div>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+        
+        <br></br>
+
+        <!-- Spinner: -->
+        <div class="theSpinner">
+            <lightning:spinner class="slds-hide" aura:id="theSpinner" />
+        </div>
+        <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner variant="brand" />
+        </aura:if>
+
+        <!-- Tabset -->
+       <lightning:tabset>
+            <!-- First Tab: -->
+            <lightning:tab label="Mandatory Information" iconName="utility:edit">                      
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" largeDeviceSize="4" mediumDeviceSize="4" padding="around-small">
+                        <div class="custom-box4"> <b><lightning:input required="true" type="text" name="input2" onchange="{!c.checkRequired}" label="Transportation Document Number" value="{!v.mainGIWrapper.reference}" /></b></div>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" largeDeviceSize="4" mediumDeviceSize="4" padding="around-small">
+                        <div class="custom-box4">    <b><lightning:input required="false" type="date" name="input2" label="Transportation Document Date" onchange="{!c.checkRequired}" value="{!v.mainGIWrapper.dateDelivery}" /></b></div>
+                    </lightning:layoutItem>
+                <lightning:layoutItem size="12" largeDeviceSize="4" mediumDeviceSize="4" padding="around-small">
+                        <div class="custom-box4">    <b><lightning:input required="true" type="date" placeholder="{!v.todayDate}" onchange="{!c.checkRequired}" name="input2" label="Good Issue Registration Date" value="{!v.mainGIWrapper.registrationDate}" /></b></div>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:tab>
+            
+            <!-- Second Tab: -->
+            <lightning:tab label="Good Issue" iconName="utility:table">
+                <!-- For error: -->
+                <aura:if isTrue="{!v.noProductSerial}">
+                    <div class="rosso"><b>No Serial/Lot available for this Line</b></div>
+                </aura:if>
+
+                <!-- Table: -->
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="aa" scope="col">
+                                <div class="slds-truncate" title="Transfer Order Line">Transfer Order Line</div>
+                            </th>
+                            <th  class="aa" scope="col">
+                                <div class="slds-truncate maxColSize300" title="Product">Product Name</div>
+                            </th>
+                            <th  class="aa" scope="col">
+                                <div class="slds-truncate maxColSize200" title="Product Code">Product Code</div>
+                            </th>
+                            <th  class="aa" scope="col">
+                                <div class="slds-truncate" title="SKU Code">SKU Code</div>
+                            </th>
+                            <th class="aa" scope="col">
+                                <div class="slds-truncate" title="Ship-To Warehouse">Ship-To Warehouse</div>
+                            </th>
+                            
+                            <th class="aa" scope="col">
+                                <div class="slds-truncate" title="Quantity">Quantity</div>
+                            </th>
+                            <th class="aa" scope="col">
+                                <div class="slds-truncate" title="Location">From Location</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.mainGIWrapper.lstOrderLine}" var="item" indexVar="varIndexTOline">
+                            <tr class="slds-hint-parent" style="background:rgb(226, 224, 224); font-weight: bold;">
+                                <td class="aa" data-label="Transfer Order Line">
+                                    <div class="slds-truncate" title="Transfer Order Line">{!item.transferOrderLineName}</div>
+                                </td>
+                                <td class="aa" data-label="Product Name">
+                                    <div class="slds-truncate maxColSize300" title="Product Name">{!item.productName}</div>
+                                </td>
+                                <td class="aa" data-label="Product Code">
+                                    <div class="slds-truncate maxColSize200" title="Product Code">{!item.productCode}</div>
+                                </td>
+                                <td class="aa" data-label="Product Code">
+                                    <div class="slds-truncate" title="Product Code">{!item.SKUCode}</div>
+                                </td>
+                                <td class="aa"  data-label="Transfer-To Warehouse">
+                                    <div class="slds-truncate" title="Transfer-To Warehouse">{!item.transferToWarehouse}</div>
+                                </td>
+                                
+                                <!-- Button cell: -->
+                                <td class="aa"  data-label="Order Quantity">
+                                    <div class="slds-truncate" title="Order Quantity" > 
+                                        <lightning:layout verticalAlign="left" horizontalAlign="left"  multipleRows="true">
+                                            <lightning:layoutItem padding="horizontal-small" size="6" ><div class="slds-form_horizontal">
+                                                <lightning:input type="number" name="input2" label="" value="{!item.orderQuantity}" /></div>
+                                            </lightning:layoutItem>   
+                                            <lightning:layoutItem padding="around-small" size="2" >
+                                                <button class="slds-button slds-button_outline-brand" type="button" onclick="{!c.setNewSize}" id="{!item.transferOrderLine}" value="{!item.orderQuantity}" >Apply</button>             
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                    </div>
+                                </td>
+
+                                <!-- Location cell: -->
+                                <td class="aa"  data-label="Location">
+                                    <aura:if isTrue="{!!v.showCustomLocationSearch}">
+                                        <div class ="alto">
+                                            <span class="slds-pill slds-pill_link fullWidth"> 
+                                                <a href="javascript:void(0);" class="slds-pill__action slds-p-left_x-small" title="{!item.locationName}">
+                                                    <!-- <lightning:icon iconName="utility:record" size="x-small"/> -->
+                                                    <span class="slds-pill__label slds-p-left_x-small">{!item.locationName}</span>
+                                                </a>
+                                                <button class="slds-button slds-button_icon slds-button_icon slds-pill__remove" title="Remove" data-name="{!varIndexTOline}" data-action="Location" onclick="{!c.clearSelection}" >
+                                                    <lightning:icon iconName="utility:close" size="small" alternativeText="Press delete"/>
+                                                    <span class="slds-assistive-text">Remove</span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    <aura:set attribute="else">
+                                        <div class ="piualto">
+                                            <c:strike_lookup
+                                                label = ""
+                                                object = "gii__Location__c"
+                                                value = "{!item.locationId}"
+                                                searchField = "Name"
+                                                placeholder = ""                        
+                                                iconName = "custom:custom78"
+                                                order = "Id"
+                                                limit = "10"
+                                                searchingMessage = "Search..."
+                                                noResultsMessage = "No Result found"
+                                                loadingMessage = ""
+                                                errorMessage = ""
+                                                filter = "{!v.filter}"/>
+                                        </div>  
+                                    </aura:set></aura:if>
+                                </td>
+                            </tr>
+
+                            <!-- For Serial Products: -->
+                            <aura:if isTrue="{!item.isSerialCntr}">
+                                <aura:iteration items="{!item.lstAssignedSerial}" var="itemPS" indexVar="varIndex">
+                                    <tr class="slds-truncate">
+                                        <td class="aa" data-label="Order Quantity">
+                                            <div class="slds-truncate" title="Serial Number">Serial #{!varIndex+1}</div>
+                                        </td>
+                                        <td class="aa" data-label="Product Serial">
+                                            <div class="slds-truncate" title="Product Serial" >
+                                                <aura:if isTrue="{! empty(itemPS.serialNumber) }"> 
+                                                    <span>    
+                                                        <input type="text" class="slds-input slds-combobox__input" id="combobox-unique-id" 
+                                                                aria-activedescendant="listbox-option-unique-id-01" aria-autocomplete="list" 
+                                                                aria-controls="listbox-unique-id" autocomplete="off" role="combobox" 
+                                                                placeholder="Click To Search" disabled="true"/>
+                                                        <button data-name="{!varIndexTOline+'-'+varIndex}" data-id="{!item.productCode}" data-action="Product Serial" onclick="{!c.openModal}" 
+                                                                class="slds-button slds-button_icon slds-button_icon slds-pill__remove searchButton" 
+                                                                title="Search">
+                                                            <lightning:icon iconName="utility:search" size="small" 
+                                                                            alternativeText="Search"/>
+                                                            <span class="slds-assistive-text" >Search</span>
+                                                        </button>
+                                                    </span>
+                                                <aura:set attribute="else"> 
+                                                    <span class="slds-pill slds-pill_link fullWidth"> 
+                                                        <a href="javascript:void(0);" class="slds-pill__action slds-p-left_x-small" title="{!itemPS.serialNumber}">
+                                                            <!-- <lightning:icon iconName="utility:record" size="x-small"/> -->
+                                                            <span class="slds-pill__label slds-p-left_x-small">{!itemPS.serialNumber}</span>
+                                                        </a>
+                                                        <button onclick="{!c.clearSelection}" 
+                                                                class="slds-button slds-button_icon slds-button_icon slds-pill__remove" 
+                                                                title="Remove" data-name="{!varIndexTOline+'-'+varIndex}" data-action="Product Serial">
+                                                            <lightning:icon iconName="utility:close" size="small" 
+                                                                            alternativeText="Press delete"/>
+                                                            <span class="slds-assistive-text" >Remove</span>
+                                                        </button>
+                                                    </span> 
+                                                </aura:set></aura:if>
+                                            </div>
+                                        </td>
+                                        <td class="aa"></td>
+                                        <td class="aa"></td>
+                                        <td class="aa"></td>
+                                        <td class="aa"></td>
+                                    </tr>
+                                </aura:iteration>
+                            </aura:if>
+                            
+                            <!-- For Lot Controlled products: -->
+                            <aura:if isTrue="{!item.isLotControlled}">
+                                <aura:iteration items="{!item.lstAssignedSerial}" var="itemPS" indexVar="varIndex">
+                                    <tr class="slds-truncate">
+                                        <td class="aa" data-label="Order Quantity">
+                                            <div class="slds-truncate" title="Lot Number">Lot #{!varIndex+1}</div>
+                                        </td>
+                                        <td class="aa" data-label="Product Lot">
+                                            <div class="slds-truncate" title="Product Lot" >
+                                                <aura:if isTrue="{! empty(itemPS.serialNumber) }"> 
+                                                    <span>    
+                                                        <input type="text" class="slds-input slds-combobox__input" id="combobox-unique-id" 
+                                                                aria-activedescendant="listbox-option-unique-id-01" aria-autocomplete="list" 
+                                                                aria-controls="listbox-unique-id" autocomplete="off" role="combobox" 
+                                                                placeholder="Click To Search" disabled="true"/>
+                                                        <button data-name="{!varIndexTOline+'-'+varIndex}" data-id="{!item.productCode}" data-action="Product Lot" onclick="{!c.openModalForLot}" 
+                                                                class="slds-button slds-button_icon slds-button_icon slds-pill__remove searchButton" 
+                                                                title="Search">
+                                                            <lightning:icon iconName="utility:search" size="small" 
+                                                                            alternativeText="Search"/>
+                                                            <span class="slds-assistive-text" >Search</span>
+                                                        </button>
+                                                    </span>
+                                                <aura:set attribute="else"> 
+                                                    <span class="slds-pill slds-pill_link fullWidth"> 
+                                                        <a href="javascript:void(0);" class="slds-pill__action slds-p-left_x-small" title="{!itemPS.serialNumber}">
+                                                            <!-- <lightning:icon iconName="utility:record" size="x-small"/> -->
+                                                            <span class="slds-pill__label slds-p-left_x-small">{!itemPS.serialNumber}</span>
+                                                        </a>
+                                                        <button onclick="{!c.clearSelection}" 
+                                                                class="slds-button slds-button_icon slds-button_icon slds-pill__remove" 
+                                                                title="Remove" data-name="{!varIndexTOline+'-'+varIndex}" data-action="Product Lot">
+                                                            <lightning:icon iconName="utility:close" size="small" 
+                                                                            alternativeText="Press delete"/>
+                                                            <span class="slds-assistive-text" >Remove</span>
+                                                        </button>
+                                                    </span> 
+                                                </aura:set>
+                                                </aura:if>
+                                            </div>
+                                        </td>
+                                        <td class="aa"></td>
+                                        <td class="aa"></td>
+                                        <td class="aa"></td>
+                                        <td class="aa"></td>
+                                    </tr>
+                                </aura:iteration>
+                            </aura:if>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+
+                <!-- For Serial Products messages: -->
+                <aura:if isTrue="{!v.blErrorMsg}">
+                    <div class="rosso"><b>Please Select at least one Serial</b></div><br></br>
+                </aura:if>
+
+                <!--Use aura:if tag to display Model Box, on the bese of conditions. [isOpen boolean attribute] -->   
+                <aura:if isTrue="{!v.isOpen}">
+                    <!-- MODAL BOX Start --> 
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-hidden="true" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open modalSection">
+                        <div class="slds-modal__container" style="width: auto">
+                            <!-- ###### MODAL BOX HEADER Start ######-->
+                            <header class="slds-modal__header">
+                                <lightning:buttonIcon iconName="utility:close"
+                                                        onclick="{! c.closeModel }"
+                                                        alternativeText="close"
+                                                        variant="bare-inverse"
+                                                        class="slds-modal__close"/>
+                                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Available {!v.action}</h2>
+                            </header>
+                            <aura:if isTrue="{!v.action=='Product Serial'}">
+                                <!--MODAL BOX BODY Part Start for Product Serial-->
+                                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr class="slds-line-height_reset">
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Product Serial">Product Serial</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Product Name">Product Name</div>
+                                                </th>
+                                                <!-- <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Available">Available</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Reserved">Reserved</div>
+                                                </th> -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.listShowPS}" var="psItem">
+                                                <tr class="slds-hint-parent" data-name="{!psItem.gii__ProductSerial__r.Name}"  onclick="{!c.psSelected}"><!-- data-id="{!psItem.Id}"-->
+                                                    <td data-label="{!psItem.Name}">
+                                                        <a href="javascript:void(0);">
+                                                            <div  title="{!psItem.gii__ProductSerial__r.Name}" class="slds-truncate">{!psItem.gii__ProductSerial__r.Name}</div>
+                                                        </a>    
+                                                    </td>
+                                                    <td data-label="{!psItem.gii__Product__r.Name}">
+                                                        <div class="slds-truncate" title="{!psItem.gii__Product__r.Name}">{!psItem.gii__Product__r.Name}</div>
+                                                    </td>
+                                                    <!-- <td data-label="{!psItem.gii__Available__c}">
+                                                        <div class="slds-truncate" title="{!psItem.gii__Available__c}">{!psItem.gii__Available__c}</div>
+                                                    </td>
+                                                    <td data-label="{!psItem.giic_Reserved__c}">
+                                                        <div class="slds-truncate" title="{!psItem.giic_Reserved__c}">{!psItem.giic_Reserved__c}</div>
+                                                    </td> -->
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!--MODAL BOX BODY Part End for product Serial-->
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.action=='Product Lot'}">
+                                <!--MODAL BOX BODY Part Start for Product Lot-->
+                                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr class="slds-line-height_reset">
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Lot Number">Lot Number</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Product Name">Product Name</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Current Quantity">Lot Quantity</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Quantity">&nbsp;&nbsp; Quantity</div>
+                                                </th>
+                                                <!-- <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Available">Available</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Reserved">Reserved</div>
+                                                </th> -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.listShowPS}" var="psItem">
+                                                
+                                                <tr class="slds-hint-parent"   >    <!-- data-id="{!psItem.Id}"-->
+                                                    <td data-label="{!psItem.Name}" data-name="{!psItem.gii__ProductLot__r.Name}"  >
+                                                        <a href="javascript:void(0);">
+                                                            <div  title="{!psItem.gii__ProductLot__r.Name}" class="slds-truncate">{!psItem.gii__ProductLot__r.Name}</div>
+                                                        </a>    
+                                                    </td>
+                                                    
+                                                    <td data-label="{!psItem.gii__Product__r.Name}">
+                                                        <div class="slds-truncate" title="{!psItem.gii__Product__r.Name}">{!psItem.gii__Product__r.Name}  </div>
+                                                    </td>
+                                                    
+                                                    <td data-label="{!psItem.gii__Product__r.Name}">
+                                                        <div class="slds-truncate" title="{!psItem.gii__Available__c}">{!psItem.gii__Available__c}</div>
+                                                    </td>
+                                                    <td data-label="{!psItem.gii__ProductLot__r.Name}" data-name="{!psItem.gii__ProductLot__r.Name}"> 
+                                                    <!--<lightning:input type="number" name="input2" label="" value="{!psItem.Quantity}" onchange="{!c.setLotQuantityMap}" />  -->
+                                                    <lightning:layout multipleRows="true">
+                                                        <lightning:layoutItem size="3" padding="around-small">
+                                                            <lightning:input type="number" name="input2" label="" value="{!psItem.Quantity}"/>
+                                                        </lightning:layoutItem>
+                                                        <lightning:layoutItem size="3" padding="around-small"><br></br>
+                                                            <button class="slds-button slds-button_outline-brand" type="button" onclick="{!c.setLotQuantityMap}" id="{!psItem.gii__ProductLot__r.Name}" value="{!psItem.Quantity}" >Apply</button>    
+                                                        </lightning:layoutItem>
+                                                    </lightning:layout>  </td> 
+                                                    <!-- <td data-label="{!psItem.gii__Available__c}">
+                                                        <div class="slds-truncate" title="{!psItem.gii__Available__c}">{!psItem.gii__Available__c}</div>
+                                                    </td>
+                                                    <td data-label="{!psItem.giic_Reserved__c}">
+                                                        <div class="slds-truncate" title="{!psItem.giic_Reserved__c}">{!psItem.giic_Reserved__c}</div>
+                                                    </td> -->
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!--MODAL BOX BODY Part End for product lot-->
+                            </aura:if>
+                            
+                            <!--MODAL BOX FOOTER Part Start-->
+                            <!--footer class="slds-modal__footer"-->
+                            <lightning:button variant="neutral" 
+                                                label="Cancel"
+                                                title="Cancel"
+                                                onclick="{! c.closeModel }"/>
+                            <!-- </footer> -->
+                            <!--MODAL BOX FOOTER Part End-->
+                        </div>
+                    </section>
+                </aura:if>
+
+                <!-- MODAL BOX End -->
+                <div class="actionBtn">
+                    <br></br>
+                    <lightning:button label="Save" variant="brand"  title="Save" disabled="{!v.savePermitted}" onclick="{!c.handleSave}"/>
+                    <lightning:button label="Cancel" title="Cancel" onclick="{!c.handleCancel}"/>
+                </div>   
+            </lightning:tab>
+        </lightning:tabset>
+    </div>
+
+</aura:component>

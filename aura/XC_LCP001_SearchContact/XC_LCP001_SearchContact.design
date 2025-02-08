@@ -1,0 +1,7 @@
+<design:component>
+   <design:attribute name="documentType" label="Document Type"/>
+   <design:attribute name="documentNumber" label="Document Number"/>
+   <design:attribute name="accountId" label="Account Id"/>
+   <design:attribute name="email" label="Email" />
+   <design:attribute name="contactId" label="Contact Id"/>
+</design:component>

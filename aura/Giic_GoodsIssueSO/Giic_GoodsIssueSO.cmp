@@ -1,0 +1,418 @@
+<aura:component controller="Giic_GoodsIssueSO" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <!--Handlers-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <!--Attributes-->
+    <aura:attribute name="salesOrderLine" type="List"/>
+    <aura:attribute name="salesOrder" type="Object"/>
+    <aura:attribute name="mainGIWrapper" type="Giic_GoodsIssueSO.SalesOrder" />
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="mapPSData" type="Map"/>
+    <aura:attribute name="listShowPS" type="List"/>
+    <aura:attribute name="listShowLocation" type="List"/>
+    <aura:attribute name="psPosition" type="string"/>
+    <aura:attribute name="action" type="string"/>
+    <aura:attribute name="blErrorMsg" type="boolean" default="false"/>
+    <aura:attribute name="disableSave" type="boolean" default="false"/>
+    <aura:attribute name="showSpinner" type="boolean" default="false"/>
+     <aura:attribute name="isLastGoodIssue" type="boolean" default="true"/>
+    <!--  this tag sets modal width -->
+    <aura:html tag="style">
+        .slds-modal__footer {
+        display: none!important;
+        }
+        .slds-modal__container {
+        max-width: 70% !important; 
+        width:70% !important;
+        }
+        .slds-modal__content{
+        overflow-y:hidden !important;
+        height:unset !important;
+        max-height:unset !important;
+        }
+        .slds-modal__header {
+        background-color: #1B5297;
+        color:white;
+        }
+    </aura:html>      
+    <!--Body Start-->
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <div id="mainDiv">
+        <aura:if isTrue="{!v.showSpinner}">
+            <div>
+                <lightning:spinner variant="brand" />
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.mainGIWrapper.odrStatus != 'Shipped'}">
+            <div id="tableDiv" class="slds-box_border slds-p-around_small">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered slds-table--striped">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="" scope="col">
+                                <div class="slds-align_absolute-center slds-truncate" title="Transfer Order Line">Sales Order Line</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-align_absolute-center slds-truncate" title="Product">Product</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-align_absolute-center slds-truncate" title="Code">Code</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-align_absolute-center slds-truncate" title="SKU Code">SKU Code</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-align_absolute-center slds-truncate" title="Quantity">Order Quantity</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-align_absolute-center slds-truncate" title="Open Quantity">Remained Quantity</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-align_absolute-center slds-truncate" title="Quantity">Consumed Quantity</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-align_absolute-center slds-truncate" title="Quantity">Product Required</div>
+                            </th>
+                            <!--
+                            <th class="" scope="col">
+                                <div class="slds-align_absolute-center slds-truncate" title="Quantity">Location</div>
+                            </th>
+                         -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.mainGIWrapper.salesOrderLineList}" var="item" indexVar="varIndexSOline">
+                            <tr class="slds-hint-parent" style="background:rgb(226, 224, 224); font-weight: bold;">
+                                <td data-label="Sales Order Line">
+                                    <div class="slds-truncate" title="Transfer Order Line">{!item.Name}</div>
+                                </td>
+                                <td data-label="Product Name">
+                                    <div class="slds-truncate" title="Product Name">{!item.productName}</div>
+                                </td>
+                                <td data-label="Code">
+                                    <div class="slds-truncate" title="Product Code">{!item.productCode}</div>
+                                </td>
+                                <td data-label="SKU Code">
+                                    <div class="slds-truncate" title="SKU Code">{!item.SKUCode}</div>
+                                </td>
+                                
+                                <td data-label="Order Quantity">
+                                    <div class="slds-truncate" title="Order Quantity">
+                                        <lightning:input class="slds-form_inline" type="number" name="{!varIndexSOline}" value="{!item.orderQuantity}" readonly="true" />
+                                    </div>
+                                </td>
+                                 <td data-label="Open Quantity">
+                                    <div class="slds-truncate" title="Remained Open Quantity">
+                                        <lightning:input class="slds-form_inline" type="number" name="{!varIndexSOline}" value="{!item.openQuantity}" readonly="true" />
+                                    </div>
+                                </td>
+                                <td data-label="Consumed Quantity">
+                                    <div class="slds-truncate" title="Consumed Quantity">
+                                        <lightning:input class="slds-form_inline" type="number" name="{!varIndexSOline}" value="{!item.consumedQuantity}" onchange="{!c.validatePS}"/>
+                                    </div>
+                                </td>
+                                <td data-label="Product Required Id">
+                                    <div class="slds-truncate" title="ProductRequiredID">{!item.productRequiredID}</div>
+                                </td>
+                                <!--
+                                <td data-label="Location">
+                                    <div class="slds-truncate" title="Location">
+                                        <lightning:select class="slds-form_inline" name="{!varIndexSOline}" onchange="{!c.setLocValue}">
+                                            <option value="">choose one...</option>
+                                            <aura:iteration items="{!item.LocationList}" var="itemLoc">
+                                                <option name="{!varIndex}" value="{!itemLoc.locationId}">{!itemLoc.locationName}</option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                </td>
+                                -->
+                            </tr>
+                            <aura:if isTrue="{!item.isSerialControlled}">
+                                <aura:iteration items="{!item.assignedSerials}" var="itemPS" indexVar="varIndex">
+                                    <tr class="slds-truncate">
+                                        <td data-label="Order Quantity">
+                                            <div class="slds-truncate" title="Serial Number">Serial #{!varIndex+1}</div>
+                                        </td>
+                                        <td data-label="Product Serial">
+                                            <div class="slds-truncate" title="Product Serial" >
+                                                <aura:if isTrue="{!empty(itemPS.serialNumber) }"> 
+                                                    <span>    
+                                                        <input type="text" class="slds-input slds-combobox__input" aura:id="pdtSerialId" 
+                                                               aria-activedescendant="listbox-option-unique-id-01" aria-autocomplete="list" 
+                                                               aria-controls="listbox-unique-id" autocomplete="off" role="combobox" 
+                                                               placeholder="Click To Search" disabled="true"/>
+                                                        
+                                                        <button data-name="{!varIndexSOline+'-'+varIndex}" data-id="{!item.productName}" data-action="Product Serial" onclick="{!c.openModal}" 
+                                                                class="slds-button slds-button_icon slds-button_icon slds-pill__remove searchButton" 
+                                                                title="Search">
+                                                            <lightning:icon iconName="utility:search" size="small" 
+                                                                            alternativeText="Search"/>
+                                                            <span class="slds-assistive-text" >Search</span>
+                                                        </button>
+                                                    </span>
+                                                    <aura:set attribute="else"> 
+                                                        <span class="slds-pill slds-pill_link fullWidth"> 
+                                                            <a href="javascript:void(0);" class="slds-pill__action slds-p-left_x-small" title="{!itemPS.serialNumber}">
+                                                                <!-- <lightning:icon iconName="utility:record" size="x-small"/> -->
+                                                                <span class="slds-pill__label slds-p-left_x-small">{!itemPS.serialNumber}</span>
+                                                            </a>
+                                                            <button onclick="{!c.clearSelection}" 
+                                                                    class="slds-button slds-button_icon slds-button_icon slds-pill__remove" 
+                                                                    title="Remove" data-name="{!varIndexSOline+'-'+varIndex}" data-action="Product Serial">
+                                                                <lightning:icon iconName="utility:close" size="small" 
+                                                                                alternativeText="Press delete"/>
+                                                                <span class="slds-assistive-text" >Remove</span>
+                                                            </button>
+                                                        </span> 
+                                                    </aura:set>
+                                                </aura:if>
+                                            </div>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        
+                                    </tr>
+                                </aura:iteration>
+                            </aura:if>
+                             
+                            
+                            
+                            <aura:if isTrue="{!item.isLotControlled}">
+                        <aura:iteration items="{!item.lstAssignedLot}" var="itemPS" indexVar="varIndex">
+                            <tr class="slds-truncate">
+                                <td class="aa" data-label="Order Quantity">
+                                    <div class="slds-truncate" title="Lot Number">Lot #{!varIndex+1}</div>
+                                </td>
+                                <td class="aa" data-label="Product Lot">
+                                    <div class="slds-truncate" title="Product Lot" >
+                                        <aura:if isTrue="{! empty(itemPS.lotNumber) }"> 
+                                            <span>    
+                                                <input type="text" class="slds-input slds-combobox__input" id="combobox-unique-id2" 
+                                                        aria-activedescendant="listbox-option-unique-id-01" aria-autocomplete="list" 
+                                                        aria-controls="listbox-unique-id" autocomplete="off" role="combobox" 
+                                                        placeholder="Click To Search" disabled="true"/>
+                                                    
+                                                    <button data-name="{!varIndexSOline+'-'+varIndex}" data-id="{!item.productName}" data-action="Product Lot" onclick="{!c.openModalForLot}" 
+                                                            class="slds-button slds-button_icon slds-button_icon slds-pill__remove searchButton" 
+                                                            title="Search">
+                                                        <lightning:icon iconName="utility:search" size="small" 
+                                                                        alternativeText="Search"/>
+                                                        <span class="slds-assistive-text" >Search</span>
+                                                    </button>
+                                                
+                                                </span>
+                                            <aura:set attribute="else"> 
+                                                <span class="slds-pill slds-pill_link fullWidth"> 
+                                                    <a href="javascript:void(0);" class="slds-pill__action slds-p-left_x-small" title="{!itemPS.lotNumber}">
+                                                        <!-- <lightning:icon iconName="utility:record" size="x-small"/> -->
+                                                        <span class="slds-pill__label slds-p-left_x-small">{!itemPS.lotNumber}</span>
+                                                    </a>
+                                                    <button onclick="{!c.clearSelection}" 
+                                                            class="slds-button slds-button_icon slds-button_icon slds-pill__remove" 
+                                                            title="Remove" data-name="{!varIndexSOline+'-'+varIndex}" data-action="Product Lot">
+                                                        <lightning:icon iconName="utility:close" size="small" 
+                                                                        alternativeText="Press delete"/>
+                                                        <span class="slds-assistive-text" >Remove</span>
+                                                    </button>
+                                                </span> 
+                                            </aura:set>
+                                        </aura:if>
+                                    </div>
+                                </td>
+                                <td class="aa"></td>
+                                 <td class="aa"></td>
+                                <td class="aa"></td>
+                                <td class="aa"></td>
+                                
+                            </tr>
+                        </aura:iteration>
+                    </aura:if>
+                            
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+            <aura:set attribute="else">
+                <b>Sales Order is Shipped</b>
+            </aura:set>
+        </aura:if>
+        
+        <!--Use aura:if tag to display Model Box, on the bese of conditions. [isOpen boolean attribute] -->   
+        <aura:if isTrue="{!v.isOpen}">
+            <!-- MODAL BOX Start --> 
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-hidden="true" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open modalSection">
+                <div class="slds-modal__container" style="width: auto">
+                    <!-- ###### MODAL BOX HEADER Start ######-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.action}</h2>
+                    </header>
+                    
+                    <aura:if isTrue="{!v.action=='Product Serial'}">
+                        <!--MODAL BOX BODY Part Start for Product Serial-->
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <div class="slds-table--header-fixed_container" style="height:800px;">
+            				<div class="slds-scrollable_y" style="height:100%;">
+                            <table class="slds-table slds-table_bordered slds-table--header-fixed" >
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Product Serial">Product Serial</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Product Name">Product Name</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Available">Available</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Reserved">Reserved</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody >
+                                    <aura:iteration items="{!v.listShowPS}" var="psItem">
+                                        <tr class="slds-hint-parent" data-name="{!psItem.gii__ProductSerial__r.Name}"  onclick="{!c.psSelected}"><!-- data-id="{!psItem.Id}"-->
+                                            <td data-label="{!psItem.Name}">
+                                                <a href="javascript:void(0);">
+                                                    <div  title="{!psItem.gii__ProductSerial__r.Name}" class="slds-truncate">{!psItem.gii__ProductSerial__r.Name}</div>
+                                                </a>    
+                                            </td>
+                                            <td data-label="{!psItem.gii__Product__r.Name}">
+                                                <div class="slds-truncate" title="{!psItem.gii__Product__r.Name}">{!psItem.gii__Product__r.Name}</div>
+                                            </td>
+                                            <td data-label="{!psItem.gii__Available__c}">
+                                                <div class="slds-truncate" title="{!psItem.gii__Available__c}">{!psItem.gii__Available__c}</div>
+                                            </td>
+                                            <td data-label="{!psItem.giic_Reserved__c}">
+                                                <div class="slds-truncate" title="{!psItem.giic_Reserved__c}">{!psItem.giic_Reserved__c}</div>
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!--MODAL BOX BODY Part End for product Serial-->
+                    </aura:if>
+                    
+                    
+                     
+                     <aura:if isTrue="{!v.action=='Product Lot'}">
+                        <!--MODAL BOX BODY Part Start for Product Lot-->
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <div style="height:385px;overflow:auto;">
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Lot Number">Lot Number</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Product Name">Product Name</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Current Quantity">Available Lot Quantity</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Quantity">&nbsp;&nbsp; Quantity</div>
+                                        </th>
+                                        <!-- <th class="" scope="col">
+                                            <div class="slds-truncate" title="Available">Available</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Reserved">Reserved</div>
+                                        </th> -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <aura:iteration items="{!v.listShowPS}" var="psItem">
+                                        
+                                        <tr class="slds-hint-parent"   >    <!-- data-id="{!psItem.Id}"-->
+                                            <td data-label="{!psItem.Name}" data-name="{!psItem.gii__ProductLot__r.Name}"  >
+                                                <a href="javascript:void(0);">
+                                                    <div  title="{!psItem.gii__ProductLot__r.Name}" class="slds-truncate">{!psItem.gii__ProductLot__r.Name}</div>
+                                                </a>    
+                                            </td>
+                                            
+                                            <td data-label="{!psItem.gii__Product__r.Name}">
+                                                <div class="slds-truncate" title="{!psItem.gii__Product__r.Name}">{!psItem.gii__Product__r.Name}  </div>
+                                            </td>
+                                            
+                                             <td style="text-align:center" data-label="{!psItem.gii__Product__r.Name}">
+                                                <div class="slds-truncate" title="{!psItem.gii__ProductLot__r.Giic_TotalQuantity__c}">{!psItem.gii__Available__c}</div>
+                                            </td>
+                                            
+                                            
+                                             
+                                            
+                                             <td data-label="{!psItem.gii__ProductLot__r.Name}" data-name="{!psItem.gii__ProductLot__r.Name}"> 
+                                                 
+                                                
+                                                 
+                                                
+                                             <!--    <lightning:input type="number" name="input2" label="" value="{!psItem.Quantity}" onchange="{!c.setLotQuantityMap}" />  -->
+                                                  <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="3" padding="around-small">
+            
+            <lightning:input type="number" name="input2" label="" value="{!psItem.Quantity}" />
+                </lightning:layoutItem>
+            <lightning:layoutItem size="3" padding="around-small"><br></br>
+                 <button class="slds-button slds-button_outline-brand" type="button" onclick="{!c.setLotQuantityMap}" id="{!psItem.gii__ProductLot__r.Name}" name="{!psItem.gii__ProductLot__r.Giic_TotalQuantity__c}"  value="{!psItem.Quantity}" >Apply</button>    
+                                                 
+            </lightning:layoutItem>
+                                                      
+                                                 </lightning:layout>  </td> 
+                                                
+                                            
+                               
+                                            <!-- <td data-label="{!psItem.gii__Available__c}">
+                                                <div class="slds-truncate" title="{!psItem.gii__Available__c}">{!psItem.gii__Available__c}</div>
+                                            </td>
+                                            <td data-label="{!psItem.giic_Reserved__c}">
+                                                <div class="slds-truncate" title="{!psItem.giic_Reserved__c}">{!psItem.giic_Reserved__c}</div>
+                                            </td> -->
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                            </div>
+                        </div>
+                        <!--MODAL BOX BODY Part End for product lot-->
+                    </aura:if>
+                    
+                    
+                    
+                    
+                    <!--MODAL BOX FOOTER Part Start-->
+                    <!--footer class="slds-modal__footer"-->
+                    <lightning:button variant="neutral" 
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeModel }"/>
+                    <!-- </footer> -->
+                    <!--MODAL BOX FOOTER Part End-->
+                </div>
+            </section>
+        </aura:if><br></br><br></br>
+          <lightning:input type="checkbox" label="Last Good Issue" name="input1" value="{!v.isLastGoodIssue}" checked="{!v.isLastGoodIssue}"/>
+        <!-- MODAL BOX End --> 
+        <aura:if isTrue="{!v.mainGIWrapper.odrStatus != 'Shipped'}">
+            <div class="slds-float_right">
+                <div class="slds-p-around_small">
+                    <aura:if isTrue="{!v.blErrorMsg}">
+                        <p class="errorMsg">{!$Label.c.giic_ErrorMsgForGIT}</p>
+                    </aura:if>
+                    <lightning:button disabled = "{!v.disableSave}" iconName="utility:save" label="Save" variant="brand"  title="Save" onclick="{!c.handleSave}"/>
+                    <lightning:button label="Cancel"  iconName="utility:close" title="Cancel" onclick="{!c.cancel}"/>
+                </div>
+            </div>
+        </aura:if>
+        <!--Body End-->
+    </div>
+</aura:component>

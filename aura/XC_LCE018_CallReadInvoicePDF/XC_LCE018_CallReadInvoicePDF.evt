@@ -1,0 +1,7 @@
+<!--
+ - Created by Monica Cutillo on 28/02/2020
+ -->
+
+<aura:event type="COMPONENT" description="XC_LCE018_CallReadInvoicePDF">
+    <aura:attribute name="invoiceStringWrapper" type="String"/>
+</aura:event>

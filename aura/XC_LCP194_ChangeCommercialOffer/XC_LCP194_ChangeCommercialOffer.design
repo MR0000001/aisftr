@@ -1,0 +1,5 @@
+<design:component >
+    <design:attribute name="availableForLE" label="Available for legal entities" description = "The legalentities for which this component has to be shown. Comma separated"/>
+    <design:attribute name="availableForRt" label="Available for recordTypes" description = "The record types for which this component has to be shown. Comma separated"/>
+    <design:attribute name="cmpOrigin" label="Component origin" description = "Defines the component origin, values accepted are QuickAction (default) and RecordPage"/>
+</design:component>

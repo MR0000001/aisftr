@@ -1,0 +1,53 @@
+<!--
+* @author Lorenzo Orlanducci lorenzo.orlanducci@nttdata.com 
+* @date Creation 13/02/2019
+* @date Modification 16/12/2019 - Domenico Del Prete - domenico.delprete@nttdata.com & Salvatore Agrillo - salvatore.agrillo@nttdata.com
+* @description component for quote details view
+-->
+
+<aura:component controller="XC_LCC139_QuoteDetails"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,force:hasSObjectName">
+
+    <lightning:notificationsLibrary aura:id="notifLib" />
+
+    <aura:attribute name="quoteFound" type="Boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <lightning:card variant="Narrow" title="{!$Label.c.XC_CL_QuoteTitleComponent}" iconName="standard:quotes">
+        <aura:set attribute="actions">
+            <lightning:buttonIcon iconName="utility:down" variant="border-filled" size="x-small"
+                alternativeText="Show More" />
+        </aura:set>
+        <aura:if isTrue="{!v.quoteFound}">
+
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="6" padding="horizontal-small">
+                    <lightning:input aura:id="oneTime" Name="oneTime" label="Price Total" disabled="true" />
+                </lightning:layoutItem>
+                <lightning:layoutItem size="6" padding="horizontal-small">
+                    <lightning:input aura:id="recurringFrequency" Name="recurringFrequency"
+                        label="Total Frequency" disabled="true" />
+                </lightning:layoutItem>
+                <!--<lightning:layoutItem size="6" padding="horizontal-small">
+                    <lightning:input aura:id="recurringCharge" Name="recurringCharge" label="Recurring Charge Total" disabled="true" />
+                </lightning:layoutItem>-->
+                <!--<lightning:layoutItem size = "6" padding="horizontal-small">
+                  		<lightning:input aura:id="quoteNumber" Name="quoteNumber" label = "Quote Number" disabled = "true"/> 
+                </lightning:layoutItem>-->
+                <!--<lightning:layoutItem size = "6" padding="horizontal-small">
+                       	<lightning:input aura:id="recordType" Name="recordType" label = "Record type" disabled = "true"/> 
+                </lightning:layoutItem>-->
+                <!--<lightning:layoutItem size = "6" padding="horizontal-small"> 
+                     <lightning:input aura:id="opportunityName" Name="opportunityName" label = "Opportunity Name"  disabled="true"/>
+                </lightning:layoutItem>-->
+                <!--<lightning:layoutItem size = "6" padding="horizontal-small">
+                    	<lightning:input aura:id="status" Name="status" label = "Status" disabled = "true"/> 
+                </lightning:layoutItem>-->
+            </lightning:layout>
+            <aura:set attribute="else">
+                &nbsp;&nbsp; {!$Label.c.XC_CL_NoQuoteIds}
+            </aura:set>
+        </aura:if>
+    </lightning:card>
+
+</aura:component>

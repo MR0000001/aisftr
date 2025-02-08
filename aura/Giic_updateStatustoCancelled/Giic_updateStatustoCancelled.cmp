@@ -1,0 +1,38 @@
+<aura:component controller="Giic_PurchaseOrderUtility" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="defaultValue" type="String" default="Updating..."/>
+    <aura:attribute name ="showSpinner" type="Boolean" default="true"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>  
+    <aura:attribute name="reason" type="string" default="" />
+    <aura:attribute name="reasonsList" type="List"/>
+    <aura:attribute name="otherReason" type="string"/>
+    <aura:if isTrue="{!v.showSpinner}">
+          <lightning:spinner aura:id="mySpinner" />
+    </aura:if>
+    
+    <lightning:layout>      
+            <lightning:select name="selectReason1" label="Reason of Cancellation" required="true" onchange="{!c.onChangeReason}">
+                <option value="">Choose one...</option>
+                <aura:iteration items="{!v.reasonsList}" var="r">
+                    <option value="{!r}" text="{!r}"></option>
+                </aura:iteration>
+            </lightning:select>
+          </lightning:layout>
+
+        <br></br>
+        <br></br>
+    
+    <lightning:layout>    
+         <div class="row">
+           <ui:inputText label="Insert a better explenation of the Reason of cancellation" class="field" value="{!v.otherReason}" updateOn="change"/>
+         </div>  
+      
+          </lightning:layout>
+    
+      <br></br>
+        <br></br>
+    <div class="slds-modal__footer">
+        <lightning:button label="Cancel" variant="neutral" onclick="{!c.closeModal}"/>
+        <lightning:button label="Confirm" variant="brand" onclick="{!c.saveCancellation}"/> 
+    </div>  
+</aura:component>

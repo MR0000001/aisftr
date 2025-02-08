@@ -1,0 +1,23 @@
+<aura:component controller="XC_LCC187_PPM_ContractMaintenanceService" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride" access="global" >
+	<!--Attribute-->
+    
+	<aura:attribute name="recordId" type="String" /> 
+    <aura:attribute name="prjName" type="string"/>
+    <aura:attribute name="spinnerControl" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:if isTrue="{!v.spinnerControl}" >
+        <div aura:id="masterSpinner" style="position: fixed; top: 0; right: -532px; bottom: 0; left: -532px; z-index: 9998; background-color: transparent;">
+        <lightning:spinner aura:id="mySpinner" />
+        </div>
+    </aura:if>
+    <!--  <div class="row">-->
+       <!--  <h2 class="header">Project Name</h2>-->
+      <!--   <lightning:input type="string" name="input1" label="Insert  the name of the project" value="{!v.prjName}" />-->
+         <!--<br/>-->
+    <!--Create project button-->
+    <!-- <ui:button  aura:id="button" buttonTitle="Click to see what you put into the field"  
+                label="Create Project" press="{!c.doInit}"/>-->
+       
+  <!--  </div>-->
+</aura:component>

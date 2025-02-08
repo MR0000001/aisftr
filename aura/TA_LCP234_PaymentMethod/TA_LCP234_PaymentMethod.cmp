@@ -1,0 +1,234 @@
+<aura:component controller="TA_LCC234_PaymentMethod"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+
+    <aura:attribute access="public" name="fieldSet" type="String" />
+    <aura:attribute access="public" name="workOrder" type="Object" />
+    <aura:attribute access="public" name="general" type="Object" />
+    <aura:attribute access="public" name="custom" type="Object" />
+    <aura:attribute access="public" name="customerCardBg" type="String" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+
+    <aura:attribute access="private" name="infoBag" type="Object" />
+    <aura:attribute access="private" name="billingAddressList" type="List" default="[]"/>
+    <aura:attribute access="private" name="paymentsAllowedList" type="List" default="[]"/>
+    <aura:attribute access="private" name="billingProfileWrapper" type="Object" />
+    <aura:attribute access="private" name="billingProfileLineItemMap" type="Object" />
+    <aura:attribute access="private" name="billingAddressSelected" type="String" />
+    <aura:attribute access="private" name="selectedPaymentMethod" type="String" />
+    <aura:attribute access="private" name="selectedBillingProfileLineItemList" type="List" />
+    <aura:attribute access="private" name="billingProfileLineItemIdSelected" type="String" />
+    <aura:attribute access="private" name="showNewPaymentModal" type="Boolean" default="false" />
+
+    <aura:attribute access="private" name="invoicePreference" type="String"/>
+    <aura:attribute access="private" name="invoicePreferencesList" type="List"/>
+    <aura:attribute access="private" name="disabledInvoicePreference" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="radioModalPreference" type="String"/>
+    <aura:attribute access="private" name="radioModalList" type="List"/>
+    <aura:attribute access="private" name="iban" type="String"/>
+    <aura:attribute access="private" name="bic" type="String"/>
+    <aura:attribute access="private" name="disabledNewPaymentMethod" type="Boolean" default="false"/>
+    <aura:attribute access="private" name="showZuora" type="Boolean"/>
+    <aura:attribute access="private" name="billingProfile" type="Object"/>
+    <aura:attribute access="private" name="soldToAddrFromParent" type="Object"/>
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="init" action="{!c.handleInitialize}" value="{!this}" />
+    <aura:handler event="c:TA_LCE233_QuoteSummary" action="{!c.handleUpdateOrderItemBillingProfile}" />
+    <aura:handler event="c:XC_LCE019_CloseChildComponent" name="XC_LCE019_CloseChildComponent"
+        action="{!c.closeZuoraComponent}" />
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+    <aura:registerEvent name="sendInitStateEvt" type="c:TA_LCE220_SendInitStateEvt"/> 
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <div class="ta-box-custom-margin" style="{!'background-image:' + ' url(' + v.customerCardBg +'); background-size: cover;
+                    background-position:' + v.general.bgPosition + '; background-color: ' + v.general.bgColor + '; box-shadow: 0vw 1vw 2vw -0.8vw black; background-blend-mode: lighten; border-radius: 2.5vw; padding: 5vw;'}">
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" class="ta-border-bottom-white slds-m-top_small slds-p-bottom_large slds-m-bottom_x-small">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="9" class="ta-title" >
+                        <h3 class="ta-color-white"> {!$Label.c.XC_CL_SelectPaymentMethod} </h3>
+                    </lightning:layoutItem> 
+                    <lightning:layoutItem size="3" class="slds-text-align_right">
+                        <span class="ta-accordion-header-button" onclick="{!c.handleInitialize}" name="refresh"> {!$Label.c.XC_CL_RefreshButton} </span>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:layoutItem>
+
+            <aura:if isTrue="{!v.infoBag.orderItemId != null}">
+                <!-- DELIVERY ADDRESS -->
+                <lightning:layoutItem size="12" class="ta-margin-vertical-small">
+                    <p class="ta-color-grey ta-font-weight-800">{!$Label.c.TA_DeliveryAddress}</p>
+                    <p class="ta-color-white ta-font-weight-800">{!v.workOrder.XC_Address__r.Name}</p>
+                </lightning:layoutItem>
+    
+                <!-- PICKLIST BILLING ADDRESS -->
+                <lightning:layoutItem size="12" class="ta-picklist-container ta-margin-vertical-small">
+                    <p class="ta-color-grey ta-font-weight-800">{!$Label.c.TA_BillingAddress}</p>
+                    <lightning:select label="{!$Label.c.TA_BillingAddress}" value="{!v.billingAddressSelected}" onchange="{!c.handleSelectBillingAddress}">
+                        <aura:iteration items="{!v.billingAddressList}" var="billingAddress">
+                            <option value="{!billingAddress.id}" selected="{!billingAddress.selected}">{!billingAddress.name}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </lightning:layoutItem>
+    
+                <!-- PICKLIST PAYMENT ALLOWED -->
+                <lightning:layoutItem size="12" class="ta-picklist-container ta-margin-vertical-small">
+                    <p class="ta-color-grey ta-font-weight-800">{!$Label.c.XC_CL_SelectPaymentMethod}</p>
+                    <lightning:select label="{!$Label.c.XC_CL_SelectPaymentMethod}" value="{!v.selectedPaymentMethod}" onchange="{!c.handleSelectPaymentMethod}">
+                        <aura:iteration items="{!v.paymentsAllowedList}" var="paymentsAllowed">
+                            <option value="{!paymentsAllowed.id}" selected="{!paymentsAllowed.selected}">{!paymentsAllowed.name}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </lightning:layoutItem>
+    
+                <!-- RADIOGROUP INVOICE PREFERENCES -->
+                <!-- <aura:if isTrue="{!or(v.selectedPaymentMethod == 'External Financing', v.selectedPaymentMethod == 'Credit Card')}">
+                    <lightning:layoutItem size="12" class="{!if(v.disabledInvoicePreference, 'ta-invoice-section-disabled', 'ta-invoice-section')}">  
+                        <p class="ta-color-white ta-font-weight-800">{!$Label.c.TA_InvoiceDeliveryPreference}</p>
+                        <lightning:radioGroup name="invoicePreferences"
+                                        options="{!v.invoicePreferencesList}"
+                                        type="radio"
+                                        value="{!v.invoicePreference}"
+                                        disabled="{!v.disabledInvoicePreference}"
+                                        onchange="{!c.handleInvoicePreferences}" />
+                    </lightning:layoutItem>
+                </aura:if> -->
+
+                <!-- CARD PAYMENT METHOD -->
+                <aura:if isTrue="{!v.selectedBillingProfileLineItemList.length > 0}">
+                    <lightning:layout multipleRows="true" class="slds-m-top_medium">
+                        <aura:iteration items="{!v.selectedBillingProfileLineItemList}" var="billingProfileLineItem">
+                            <lightning:layoutItem size="12">
+                                <div id="{!billingProfileLineItem.Id}" onclick="{!c.handleCardChecked}">
+                                    <lightning:layout multipleRows="true" class="ta-select-card">
+                                        <lightning:layoutItem size="12">
+                                            <img src="{!$Resource.TA_Icons + '/xc-icons/credit-cards-white.svg'}" width="30" class="slds-m-bottom_small"/>
+                                            <h3 class="ta-color-white"> {!billingProfileLineItem.XC_BillingProfile__r.NE__Payment__c} </h3>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="12" class="ta-select-card-description">
+                                            <p class="ta-color-white-opacity-60">{!billingProfileLineItem.XC_MandateType__c}</p>
+                                            <p class="ta-color-white-opacity-60">{!billingProfileLineItem.XC_BillingProfile__r.NE__Iban__c}</p>
+                                        </lightning:layoutItem>
+            
+                                        <div class="ta-select-icon-container">
+                                            <aura:if isTrue="{!billingProfileLineItem.isChecked}">
+                                                <img src="{!$Resource.TA_Icons + '/xc-icons/check.svg'}" class="ta-icon-check"/>
+                                            </aura:if>
+                                        </div>
+                                    </lightning:layout>
+                                </div>
+                            </lightning:layoutItem>
+                        </aura:iteration>
+                    </lightning:layout>
+                </aura:if>
+
+                <!-- ADD NEW PAYMENT METHOD -->    
+                <aura:if isTrue="{!v.selectedPaymentMethod != ''}">
+                    <lightning:layout multipleRows="true">
+                        <span id="add"  onclick="{!c.handleShowNewPaymentModal}" class="{!if(v.disabledNewPaymentMethod, 'ta-button-add-payment-method-disabled', 'ta-button-add-payment-method')}">
+                            <lightning:layoutItem size="12">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="11" class="slds-p-top_xxx-small">{!$Label.c.TA_AddNew + ' '} {!v.selectedPaymentMethod}         
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="1">
+                                        <img src="{!$Resource.TA_Icons + '/xc-icons/add-white.svg'}"/>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </lightning:layoutItem>
+                        </span>
+                    </lightning:layout>
+                </aura:if>
+
+                <aura:set attribute="else">
+                    <p class="ta-color-grey ta-font-weight-800">{!$Label.c.TA_NoPaymentMethod}</p>
+                </aura:set>
+            </aura:if>
+        </lightning:layout>
+    </div>
+
+    <!-- NEW PAYMENT METHOD MODAL --> 
+    <aura:if isTrue="{!v.showNewPaymentModal}">
+        <div class="ta-modal-bg">
+
+            <!-- GENERIC MODAL--> 
+            <aura:if isTrue="{!(v.selectedPaymentMethod == 'Direct Debt' || v.selectedPaymentMethod == 'Commodity Bill')}">
+                <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">                
+                    <lightning:layoutItem size="11" class="slds-text-align_center slds-m-bottom_large">
+                        <h3>{!v.selectedPaymentMethod}</h3>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="1">
+                        <img id="close" src="{!$Resource.TA_Icons + '/xc-icons/close.svg'}" onclick="{!c.handleShowNewPaymentModal}" />
+                    </lightning:layoutItem>  
+
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large">
+                            <lightning:input name="iban" label="IBAN" value="{!v.iban}" onblur="{!c.handleModalIban}" onchange="{!c.handleUpperCase}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large">
+                            <lightning:input name="bic" label="BIC" value="{!v.bic}" onblur="{!c.handleModalBic}" onchange="{!c.handleUpperCase}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <lightning:radioGroup name="radioModal"
+                                options="{!v.radioModalList}"
+                                type="radio"
+                                value="{!v.radioModalPreference}"
+                                onchange="{!c.handleRadioModalPreferences}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+
+                    <lightning:layoutItem size="12" class="slds-text-align_center">
+                        <lightning:button class="ta-button-primary-modal"
+                            label="continue"
+                            name="continue"
+                            onclick="{!c.handleModalButton}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </aura:if>
+
+            <!-- CREDIT CARD MODAL-->
+            <aura:if isTrue="{!v.selectedPaymentMethod == 'Credit Card'}">
+                <lightning:layout multipleRows="true" class="ta-modal-container ta-animation-pop-in">
+                    <lightning:layoutItem size="12" class="slds-text-align_center slds-m-bottom_large slds-m-top_small slds-m-bottom_small">
+                        <p> {!$Label.c.TA_InstructionNewPayment} </p>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" class="slds-text-align_center">
+                        <lightning:button class="ta-button-primary-modal"
+                            label="ok"
+                            name="ok"
+                            onclick="{!c.handleModalButton}" />
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </aura:if>
+
+            <!-- BANK TRANSFER MODAL ZUORA COMPONENT-->
+            <!-- <aura:if isTrue="{!and(v.selectedPaymentMethod == 'Bank Transfer',v.showZuora)}"> -->
+            <aura:if isTrue="{!v.showZuora}">
+                <div class="slds-modal__content slds-p-around__medium">
+                    <c:XC_LCP116_CreateBillingFromOrder fromOrderComponent="false"
+                        firstRecordId="{!v.billingProfileWrapper.AccountID}"
+                        recordId="{!v.billingProfileWrapper.OrderID}"
+                        sobjecttype="NE__Billing_Profile__c"
+                        contactId="{!v.billingProfileWrapper.ContactID}"
+                        addressId="{!v.billingAddressSelected}"
+                        legalEnt="{!v.billingProfileWrapper.LegalEntity}"
+                        configurationId="{!v.billingProfileWrapper.OrderID}"
+                        paymentAttr="{!v.selectedPaymentMethod}"
+                        closeStrikeModal="true"
+                        paymentMethodCategoryVal="External"
+                        billingProfileId="{!v.billingProfile.Id}"
+                        bankFromParent="{!v.billingProfile.NE__Iban__c}"
+                        soldToAddrFromParent="{!v.soldToAddrFromParent}"/>
+                </div>
+            </aura:if>
+        </div>
+    </aura:if>
+</aura:component>

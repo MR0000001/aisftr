@@ -1,0 +1,16 @@
+<!--
+* @author Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.it & Sara Miozza - sara.miozza@nttdata.com
+* @date Creation 08/04/2019
+* @date Modification 08/04/2019 Lorenzo Orlanducci - lorenzo.orlanducci@nttdata.it
+* @description XC_LCP103_OrderListner – Component for listner event from ZuoraBillingProfileCreation cmp
+  and open Payment QuickAction
+-->
+<aura:component 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,lightning:actionOverride,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable">
+    
+    
+     <lightning:quickActionAPI aura:id="quickActionAPI" />
+    <aura:handler event="c:XC_LCE016_RefreshView" action="{!c.selectUpdateCaseAction}"/>
+
+	
+</aura:component>

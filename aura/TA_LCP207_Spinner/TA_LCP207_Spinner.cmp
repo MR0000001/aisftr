@@ -1,0 +1,22 @@
+<aura:component>
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <div class="ta-loading-spinner">
+        <lightning:layout class="slds-wrap slds-text-align_center">
+            <lightning:layoutItem size="6" class="slds-text-align_center slds-m-bottom_xx-large">
+                <div class="ta-logo">
+                    <img src="{!$Resource.TA_Images + '/imgs/XC_Enel_Logo.png'}" alt="Enel logo" title="Enel logo" />
+                </div>
+            </lightning:layoutItem>
+
+            <lightning:layoutItem size="6" class="slds-text-align_center slds-m-bottom_xx-large">
+                <div class="ta-logo-spin">
+                    <img src="{!$Resource.TA_Images + '/imgs/XC_X_Logo.png'}" alt="Enel logo" title="Enel logo" />
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

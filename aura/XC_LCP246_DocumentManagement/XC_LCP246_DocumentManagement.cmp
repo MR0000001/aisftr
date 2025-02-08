@@ -1,0 +1,150 @@
+<!--
+  @author Salvatore Agrillo - salvatore.agrillo@nttdata.com
+  @date 24/03/2021
+  @description XC_LCP246_DocumentManagement - Component to manage document for an order
+-->
+
+<aura:component implements="force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes"
+                controller="XC_LCC246_DocumentManagement"
+                access="global">
+    
+    <!-- For navigation -->
+    <lightning:navigation aura:id="navService"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    <aura:registerEvent name="XC_AMP_LCE001_AMPCommunicationEvent" type="c:XC_AMP_LCE001_AMPCommunicationEvent"/>
+    <aura:handler event="c:XC_LCE246_Event" action="{!c.sendDocument}"/> 
+    {!v.body}
+
+    <!-- Attributes -->
+    <aura:attribute name="recordId" type="String" default=""/>
+    <aura:attribute name="sessionId" type="String"/>
+    <aura:attribute name="spinnerControl" type="Boolean" default="true"/>
+    <aura:attribute name="dataTable" type="Object"/>
+    <aura:attribute name="dataTableOriginal" type="Object"/>
+    <aura:attribute name="columnsTable" type="List"/>
+    <aura:attribute name="filterDocument" type="String" default=""/>
+    <aura:attribute name="orderId" type="String" default=""/>
+    <aura:attribute name="message" type="String" default="{!$Label.c.XC_CL_Loading}"/>
+    <aura:attribute name="showMessage" type="Boolean" default="true"/>
+    <aura:attribute name="showTable" type="Boolean" default="false"/>
+    <aura:attribute name="messageTable" type="String" default=""/>
+    <aura:attribute name="documentsOK" type="Boolean" default=""/>
+    <aura:attribute name="listDocumentRequired" type="List" default="[]"/>
+    <aura:attribute name="listExistingDocument" type="List" default="[]"/>
+    <aura:attribute name="disableButtons" type="Boolean" default="false"/>
+    <aura:attribute name="showSetURL" type="Boolean" default="false"/>
+    <aura:attribute name="showVocalSigned" type="Boolean" default="false"/>
+    <aura:attribute name="valueURL" type="String" default=""/>
+    <aura:attribute name="mapNameCategoryDocument" type="Object" default=""/>
+    
+    <!-- For handler -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="change" value="{!v.documentsOK}" action="{!c.createEventDocumentOk}"/>
+
+    <div class="slds-p-around_x-small">
+        <lightning:card title="{!$Label.c.XC_CL_DocumentManagement}" variant="narrow" class="slds-card_boundary" iconName="standard:document">
+
+            <aura:if isTrue="{!v.spinnerControl}">
+                <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="12"
+                    padding="around-small">
+                    <div class="slds-is-relative">
+                        <lightning:spinner aura:id="mySpinner" variant="brand" />
+                    </div>
+                </lightning:layoutItem>
+            </aura:if>
+
+            <lightning:layout multipleRows="false" horizontalAlign="center">
+                <lightning:layoutItem size="10" padding="around-small" class="centerLayoutItem">
+                    <lightning:card>
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_DigitalSignatureExternal}" title="{!$Label.c.XC_CL_DigitalSignatureExternal}" onclick="{!c.digitalSignature}" iconName="utility:edit_form" disabled="{!or(!v.showTable, v.disableButtons)}"/>
+                        <aura:if isTrue="{!v.showVocalSigned}">
+                            <lightning:button variant="brand" label="{!$Label.c.XC_CL_VocalOrderSignal}" title="{!$Label.c.XC_CL_VocalOrderSignal}" onclick="{!c.vocalOrderSign}" iconName="utility:knowledge_base" disabled="{!or(!v.showTable, v.disableButtons)}"/>
+                        </aura:if>
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_LCP173_ShowScriptCardHeader}" title="{!$Label.c.XC_CL_LCP173_ShowScriptCardHeader}" onclick="{!c.onVocalScript}" iconName="utility:collection_variable" disabled="{!or(!v.showTable, v.disableButtons)}"/>
+                        <lightning:button variant="brand" label="{!$Label.c.XC_CL_SetURL}" title="{!$Label.c.XC_CL_SetURL}" onclick="{!c.onSetURL}" iconName="utility:text_color" disabled="{!or(!v.showTable, v.disableButtons)}"/>
+                    </lightning:card>
+                </lightning:layoutItem>
+            </lightning:layout>
+
+            <aura:if isTrue="{!v.showSetURL}">
+                <lightning:layout multipleRows="false" horizontalAlign="center">
+                    <lightning:layoutItem size="10" padding="around-small" class="centerLayoutItem">
+                        <lightning:card class="borderCard">
+                            <lightning:layout multipleRows="true" horizontalAlign="center">
+                                <lightning:layoutItem size="12" padding="around-small" class="centerLayoutItem">
+                                    <lightning:input label="{!$Label.c.XC_CL_SetURL+':'}" value="{!v.valueURL}" required="true"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" padding="around-small" class="centerLayoutItem">
+                                    <lightning:button variant="brand" label="{!$Label.c.XC_CL_SaveBtn}" title="{!$Label.c.XC_CL_SaveBtn}" onclick="{!c.onSaveURL}" iconName="utility:save" disabled="{!or(!v.showTable, v.disableButtons)}"/>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:card>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </aura:if>
+
+            <lightning:layout multipleRows="false" horizontalAlign="center">
+                <lightning:layoutItem size="10" padding="around-small" class="centerLayoutItem">
+                    <lightning:card class="borderCard">
+                        <lightning:layout multipleRows="true" horizontalAlign="center">
+                            <lightning:layoutItem size="12" padding="around-small" class="centerLayoutItem">
+                                <aura:if isTrue="{!v.showTable}">
+                                    <p style="margin-bottom: 15px;"><b>{!$Label.c.TA_RequiredDocumentTitle}</b></p>
+                                    <div style="width: 95%; height: 100%;">
+                                        <lightning:input name="inputFilterDocument" label="{!$Label.c.XC_CL_FilterDocument}" value="{!v.filterDocument}" onchange="{!c.documentFiltered}" />
+                                        <lightning:datatable
+                                            keyField="Id"
+                                            data="{!v.dataTable}"
+                                            columns="{!v.columnsTable}"
+                                            hideCheckboxColumn="true"
+                                            columnWidthsMode="auto"/>
+                                    </div>
+                                <aura:set attribute="else">
+                                    <p style="margin-bottom: 15px;margin-bottom: 10px;"><b>Warning:</b></p>
+                                    <p>{!v.messageTable}</p>
+                                </aura:set></aura:if>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="12" padding="around-small" class="rightLayoutItem">
+                                <lightning:helptext content="{!$Label.c.XC_CL_HelpDocuments}" class="marginRight"/>
+                                <lightning:button variant="brand-outline" label="{!$Label.c.XC_CL_RefreshButton}" title="{!$Label.c.XC_CL_RefreshButton}" onclick="{!c.refreshTable}" iconName="utility:refresh"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:card>
+                </lightning:layoutItem>
+            </lightning:layout>
+
+            <lightning:layout multipleRows="false" horizontalAlign="center">
+                <lightning:layoutItem size="10" padding="around-small" class="centerLayoutItem">
+                    <lightning:card class="borderCard">
+                        <lightning:layout multipleRows="true" horizontalAlign="center">
+                            <lightning:layoutItem size="12" padding="around-small" class="centerLayoutItem">
+                                <aura:if isTrue="{!v.showMessage}">
+                                    <p style="margin-bottom: 15px;margin-bottom: 10px;"><b>Error:</b></p>
+                                    <p>{!v.message}</p>
+                                <aura:set attribute="else">
+                                    <p style="margin-bottom: 15px;"><b>{!$Label.c.XC_CL_UploadDocuments}</b></p>
+                                    <div class="borderSolid"><c:XC_LCP066_Doxee widthPar="100%" heightPar="400" recordId="{!v.orderId}"/></div>
+                                </aura:set></aura:if>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:card>
+                </lightning:layoutItem>
+            </lightning:layout>
+			
+			<lightning:layout multipleRows="false" horizontalAlign="center">
+                <lightning:layoutItem size="10" padding="around-small" class="centerLayoutItem">
+                    <lightning:card class="borderCard">
+                        <lightning:layout multipleRows="true" horizontalAlign="center">
+                            <lightning:layoutItem size="12" padding="around-small" class="centerLayoutItem">
+                                <c:XC_LCP_DocumentSignature recordId="{!v.orderId}"/>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:card>
+                </lightning:layoutItem>
+            </lightning:layout>
+
+        </lightning:card>
+    </div>
+
+</aura:component>

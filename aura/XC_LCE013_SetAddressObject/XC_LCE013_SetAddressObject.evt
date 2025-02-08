@@ -1,0 +1,18 @@
+<aura:event type="COMPONENT">
+    <aura:attribute name="address" type="Map" default="    	{    		
+                country: '',                                          
+                streetType: '', 
+                address : '', 
+                streetNumber : '', 
+                door : '',
+                postalCode : '', 
+                stair : '', 
+                floor: '',
+                city : '',
+                province : '',
+                category : '',
+                municipality: ''                                   
+                }"    />
+     <aura:attribute name="checkValue" type="List" />
+    <aura:attribute name="withoutValidate" type="Boolean" default="false" />
+</aura:event>

@@ -1,0 +1,78 @@
+<aura:component controller ="XC_LCC200_AddNewProductRequired"
+    implements="forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:hasPageReference,lightning:actionOverride,flexipage:availableForRecordHome,force:hasRecordId"
+    access="global">
+
+    <aura:attribute name="confItemCommercial" type="NE__OrderItem__c[]" />
+    <aura:attribute name="selectConfComm" type="boolean" default="false" />
+    <aura:attribute name="idSelectConfComm" type="string" default="--none--" />
+    <aura:attribute name="wbeElement" type="string" default="" />
+    <aura:attribute name="costCenter" type="string" default="" />
+    <aura:attribute name="parentRecordId" type="String" default="" />
+    <aura:attribute name="body1" type="Object[]" />
+    <aura:attribute name="isInitialized" type="Boolean" default="false" />
+    <aura:attribute access="public" name="showToastMessage" type="Boolean" />
+    <aura:attribute access="public" name="isError" type="Boolean" />
+    <aura:attribute access="public" name="toastMessage" type="String" />
+    <aura:attribute name="showAddTechnicalItems" type="Boolean" default="false" />
+
+    <ltng:require styles="{!join(',',
+                        $Resource.TA_CSS + '/TA_CSS/slds-override.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-mobile.css',
+                        $Resource.TA_CSS + '/TA_CSS/ta-classes-tablet.css')}" />
+
+    <aura:handler name="change" value="{!v.isInitialized}" action="{!c.handleIsInitializedChange}"/>
+
+    <aura:registerEvent name="toggleSpinnerEvent" type="c:TA_LCE213_StartSpinnerEvt"/>
+
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+    <c:TA_LCP236_ToastMessage showToastMessage="{!v.showToastMessage}" isError="{!v.isError}" toastMessage="{!v.toastMessage}" />
+
+    <c:TA_LCP247_AddTechnicalItems
+        isInitialized = "{!v.showAddTechnicalItems}"
+        woliRecordId = "{!v.parentRecordId}"
+        wbeElement = "{!v.wbeElement}"
+        costCenter = "{!v.costCenter}"
+        contestStartCI = "false"
+        recordId = "{!v.idSelectConfComm}"
+    />
+
+    <aura:if isTrue="{!v.isInitialized}">
+        <div class="ta-modal-bg">
+            <lightning:layout multipleRows="true" class="ta-modal-main-product-container ta-animation-pop-in">
+                <lightning:layoutItem size="12" class="ta-modal-header">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="11" class="ta-modal-header-title slds-text-align_center">
+                            Order Material <!-- TO DO CUSTOM LABEL -->
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="1" class="ta-modal-header-button">
+                            <img src="{!$Resource.TA_Icons + '/xc-icons/close-pink.svg'}" onclick="{!c.cancelDialog}" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-main-product-body">
+                    <div class="slds-form-element">
+                        <lightning:select onchange="{!c.onPicklistChange}" label="Related Commercial Item" class="customCls"> <!-- TO DO CUSTOM LABEL -->
+                            <option value="--none--">-none-</option> <!-- TO DO CUSTOM LABEL -->
+                            <aura:iteration items="{!v.confItemCommercial}" var="listView">
+                                <option value="{!listView.Id}">{!listView.Name}&nbsp;-&nbsp;{!listView.NE__ProdName__c}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                </lightning:layoutItem>
+
+                <lightning:layoutItem size="12" class="ta-modal-footer-two-button">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" class="slds-m-bottom_small">
+                            <lightning:button class="ta-button-closing-modal" label="{!$Label.c.TA_Cancel}" onclick="{!c.cancelDialog}" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12">
+                            <lightning:button class="{!if(v.selectConfComm, 'ta-button-primary-modal', 'ta-button-primary-modal-disabled')}" label="{!$Label.c.TA_Confirm}" onclick="{!c.callSaveComp}" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </aura:if>
+</aura:component>
